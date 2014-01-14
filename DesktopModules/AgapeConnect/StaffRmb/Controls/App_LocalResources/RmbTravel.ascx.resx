@@ -118,16 +118,16 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Explanation.Text" xml:space="preserve">
-    <value>... for claiming any costs of travelling on ministry business (including bus/train tickets, taxi fares, parking, hire car costs, flights, excess baggage, tolls etc).</value>
+    <value>... for claiming any costs of travelling on ministry business (including bus/train tickets, taxi fares, parking, rental car costs, flights, excess baggage, tolls etc).</value>
   </data>
   <data name="lblAmount.Help" xml:space="preserve">
     <value>Please enter the ammount of this expense (including tax).</value>
   </data>
   <data name="lblAmount.Text" xml:space="preserve">
-    <value>Rate and Amount:</value>
+    <value>Amount:</value>
   </data>
   <data name="lblDate.Help" xml:space="preserve">
-    <value>Enter the date of your journey or the date your incurred this expense. If this is a return ticket, enter the outbound date.</value>
+    <value>Enter your date of travel or the date of this expense. If this is a return ticket, enter the outbound date.</value>
   </data>
   <data name="lblDate.Text" xml:space="preserve">
     <value>Date:</value>
@@ -157,13 +157,13 @@
     <value>Flight</value>
   </data>
   <data name="HireCar.Text" xml:space="preserve">
-    <value>HireCar</value>
+    <value>Rental Car</value>
   </data>
   <data name="lblNormal.Text" xml:space="preserve">
     <value>Did you use this ticket to travel to/from your normal place of work?</value>
   </data>
   <data name="lblTravelcard.Text" xml:space="preserve">
-    <value>Did you use this travelcard for any non business/ministry related journeys?</value>
+    <value>Did you use this travelcard for any non business/ministry related travel?</value>
   </data>
   <data name="lblType.Help" xml:space="preserve">
     <value>Please enter the type of travel that best describes this expense</value>
@@ -193,7 +193,7 @@
     <value>Yes</value>
   </data>
   <data name="Reverse.Error" xml:space="preserve">
-    <value>You cannot enter zero or negative miles (even if you drove in reverse!).</value>
+    <value>You cannot enter zero or a negative distance.</value>
   </data>
   <data name="Amount.Error" xml:space="preserve">
     <value>Invalid Amount...</value>
