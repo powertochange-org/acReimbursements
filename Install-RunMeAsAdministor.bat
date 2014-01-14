@@ -2,14 +2,14 @@
 @echo off
 :NOWINDIR
 set /p UserInputPath= Enter the location of your DNN installation (eg. c:\DNN\):
-@set var=%UserInputPath%
+@set var="%UserInputPath%"
 
 
-IF Not %var:~-1%==\ set var=%var%\
- IF NOT EXIST %var% ( 
-	echo Path does now exist. Please try again.
- GOTO NOWINDIR
- )
+REM IF Not %var:~-1%==\ set var=%var%\
+ REM IF NOT EXIST %var% ( 
+	REM echo Path does now exist. Please try again.
+ REM GOTO NOWINDIR
+ REM )
  
  echo %var%
  echo setting up symbolic links...

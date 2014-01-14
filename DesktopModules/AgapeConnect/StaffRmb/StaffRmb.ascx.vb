@@ -141,18 +141,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
 
                 End If
-				
+
+
+
                 Dim q = From c In ds.AP_StaffBroker_Staffs Where (c.UserId1 = UserId Or c.UserId2 = UserId) And (Not PayOnly) And c.CostCenter.Trim().Length > 0 And c.PortalId = PortalId Select DisplayName = (c.DisplayName & "(" & c.CostCenter & ")"), c.CostCenter, ViewOrder = 1
-				''q = q.Union(From c In ds.AP_StaffBroker_Departments Where c.CanRmb = True And c.CostCentre.Length > 0 And c.PortalId = PortalId Select DisplayName = (c.Name & "(" & c.CostCentre & ")"), CostCenter = c.CostCentre, ViewOrder = 2)
-				Dim uinfo As DotNetNuke.Entities.Users.UserInfo = DotNetNuke.Entities.Users.UserController.GetCurrentUserInfo() 
-				Dim i = 2
-				For Each min As String In Split(uinfo.Profile.GetPropertyValue("Ministry"))
-					IF NOT (min = "")
-						q = q.Union(From c In ds.AP_StaffBroker_Departments Where c.CanRmb = True And c.CostCentre.Length > 0 And c.PortalId = PortalId AND c.Name.Substring(0, 3) = min Select DisplayName = (c.Name & "(" & c.CostCentre & ")"), CostCenter = c.CostCentre, ViewOrder = i)
-						i += 1
-					END IF
-				Next
-				
+                q = q.Union(From c In ds.AP_StaffBroker_Departments Where c.CanRmb = True And c.CostCentre.Length > 0 And c.PortalId = PortalId Select DisplayName = (c.Name & "(" & c.CostCentre & ")"), CostCenter = c.CostCentre, ViewOrder = 2)
+
                 ddlNewChargeTo.DataSource = From c In q Order By c.ViewOrder, c.DisplayName
                 ddlNewChargeTo.DataTextField = "DisplayName"
                 ddlNewChargeTo.DataValueField = "CostCenter"
@@ -162,7 +156,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 ddlChargeTo.DataTextField = "DisplayName"
                 ddlChargeTo.DataValueField = "CostCenter"
                 ddlChargeTo.DataBind()
-  
+
+
                 GridView1.Columns(0).HeaderText = Translate("TransDate")
                 GridView1.Columns(1).HeaderText = Translate("LineType")
                 GridView1.Columns(2).HeaderText = Translate("Comment")
@@ -2300,7 +2295,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             ddlCostcenter.SelectedValue = ddlChargeTo.SelectedValue
 
             ddlLineTypes.Items.Clear()
-            Dim lineTypes = From c In d.AP_StaffRmb_PortalLineTypes Where c.PortalId = PortalId Order By c.LocalName Select c.AP_Staff_RmbLineType.LineTypeId, c.LocalName, c.PCode, c.DCode
+            Dim lineTypes = From c In d.AP_StaffRmb_PortalLineTypes Where c.PortalId = PortalId Order By c.ViewOrder Select c.AP_Staff_RmbLineType.LineTypeId, c.LocalName, c.PCode, c.DCode
 
             If StaffBrokerFunctions.IsDept(PortalId, ddlChargeTo.SelectedValue) Then
                 lineTypes = lineTypes.Where(Function(x) x.DCode <> "")
