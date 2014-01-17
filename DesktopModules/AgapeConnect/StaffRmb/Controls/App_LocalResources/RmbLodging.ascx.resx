@@ -118,25 +118,31 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Explanation.Text" xml:space="preserve">
-    <value>... for claiming expenses for accommodation while traveling.</value>
+    <value>...for claiming expenses for accommodation while traveling</value>
   </data>
   <data name="lblAmount.Help" xml:space="preserve">
-    <value>Please enter the number of people, and the length of stay.</value>
+    <value>Please enter the amount of this expense (including tax).</value>
   </data>
   <data name="lblAmount.Text" xml:space="preserve">
-    <value>Rate and Amount:</value>
+    <value>Amount:</value>
   </data>
   <data name="lblDate.Help" xml:space="preserve">
-    <value>Enter the date of the start of your stay.</value>
+    <value>Enter the date of this expense.</value>
   </data>
   <data name="lblDate.Text" xml:space="preserve">
     <value>Date:</value>
   </data>
   <data name="lblDesc.Help" xml:space="preserve">
-    <value>Please enter a brief description of the accommodations.</value>
+    <value>Please enter a brief description where you stayed and for how long.</value>
   </data>
   <data name="lblDesc.Text" xml:space="preserve">
     <value>Description:</value>
+  </data>
+  <data name="lblReceipt.Help" xml:space="preserve">
+    <value>Enter the type of receipt you will be sending.  If the expense is less than [LIMIT] a receipt is not required.</value>
+  </data>
+  <data name="lblReceipt.Text" xml:space="preserve">
+    <value>Receipt Type:</value>
   </data>
   <data name="NoReceipt.Text" xml:space="preserve">
     <value>No Receipt (under [LIMIT])</value>
@@ -147,26 +153,12 @@
   <data name="VAT.Text" xml:space="preserve">
     <value>VAT Receipt</value>
   </data>
-  <data name="AmountClaimed.Text" xml:space="preserve">
-    <value>AmountClaimed:</value>
-  </data>
-  <data name="Max.Text" xml:space="preserve">
-    <value>Max:</value>
-  </data>
-  <data name="NoOfDays.Text" xml:space="preserve">
-    <value>No. of Days:</value>
-  </data>
-  <data name="NoOfPeople.Text" xml:space="preserve">
-    <value>No. of People:</value>
-  </data>
-  <data name="Type.Text" xml:space="preserve">
-    <value>Type:</value>
-  </data>
-  <data name="Limit.Error" xml:space="preserve">
-    <value>*The amount that you entered exceeds the limit.</value>
-  </data>
   <data name="Amount.Error" xml:space="preserve">
     <value>Invalid Amount...</value>
+    <comment>Error</comment>
+  </data>
+  <data name="AmountRec.Error" xml:space="preserve">
+    <value>Expenses over [LIMIT] must have a receipt</value>
     <comment>Error</comment>
   </data>
   <data name="Date.Error" xml:space="preserve">
@@ -180,5 +172,8 @@
   <data name="OldDate.Error" xml:space="preserve">
     <value>Transaction date must be in the past!</value>
     <comment>Error</comment>
+  </data>
+  <data name="Electronic.Text" xml:space="preserve">
+    <value>Electronic Receipt</value>
   </data>
 </root>
