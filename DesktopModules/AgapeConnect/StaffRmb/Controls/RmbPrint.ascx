@@ -4,8 +4,7 @@
 <%@ Register src="Currency.ascx" tagname="Currency" tagprefix="uc1" %>
 
 <div class="Agape_SubTitle"> <asp:HiddenField ID="hfNoReceiptLimit" runat="server" Value="0" /> 
-    
-    ... for claiming expenses like photocopying, pens, printer cartridges, paper etc.
+ <asp:Label ID="Label5" runat="server" Font-Italic="true" ForeColor="Gray" resourcekey="Explanation"></asp:Label>
 </div><br />
 
 <table  style="font-size:9pt; ">
