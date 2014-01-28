@@ -119,17 +119,44 @@ namespace StaffRmb
             result.isDept = false;
             result.UserIds = new List<DotNetNuke.Entities.Users.UserInfo>();
 
-            // get approvers for this amount and this account from webservice
-            StaffBroker.AP_StaffBroker_Staff staff = StaffBrokerFunctions.GetStaffMember(rmb.UserId);
-            String account = rmb.CostCenter;
-            Decimal amount = (from line in rmb.AP_Staff_RmbLines select line.GrossAmount).Sum();
-            byte[] postData = Encoding.UTF8.GetBytes(string.Format("account={0}&amount={1}", account, amount));
-            WebRequest request = WebRequest.Create("https://staffapps.powertochange.org/AuthManager/webservice/getapprovers");
+            string[] potential_approvers = null;
+            if (isStaffAccount(rmb.CostCenter))
+            {
+                potential_approvers = managersInDepartment(staff_logon);
+            }
+            else //ministry account
+            {
+                Decimal amount = (from line in rmb.AP_Staff_RmbLines select line.GrossAmount).Sum();
+                potential_approvers = staffWithSigningAuthority(rmb.CostCenter, amount);
+            }
+
+            foreach (String potential_approver in potential_approvers) {
+                if (! (potential_approver.Equals(staff_logon) || potential_approver.Equals(spouse_logon))) { //exclude rmb creator and spouse
+                    result.UserIds.Add(UserController.GetUserByName(rmb.PortalId, potential_approver+rmb.PortalId.ToString()));
+                }
+            }
+            return result;
+        }
+
+        static private bool isStaffAccount(string account)
+        // Returns true if account# starts with an 8 or a 9
+        {
+            if (account.Length != 6) return false; //must be 6 characters long
+            if (Regex.Replace(account, @"[\d-]", string.Empty).Length != 0) return false; //must all be digits
+            if (account.Substring(0, 1).Equals("8") || account.Substring(0, 1).Equals("9")) return true; //must begin with 8 or 9
+            return false;
+        }
+
+        static private string[] managersInDepartment(string logon)
+        // Returns a list of staff who supervise other staff in the same department.
+        {
+            byte[] postData = Encoding.UTF8.GetBytes(string.Format("logon={0}", logon));
+            WebRequest request = WebRequest.Create("https://staffapps.powertochange.org/AuthManager/webservice/get_department_supervisors");
             request.Method = "POST";
             request.ContentType = "application/x-www-form-urlencoded";
             request.ContentLength = postData.Length;
             Stream dataStream = request.GetRequestStream();
-            dataStream.Write(postData,0,postData.Length);
+            dataStream.Write(postData, 0, postData.Length);
             dataStream.Close();
 
             WebResponse response = request.GetResponse();
@@ -140,14 +167,31 @@ namespace StaffRmb
             dataStream.Close();
             response.Close();
 
-            string[] potential_approvers = JsonConvert.DeserializeObject<string[]>(response_string);
+            return JsonConvert.DeserializeObject<string[]>(response_string);
+        }
 
-            foreach (String potential_approver in potential_approvers) {
-                if (! (potential_approver.Equals(staff_logon) || potential_approver.Equals(spouse_logon))) { //exclude rmb creator and spouse
-                    result.UserIds.Add(UserController.GetUserByName(rmb.PortalId, potential_approver+rmb.PortalId.ToString()));
-                }
-            }
-            return result;
+        static private string[] staffWithSigningAuthority(string account, Decimal amount)
+        // Returns a list of staff with signing authority for a certain amount or greater on a given account
+        {
+            byte[] postData = Encoding.UTF8.GetBytes(string.Format("account={0}&amount={1}", account, amount));
+            WebRequest request = WebRequest.Create("https://staffapps.powertochange.org/AuthManager/webservice/get_signatories");
+            request.Method = "POST";
+            request.ContentType = "application/x-www-form-urlencoded";
+            request.ContentLength = postData.Length;
+            Stream dataStream = request.GetRequestStream();
+            dataStream.Write(postData, 0, postData.Length);
+            dataStream.Close();
+
+            WebResponse response = request.GetResponse();
+            dataStream = response.GetResponseStream();
+            StreamReader reader = new StreamReader(dataStream);
+            String response_string = reader.ReadToEnd();
+            reader.Close();
+            dataStream.Close();
+            response.Close();
+
+            return JsonConvert.DeserializeObject<string[]>(response_string);
+
         }
 
 
