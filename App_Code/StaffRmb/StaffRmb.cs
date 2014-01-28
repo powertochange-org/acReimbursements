@@ -1,7 +1,15 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Web;
+using System.Text.RegularExpressions;
+using System.Web.Services;
+using System.Web.Services.Protocols;
+using DotNetNuke.Entities.Users;
+using System.Text;
 
 /// <summary>
 /// Summary description for StaffRmb
@@ -95,85 +103,132 @@ namespace StaffRmb
         }
 
 
-
         static public Approvers getApprovers(AP_Staff_Rmb rmb, DotNetNuke.Entities.Users.UserInfo authUser, DotNetNuke.Entities.Users.UserInfo authAuthUser)
         {
-            StaffBroker.StaffBrokerDataContext dStaff = new StaffBroker.StaffBrokerDataContext();
-            Approvers rtn = new Approvers();
+            Regex stripPortal = new Regex(rmb.PortalId.ToString() + "$");
+            String staff_logon = stripPortal.Replace(UserController.GetUserById(rmb.PortalId, rmb.UserId).Username, "") ;
+            String spouse_logon = "";
+            int spouse_id = StaffBrokerFunctions.GetSpouseId(rmb.UserId);
+            if (spouse_id >= 0)
+                spouse_logon = stripPortal.Replace(UserController.GetUserById(rmb.PortalId, spouse_id).Username, "");
+            // initialize the response
+            Approvers result = new Approvers();
+            result.CCMSpecial = false;
+            result.SpouseSpecial = false;
+            result.AmountSpecial = false;
+            result.isDept = false;
+            result.UserIds = new List<DotNetNuke.Entities.Users.UserInfo>();
 
-            var st = StaffBrokerFunctions.GetStaffMember(rmb.UserId);
-            rtn.Name = st.DisplayName;
-            int SpouseId = StaffBrokerFunctions.GetSpouseId(rmb.UserId);
-            rtn.AmountSpecial = (from c in rmb.AP_Staff_RmbLines where c.LargeTransaction == true select c).Count() > 0;
-            rtn.isDept = (rmb.CostCenter != st.CostCenter);
-            rtn.SpouseSpecial = false;
-            rtn.UserIds = new List<DotNetNuke.Entities.Users.UserInfo>();
-            if (rtn.isDept)
-            {
-                var cc = from c in dStaff.AP_StaffBroker_Departments where (c.CostCentre == rmb.CostCenter) && c.PortalId == rmb.PortalId select c;
-                rtn.CCMSpecial = (from c in cc
-                                  where ((c.CostCentreManager == null && c.CostCentreDelegate == null) == false) &&
-                                      (
-                                      ((c.CostCentreManager != rmb.UserId) && (c.CostCentreManager != SpouseId)) ||
-                                      ((c.CostCentreDelegate != rmb.UserId) && (c.CostCentreDelegate != SpouseId))
+            // get approvers for this amount and this account from webservice
+            StaffBroker.AP_StaffBroker_Staff staff = StaffBrokerFunctions.GetStaffMember(rmb.UserId);
+            String account = rmb.CostCenter;
+            Decimal amount = (from line in rmb.AP_Staff_RmbLines select line.GrossAmount).Sum();
+            byte[] postData = Encoding.UTF8.GetBytes(string.Format("account={0}&amount={1}", account, amount));
+            WebRequest request = WebRequest.Create("https://staffapps.powertochange.org/AuthManager/webservice/getapprovers");
+            request.Method = "POST";
+            request.ContentType = "application/x-www-form-urlencoded";
+            request.ContentLength = postData.Length;
+            Stream dataStream = request.GetRequestStream();
+            dataStream.Write(postData,0,postData.Length);
+            dataStream.Close();
 
-                                      )
-                                  select c.CostCenterId).Count() == 0;
+            WebResponse response = request.GetResponse();
+            dataStream = response.GetResponseStream();
+            StreamReader reader = new StreamReader(dataStream);
+            String response_string = reader.ReadToEnd();
+            reader.Close();
+            dataStream.Close();
+            response.Close();
 
-                if (rtn.CCMSpecial || rtn.AmountSpecial || rtn.SpouseSpecial)
-                {
-                    rtn.UserIds.Add(authUser.UserID == rmb.UserId ? authAuthUser : authUser);
+            string[] potential_approvers = JsonConvert.DeserializeObject<string[]>(response_string);
 
-                    if (cc.First().CostCentreManager == rtn.UserIds.First().UserID || cc.First().CostCentreDelegate == rtn.UserIds.First().UserID)
-                    {
-                        rtn.AmountSpecial = false;
-                        rtn.CCMSpecial = false;
-                    }
-
-                   
+            foreach (String potential_approver in potential_approvers) {
+                if (! (potential_approver.Equals(staff_logon) || potential_approver.Equals(spouse_logon))) { //exclude rmb creator and spouse
+                    result.UserIds.Add(UserController.GetUserByName(rmb.PortalId, potential_approver+rmb.PortalId.ToString()));
                 }
-                else
-                {
-
-                    if (cc.First().CostCentreManager != rmb.UserId && cc.First().CostCentreManager != SpouseId && cc.First().CostCentreManager != null)
-                        rtn.UserIds.Add(DotNetNuke.Entities.Users.UserController.GetUserById(rmb.PortalId, (int)cc.First().CostCentreManager));
-                    if (cc.First().CostCentreDelegate != rmb.UserId && cc.First().CostCentreDelegate != SpouseId && cc.First().CostCentreDelegate != null)
-                        rtn.UserIds.Add(DotNetNuke.Entities.Users.UserController.GetUserById(rmb.PortalId, (int)cc.First().CostCentreDelegate));
-
-                }
-                if (cc.Count() > 0)
-                    rtn.Name = cc.First().Name;
-
             }
-            else
-            {
-                rtn.CCMSpecial = false;
-                var app2 = StaffBrokerFunctions.GetLeaders(rmb.UserId, true);
-                rtn.SpouseSpecial = (app2.Count() == 1 && ((app2.First() == SpouseId) || (app2.First() == rmb.UserId)));
-                if (rtn.AmountSpecial || rtn.SpouseSpecial || app2.Count() == 0)
-                {
-                    rtn.UserIds.Add(authUser.UserID == rmb.UserId ? authAuthUser : authUser);
-                   
-                    if (app2.Contains(rtn.UserIds.First().UserID))
-                    {
-                        rtn.AmountSpecial = false;
-                    }
-                }
-                else
-                {
-                    foreach (int i in (from c in app2 where c != rmb.UserId && c != SpouseId select c))
-                        rtn.UserIds.Add(DotNetNuke.Entities.Users.UserController.GetUserById(rmb.PortalId, i));
-                }
-
-            }
-
-            if(rtn.UserIds.Count()==0)
-                rtn.UserIds.Add(authUser.UserID == rmb.UserId ? authAuthUser : authUser);
-
-
-
-            return rtn;
+            return result;
         }
+
+
+        //static public Approvers getApprovers(AP_Staff_Rmb rmb, DotNetNuke.Entities.Users.UserInfo authUser, DotNetNuke.Entities.Users.UserInfo authAuthUser)
+        //{
+        //    StaffBroker.StaffBrokerDataContext dStaff = new StaffBroker.StaffBrokerDataContext();
+        //    Approvers rtn = new Approvers();
+
+        //    var st = StaffBrokerFunctions.GetStaffMember(rmb.UserId);
+        //    rtn.Name = st.DisplayName;
+        //    int SpouseId = StaffBrokerFunctions.GetSpouseId(rmb.UserId);
+        //    rtn.AmountSpecial = (from c in rmb.AP_Staff_RmbLines where c.LargeTransaction == true select c).Count() > 0;
+        //    rtn.isDept = (rmb.CostCenter != st.CostCenter);
+        //    rtn.SpouseSpecial = false;
+        //    rtn.UserIds = new List<DotNetNuke.Entities.Users.UserInfo>();
+        //    if (rtn.isDept)
+        //    {
+        //        var cc = from c in dStaff.AP_StaffBroker_Departments where (c.CostCentre == rmb.CostCenter) && c.PortalId == rmb.PortalId select c;
+        //        rtn.CCMSpecial = (from c in cc
+        //                          where ((c.CostCentreManager == null && c.CostCentreDelegate == null) == false) &&
+        //                              (
+        //                              ((c.CostCentreManager != rmb.UserId) && (c.CostCentreManager != SpouseId)) ||
+        //                              ((c.CostCentreDelegate != rmb.UserId) && (c.CostCentreDelegate != SpouseId))
+
+        //                              )
+        //                          select c.CostCenterId).Count() == 0;
+
+        //        if (rtn.CCMSpecial || rtn.AmountSpecial || rtn.SpouseSpecial)
+        //        {
+        //            rtn.UserIds.Add(authUser.UserID == rmb.UserId ? authAuthUser : authUser);
+
+        //            if (cc.First().CostCentreManager == rtn.UserIds.First().UserID || cc.First().CostCentreDelegate == rtn.UserIds.First().UserID)
+        //            {
+        //                rtn.AmountSpecial = false;
+        //                rtn.CCMSpecial = false;
+        //            }
+
+                   
+        //        }
+        //        else
+        //        {
+
+        //            if (cc.First().CostCentreManager != rmb.UserId && cc.First().CostCentreManager != SpouseId && cc.First().CostCentreManager != null)
+        //                rtn.UserIds.Add(DotNetNuke.Entities.Users.UserController.GetUserById(rmb.PortalId, (int)cc.First().CostCentreManager));
+        //            if (cc.First().CostCentreDelegate != rmb.UserId && cc.First().CostCentreDelegate != SpouseId && cc.First().CostCentreDelegate != null)
+        //                rtn.UserIds.Add(DotNetNuke.Entities.Users.UserController.GetUserById(rmb.PortalId, (int)cc.First().CostCentreDelegate));
+
+        //        }
+        //        if (cc.Count() > 0)
+        //            rtn.Name = cc.First().Name;
+
+        //    }
+        //    else
+        //    {
+        //        rtn.CCMSpecial = false;
+        //        var app2 = StaffBrokerFunctions.GetLeaders(rmb.UserId, true);
+        //        rtn.SpouseSpecial = (app2.Count() == 1 && ((app2.First() == SpouseId) || (app2.First() == rmb.UserId)));
+        //        if (rtn.AmountSpecial || rtn.SpouseSpecial || app2.Count() == 0)
+        //        {
+        //            rtn.UserIds.Add(authUser.UserID == rmb.UserId ? authAuthUser : authUser);
+                   
+        //            if (app2.Contains(rtn.UserIds.First().UserID))
+        //            {
+        //                rtn.AmountSpecial = false;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            foreach (int i in (from c in app2 where c != rmb.UserId && c != SpouseId select c))
+        //                rtn.UserIds.Add(DotNetNuke.Entities.Users.UserController.GetUserById(rmb.PortalId, i));
+        //        }
+
+        //    }
+
+        //    if(rtn.UserIds.Count()==0)
+        //        rtn.UserIds.Add(authUser.UserID == rmb.UserId ? authAuthUser : authUser);
+
+
+
+        //    return rtn;
+        //}
 
         static public Approvers getAdvApprovers(AP_Staff_AdvanceRequest  adv, double LargeTransaction, DotNetNuke.Entities.Users.UserInfo authUser, DotNetNuke.Entities.Users.UserInfo authAuthUser)
         {

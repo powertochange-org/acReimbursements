@@ -27,8 +27,9 @@
     <tr>
         <td>
             <b>
-                <dnn:Label ID="lblDistance" runat="server" ControlName="tbMiles"   />
+                <dnn:Label ID="lblAmount" runat="server" ControlName="tbMiles"   />
             </b>
+
         </td>
         <td>
             <asp:TextBox ID="tbMiles" runat="server" Width="90px" class="numeric"></asp:TextBox>
