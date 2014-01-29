@@ -4131,8 +4131,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             d.SubmitChanges()
 
             'Send Confirmation
-            'Dim Auth = UserController.GetUserById(PortalId, Settings("AuthUser"))
-            'Dim AuthAuth = UserController.GetUserById(PortalId, Settings("AuthAuthUser"))
+            Dim Auth = UserController.GetUserById(PortalId, Settings("AuthUser"))
+            Dim AuthAuth = UserController.GetUserById(PortalId, Settings("AuthAuthUser"))
 
             Dim myApprovers = StaffRmbFunctions.getAdvApprovers(insert, Settings("TeamLeaderLimit"), Nothing, Nothing)
             'Dim ConfMessage As String = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("AdvConfirmation", PortalId))
@@ -4155,7 +4155,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 'message2 = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("AdvLargeTransaction", PortalId))
                 message2 = StaffBrokerFunctions.GetTemplate("AdvLargeTransaction", PortalId)
             End If
-            Dim approver = UserController.GetUserById(insert.PortalId, insert.ApprUserId)
+            Dim approver = UserController.GetUserById(insert.PortalId, insert.ApproverId)
             Dim toEmail = approver.Email
             Dim toName = approver.FirstName
             Dim Approvers = approver.DisplayName
