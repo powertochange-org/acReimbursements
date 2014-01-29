@@ -122,6 +122,7 @@ namespace StaffRmb
             }
             else //ministry account
             {
+                result.isDept = true;
                 Decimal amount = (from line in rmb.AP_Staff_RmbLines select line.GrossAmount).Sum();
                 potential_approvers = staffWithSigningAuthority(rmb.CostCenter, amount);
             }

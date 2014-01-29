@@ -743,148 +743,110 @@
                                 </asp:Panel>
                             </a>
 
+                            <h3></h3>
+                            <div id="SubmittedPane">
+                                <asp:UpdatePanel ID="UpdatePanel4" runat="server">
+                                    <ContentTemplate>
+                                        <asp:TreeView ID="tvAllSubmitted" runat="server" NodeIndent="10">
+                                        </asp:TreeView>
+                                        <asp:Panel ID="pnlSubmittedView" runat="server">
+                                            <asp:Label ID="Label10" runat="server" class="Agape_SubTitle" ResourceKey="RmbsToApprove" Style="font-size: 8pt;"></asp:Label>
+                                            <br />
+                                            <asp:DataList ID="dlToApprove" runat="server" Width="100%">
+                                                <ItemStyle CssClass="dnnGridItem" />
+                                                <AlternatingItemStyle CssClass="dnnGridAltItem" />
+                                                <ItemTemplate>
+                                                    <table width="100%">
+                                                        <tr valign="middle">
+                                                            <td>
+                                                                <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
+                                                            </td>
+                                                            <td align="left" width="100%">
+                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Bold="true" Font-Size="9pt" Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>' Visible='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>' Visible='<%# Not IsSelected(Eval("RmbNo"))  %>' Width="100%"></asp:LinkButton>
+                                                            </td>
+                                                            <td>
+                                                                <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsSelected(Eval("RmbNo")) %>' />
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </ItemTemplate>
+                                            </asp:DataList>
+                                            <asp:DataList ID="dlAdvToApprove" runat="server" Width="100%">
+                                                <ItemStyle CssClass="dnnGridItem" />
+                                                <AlternatingItemStyle CssClass="dnnGridAltItem" />
+                                                <ItemTemplate>
+                                                    <table width="100%">
+                                                        <tr valign="middle">
+                                                            <td>
+                                                                <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
+                                                            </td>
+                                                            <td align="left" width="100%">
+                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Bold="true" Font-Size="9pt" Text='<%# GetAdvTitleTeam(Eval("LocalAdvanceId"), Eval("UserId"), Eval("RequestDate"))  %>' Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' Width="100%"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Size="10pt" Text='<%# GetAdvTitleTeam(Eval("LocalAdvanceId"),Eval("UserId"),  Eval("RequestDate"))  %>' Visible='<%# Not IsAdvSelected(Eval("AdvanceId"))  %>' Width="100%"></asp:LinkButton>
+                                                            </td>
+                                                            <td>
+                                                                <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' />
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </ItemTemplate>
+                                            </asp:DataList>
+                                            <div style="width: 100%; border-bottom: dashed 1px black;">
+                                                &nbsp;
+                                            </div>
+                                            <asp:Label ID="Label11" runat="server" class="Agape_SubTitle" ResourceKey="YourRmbs" Style="font-size: 8pt;"></asp:Label>
+                                            <br />
+                                            <asp:DataList ID="dlSubmitted" runat="server" Width="100%">
+                                                <ItemStyle CssClass="dnnGridItem" />
+                                                <AlternatingItemStyle CssClass="dnnGridAltItem" />
+                                                <ItemTemplate>
+                                                    <table width="100%">
+                                                        <tr valign="middle">
+                                                            <td>
+                                                                <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
+                                                            </td>
+                                                            <td align="left" width="100%">
+                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Bold="true" Font-Size="9pt" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' Visible='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' Visible='<%# Not IsSelected(Eval("RmbNo"))  %>' Width="100%"></asp:LinkButton>
+                                                            </td>
+                                                            <td>
+                                                                <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsSelected(Eval("RmbNo")) %>' />
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </ItemTemplate>
+                                            </asp:DataList>
+                                            <asp:DataList ID="dlAdvSubmitted" runat="server" Width="100%">
+                                                <ItemTemplate>
+                                                    <table width="100%">
+                                                        <tr valign="middle">
+                                                            <td>
+                                                                <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
+                                                            </td>
+                                                            <td align="left" width="100%">
+                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Bold="true" Font-Size="9pt" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>' Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' Width="100%"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Size="10pt" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>' Visible='<%# Not IsAdvSelected(Eval("AdvanceId"))  %>' Width="100%"></asp:LinkButton>
+                                                            </td>
+                                                            <td>
+                                                                <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' />
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </ItemTemplate>
+                                            </asp:DataList>
+                                        </asp:Panel>
+                                    </ContentTemplate>
+                                    <Triggers>
+                                        <asp:PostBackTrigger ControlID="dlToApprove" />
+                                        <asp:PostBackTrigger ControlID="dlSubmitted" />
+                                        <asp:PostBackTrigger ControlID="dlAdvSubmitted" />
+                                        <asp:PostBackTrigger ControlID="dlAdvToApprove" />
+                                    </Triggers>
+                                </asp:UpdatePanel>
+                            </div>
+
                         </h3>
-                        <div id="SubmittedPane">
-                            <asp:UpdatePanel ID="UpdatePanel4" runat="server">
-                                <ContentTemplate>
-                                    <asp:TreeView ID="tvAllSubmitted" runat="server" NodeIndent="10">
-                                    </asp:TreeView>
-                                    <asp:Panel ID="pnlSubmittedView" runat="server">
-                                        <asp:Label ID="Label10" runat="server" class="Agape_SubTitle"
-                                            ResourceKey="RmbsToApprove" Style="font-size: 8pt;"></asp:Label>
-                                        <br />
-                                        <asp:DataList ID="dlToApprove" runat="server" Width="100%">
-                                            <ItemStyle CssClass="dnnGridItem" />
-                                            <AlternatingItemStyle CssClass="dnnGridAltItem" />
-                                            <ItemTemplate>
-                                                <table width="100%">
-                                                    <tr valign="middle">
-                                                        <td>
-                                                            <asp:Image ID="Image2" runat="server"
-                                                                ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
-                                                        </td>
-                                                        <td align="left" width="100%">
-                                                            <asp:LinkButton ID="LinkButton3" runat="server"
-                                                                CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Bold="true"
-                                                                Font-Size="9pt"
-                                                                Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>'
-                                                                Visible='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
-                                                            <asp:LinkButton ID="LinkButton2" runat="server"
-                                                                CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt"
-                                                                Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>'
-                                                                Visible='<%# Not IsSelected(Eval("RmbNo"))  %>' Width="100%"></asp:LinkButton>
-                                                        </td>
-                                                        <td>
-                                                            <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif"
-                                                                Visible='<%# IsSelected(Eval("RmbNo")) %>' />
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </ItemTemplate>
-                                        </asp:DataList>
-                                        <asp:DataList ID="dlAdvToApprove" runat="server" Width="100%">
-                                            <ItemStyle CssClass="dnnGridItem" />
-                                            <AlternatingItemStyle CssClass="dnnGridAltItem" />
-                                            <ItemTemplate>
-                                                <table width="100%">
-                                                    <tr valign="middle">
-                                                        <td>
-                                                            <asp:Image ID="Image2" runat="server"
-                                                                ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
-                                                        </td>
-                                                        <td align="left" width="100%">
-                                                            <asp:LinkButton ID="LinkButton3" runat="server"
-                                                                CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance"
-                                                                Font-Bold="true" Font-Size="9pt"
-                                                                Text='<%# GetAdvTitleTeam(Eval("LocalAdvanceId"), Eval("UserId"), Eval("RequestDate"))  %>'
-                                                                Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' Width="100%"></asp:LinkButton>
-                                                            <asp:LinkButton ID="LinkButton2" runat="server"
-                                                                CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance"
-                                                                Font-Size="10pt"
-                                                                Text='<%# GetAdvTitleTeam(Eval("LocalAdvanceId"),Eval("UserId"),  Eval("RequestDate"))  %>'
-                                                                Visible='<%# Not IsAdvSelected(Eval("AdvanceId"))  %>' Width="100%"></asp:LinkButton>
-                                                        </td>
-                                                        <td>
-                                                            <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif"
-                                                                Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' />
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </ItemTemplate>
-                                        </asp:DataList>
-                                        <div style="width: 100%; border-bottom: dashed 1px black;">
-                                            &nbsp;
-                                        </div>
-                                        <asp:Label ID="Label11" runat="server" class="Agape_SubTitle"
-                                            ResourceKey="YourRmbs" Style="font-size: 8pt;"></asp:Label>
-                                        <br />
-                                        <asp:DataList ID="dlSubmitted" runat="server" Width="100%">
-                                            <ItemStyle CssClass="dnnGridItem" />
-                                            <AlternatingItemStyle CssClass="dnnGridAltItem" />
-                                            <ItemTemplate>
-                                                <table width="100%">
-                                                    <tr valign="middle">
-                                                        <td>
-                                                            <asp:Image ID="Image2" runat="server"
-                                                                ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
-                                                        </td>
-                                                        <td align="left" width="100%">
-                                                            <asp:LinkButton ID="LinkButton3" runat="server"
-                                                                CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Bold="true"
-                                                                Font-Size="9pt"
-                                                                Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>'
-                                                                Visible='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
-                                                            <asp:LinkButton ID="LinkButton2" runat="server"
-                                                                CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt"
-                                                                Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>'
-                                                                Visible='<%# Not IsSelected(Eval("RmbNo"))  %>' Width="100%"></asp:LinkButton>
-                                                        </td>
-                                                        <td>
-                                                            <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif"
-                                                                Visible='<%# IsSelected(Eval("RmbNo")) %>' />
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </ItemTemplate>
-                                        </asp:DataList>
-                                        <asp:DataList ID="dlAdvSubmitted" runat="server" Width="100%">
-                                            <ItemTemplate>
-                                                <table width="100%">
-                                                    <tr valign="middle">
-                                                        <td>
-                                                            <asp:Image ID="Image2" runat="server"
-                                                                ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
-                                                        </td>
-                                                        <td align="left" width="100%">
-                                                            <asp:LinkButton ID="LinkButton3" runat="server"
-                                                                CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance"
-                                                                Font-Bold="true" Font-Size="9pt"
-                                                                Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>'
-                                                                Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' Width="100%"></asp:LinkButton>
-                                                            <asp:LinkButton ID="LinkButton2" runat="server"
-                                                                CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance"
-                                                                Font-Size="10pt"
-                                                                Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>'
-                                                                Visible='<%# Not IsAdvSelected(Eval("AdvanceId"))  %>' Width="100%"></asp:LinkButton>
-                                                        </td>
-                                                        <td>
-                                                            <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif"
-                                                                Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' />
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </ItemTemplate>
-                                        </asp:DataList>
-                                    </asp:Panel>
-                                </ContentTemplate>
-                                <Triggers>
-                                    <asp:PostBackTrigger ControlID="dlToApprove" />
-                                    <asp:PostBackTrigger ControlID="dlSubmitted" />
-                                    <asp:PostBackTrigger ControlID="dlAdvSubmitted" />
-                                    <asp:PostBackTrigger ControlID="dlAdvToApprove" />
-                                </Triggers>
-                            </asp:UpdatePanel>
-                        </div>
 
 
                     </div>
@@ -899,320 +861,229 @@
                                 </asp:Panel>
                             </a>
 
-                        </h3>
-                        <div id="ApprovedPane">
-                            <asp:UpdatePanel ID="UpdatePanel6" runat="server">
-                                <ContentTemplate>
-                                    <asp:Panel ID="pnlApprovedAcc" runat="server">
-                                        <asp:Label ID="Label12" runat="server" class="Agape_SubTitle"
-                                            ResourceKey="Receipts"
-                                            Style="font-size: 8pt; color: Gray; font-style: italic;"></asp:Label>
-                                        <br />
-                                        <asp:DataList ID="dlReceipts" runat="server" Width="100%">
-                                            <ItemStyle CssClass="dnnGridItem" />
-                                            <AlternatingItemStyle CssClass="dnnGridAltItem" />
-                                            <ItemTemplate>
-                                                <table width="100%">
-                                                    <tr valign="middle">
-                                                        <td>
-                                                            <asp:Image ID="Image2" runat="server"
-                                                                ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
-                                                        </td>
-                                                        <td align="left" width="100%">
-                                                            <asp:LinkButton ID="LinkButton3" runat="server"
-                                                                CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Bold="true"
-                                                                Font-Size="9pt"
-                                                                Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>'
-                                                                Visible='<%# IsSelected(Eval("RmbNo")) %>'></asp:LinkButton>
-                                                            <asp:LinkButton ID="LinkButton2" runat="server"
-                                                                CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt"
-                                                                Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>'
-                                                                Visible='<%# Not IsSelected(Eval("RmbNo"))  %>'></asp:LinkButton>
-                                                        </td>
-                                                        <td>
-                                                            <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif"
-                                                                Visible='<%# IsSelected(Eval("RmbNo")) %>' />
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </ItemTemplate>
-                                        </asp:DataList>
-                                        <div style="width: 100%; border-bottom: dashed 1px black;">
-                                            &nbsp;
-                                        </div>
-                                        <asp:Label ID="Label13" runat="server" class="Agape_SubTitle"
-                                            ResourceKey="NoReceipts"
-                                            Style="font-size: 8pt; color: Gray; font-style: italic;"></asp:Label>
-                                        <br />
-                                        <asp:DataList ID="dlNoReceipts" runat="server" Width="100%">
-                                            <ItemStyle CssClass="dnnGridItem" />
-                                            <AlternatingItemStyle CssClass="dnnGridAltItem" />
-                                            <ItemTemplate>
-                                                <table width="100%">
-                                                    <tr valign="middle">
-                                                        <td>
-                                                            <asp:Image ID="Image2" runat="server"
-                                                                ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
-                                                        </td>
-                                                        <td align="left" width="100%">
-                                                            <asp:LinkButton ID="LinkButton3" runat="server"
-                                                                CommandArgument='<%# Eval("RMBNo") %>' CommandName="Goto" Font-Bold="true"
-                                                                Font-Size="9pt"
-                                                                Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>'
-                                                                Visible='<%# IsSelected(Eval("RmbNo")) %>'></asp:LinkButton>
-                                                            <asp:LinkButton ID="LinkButton2" runat="server"
-                                                                CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt"
-                                                                Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>'
-                                                                Visible='<%# Not IsSelected(Eval("RmbNo"))  %>'></asp:LinkButton>
-                                                        </td>
-                                                        <td>
-                                                            <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif"
-                                                                Visible='<%# IsSelected(Eval("RmbNo")) %>' />
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </ItemTemplate>
-                                        </asp:DataList>
-                                        <asp:DataList ID="dlAdvNoReceipts" runat="server" Width="100%">
-                                            <ItemTemplate>
-                                                <table width="100%">
-                                                    <tr valign="middle">
-                                                        <td>
-                                                            <asp:Image ID="Image2" runat="server"
-                                                                ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
-                                                        </td>
-                                                        <td align="left" width="100%">
-                                                            <asp:LinkButton ID="LinkButton3" runat="server"
-                                                                CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance"
-                                                                Font-Bold="true" Font-Size="9pt"
-                                                                Text='<%# GetAdvTitleTeam(Eval("LocalAdvanceId"), Eval("UserId"), Eval("RequestDate"))  %>'
-                                                                Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>'></asp:LinkButton>
-                                                            <asp:LinkButton ID="LinkButton2" runat="server"
-                                                                CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance"
-                                                                Font-Size="10pt"
-                                                                Text='<%# GetAdvTitleTeam(Eval("LocalAdvanceId"), Eval("UserId"), Eval("RequestDate"))  %>'
-                                                                Visible='<%# Not IsAdvSelected(Eval("AdvanceId"))  %>'></asp:LinkButton>
-                                                        </td>
-                                                        <td>
-                                                            <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif"
-                                                                Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' />
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </ItemTemplate>
-                                        </asp:DataList>
-                                        <asp:Panel ID="pnlPendingDownload" runat="server">
-                                            <div style="width: 100%; border-bottom: dashed 1px black;">
-                                                &nbsp;
-                                            </div>
-                                            <asp:Label ID="Label14" runat="server" class="Agape_SubTitle"
-                                                ResourceKey="PendingDownload"
-                                                Style="font-size: 8pt; color: Gray; font-style: italic;"></asp:Label>
+                            <h3></h3>
+                            <div id="ApprovedPane">
+                                <asp:UpdatePanel ID="UpdatePanel6" runat="server">
+                                    <ContentTemplate>
+                                        <asp:Panel ID="pnlApprovedAcc" runat="server">
+                                            <asp:Label ID="Label12" runat="server" class="Agape_SubTitle" ResourceKey="Receipts" Style="font-size: 8pt; color: Gray; font-style: italic;"></asp:Label>
                                             <br />
-                                            <asp:DataList ID="dlPendingDownload" runat="server" Width="100%">
+                                            <asp:DataList ID="dlReceipts" runat="server" Width="100%">
                                                 <ItemStyle CssClass="dnnGridItem" />
                                                 <AlternatingItemStyle CssClass="dnnGridAltItem" />
                                                 <ItemTemplate>
                                                     <table width="100%">
                                                         <tr valign="middle">
                                                             <td>
-                                                                <asp:Image ID="Image2" runat="server"
-                                                                    ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
+                                                                <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
                                                             </td>
                                                             <td align="left" width="100%">
-                                                                <asp:LinkButton ID="LinkButton3" runat="server"
-                                                                    CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Bold="true"
-                                                                    Font-Size="9pt"
-                                                                    Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>'
-                                                                    Visible='<%# IsSelected(Eval("RmbNo")) %>'></asp:LinkButton>
-                                                                <asp:LinkButton ID="LinkButton2" runat="server"
-                                                                    CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt"
-                                                                    Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>'
-                                                                    Visible='<%# Not IsSelected(Eval("RmbNo"))  %>'></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Bold="true" Font-Size="9pt" Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>' Visible='<%# IsSelected(Eval("RmbNo")) %>'></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>' Visible='<%# Not IsSelected(Eval("RmbNo"))  %>'></asp:LinkButton>
                                                             </td>
                                                             <td>
-                                                                <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif"
-                                                                    Visible='<%# IsSelected(Eval("RmbNo")) %>' />
+                                                                <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsSelected(Eval("RmbNo")) %>' />
                                                             </td>
                                                         </tr>
                                                     </table>
                                                 </ItemTemplate>
                                             </asp:DataList>
-                                            <asp:DataList ID="dlAdvPendingDownload" runat="server" Width="100%">
+                                            <div style="width: 100%; border-bottom: dashed 1px black;">
+                                                &nbsp;
+                                            </div>
+                                            <asp:Label ID="Label13" runat="server" class="Agape_SubTitle" ResourceKey="NoReceipts" Style="font-size: 8pt; color: Gray; font-style: italic;"></asp:Label>
+                                            <br />
+                                            <asp:DataList ID="dlNoReceipts" runat="server" Width="100%">
+                                                <ItemStyle CssClass="dnnGridItem" />
+                                                <AlternatingItemStyle CssClass="dnnGridAltItem" />
                                                 <ItemTemplate>
                                                     <table width="100%">
                                                         <tr valign="middle">
                                                             <td>
-                                                                <asp:Image ID="Image2" runat="server"
-                                                                    ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
+                                                                <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
                                                             </td>
                                                             <td align="left" width="100%">
-                                                                <asp:LinkButton ID="LinkButton3" runat="server"
-                                                                    CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance"
-                                                                    Font-Bold="true" Font-Size="9pt"
-                                                                    Text='<%# GetAdvTitleTeam(Eval("LocalAdvanceId"), Eval("UserId"), Eval("RequestDate"))  %>'
-                                                                    Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>'></asp:LinkButton>
-                                                                <asp:LinkButton ID="LinkButton2" runat="server"
-                                                                    CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance"
-                                                                    Font-Size="10pt"
-                                                                    Text='<%# GetAdvTitleTeam(Eval("LocalAdvanceId"), Eval("UserId"), Eval("RequestDate"))  %>'
-                                                                    Visible='<%# Not IsAdvSelected(Eval("AdvanceId"))  %>'></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("RMBNo") %>' CommandName="Goto" Font-Bold="true" Font-Size="9pt" Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>' Visible='<%# IsSelected(Eval("RmbNo")) %>'></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>' Visible='<%# Not IsSelected(Eval("RmbNo"))  %>'></asp:LinkButton>
                                                             </td>
                                                             <td>
-                                                                <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif"
-                                                                    Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' />
+                                                                <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsSelected(Eval("RmbNo")) %>' />
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </ItemTemplate>
+                                            </asp:DataList>
+                                            <asp:DataList ID="dlAdvNoReceipts" runat="server" Width="100%">
+                                                <ItemTemplate>
+                                                    <table width="100%">
+                                                        <tr valign="middle">
+                                                            <td>
+                                                                <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
+                                                            </td>
+                                                            <td align="left" width="100%">
+                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Bold="true" Font-Size="9pt" Text='<%# GetAdvTitleTeam(Eval("LocalAdvanceId"), Eval("UserId"), Eval("RequestDate"))  %>' Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>'></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Size="10pt" Text='<%# GetAdvTitleTeam(Eval("LocalAdvanceId"), Eval("UserId"), Eval("RequestDate"))  %>' Visible='<%# Not IsAdvSelected(Eval("AdvanceId"))  %>'></asp:LinkButton>
+                                                            </td>
+                                                            <td>
+                                                                <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' />
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </ItemTemplate>
+                                            </asp:DataList>
+                                            <asp:Panel ID="pnlPendingDownload" runat="server">
+                                                <div style="width: 100%; border-bottom: dashed 1px black;">
+                                                    &nbsp;
+                                                </div>
+                                                <asp:Label ID="Label14" runat="server" class="Agape_SubTitle" ResourceKey="PendingDownload" Style="font-size: 8pt; color: Gray; font-style: italic;"></asp:Label>
+                                                <br />
+                                                <asp:DataList ID="dlPendingDownload" runat="server" Width="100%">
+                                                    <ItemStyle CssClass="dnnGridItem" />
+                                                    <AlternatingItemStyle CssClass="dnnGridAltItem" />
+                                                    <ItemTemplate>
+                                                        <table width="100%">
+                                                            <tr valign="middle">
+                                                                <td>
+                                                                    <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
+                                                                </td>
+                                                                <td align="left" width="100%">
+                                                                    <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Bold="true" Font-Size="9pt" Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>' Visible='<%# IsSelected(Eval("RmbNo")) %>'></asp:LinkButton>
+                                                                    <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>' Visible='<%# Not IsSelected(Eval("RmbNo"))  %>'></asp:LinkButton>
+                                                                </td>
+                                                                <td>
+                                                                    <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsSelected(Eval("RmbNo")) %>' />
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </ItemTemplate>
+                                                </asp:DataList>
+                                                <asp:DataList ID="dlAdvPendingDownload" runat="server" Width="100%">
+                                                    <ItemTemplate>
+                                                        <table width="100%">
+                                                            <tr valign="middle">
+                                                                <td>
+                                                                    <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
+                                                                </td>
+                                                                <td align="left" width="100%">
+                                                                    <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Bold="true" Font-Size="9pt" Text='<%# GetAdvTitleTeam(Eval("LocalAdvanceId"), Eval("UserId"), Eval("RequestDate"))  %>' Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>'></asp:LinkButton>
+                                                                    <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Size="10pt" Text='<%# GetAdvTitleTeam(Eval("LocalAdvanceId"), Eval("UserId"), Eval("RequestDate"))  %>' Visible='<%# Not IsAdvSelected(Eval("AdvanceId"))  %>'></asp:LinkButton>
+                                                                </td>
+                                                                <td>
+                                                                    <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' />
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </ItemTemplate>
+                                                </asp:DataList>
+                                            </asp:Panel>
+                                        </asp:Panel>
+                                        <asp:Panel ID="pnlApprovedView" runat="server">
+                                            <asp:Label ID="Label15" runat="server" class="Agape_SubTitle" ResourceKey="YourRmbs" Style="font-size: 8pt;"></asp:Label>
+                                            <br />
+                                            <asp:DataList ID="dlApproved" runat="server" Width="100%">
+                                                <ItemStyle CssClass="dnnGridItem" />
+                                                <AlternatingItemStyle CssClass="dnnGridAltItem" />
+                                                <ItemTemplate>
+                                                    <table width="100%">
+                                                        <tr valign="middle">
+                                                            <td>
+                                                                <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
+                                                            </td>
+                                                            <td align="left" width="100%">
+                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Bold="true" Font-Size="9pt" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' Visible='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' Visible='<%# Not IsSelected(Eval("RmbNo"))  %>' Width="100%"></asp:LinkButton>
+                                                            </td>
+                                                            <td>
+                                                                <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsSelected(Eval("RmbNo")) %>' />
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </ItemTemplate>
+                                            </asp:DataList>
+                                            <asp:DataList ID="dlAdvApproved" runat="server" Width="100%">
+                                                <ItemStyle CssClass="dnnGridItem" />
+                                                <AlternatingItemStyle CssClass="dnnGridAltItem" />
+                                                <ItemTemplate>
+                                                    <table width="100%">
+                                                        <tr valign="middle">
+                                                            <td>
+                                                                <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
+                                                            </td>
+                                                            <td align="left" width="100%">
+                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Bold="true" Font-Size="9pt" Text='<%# GetAdvTitle( Eval("LocalAdvanceId"), Eval("RequestDate"))  %>' Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' Width="100%"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Size="10pt" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"), Eval("RequestDate"))  %>' Visible='<%# Not IsSelected(Eval("AdvanceId"))  %>' Width="100%"></asp:LinkButton>
+                                                            </td>
+                                                            <td>
+                                                                <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' />
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </ItemTemplate>
+                                            </asp:DataList>
+                                            <div style="width: 100%; border-bottom: dashed 1px black;">
+                                                &nbsp;
+                                            </div>
+                                            <asp:Label ID="Label16" runat="server" class="Agape_SubTitle" ResourceKey="TeamRmbs" Style="font-size: 8pt;"></asp:Label>
+                                            <br />
+                                            <asp:DataList ID="dlTeamApproved" runat="server" Width="100%">
+                                                <ItemStyle CssClass="dnnGridItem" />
+                                                <AlternatingItemStyle CssClass="dnnGridAltItem" />
+                                                <ItemTemplate>
+                                                    <table width="100%">
+                                                        <tr valign="middle">
+                                                            <td>
+                                                                <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
+                                                            </td>
+                                                            <td align="left" width="100%">
+                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Bold="true" Font-Size="9pt" Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>' Visible='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>' Visible='<%# Not IsSelected(Eval("RmbNo"))  %>' Width="100%"></asp:LinkButton>
+                                                            </td>
+                                                            <td>
+                                                                <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsSelected(Eval("RmbNo")) %>' />
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </ItemTemplate>
+                                            </asp:DataList>
+                                            <asp:DataList ID="dlAdvTeamApproved" runat="server" Width="100%">
+                                                <ItemStyle CssClass="dnnGridItem" />
+                                                <AlternatingItemStyle CssClass="dnnGridAltItem" />
+                                                <ItemTemplate>
+                                                    <table width="100%">
+                                                        <tr valign="middle">
+                                                            <td>
+                                                                <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
+                                                            </td>
+                                                            <td align="left" width="100%">
+                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Bold="true" Font-Size="9pt" Text='<%# GetAdvTitleTeam(Eval("LocalAdvanceId"), Eval("UserId"), Eval("RequestDate"))  %>' Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' Width="100%"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Size="10pt" Text='<%# GetAdvTitleTeam(Eval("LocalAdvanceId"), Eval("UserId"), Eval("RequestDate"))  %>' Visible='<%# Not IsAdvSelected(Eval("AdvanceId"))  %>' Width="100%"></asp:LinkButton>
+                                                            </td>
+                                                            <td>
+                                                                <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' />
                                                             </td>
                                                         </tr>
                                                     </table>
                                                 </ItemTemplate>
                                             </asp:DataList>
                                         </asp:Panel>
-                                    </asp:Panel>
-                                    <asp:Panel ID="pnlApprovedView" runat="server">
-                                        <asp:Label ID="Label15" runat="server" class="Agape_SubTitle"
-                                            ResourceKey="YourRmbs" Style="font-size: 8pt;"></asp:Label>
-                                        <br />
-                                        <asp:DataList ID="dlApproved" runat="server" Width="100%">
-                                            <ItemStyle CssClass="dnnGridItem" />
-                                            <AlternatingItemStyle CssClass="dnnGridAltItem" />
-                                            <ItemTemplate>
-                                                <table width="100%">
-                                                    <tr valign="middle">
-                                                        <td>
-                                                            <asp:Image ID="Image2" runat="server"
-                                                                ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
-                                                        </td>
-                                                        <td align="left" width="100%">
-                                                            <asp:LinkButton ID="LinkButton3" runat="server"
-                                                                CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Bold="true"
-                                                                Font-Size="9pt"
-                                                                Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>'
-                                                                Visible='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
-                                                            <asp:LinkButton ID="LinkButton2" runat="server"
-                                                                CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt"
-                                                                Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>'
-                                                                Visible='<%# Not IsSelected(Eval("RmbNo"))  %>' Width="100%"></asp:LinkButton>
-                                                        </td>
-                                                        <td>
-                                                            <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif"
-                                                                Visible='<%# IsSelected(Eval("RmbNo")) %>' />
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </ItemTemplate>
-                                        </asp:DataList>
-                                        <asp:DataList ID="dlAdvApproved" runat="server" Width="100%">
-                                            <ItemStyle CssClass="dnnGridItem" />
-                                            <AlternatingItemStyle CssClass="dnnGridAltItem" />
-                                            <ItemTemplate>
-                                                <table width="100%">
-                                                    <tr valign="middle">
-                                                        <td>
-                                                            <asp:Image ID="Image2" runat="server"
-                                                                ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
-                                                        </td>
-                                                        <td align="left" width="100%">
-                                                            <asp:LinkButton ID="LinkButton3" runat="server"
-                                                                CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance"
-                                                                Font-Bold="true" Font-Size="9pt"
-                                                                Text='<%# GetAdvTitle( Eval("LocalAdvanceId"), Eval("RequestDate"))  %>'
-                                                                Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' Width="100%"></asp:LinkButton>
-                                                            <asp:LinkButton ID="LinkButton2" runat="server"
-                                                                CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance"
-                                                                Font-Size="10pt"
-                                                                Text='<%# GetAdvTitle(Eval("LocalAdvanceId"), Eval("RequestDate"))  %>'
-                                                                Visible='<%# Not IsSelected(Eval("AdvanceId"))  %>' Width="100%"></asp:LinkButton>
-                                                        </td>
-                                                        <td>
-                                                            <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif"
-                                                                Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' />
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </ItemTemplate>
-                                        </asp:DataList>
-                                        <div style="width: 100%; border-bottom: dashed 1px black;">
-                                            &nbsp;
-                                        </div>
-                                        <asp:Label ID="Label16" runat="server" class="Agape_SubTitle"
-                                            ResourceKey="TeamRmbs" Style="font-size: 8pt;"></asp:Label>
-                                        <br />
-                                        <asp:DataList ID="dlTeamApproved" runat="server" Width="100%">
-                                            <ItemStyle CssClass="dnnGridItem" />
-                                            <AlternatingItemStyle CssClass="dnnGridAltItem" />
-                                            <ItemTemplate>
-                                                <table width="100%">
-                                                    <tr valign="middle">
-                                                        <td>
-                                                            <asp:Image ID="Image2" runat="server"
-                                                                ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
-                                                        </td>
-                                                        <td align="left" width="100%">
-                                                            <asp:LinkButton ID="LinkButton3" runat="server"
-                                                                CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Bold="true"
-                                                                Font-Size="9pt"
-                                                                Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>'
-                                                                Visible='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
-                                                            <asp:LinkButton ID="LinkButton2" runat="server"
-                                                                CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt"
-                                                                Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>'
-                                                                Visible='<%# Not IsSelected(Eval("RmbNo"))  %>' Width="100%"></asp:LinkButton>
-                                                        </td>
-                                                        <td>
-                                                            <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif"
-                                                                Visible='<%# IsSelected(Eval("RmbNo")) %>' />
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </ItemTemplate>
-                                        </asp:DataList>
-                                        <asp:DataList ID="dlAdvTeamApproved" runat="server" Width="100%">
-                                            <ItemStyle CssClass="dnnGridItem" />
-                                            <AlternatingItemStyle CssClass="dnnGridAltItem" />
-                                            <ItemTemplate>
-                                                <table width="100%">
-                                                    <tr valign="middle">
-                                                        <td>
-                                                            <asp:Image ID="Image2" runat="server"
-                                                                ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
-                                                        </td>
-                                                        <td align="left" width="100%">
-                                                            <asp:LinkButton ID="LinkButton3" runat="server"
-                                                                CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance"
-                                                                Font-Bold="true" Font-Size="9pt"
-                                                                Text='<%# GetAdvTitleTeam(Eval("LocalAdvanceId"), Eval("UserId"), Eval("RequestDate"))  %>'
-                                                                Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' Width="100%"></asp:LinkButton>
-                                                            <asp:LinkButton ID="LinkButton2" runat="server"
-                                                                CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance"
-                                                                Font-Size="10pt"
-                                                                Text='<%# GetAdvTitleTeam(Eval("LocalAdvanceId"), Eval("UserId"), Eval("RequestDate"))  %>'
-                                                                Visible='<%# Not IsAdvSelected(Eval("AdvanceId"))  %>' Width="100%"></asp:LinkButton>
-                                                        </td>
-                                                        <td>
-                                                            <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif"
-                                                                Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' />
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </ItemTemplate>
-                                        </asp:DataList>
-                                    </asp:Panel>
-                                </ContentTemplate>
-                                <Triggers>
-                                    <asp:PostBackTrigger ControlID="dlTeamApproved" />
-                                    <asp:PostBackTrigger ControlID="dlApproved" />
-                                    <asp:PostBackTrigger ControlID="dlReceipts" />
-                                    <asp:PostBackTrigger ControlID="dlNoReceipts" />
-                                    <asp:PostBackTrigger ControlID="dlAdvSubmitted" />
-                                    <asp:PostBackTrigger ControlID="dlAdvToApprove" />
-                                    <asp:PostBackTrigger ControlID="dlAdvApproved" />
-                                    <asp:PostBackTrigger ControlID="dlAdvTeamApproved" />
-                                    <asp:PostBackTrigger ControlID="dlAdvPendingDownload" />
-                                    <asp:PostBackTrigger ControlID="dlPendingDownload" />
-                                    <asp:PostBackTrigger ControlID="dlAdvNoReceipts" />
-                                </Triggers>
-                            </asp:UpdatePanel>
-                        </div>
+                                    </ContentTemplate>
+                                    <Triggers>
+                                        <asp:PostBackTrigger ControlID="dlTeamApproved" />
+                                        <asp:PostBackTrigger ControlID="dlApproved" />
+                                        <asp:PostBackTrigger ControlID="dlReceipts" />
+                                        <asp:PostBackTrigger ControlID="dlNoReceipts" />
+                                        <asp:PostBackTrigger ControlID="dlAdvSubmitted" />
+                                        <asp:PostBackTrigger ControlID="dlAdvToApprove" />
+                                        <asp:PostBackTrigger ControlID="dlAdvApproved" />
+                                        <asp:PostBackTrigger ControlID="dlAdvTeamApproved" />
+                                        <asp:PostBackTrigger ControlID="dlAdvPendingDownload" />
+                                        <asp:PostBackTrigger ControlID="dlPendingDownload" />
+                                        <asp:PostBackTrigger ControlID="dlAdvNoReceipts" />
+                                    </Triggers>
+                                </asp:UpdatePanel>
+                            </div>
+
+                        </h3>
 
                     </div>
                     <div>
@@ -1342,7 +1213,7 @@
                                             <asp:Label ID="ttlApprovedBy" runat="server" resourcekey="ApprovedBy" Visible="false"></asp:Label>
                                         </td>
                                         <td class="hdrValue" rowspan="2" valign="top">
-                                            <asp:Label ID="lblApprovedBy" runat="server"></asp:Label>
+                                            <asp:DropDownList ID="ddlApprovedBy" runat="server"></asp:DropDownList>
                                         </td>
                                         <td class="hdrTitle">
                                             <asp:Label ID="Label22" runat="server" resourcekey="ProcessedBy"></asp:Label>
@@ -2093,13 +1964,7 @@
 
     <asp:Label ID="lblMovedMenu" runat="server" Font-Size="XX-Small" Font-Italic="true" ForeColor="Gray" Text="If you are looking for Settings, Suggested Payments or Download Batched Transactions, these links have moved. Click the faint wrench/screwdriver icon at the top right corner of this module. "></asp:Label>
 
-    &nbsp<%--; &nbsp;
-<asp:LinkButton ID="btnSettings" runat="server" resourcekey="btnSettings"></asp:LinkButton>
-&nbsp; &nbsp;
-<asp:LinkButton ID="btnDownloadBatch" runat="server" resourcekey="btnDownloadBatch"
-    OnClientClick="showDownload();">Download Batched Reimbursments</asp:LinkButton> &nbsp; &nbsp;
-    
-<asp:LinkButton ID="btnShowSuggestedPayments" OnClientClick="showSuggestedPayments();" runat="server" resourcekey="SuggestedPayments">Suggested Payments</asp:LinkButton>--%>
+    &nbsp<%--  <asp:PostBackTrigger ControlID="btnAddLine" />--%>
     <br />
 
 </div>
