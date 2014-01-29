@@ -3580,7 +3580,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim approver = UserController.GetUserById(theRmb.PortalId, theRmb.ApprUserId)
             Dim toEmail = approver.Email
             Dim toName = approver.FirstName
-            Dim Approvers = approver.FullName
+            Dim Approvers = approver.DisplayName
 
             If myApprovers.isDept Then
                 'Department Reimbursement
@@ -3628,13 +3628,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 End If
                 If toEmail.Length > 0 Then
                     ' DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agape.org.uk", Left(toEmail, toEmail.Length - 1), "donotreply@agape.org.uk", "Reimbursement for " & UserInfo.FirstName & " " & UserInfo.LastName, message2, "", "HTML", "", "", "", "")
-                    DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agapeconnect.me", Left(toEmail, toEmail.Length - 1), "", Translate("SubmittedApprEmailSubject").Replace("[STAFFNAME]", UserInfo.FirstName & " " & UserInfo.LastName), message2, "", "HTML", "", "", "", "")
+                    DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agapeconnect.me", toEmail, "", Translate("SubmittedApprEmailSubject").Replace("[STAFFNAME]", UserInfo.FirstName & " " & UserInfo.LastName), message2, "", "HTML", "", "", "", "")
 
                 End If
 
             End If
 
-            message = message.Replace("[APPROVERS]", Approvers)
+            message = message.Replace("[APPROVER]", Approvers)
 
 
 
@@ -4131,10 +4131,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             d.SubmitChanges()
 
             'Send Confirmation
-            Dim Auth = UserController.GetUserById(PortalId, Settings("AuthUser"))
-            Dim AuthAuth = UserController.GetUserById(PortalId, Settings("AuthAuthUser"))
+            'Dim Auth = UserController.GetUserById(PortalId, Settings("AuthUser"))
+            'Dim AuthAuth = UserController.GetUserById(PortalId, Settings("AuthAuthUser"))
 
-            Dim myApprovers = StaffRmbFunctions.getAdvApprovers(insert, Settings("TeamLeaderLimit"), Auth, AuthAuth)
+            Dim myApprovers = StaffRmbFunctions.getAdvApprovers(insert, Settings("TeamLeaderLimit"), Nothing, Nothing)
             'Dim ConfMessage As String = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("AdvConfirmation", PortalId))
             Dim ConfMessage As String = StaffBrokerFunctions.GetTemplate("AdvConfirmation", PortalId)
             ConfMessage = ConfMessage.Replace("[STAFFNAME]", UserInfo.DisplayName).Replace("[ADVNO]", insert.LocalAdvanceId)
@@ -4149,21 +4149,17 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 ConfMessage = ConfMessage.Replace("[EXTRA]", "")
             End If
 
-            Dim Approvers As String = ""
             Dim message2 As String = StaffBrokerFunctions.GetTemplate("AdvApproverEmail", PortalId)
 
             If myApprovers.AmountSpecial Then
                 'message2 = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("AdvLargeTransaction", PortalId))
                 message2 = StaffBrokerFunctions.GetTemplate("AdvLargeTransaction", PortalId)
             End If
-            Dim toEmail As String = ""
-            Dim toName As String = ""
-            For Each row In myApprovers.UserIds
-                Approvers = Approvers & row.FirstName & " " & row.LastName & "<br />"
-                'Send Approvers Instructions Here
-                toEmail = toEmail & row.Email & ";"
-                toName = toName & row.FirstName & ", "
-            Next
+            Dim approver = UserController.GetUserById(insert.PortalId, insert.ApprUserId)
+            Dim toEmail = approver.Email
+            Dim toName = approver.FirstName
+            Dim Approvers = approver.DisplayName
+
             message2 = message2.Replace("[STAFFNAME]", UserInfo.DisplayName).Replace("[ADVNO]", insert.AdvanceId)
             message2 = message2.Replace("[AMOUNT]", StaffBrokerFunctions.GetSetting("Currency", PortalId) & insert.RequestAmount)
             message2 = message2.Replace("[APPRNAME]", Left(toName, Math.Max(toName.Length - 2, 0)))
@@ -4173,11 +4169,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             If toEmail.Length > 0 Then
                 ' DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agape.org.uk", Left(toEmail, toEmail.Length - 1), "donotreply@agape.org.uk", "Reimbursement for " & UserInfo.FirstName & " " & UserInfo.LastName, message2, "", "HTML", "", "", "", "")
-                DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agapeconnect.me", Left(toEmail, toEmail.Length - 1), "", Translate("AdvSubmittedApprEmailSubject").Replace("[STAFFNAME]", UserInfo.FirstName & " " & UserInfo.LastName), message2, "", "HTML", "", "", "", "")
+                DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agapeconnect.me", toEmail, "", Translate("AdvSubmittedApprEmailSubject").Replace("[STAFFNAME]", UserInfo.FirstName & " " & UserInfo.LastName), message2, "", "HTML", "", "", "", "")
 
             End If
 
-            ConfMessage = ConfMessage.Replace("[APPROVERS]", Approvers)
+            ConfMessage = ConfMessage.Replace("[APPROVER]", Approvers)
             '  DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agape.org.uk", UserInfo.Email, "donotreply@agape.org.uk", "Reimbursement #" & theRmb.RMBNo, message, Server.MapPath("/Portals/0/RmbForm" & theRmb.RMBNo & ".htm"), "HTML", "", "", "", "")
             DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agapeconnect.me", UserInfo.Email, "", Translate("AdvEmailSubmittedSubject").Replace("[ADVNO]", insert.LocalAdvanceId), ConfMessage, "", "HTML", "", "", "", "")
 
