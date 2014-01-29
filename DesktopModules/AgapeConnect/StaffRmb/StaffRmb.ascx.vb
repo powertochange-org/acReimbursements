@@ -1063,19 +1063,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         Dim AuthUser = UserController.GetUserById(PortalId, Settings("AuthUser"))
                         Dim AuthAuthUser = UserController.GetUserById(PortalId, Settings("AuthAuthUser"))
                         Dim approvers = StaffRmbFunctions.getApprovers(q.First, AuthUser, AuthAuthUser)
-                        Dim appList = ""
+                        Dim appList = New DropDownList()
                         For Each row In approvers.UserIds
                             If Not row Is Nothing Then
-                                appList &= row.DisplayName & ", "
+                                appList.Items.Add(row.DisplayName)
                             End If
 
                         Next
-                        If (appList.Length > 2) Then
-                            lblApprovedBy.Text = Left(appList, appList.Length - 2)
-                        Else
-                            lblApprovedBy.Text = ""
-                        End If
-
 
                         ttlWaitingApp.Visible = True
                         ttlApprovedBy.Visible = False

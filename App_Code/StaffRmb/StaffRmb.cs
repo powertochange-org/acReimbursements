@@ -105,12 +105,8 @@ namespace StaffRmb
 
         static public Approvers getApprovers(AP_Staff_Rmb rmb, DotNetNuke.Entities.Users.UserInfo authUser, DotNetNuke.Entities.Users.UserInfo authAuthUser)
         {
-            Regex stripPortal = new Regex(rmb.PortalId.ToString() + "$");
-            String staff_logon = stripPortal.Replace(UserController.GetUserById(rmb.PortalId, rmb.UserId).Username, "") ;
-            String spouse_logon = "";
-            int spouse_id = StaffBrokerFunctions.GetSpouseId(rmb.UserId);
-            if (spouse_id >= 0)
-                spouse_logon = stripPortal.Replace(UserController.GetUserById(rmb.PortalId, spouse_id).Username, "");
+            String staff_logon = logonFromId(rmb.PortalId, rmb.UserId);
+            String spouse_logon = logonFromId(rmb.PortalId, StaffBrokerFunctions.GetSpouseId(rmb.UserId));
             // initialize the response
             Approvers result = new Approvers();
             result.CCMSpecial = false;
@@ -122,7 +118,7 @@ namespace StaffRmb
             string[] potential_approvers = null;
             if (isStaffAccount(rmb.CostCenter))
             {
-                potential_approvers = managersInDepartment(staff_logon);
+                potential_approvers = combineArrays(managersInDepartment(staff_logon), managersInDepartment(spouse_logon));
             }
             else //ministry account
             {
@@ -138,6 +134,20 @@ namespace StaffRmb
             return result;
         }
 
+        static private string[] combineArrays(string[] a1, string[]a2) {
+            string[] result = new string[a1.Length + a2.Length];
+            Array.Copy(a1, 0, result, 0, a1.Length);
+            Array.Copy(a2, 0, result, a1.Length, a2.Length);
+            return result;
+        }
+
+        static private string logonFromId(int portalId, int userId)
+        {
+            if (userId < 0) return "";
+            Regex stripPortal = new Regex(portalId.ToString() + "$");
+            return stripPortal.Replace(UserController.GetUserById(portalId, userId).Username, "");
+        }
+
         static private bool isStaffAccount(string account)
         // Returns true if account# starts with an 8 or a 9
         {
@@ -150,38 +160,32 @@ namespace StaffRmb
         static private string[] managersInDepartment(string logon)
         // Returns a list of staff who supervise other staff in the same department.
         {
-            byte[] postData = Encoding.UTF8.GetBytes(string.Format("logon={0}", logon));
-            WebRequest request = WebRequest.Create("https://staffapps.powertochange.org/AuthManager/webservice/get_department_supervisors");
-            request.Method = "POST";
-            request.ContentType = "application/x-www-form-urlencoded";
-            request.ContentLength = postData.Length;
-            Stream dataStream = request.GetRequestStream();
-            dataStream.Write(postData, 0, postData.Length);
-            dataStream.Close();
-
-            WebResponse response = request.GetResponse();
-            dataStream = response.GetResponseStream();
-            StreamReader reader = new StreamReader(dataStream);
-            String response_string = reader.ReadToEnd();
-            reader.Close();
-            dataStream.Close();
-            response.Close();
-
-            return JsonConvert.DeserializeObject<string[]>(response_string);
+            if (logon.Equals("")) return new string[0];
+            string postData = string.Format("logon={0}", logon);
+            string url = "https://staffapps.powertochange.org/AuthManager/webservice/get_department_supervisors";
+            return getResultFromWebService(url, postData);
         }
 
         static private string[] staffWithSigningAuthority(string account, Decimal amount)
         // Returns a list of staff with signing authority for a certain amount or greater on a given account
         {
-            byte[] postData = Encoding.UTF8.GetBytes(string.Format("account={0}&amount={1}", account, amount));
-            WebRequest request = WebRequest.Create("https://staffapps.powertochange.org/AuthManager/webservice/get_signatories");
+            string postData = string.Format("account={0}&amount={1}", account, amount);
+            string url = "https://staffapps.powertochange.org/AuthManager/webservice/get_signatories";
+            return getResultFromWebService(url, postData);
+        }
+
+        static private string[] getResultFromWebService(string url, string postString)
+        {
+            byte[] postData = Encoding.UTF8.GetBytes(postString);
+            //send request
+            WebRequest request = WebRequest.Create(url);
             request.Method = "POST";
             request.ContentType = "application/x-www-form-urlencoded";
             request.ContentLength = postData.Length;
             Stream dataStream = request.GetRequestStream();
             dataStream.Write(postData, 0, postData.Length);
             dataStream.Close();
-
+            //get response
             WebResponse response = request.GetResponse();
             dataStream = response.GetResponseStream();
             StreamReader reader = new StreamReader(dataStream);
@@ -191,7 +195,6 @@ namespace StaffRmb
             response.Close();
 
             return JsonConvert.DeserializeObject<string[]>(response_string);
-
         }
 
 
