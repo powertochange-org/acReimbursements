@@ -743,7 +743,7 @@
                                 </asp:Panel>
                             </a>
 
-                            <h3></h3>
+                        </h3>
                             <div id="SubmittedPane">
                                 <asp:UpdatePanel ID="UpdatePanel4" runat="server">
                                     <ContentTemplate>
@@ -846,8 +846,6 @@
                                 </asp:UpdatePanel>
                             </div>
 
-                        </h3>
-
 
                     </div>
                     <div>
@@ -860,8 +858,7 @@
                                     <asp:Label ID="lblToProcess" runat="server" Font-Bold="true"></asp:Label>
                                 </asp:Panel>
                             </a>
-
-                            <h3></h3>
+                        </h3>
                             <div id="ApprovedPane">
                                 <asp:UpdatePanel ID="UpdatePanel6" runat="server">
                                     <ContentTemplate>
@@ -1082,8 +1079,6 @@
                                     </Triggers>
                                 </asp:UpdatePanel>
                             </div>
-
-                        </h3>
 
                     </div>
                     <div>

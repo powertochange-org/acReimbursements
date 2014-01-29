@@ -3619,7 +3619,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 '    toName = toName & row.FirstName & ", "
                 'Next
                 message2 = message2.Replace("[STAFFNAME]", UserInfo.DisplayName).Replace("[RMBNO]", theRmb.RMBNo).Replace("[USERREF]", IIf(theRmb.UserRef <> "", theRmb.UserRef, "None"))
-                message2 = message2.Replace("[APPRNAME]", Left(toName, Math.Max(toName.Length - 2, 0)))
+                message2 = message2.Replace("[APPRNAME]", toName)
                 message2 = message2.Replace("[TEAMLEADERLIMIT]", StaffBrokerFunctions.GetSetting("Currency", PortalId) & Settings("TeamLeaderLimit"))
                 If theRmb.UserComment <> "" Then
                     message2 = message2.Replace("[COMMENTS]", Translate("EmailComments") & "<br />" & theRmb.UserComment)
@@ -4162,7 +4162,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             message2 = message2.Replace("[STAFFNAME]", UserInfo.DisplayName).Replace("[ADVNO]", insert.AdvanceId)
             message2 = message2.Replace("[AMOUNT]", StaffBrokerFunctions.GetSetting("Currency", PortalId) & insert.RequestAmount)
-            message2 = message2.Replace("[APPRNAME]", Left(toName, Math.Max(toName.Length - 2, 0)))
+            message2 = message2.Replace("[APPRNAME]", toName)
             message2 = message2.Replace("[TEAMLEADERLIMIT]", StaffBrokerFunctions.GetSetting("Currency", PortalId) & Settings("TeamLeaderLimit"))
 
             message2 = message2.Replace("[COMMENTS]", insert.RequestText)
