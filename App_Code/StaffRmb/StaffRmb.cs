@@ -134,7 +134,33 @@ namespace StaffRmb
             return result;
         }
 
-        static private string[] combineArrays(string[] a1, string[]a2) {
+        static public Approvers getAdvApprovers(AP_Staff_AdvanceRequest adv, Double largeTransaction, DotNetNuke.Entities.Users.UserInfo authUser, DotNetNuke.Entities.Users.UserInfo authAuthUser)
+        {
+            String staff_logon = logonFromId(adv.PortalId , (int)adv.UserId);
+            String spouse_logon = logonFromId(adv.PortalId, StaffBrokerFunctions.GetSpouseId((int)adv.UserId));
+            // initialize the response
+            Approvers result = new Approvers();
+            result.CCMSpecial = false;
+            result.SpouseSpecial = false;
+            result.AmountSpecial = false;
+            result.isDept = false;
+            result.UserIds = new List<DotNetNuke.Entities.Users.UserInfo>();
+
+            string[] potential_approvers = null;
+            Decimal amount = (Decimal)adv.RequestAmount;
+            potential_approvers = staffWithSigningAuthority(personalCostCenter((int)adv.UserId), amount);
+            foreach (String potential_approver in potential_approvers)
+            {
+                if (!(potential_approver.Equals(staff_logon) || potential_approver.Equals(spouse_logon)))
+                { //exclude staff and spouse
+                    result.UserIds.Add(UserController.GetUserByName(adv.PortalId, potential_approver + adv.PortalId.ToString()));
+                }
+            }
+            return result;
+        }
+
+        static private string[] combineArrays(string[] a1, string[] a2)
+        {
             string[] result = new string[a1.Length + a2.Length];
             Array.Copy(a1, 0, result, 0, a1.Length);
             Array.Copy(a2, 0, result, a1.Length, a2.Length);
@@ -146,6 +172,10 @@ namespace StaffRmb
             if (userId < 0) return "";
             Regex stripPortal = new Regex(portalId.ToString() + "$");
             return stripPortal.Replace(UserController.GetUserById(portalId, userId).Username, "");
+        }
+
+        static private string personalCostCenter(int userId) {
+            return StaffBrokerFunctions.GetStaffMember(userId).CostCenter;
         }
 
         static private bool isStaffAccount(string account)
@@ -277,42 +307,37 @@ namespace StaffRmb
         //    return rtn;
         //}
 
-        static public Approvers getAdvApprovers(AP_Staff_AdvanceRequest  adv, double LargeTransaction, DotNetNuke.Entities.Users.UserInfo authUser, DotNetNuke.Entities.Users.UserInfo authAuthUser)
-        {
-            StaffBroker.StaffBrokerDataContext dStaff = new StaffBroker.StaffBrokerDataContext();
-            Approvers rtn = new Approvers();
+        //static public Approvers getAdvApprovers(AP_Staff_AdvanceRequest  adv, double LargeTransaction, DotNetNuke.Entities.Users.UserInfo authUser, DotNetNuke.Entities.Users.UserInfo authAuthUser)
+        //{
+        //    StaffBroker.StaffBrokerDataContext dStaff = new StaffBroker.StaffBrokerDataContext();
+        //    Approvers rtn = new Approvers();
 
-            var st = StaffBrokerFunctions.GetStaffMember((int)adv.UserId );
-            rtn.Name = st.DisplayName;
-            int SpouseId = StaffBrokerFunctions.GetSpouseId((int)adv.UserId);
-            rtn.AmountSpecial = ((double)adv.RequestAmount)>LargeTransaction ;
+        //    var st = StaffBrokerFunctions.GetStaffMember((int)adv.UserId );
+        //    rtn.Name = st.DisplayName;
+        //    int SpouseId = StaffBrokerFunctions.GetSpouseId((int)adv.UserId);
+        //    rtn.AmountSpecial = ((double)adv.RequestAmount)>LargeTransaction ;
            
-            rtn.SpouseSpecial = false;
-            rtn.UserIds = new List<DotNetNuke.Entities.Users.UserInfo>();
+        //    rtn.SpouseSpecial = false;
+        //    rtn.UserIds = new List<DotNetNuke.Entities.Users.UserInfo>();
             
-            var app2 = StaffBrokerFunctions.GetLeaders((int)adv.UserId, true);
-            rtn.SpouseSpecial = (app2.Count() == 1 && ((app2.First() == SpouseId) || (app2.First() == (int)adv.UserId)));
-            if (rtn.AmountSpecial || rtn.SpouseSpecial || app2.Count() == 0)
-            {
-                rtn.UserIds.Add(authUser.UserID == adv.UserId ? authAuthUser : authUser);
+        //    var app2 = StaffBrokerFunctions.GetLeaders((int)adv.UserId, true);
+        //    rtn.SpouseSpecial = (app2.Count() == 1 && ((app2.First() == SpouseId) || (app2.First() == (int)adv.UserId)));
+        //    if (rtn.AmountSpecial || rtn.SpouseSpecial || app2.Count() == 0)
+        //    {
+        //        rtn.UserIds.Add(authUser.UserID == adv.UserId ? authAuthUser : authUser);
 
-                if (app2.Contains((authUser.UserID == adv.UserId ? (authAuthUser.UserID) : authUser.UserID)))
-                {
-                    rtn.AmountSpecial = false;
-                }
-            }
-            else
-            {
-                foreach (int i in (from c in app2 where c != adv.UserId && c != SpouseId select c))
-                    rtn.UserIds.Add(DotNetNuke.Entities.Users.UserController.GetUserById(adv.PortalId, i));
-            }
-
-         
-
-               
-
-            return rtn;
-        }
+        //        if (app2.Contains((authUser.UserID == adv.UserId ? (authAuthUser.UserID) : authUser.UserID)))
+        //        {
+        //            rtn.AmountSpecial = false;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        foreach (int i in (from c in app2 where c != adv.UserId && c != SpouseId select c))
+        //            rtn.UserIds.Add(DotNetNuke.Entities.Users.UserController.GetUserById(adv.PortalId, i));
+        //    }
+        //    return rtn;
+        //}
 
 
         static public int GetNewRID(int PortalId)
