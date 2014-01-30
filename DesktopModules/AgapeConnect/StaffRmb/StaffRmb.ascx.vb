@@ -826,13 +826,17 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     If q.First.ApprovedDate Is Nothing Then
                         Dim approvers = StaffRmbFunctions.getAdvApprovers(q.First, 0, Nothing, Nothing)
                         ddlApprovedBy.Items.Clear()
-                        ddlApprovedBy.Items.Add(New ListItem())
+                        Dim blank As ListItem
+                        blank = New ListItem("", "-1")
+                        blank.Attributes.Add("disabled", "disabled")
                         For Each row In approvers.UserIds
                             If Not row Is Nothing Then
                                 ddlApprovedBy.Items.Add(New ListItem(row.DisplayName, row.UserID))
                             End If
                         Next
-                        If Not q.First.ApproverId Is Nothing Then
+                        If q.First.ApproverId Is Nothing Then
+                            ddlApprovedBy.SelectedValue = -1
+                        Else
                             ddlApprovedBy.SelectedValue = q.First.ApproverId
                         End If
                     Else
@@ -1064,16 +1068,20 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         Dim approvers = StaffRmbFunctions.getApprovers(q.First, Nothing, Nothing)
  
                         ddlApprovedBy.Items.Clear()
-                        ddlApprovedBy.Items.Add(New ListItem())
+                        Dim blank As ListItem
+                        blank = New ListItem("", "-1")
+                        blank.Attributes.Add("disabled", "disabled")
+                        ddlApprovedBy.Items.Add(blank)
                         For Each row In approvers.UserIds
                             If Not row Is Nothing Then
                                 ddlApprovedBy.Items.Add(New ListItem(row.DisplayName, row.UserID))
                             End If
                         Next
-                        If Not q.First.ApprUserId Is Nothing Then
+                        If q.First.ApprUserId Is Nothing Then
+                            ddlApprovedBy.SelectedValue = -1
+                        Else
                             ddlApprovedBy.SelectedValue = q.First.ApprUserId
                         End If
-
 
                         ttlWaitingApp.Visible = True
                         ttlApprovedBy.Visible = False
@@ -1286,6 +1294,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         Case RmbStatus.Draft, RmbStatus.MoreInfo
                             ddlChargeTo.Enabled = True
                             btnSubmit.Visible = True
+                            If ddlApprovedBy.SelectedValue <= 0 Then
+                                btnSubmit.Enabled = False
+                                btnSubmit.ToolTip = "Please select an 'Approver' for this reimbursement"
+                            Else
+                                btnSubmit.ToolTip = ""
+                            End If
                             btnSave.Visible = True
                             btnSaveAdv.Visible = True
                             btnCancel.Visible = True
@@ -4162,7 +4176,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             message2 = message2.Replace("[STAFFNAME]", UserInfo.DisplayName).Replace("[ADVNO]", insert.AdvanceId)
             message2 = message2.Replace("[AMOUNT]", StaffBrokerFunctions.GetSetting("Currency", PortalId) & insert.RequestAmount)
-            message2 = message2.Replace("[APPRNAME]", toName)
+            message2 = message2.Replace("[APPRNAME]", Left(toName, Math.Max(toName.Length - 2, 0)))
             message2 = message2.Replace("[TEAMLEADERLIMIT]", StaffBrokerFunctions.GetSetting("Currency", PortalId) & Settings("TeamLeaderLimit"))
 
             message2 = message2.Replace("[COMMENTS]", insert.RequestText)
