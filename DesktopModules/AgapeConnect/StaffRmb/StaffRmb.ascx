@@ -1321,7 +1321,6 @@
                                                 <ItemTemplate>
                                                     <asp:Label ID="Label2" runat="server" CssClass='<%# IIF(Eval("OutOfDate"), "ui-state-highlight ui-corner-all","") %>' ToolTip='<%# IIF(Eval("OutOfDate"),Translate("OutOfDate"),"") %>' Text='<%# Bind("TransDate", "{0:d}") %>'></asp:Label>
                                                 </ItemTemplate>
-                                                <HeaderStyle ForeColor="White" />
                                                 <ItemStyle HorizontalAlign="Left" Width="50px" />
                                             </asp:TemplateField>
                                             <asp:TemplateField HeaderText="Line Type" SortExpression="LineType" ItemStyle-Width="110px">
@@ -1331,7 +1330,6 @@
                                                 <ItemTemplate>
                                                     <asp:Label ID="Label1" runat="server" CssClass='<%# IIF(IsWrongType(Eval("CostCenter"), Eval("LineType")), "ui-state-error ui-corner-all","") %>' ToolTip='<%# IIF(IsWrongType(Eval("CostCenter"), Eval("LineType")),Translate("lblWrongType"),"") %>' Text='<%# GetLocalTypeName(Eval("AP_Staff_RmbLineType.LineTypeId") )%>'></asp:Label>
                                                 </ItemTemplate>
-                                                <HeaderStyle ForeColor="White" />
                                                 <ItemStyle HorizontalAlign="Left" />
                                             </asp:TemplateField>
 
@@ -1351,7 +1349,6 @@
                                                         <asp:Label ID="lblRemainingBalance" runat="server" Font-Size="XX-Small" ForeColor="#AAAAAA" Font-Italic="true" Text="Estimated Remaining Balance:"></asp:Label>
                                                     </asp:Panel>
                                                 </FooterTemplate>
-                                                <HeaderStyle ForeColor="White" />
                                                 <ItemStyle HorizontalAlign="Left" />
                                                 <FooterStyle HorizontalAlign="Right" />
                                             </asp:TemplateField>
@@ -1372,13 +1369,11 @@
                                                         <asp:Label ID="lblRemainingBalance" runat="server" Font-Size="xx-small" Text='<%# GetRemainingBalance()%>'></asp:Label>
                                                     </asp:Panel>
                                                 </FooterTemplate>
-                                                <HeaderStyle ForeColor="White" />
                                                 <ItemStyle HorizontalAlign="Right" />
                                                 <FooterStyle HorizontalAlign="Right" />
                                             </asp:TemplateField>
                                             <asp:BoundField DataField="ReceiptNo" HeaderText="Receipt No" SortExpression="ReceiptNo"
-                                                HeaderStyle-ForeColor="White" ItemStyle-HorizontalAlign="Center" ItemStyle-Width="75px">
-                                                <HeaderStyle ForeColor="White"></HeaderStyle>
+                                               ItemStyle-HorizontalAlign="Center" ItemStyle-Width="75px">
                                                 <ItemStyle HorizontalAlign="Center"></ItemStyle>
                                             </asp:BoundField>
                                             <asp:TemplateField HeaderText="" ItemStyle-Width="10px" ItemStyle-Wrap="false">
@@ -1399,7 +1394,6 @@
 
 
                                                 </ItemTemplate>
-                                                <HeaderStyle ForeColor="White" />
                                                 <ItemStyle HorizontalAlign="Left" />
                                             </asp:TemplateField>
                                             <asp:TemplateField HeaderText="" ItemStyle-Width="10px" ItemStyle-Wrap="false">
@@ -1407,7 +1401,6 @@
                                                 </EditItemTemplate>
                                                 <ItemTemplate>
                                                 </ItemTemplate>
-                                                <HeaderStyle ForeColor="White" />
                                                 <ItemStyle HorizontalAlign="Left" />
                                             </asp:TemplateField>
                                         </Columns>
@@ -1492,10 +1485,10 @@
                         <asp:Panel ID="pnlMainAdvance" runat="server" Visible="false" CssClass="ui-widget ui-widget-content ui-corner-all">
                             <div class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all">
                                 <div style="width: 100%; vertical-align: middle; font-size: 20pt; margin: 3px 5px 3px 3px; font-weight: bold; border-width: 2pt; border-bottom-style: solid;">
-                                    <asp:Image ID="imgAdvAvatar" runat="server" Width="50px" ImageUrl="/images/no_avatar.gif" Style="float: left; color: White; margin-right: 5px; border-width: 2pt; border-style: solid;" />
+                                    <asp:Image ID="imgAdvAvatar" runat="server" Width="50px" ImageUrl="/images/no_avatar.gif" Style="float: left; color: blue; margin-right: 5px; border-width: 2pt; border-style: solid;" />
 
-                                    <asp:Label ID="Label42" runat="server" resourcekey="Advance" Style="float: left; margin-right: 3px; color: White;"></asp:Label>
-                                    <asp:Label ID="lblAdvanceId" runat="server" Style="float: left; color: White;"></asp:Label>:
+                                    <asp:Label ID="Label42" runat="server" resourcekey="Advance" Style="float: left; margin-right: 3px; color: blue;"></asp:Label>
+                                    <asp:Label ID="lblAdvanceId" runat="server" Style="float: left; color: blue;"></asp:Label>:
                            
                                 </div>
 
