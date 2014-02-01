@@ -168,7 +168,7 @@ namespace StaffRmb
             return result;
         }
 
-        static private string logonFromId(int portalId, int userId)
+        static public string logonFromId(int portalId, int userId)
         {
             if (userId < 0) return "";
             Regex stripPortal = new Regex(portalId.ToString() + "$");
@@ -202,6 +202,14 @@ namespace StaffRmb
         {
             string postData = string.Format("account={0}&amount={1}", account, amount);
             string url = "https://staffapps.powertochange.org/AuthManager/webservice/get_signatories";
+            return getResultFromWebService(url, postData);
+        }
+
+        static public string[] staffWhoReportTo(string logon, Boolean directly)
+        // Returns a list of staff who report (either directly or indirectly) to the given user
+        {
+            string postData = string.Format("logon={0}&directly{1}", logon, directly);
+            string url = "https://staffapps.powertochange.org/Authmanager/webservice/get_subordinates";
             return getResultFromWebService(url, postData);
         }
 
