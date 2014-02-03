@@ -710,25 +710,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     AdvReason.Text = q.First.RequestText
                     AdvDate.Text = Translate("AdvDate").Replace("[DATE]", q.First.RequestDate.Value.ToShortDateString)
                     If q.First.ApprovedDate Is Nothing Then
-                        Dim approvers = StaffRmbFunctions.getAdvApprovers(q.First, 0, Nothing, Nothing)
-                        ddlApprovedBy.Items.Clear()
-                        Dim blank As ListItem
-                        blank = New ListItem("", "-1")
-                        blank.Attributes.Add("disabled", "disabled")
-                        For Each row In approvers.UserIds
-                            If Not row Is Nothing Then
-                                ddlApprovedBy.Items.Add(New ListItem(row.DisplayName, row.UserID))
-                            End If
-                        Next
-                        If q.First.ApproverId Is Nothing Then
-                            ddlApprovedBy.SelectedValue = -1
-                        Else
-                            Try
-                                ddlApprovedBy.SelectedValue = q.First.ApproverId
-                            Catch ex As Exception
-                                ddlApprovedBy.SelectedValue = -1
-                            End Try
-                        End If
+                        updateApproversList(q.First)
                     Else
                         Dim Approver = UserController.GetUserById(PortalId, q.First.ApproverId).DisplayName
                         AdvDate.Text &= "<br />" & Translate("AdvApproved").Replace("[DATE]", q.First.ApprovedDate.Value.ToShortDateString).Replace("[STAFFNAME]", Approver)
@@ -955,23 +937,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     If q.First.ApprDate Is Nothing Then
                         'Dim AuthUser = UserController.GetUserById(PortalId, Settings("AuthUser"))
                         'Dim AuthAuthUser = UserController.GetUserById(PortalId, Settings("AuthAuthUser"))
-                        Dim approvers = StaffRmbFunctions.getApprovers(q.First, Nothing, Nothing)
+                        updateApproversList(q.First)
 
-                        ddlApprovedBy.Items.Clear()
-                        Dim blank As ListItem
-                        blank = New ListItem("", "-1")
-                        blank.Attributes.Add("disabled", "disabled")
-                        ddlApprovedBy.Items.Add(blank)
-                        For Each row In approvers.UserIds
-                            If Not row Is Nothing Then
-                                ddlApprovedBy.Items.Add(New ListItem(row.DisplayName, row.UserID))
-                            End If
-                        Next
-                        Try
-                            ddlApprovedBy.SelectedValue = q.First.ApprUserId
-                        Catch ex As Exception
-                            ddlApprovedBy.SelectedValue = -1
-                        End Try
 
                         ttlWaitingApp.Visible = True
                         ttlApprovedBy.Visible = False
@@ -1182,7 +1149,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     If ddlApprovedBy.SelectedValue <= 0 Then
                         btnSubmit.Enabled = False
-                        btnSubmit.ToolTip = "Please select an 'Approver' for this reimbursement, and click 'Save'"
+                        btnSubmit.ToolTip = "Please select an 'Approver' for this reimbursement"
                     Else
                         btnSubmit.ToolTip = ""
                     End If
@@ -1371,6 +1338,34 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 lblError.Visible = True
             End Try
 
+        End Sub
+
+        Private Sub updateApproversList(ByRef obj As Object)
+            Dim approvers As Object
+            Dim approverId = -1
+            If (obj.GetType() Is GetType(AP_Staff_Rmb)) Then
+                approvers = StaffRmbFunctions.getApprovers(obj, Nothing, Nothing)
+                approverId = obj.ApprUserId
+            Else
+                approvers = StaffRmbFunctions.getAdvApprovers(obj, 0D, Nothing, Nothing)
+                approverId = obj.ApproverId
+            End If
+
+            ddlApprovedBy.Items.Clear()
+            Dim blank As ListItem
+            blank = New ListItem("", "-1")
+            blank.Attributes.Add("disabled", "disabled")
+            ddlApprovedBy.Items.Add(blank)
+            For Each row In approvers.UserIds
+                If Not row Is Nothing Then
+                    ddlApprovedBy.Items.Add(New ListItem(row.DisplayName, row.UserID))
+                End If
+            Next
+            Try
+                ddlApprovedBy.SelectedValue = approverId
+            Catch ex As Exception
+                ddlApprovedBy.SelectedValue = -1
+            End Try
         End Sub
 #End Region
 
@@ -1905,7 +1900,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value
             If rmb.Count > 0 Then
-
+                '--Ensure form is saved first
+                btnSave_Click(Me, Nothing)
 
 
                 Dim NewStatus As Integer = RmbStatus.Submitted
@@ -2351,7 +2347,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             theRmb.First.Status = RmbStatus.PendingDownload
             theRmb.First.ProcDate = Today
             theRmb.First.MoreInfoRequested = False
-            theRmb.First.ProcUserId = Userid
+            theRmb.First.ProcUserId = UserId
             d.SubmitChanges()
             LoadRmb(hfRmbNo.Value)
             ResetMenu()
@@ -2801,18 +2797,26 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         row.CostCenter = ddlChargeTo.SelectedValue
                     End If
                 Next
-
-
-
             End If
 
             rmb.First.CostCenter = ddlChargeTo.SelectedValue
             rmb.First.Department = Dept
+            updateApproversList(rmb.First)
             d.SubmitChanges()
-
 
             btnSave_Click(Me, Nothing)
         End Sub
+
+        Protected Sub ddlApprovedBy_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles ddlApprovedBy.SelectedIndexChanged
+            Dim RmbNo = CInt(hfRmbNo.Value)
+            Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo And c.PortalId = PortalId
+
+            rmb.First.ApprUserId = ddlApprovedBy.SelectedValue
+            d.SubmitChanges()
+            btnSave_Click(Me, Nothing)
+            LoadRmb(hfRmbNo.Value)
+        End Sub
+
 
 #End Region
 #Region "Formatting and shortcuts"
@@ -3944,7 +3948,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 ResetMenu()
 
 
-                
+
             End If
 
 
@@ -4882,6 +4886,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Property
 
 #End Region
-      
+
     End Class
 End Namespace

@@ -1208,7 +1208,7 @@
                                             <asp:Label ID="ttlApprovedBy" runat="server" resourcekey="ApprovedBy" Visible="false"></asp:Label>
                                         </td>
                                         <td class="hdrValue" rowspan="2" valign="top">
-                                            <asp:DropDownList ID="ddlApprovedBy" runat="server"></asp:DropDownList>
+                                            <asp:DropDownList ID="ddlApprovedBy" AutoPostBack="true" runat="server"></asp:DropDownList>
                                         </td>
                                         <td class="hdrTitle">
                                             <asp:Label ID="Label22" runat="server" resourcekey="ProcessedBy"></asp:Label>
