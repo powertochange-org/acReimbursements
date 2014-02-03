@@ -967,15 +967,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                 ddlApprovedBy.Items.Add(New ListItem(row.DisplayName, row.UserID))
                             End If
                         Next
-                        If q.First.ApprUserId Is Nothing Then
+                        Try
+                            ddlApprovedBy.SelectedValue = q.First.ApprUserId
+                        Catch ex As Exception
                             ddlApprovedBy.SelectedValue = -1
-                        Else
-                            Try
-                                ddlApprovedBy.SelectedValue = q.First.ApprUserId
-                            Catch ex As Exception
-                                ddlApprovedBy.SelectedValue = -1
-                            End Try
-                        End If
+                        End Try
 
                         ttlWaitingApp.Visible = True
                         ttlApprovedBy.Visible = False
