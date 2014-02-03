@@ -267,6 +267,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         End Sub
 #End Region
+
 #Region "Loading Functions"
         Public Sub ResetMenu()
 
@@ -295,15 +296,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 'Select Reimbursements that you submitted that are awaiting approval
                 Dim allStaff = StaffBrokerFunctions.GetStaff()
-                'Dim Team = StaffBrokerFunctions.GetTeam(UserId) 
-                Dim Team As New List(Of StaffBroker.User) '--people that report to this user (indirectly or directly) 
-                Dim userLogon = StaffRmbFunctions.logonFromId(PortalId, UserId)
-                For Each logon In StaffRmbFunctions.staffWhoReportTo(userLogon, False)
-                    Team.Add(From s In allStaff Where s.Username = logon + PortalId.ToString())
-                Next
-
+                Dim Team = StaffBrokerFunctions.GetTeam(UserId)
                 Dim SpouseList = StaffBrokerFunctions.GetTeam(SpouseId)
                 'Dim CostCentres = StaffBrokerFunctions.GetDepartments(UserId) '--departments that user manages (or have been delegated to him)
+
                 If isAcc Then '--if user is on the accounts team...
                     pnlSubmittedView.Visible = False
                     pnlApprovedAcc.Visible = True
@@ -960,7 +956,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         'Dim AuthUser = UserController.GetUserById(PortalId, Settings("AuthUser"))
                         'Dim AuthAuthUser = UserController.GetUserById(PortalId, Settings("AuthAuthUser"))
                         Dim approvers = StaffRmbFunctions.getApprovers(q.First, Nothing, Nothing)
- 
+
                         ddlApprovedBy.Items.Clear()
                         Dim blank As ListItem
                         blank = New ListItem("", "-1")
