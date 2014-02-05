@@ -2822,7 +2822,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Try
                 rmb.First.ApprUserId = ddlApprovedBy.SelectedValue
             Catch
-                rmb.First.ApprUserId = Nothing;
+                rmb.First.ApprUserId = Nothing
             End Try
             d.SubmitChanges()
             btnSave_Click(Me, Nothing)
