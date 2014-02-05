@@ -1345,7 +1345,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
 
             Catch ex As Exception
-                lblError.Text = "Error loading Rmb: " & ex.Message
+                lblError.Text = "Error loading Rmb: " & ex.Message & ex.StackTrace
                 lblError.Visible = True
             End Try
 
