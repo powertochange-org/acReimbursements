@@ -305,6 +305,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     pnlApprovedAcc.Visible = True
                     pnlApprovedView.Visible = False
 
+                    '--Build a tree of all reimbursements in "submitted" state
                     'allStaff = StaffBrokerFunctions.GetStaff()
                     Dim AllStaffNode As New TreeNode("All Staff")
                     AllStaffNode.SelectAction = TreeNodeSelectAction.Expand
@@ -330,7 +331,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             End If
                         Next
 
-                        '--...and list advance requests
+                        '--...and submitted advance requests
                         Dim SubmittedAdv = (From c In d.AP_Staff_AdvanceRequests Where c.RequestStatus = RmbStatus.Submitted And c.PortalId = PortalId And c.UserId = person.UserID Order By c.LocalAdvanceId Descending Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId).Take(MenuSize)
                         For Each row In SubmittedAdv
                             Dim node2 As New TreeNode()
@@ -382,7 +383,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     tvAllSubmitted.Nodes.Add(AllStaffNode)
                     tvProcessed.Nodes.Add(AllStaffNode2)
 
-
+                    '--This is the key part for the ACCOUNTS team (approved, but not processed requests)
                     '--lookup all approved reimbursements
                     Dim AllApproved = (From c In d.AP_Staff_Rmbs
                                        Where (c.Status = RmbStatus.Approved Or c.Status >= RmbStatus.PendingDownload) And c.PortalId = PortalId Order By c.RID Descending
@@ -936,19 +937,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     updateApproversList(q.First)
                     If q.First.ApprDate Is Nothing Then
-                        'Dim AuthUser = UserController.GetUserById(PortalId, Settings("AuthUser"))
-                        'Dim AuthAuthUser = UserController.GetUserById(PortalId, Settings("AuthAuthUser"))
                         ttlWaitingApp.Visible = True
                         ttlApprovedBy.Visible = False
                         lblApprovedDate.Text = ""
-                        ''ddlApprovedBy.Text = appList
                     Else
                         ttlWaitingApp.Visible = False
                         ttlApprovedBy.Visible = True
                         Dim approver = UserController.GetUserById(PortalId, q.First.ApprUserId)
                         ttlApprovedBy.Text = approver.DisplayName
                         lblApprovedDate.Text = q.First.ApprDate.Value.ToShortDateString
-
                     End If
 
                     If q.First.ProcUserId Is Nothing Then
@@ -1154,6 +1151,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Select Case q.First.Status
                         Case RmbStatus.Draft, RmbStatus.MoreInfo
                             ddlChargeTo.Enabled = True
+                            ddlApprovedBy.Visible = True
                             ddlApprovedBy.Enabled = True
                             btnSubmit.Visible = True
                             btnSave.Visible = True
@@ -1166,7 +1164,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             tbAdvanceAmount.Enabled = True
                         Case RmbStatus.Submitted
                             ddlChargeTo.Enabled = False
-                            ddlApprovedBy.Enabled = False
+                            ddlApprovedBy.Visible = False
+                            lblApprovedBy.Visible = True
                             btnSubmit.Visible = False
                             btnSave.Visible = True
                             btnSaveAdv.Visible = True
@@ -1178,7 +1177,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             tbAdvanceAmount.Enabled = True
                         Case RmbStatus.Approved
                             ddlChargeTo.Enabled = False
-                            ddlApprovedBy.Enabled = False
+                            ddlApprovedBy.Visible = False
+                            lblApprovedBy.Visible = True
                             btnSubmit.Visible = False
                             btnSave.Visible = True
                             btnSaveAdv.Visible = True
@@ -1191,7 +1191,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             tbAdvanceAmount.Enabled = True
                         Case RmbStatus.PendingDownload, RmbStatus.DownloadFailed
                             ddlChargeTo.Enabled = False
-                            ddlApprovedBy.Enabled = False
+                            ddlApprovedBy.Visible = False
+                            lblApprovedBy.Visible = True
                             btnSubmit.Visible = False
                             btnSave.Visible = False
                             btnSaveAdv.Visible = False
@@ -1204,7 +1205,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             cbMoreInfo.Visible = False
                         Case RmbStatus.Processed
                             ddlChargeTo.Enabled = False
-                            ddlApprovedBy.Enabled = False
+                            ddlApprovedBy.Visible = False
+                            lblApprovedBy.Visible = True
                             btnSubmit.Visible = False
                             btnSave.Visible = False
                             btnSaveAdv.Visible = False
@@ -1217,7 +1219,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             cbMoreInfo.Visible = False
                         Case RmbStatus.Cancelled
                             ddlChargeTo.Enabled = True
+                            ddlApprovedBy.Visible = True
                             ddlApprovedBy.Enabled = True
+                            lblApprovedBy.Visible = False
                             btnSubmit.Visible = True
                             btnSave.Visible = True
                             btnSaveAdv.Visible = True
@@ -1229,7 +1233,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             tbAdvanceAmount.Enabled = True
                         Case Else
                             ddlChargeTo.Enabled = False
-                            ddlApprovedBy.Enabled = False
+                            ddlApprovedBy.Visible = True
+                            ddlApprovedBy.Enabled = True
+                            lblApprovedBy.Visible = False
                             btnSubmit.Visible = False
                             btnSave.Visible = False
                             btnSaveAdv.Visible = False
@@ -1372,8 +1378,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Next
             Try
                 ddlApprovedBy.SelectedValue = approverId
+                lblApprovedBy.Text = ddlApprovedBy.SelectedItem.ToString
             Catch ex As Exception
                 ddlApprovedBy.SelectedValue = -1
+                lblApprovedBy.Text = "[NOBODY]"
             End Try
         End Sub
 #End Region

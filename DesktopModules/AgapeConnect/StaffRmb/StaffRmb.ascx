@@ -743,7 +743,7 @@
                                 </asp:Panel>
                             </a>
 
-                        </h3>
+                            </h3>
                             <div id="SubmittedPane">
                                 <asp:UpdatePanel ID="UpdatePanel4" runat="server">
                                     <ContentTemplate>
@@ -846,6 +846,8 @@
                                 </asp:UpdatePanel>
                             </div>
 
+                        </h3>
+
 
                     </div>
                     <div>
@@ -858,7 +860,7 @@
                                     <asp:Label ID="lblToProcess" runat="server" Font-Bold="true"></asp:Label>
                                 </asp:Panel>
                             </a>
-                        </h3>
+                            </h3>
                             <div id="ApprovedPane">
                                 <asp:UpdatePanel ID="UpdatePanel6" runat="server">
                                     <ContentTemplate>
@@ -1079,6 +1081,7 @@
                                     </Triggers>
                                 </asp:UpdatePanel>
                             </div>
+                        </h3>
 
                     </div>
                     <div>
@@ -1209,6 +1212,7 @@
                                         </td>
                                         <td class="hdrValue" rowspan="2" valign="top">
                                             <asp:DropDownList ID="ddlApprovedBy" AutoPostBack="true" runat="server"></asp:DropDownList>
+                                            <asp:Label ID="lblApprovedBy" runat="server" Visible="false"></asp:Label>
                                         </td>
                                         <td class="hdrTitle">
                                             <asp:Label ID="Label22" runat="server" resourcekey="ProcessedBy"></asp:Label>
