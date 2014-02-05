@@ -2819,8 +2819,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Protected Sub ddlApprovedBy_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles ddlApprovedBy.SelectedIndexChanged
             Dim RmbNo = CInt(hfRmbNo.Value)
             Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo And c.PortalId = PortalId
-
-            rmb.First.ApprUserId = ddlApprovedBy.SelectedValue
+            Try
+                rmb.First.ApprUserId = ddlApprovedBy.SelectedValue
+            Catch
+                rmb.First.ApprUserId = Nothing;
+            End Try
             d.SubmitChanges()
             btnSave_Click(Me, Nothing)
             LoadRmb(hfRmbNo.Value)
