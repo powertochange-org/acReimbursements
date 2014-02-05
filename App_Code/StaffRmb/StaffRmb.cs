@@ -213,6 +213,19 @@ namespace StaffRmb
             return getResultFromWebService(url, postData);
         }
 
+        static public double accountBalance(string account, string user_logon)
+        // Returns the balance of the account, or 0 if the specified user does not have View Finanicals access to the account
+        {
+            string postData = string.Format("_reportPath=/General/AccountBalance&_renderFormat=CSV&_apiToken={0}&ProjectCodeSearch={1}&ExecuteAsUser={2}", Constants.getApiToken(), account, user_logon);
+            string url = "https://1chronicles/CallRptServices2012/CallRpt.aspx";
+            double result = 0;
+            try {
+                result = Double.Parse(getResultFromWebService(url, postData)[0]);
+            } catch(Exception e) {
+            }
+            return result;
+        }
+
         static private string[] getResultFromWebService(string url, string postString)
         {
             byte[] postData = Encoding.UTF8.GetBytes(postString);

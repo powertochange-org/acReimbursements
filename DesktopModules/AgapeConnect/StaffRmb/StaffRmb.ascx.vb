@@ -948,7 +948,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         ttlWaitingApp.Visible = False
                         ttlApprovedBy.Visible = True
                         Dim approver = UserController.GetUserById(PortalId, q.First.ApprUserId)
-                        ddlApprovedBy.Text = approver.DisplayName
+                        ttlApprovedBy.Text = approver.DisplayName
                         lblApprovedDate.Text = q.First.ApprDate.Value.ToShortDateString
 
                     End If
@@ -1147,15 +1147,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
 
 
-                    If ddlApprovedBy.SelectedValue <= 0 Then
+                    If ddlApprovedBy.SelectedValue.Length = 0 Or ddlApprovedBy.SelectedValue.Equals("-1") Then
                         btnSubmit.Enabled = False
-                        btnSubmit.ToolTip = "Please select an 'Approver' for this reimbursement"
+                        btnSubmit.ToolTip = "Please select an 'Approver' before submitting"
                     Else
                         btnSubmit.ToolTip = ""
                     End If
                     Select Case q.First.Status
                         Case RmbStatus.Draft, RmbStatus.MoreInfo
                             ddlChargeTo.Enabled = True
+                            ddlApprovedBy.Enabled = True
                             btnSubmit.Visible = True
                             btnSave.Visible = True
                             btnSaveAdv.Visible = True
@@ -1167,6 +1168,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             tbAdvanceAmount.Enabled = True
                         Case RmbStatus.Submitted
                             ddlChargeTo.Enabled = False
+                            ddlApprovedBy.Enabled = False
                             btnSubmit.Visible = False
                             btnSave.Visible = True
                             btnSaveAdv.Visible = True
@@ -1178,6 +1180,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             tbAdvanceAmount.Enabled = True
                         Case RmbStatus.Approved
                             ddlChargeTo.Enabled = False
+                            ddlApprovedBy.Enabled = False
                             btnSubmit.Visible = False
                             btnSave.Visible = True
                             btnSaveAdv.Visible = True
@@ -1190,6 +1193,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             tbAdvanceAmount.Enabled = True
                         Case RmbStatus.PendingDownload, RmbStatus.DownloadFailed
                             ddlChargeTo.Enabled = False
+                            ddlApprovedBy.Enabled = False
                             btnSubmit.Visible = False
                             btnSave.Visible = False
                             btnSaveAdv.Visible = False
@@ -1202,6 +1206,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             cbMoreInfo.Visible = False
                         Case RmbStatus.Processed
                             ddlChargeTo.Enabled = False
+                            ddlApprovedBy.Enabled = False
                             btnSubmit.Visible = False
                             btnSave.Visible = False
                             btnSaveAdv.Visible = False
@@ -1214,6 +1219,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             cbMoreInfo.Visible = False
                         Case RmbStatus.Cancelled
                             ddlChargeTo.Enabled = True
+                            ddlApprovedBy.Enabled = True
                             btnSubmit.Visible = True
                             btnSave.Visible = True
                             btnSaveAdv.Visible = True
@@ -1225,6 +1231,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             tbAdvanceAmount.Enabled = True
                         Case Else
                             ddlChargeTo.Enabled = False
+                            ddlApprovedBy.Enabled = False
                             btnSubmit.Visible = False
                             btnSave.Visible = False
                             btnSaveAdv.Visible = False
@@ -1325,6 +1332,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         tbApprComments.Enabled = False
                         tbAccComments.Enabled = False
                     End If
+                    If q.First.Status = RmbStatus.Cancelled Then
+                        tbComments.Enabled = True
+                    End If
+
                     'pnlMain.Visible = True
                     'pnlSplash.Visible = False  
                 Else
@@ -3165,28 +3176,32 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Function
 
         Public Function GetNumericRemainingBalance(ByVal mode As Integer) As Double
+
             Dim statusList = {RmbStatus.Approved, RmbStatus.PendingDownload, RmbStatus.DownloadFailed}
             If mode = 2 Then
                 statusList = {RmbStatus.PendingDownload, RmbStatus.DownloadFailed}
             End If
+
             Dim AccountBalance As Double = 0
             If hfAccountBalance.Value <> "" Then
                 AccountBalance = hfAccountBalance.Value
             End If
 
+            '--Get totals from form
             Dim r = (From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value) And PortalId = PortalId).First
+            Dim theStaff = StaffBrokerFunctions.GetStaffMember(r.UserId)
 
             Dim Advance As Double = 0
             If Not r.AdvanceRequest = Nothing Then
                 Advance = r.AdvanceRequest
             End If
 
-            Dim theStaff = StaffBrokerFunctions.GetStaffMember(r.UserId)
             Dim rTotal As Double = 0
             Dim rT = (From c In d.AP_Staff_RmbLines Where c.AP_Staff_Rmb.PortalId = PortalId And (c.AP_Staff_Rmb.UserId = theStaff.UserId1 Or c.AP_Staff_Rmb.UserId = theStaff.UserId2) And statusList.Contains(c.AP_Staff_Rmb.Status) Select c.GrossAmount)
             If rT.Count > 0 Then
                 rTotal = rT.Sum()
             End If
+
             Dim a = (From c In d.AP_Staff_AdvanceRequests Where c.PortalId = PortalId And (c.UserId = theStaff.UserId1 Or c.UserId = theStaff.UserId2) And statusList.Contains(c.RequestStatus) Select c.RequestAmount)
             Dim aTotal As Double = 0
             If a.Count > 0 Then
