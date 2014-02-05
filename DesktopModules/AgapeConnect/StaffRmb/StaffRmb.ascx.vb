@@ -949,6 +949,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         ttlApprovedBy.Visible = True
                         Dim approver = UserController.GetUserById(PortalId, q.First.ApprUserId)
                         ttlApprovedBy.Text = approver.DisplayName
+                        ddlApprovedBy.Items.Add(approver.DisplayName) 'This is hidden, but it can't be blank
                         lblApprovedDate.Text = q.First.ApprDate.Value.ToShortDateString
 
                     End If
