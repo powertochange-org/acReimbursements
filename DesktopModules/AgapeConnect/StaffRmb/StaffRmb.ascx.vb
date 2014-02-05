@@ -1147,7 +1147,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
 
 
-                    If ddlApprovedBy.SelectedValue.Length = 0 Or ddlApprovedBy.SelectedValue.Equals("-1") Then
+                    If ddlApprovedBy.SelectedValue = Nothing Or ddlApprovedBy.SelectedValue.Equals("-1") Then
                         btnSubmit.Enabled = False
                         btnSubmit.ToolTip = "Please select an 'Approver' before submitting"
                     Else
