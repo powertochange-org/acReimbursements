@@ -246,13 +246,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 If lt.Count > 0 Then
 
-
-
                     phLineDetail.Controls.Clear()
                     theControl = LoadControl(lt.First.ControlPath)
                     theControl.ID = "theControl"
                     phLineDetail.Controls.Add(theControl)
-
 
 
                 End If
@@ -307,81 +304,108 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     '--Build a tree of all reimbursements in "submitted" state
                     'allStaff = StaffBrokerFunctions.GetStaff()
-                    Dim AllStaffNode As New TreeNode("All Staff")
-                    AllStaffNode.SelectAction = TreeNodeSelectAction.Expand
-                    AllStaffNode.Expanded = False
-                    Dim AllStaffNode2 As New TreeNode("All Staff")
-                    AllStaffNode2.SelectAction = TreeNodeSelectAction.Expand
-                    AllStaffNode2.Expanded = False
-                    For Each person In allStaff '--list submitted reimbursements by person
-                        Dim Submitted = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Submitted And c.PortalId = PortalId And (c.UserId = person.UserID) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
-                        Dim node As New TreeNode(person.DisplayName)
-                        node.Expanded = False
-                        node.SelectAction = TreeNodeSelectAction.Expand
-                        For Each row In Submitted '--get details of each reimbursement
-                            Dim node2 As New TreeNode()
-                            node2.Text = GetRmbTitleTeamShort(row.RID, row.RmbDate)
-                            node2.NavigateUrl = NavigateURL() & "?RmbNo=" & row.RMBNo
+                    Dim AllStaffSubmittedNode As New TreeNode("All Staff")
+                    AllStaffSubmittedNode.SelectAction = TreeNodeSelectAction.Expand
+                    AllStaffSubmittedNode.Expanded = False
+                    '--Build a tree of all reimbursements in "processed" state
+                    Dim AllStaffProcessedNode As New TreeNode("All Staff")
+                    AllStaffProcessedNode.SelectAction = TreeNodeSelectAction.Expand
+                    AllStaffProcessedNode.Expanded = False
 
-                            node.ChildNodes.Add(node2)
+                    '--Divide the list by first letter of last name
+                    tvProcessed.Nodes.Clear()
+                    tvAllSubmitted.Nodes.Clear()
+                    For Each c In "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray()
+                        Dim sNode As New TreeNode(c)
+                        Dim pNode As New TreeNode(c)
+                        sNode.Expanded = False
+                        pNode.Expanded = False
+                        sNode.SelectAction = TreeNodeSelectAction.Expand
+                        pNode.SelectAction = TreeNodeSelectAction.Expand
+                        AllStaffSubmittedNode.ChildNodes.Add(sNode)
+                        AllStaffProcessedNode.ChildNodes.Add(pNode)
+                    Next
+
+                    '--list submitted/processed reimbursements by person
+                    For Each person In allStaff
+                        Dim letterIndex = Asc(person.LastName.ElementAt(0)) - Asc("A")
+                        Dim sAlphabetNode = AllStaffSubmittedNode.ChildNodes.Item(letterIndex)
+                        Dim pAlphabetNode = AllStaffProcessedNode.ChildNodes.Item(letterIndex)
+                        '--here are the submitted reimbursements
+                        Dim Submitted = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Submitted And c.PortalId = PortalId And (c.UserId = person.UserID) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
+
+                        Dim submittedNode As New TreeNode(person.DisplayName)
+                        submittedNode.Expanded = False
+                        submittedNode.SelectAction = TreeNodeSelectAction.Expand
+
+                        For Each row In Submitted '--get details of each reimbursement
+                            Dim reimbursementNode As New TreeNode()
+                            reimbursementNode.Text = GetRmbTitleTeamShort(row.RID, row.RmbDate)
+                            reimbursementNode.NavigateUrl = NavigateURL() & "?RmbNo=" & row.RMBNo
+
+                            submittedNode.ChildNodes.Add(reimbursementNode)
 
                             If IsSelected(row.RMBNo) Then
-                                node.Expanded = True
-                                AllStaffNode.Expanded = True
+                                submittedNode.Expanded = True
+                                sAlphabetNode.Expanded = True
+                                AllStaffSubmittedNode.Expanded = True
                             End If
                         Next
 
-                        '--...and submitted advance requests
+                        '--...and each advance requests
                         Dim SubmittedAdv = (From c In d.AP_Staff_AdvanceRequests Where c.RequestStatus = RmbStatus.Submitted And c.PortalId = PortalId And c.UserId = person.UserID Order By c.LocalAdvanceId Descending Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId).Take(MenuSize)
                         For Each row In SubmittedAdv
-                            Dim node2 As New TreeNode()
-                            node2.Text = GetAdvTitleTeamShort(row.LocalAdvanceId, row.RequestDate)
-                            node2.NavigateUrl = NavigateURL() & "?RmbNo=" & -row.AdvanceId
-                            node.ChildNodes.Add(node2)
+                            Dim advanceNode As New TreeNode()
+                            advanceNode.Text = GetAdvTitleTeamShort(row.LocalAdvanceId, row.RequestDate)
+                            advanceNode.NavigateUrl = NavigateURL() & "?RmbNo=" & -row.AdvanceId
+                            submittedNode.ChildNodes.Add(advanceNode)
                             If IsSelected(-row.AdvanceId) Then
-                                node.Expanded = True
-                                AllStaffNode.Expanded = True
+                                submittedNode.Expanded = True
+                                sAlphabetNode.Expanded = True
+                                AllStaffSubmittedNode.Expanded = True
                             End If
                         Next
 
                         '--list processed reimbursements
-                        Dim nodeB As New TreeNode(person.DisplayName)
-                        nodeB.Expanded = False
-                        nodeB.SelectAction = TreeNodeSelectAction.Expand
+                        Dim processedNode As New TreeNode(person.DisplayName)
+                        processedNode.Expanded = False
+                        processedNode.SelectAction = TreeNodeSelectAction.Expand
                         Dim Processed = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Processed And c.PortalId = PortalId And (c.UserId = person.UserID) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
                         For Each row In Processed
-                            Dim node2 As New TreeNode()
-                            node2.Text = GetRmbTitleTeamShort(row.RID, row.RmbDate)
-                            node2.NavigateUrl = NavigateURL() & "?RmbNo=" & row.RMBNo
+                            Dim reimbursementNode As New TreeNode()
+                            reimbursementNode.Text = GetRmbTitleTeamShort(row.RID, row.RmbDate)
+                            reimbursementNode.NavigateUrl = NavigateURL() & "?RmbNo=" & row.RMBNo
 
-                            nodeB.ChildNodes.Add(node2)
+                            processedNode.ChildNodes.Add(reimbursementNode)
                             If IsSelected(row.RMBNo) Then
-                                nodeB.Expanded = True
-                                AllStaffNode2.Expanded = True
+                                processedNode.Expanded = True
+                                pAlphabetNode.Expanded = True
+                                AllStaffProcessedNode.Expanded = True
                             End If
                         Next
 
                         '--...and list processed advances
                         Dim ProcessedAdv = (From c In d.AP_Staff_AdvanceRequests Where c.RequestStatus = RmbStatus.Processed And c.PortalId = PortalId And c.UserId = person.UserID Order By c.LocalAdvanceId Descending Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId).Take(MenuSize)
                         For Each row In ProcessedAdv
-                            Dim node2 As New TreeNode()
-                            node2.Text = GetAdvTitleTeamShort(row.LocalAdvanceId, row.RequestDate)
-                            node2.NavigateUrl = NavigateURL() & "?RmbNo=" & -row.AdvanceId
-                            nodeB.ChildNodes.Add(node2)
+                            Dim advanceNode As New TreeNode()
+                            advanceNode.Text = GetAdvTitleTeamShort(row.LocalAdvanceId, row.RequestDate)
+                            advanceNode.NavigateUrl = NavigateURL() & "?RmbNo=" & -row.AdvanceId
+                            processedNode.ChildNodes.Add(advanceNode)
                             If IsSelected(-row.AdvanceId) Then
-                                nodeB.Expanded = True
-                                AllStaffNode2.Expanded = True
+                                processedNode.Expanded = True
+                                AllStaffProcessedNode.Expanded = True
                             End If
                         Next
 
 
-                        AllStaffNode2.ChildNodes.Add(nodeB)
-                        AllStaffNode.ChildNodes.Add(node)
+                        pAlphabetNode.ChildNodes.Add(processedNode)
+                        sAlphabetNode.ChildNodes.Add(submittedNode
+                                                             )
                     Next
                     tvProcessed.Nodes.Clear()
                     tvAllSubmitted.Nodes.Clear()
-                    tvAllSubmitted.Nodes.Add(AllStaffNode)
-                    tvProcessed.Nodes.Add(AllStaffNode2)
+                    tvAllSubmitted.Nodes.Add(AllStaffSubmittedNode)
+                    tvProcessed.Nodes.Add(AllStaffProcessedNode)
 
                     '--This is the key part for the ACCOUNTS team (approved, but not processed requests)
                     '--lookup all approved reimbursements
