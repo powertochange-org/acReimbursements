@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?><Database Name="AgapeConnect" Class="StaffRmbDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
-  <Connection Mode="WebSettings" ConnectionString="Data Source=.\SQLEXPRESS;Initial Catalog=AgapeConnect;Integrated Security=True" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="SiteSqlServer" Provider="System.Data.SqlClient" />
+  <Connection Mode="WebSettings" ConnectionString="Data Source=DEV_SQL2012;Initial Catalog=PTC_Staff;User ID=PTC_Staff" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="SiteSqlServer" Provider="System.Data.SqlClient" />
   <Table Name="dbo.AP_Staff_RmbLineType" Member="AP_Staff_RmbLineTypes">
     <Type Name="AP_Staff_RmbLineType">
       <Column Name="LineTypeId" Type="System.Int16" DbType="SmallInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />

@@ -102,6 +102,14 @@ namespace StaffRmb
         {
         }
 
+        static public String getCostCentres()
+        {
+            var result = new StaffRmbDataContext().AP_StaffBroker_CostCenters.Select(s => new { label = s.CostCentreCode + ":" + s.CostCentreName, value = s.CostCentreCode}).OrderBy(o => o.value);
+            return JsonConvert.SerializeObject(result).Replace('\'', ' ').Replace("\"label\"","label").Replace("\"value\"","value");
+            //return "[{label:\"920080:Brent Nesbitt\", value:\"920080\"},{label:\"123000:Advancement\", value:\"123000\"}]";
+            
+        }
+
 
         static public Approvers getApprovers(AP_Staff_Rmb rmb, DotNetNuke.Entities.Users.UserInfo authUser, DotNetNuke.Entities.Users.UserInfo authAuthUser)
         {
@@ -194,7 +202,8 @@ namespace StaffRmb
             if (logon.Equals("")) return new string[0];
             string postData = string.Format("logon={0}", logon);
             string url = "https://staffapps.powertochange.org/AuthManager/webservice/get_department_supervisors";
-            return getResultFromWebService(url, postData);
+            string result = getResultFromWebService(url, postData);
+            return JsonConvert.DeserializeObject<string[]>(result);
         }
 
         static private string[] staffWithSigningAuthority(string account, Decimal amount)
@@ -202,7 +211,8 @@ namespace StaffRmb
         {
             string postData = string.Format("account={0}&amount={1}", account, amount);
             string url = "https://staffapps.powertochange.org/AuthManager/webservice/get_signatories";
-            return getResultFromWebService(url, postData);
+            string result = getResultFromWebService(url, postData);
+            return JsonConvert.DeserializeObject<string[]>(result);
         }
 
         static public string[] staffWhoReportTo(string logon, Boolean directly)
@@ -210,7 +220,17 @@ namespace StaffRmb
         {
             string postData = string.Format("logon={0}&directly{1}", logon, directly);
             string url = "https://staffapps.powertochange.org/Authmanager/webservice/get_subordinates";
-            return getResultFromWebService(url, postData);
+            string result = getResultFromWebService(url, postData);
+            return JsonConvert.DeserializeObject<string[]>(result);
+        }
+
+        static public string getAccounts(string logon)
+        // Returns a list of all accounts, provided the given logon is valid (using checkAuthorizations where user==logon)
+        {
+            string postData = string.Format("logon={0}", logon);
+            string url = "https://staffapps.powertochange.org/Authmanager/webservice/get_accounts";
+            string result = getResultFromWebService(url, postData);
+            return result;
         }
 
         static public double accountBalance(string account, string user_logon)
@@ -219,14 +239,10 @@ namespace StaffRmb
             string postData = string.Format("_reportPath=/General/AccountBalance&_renderFormat=CSV&_apiToken={0}&ProjectCodeSearch={1}&ExecuteAsUser={2}", Constants.getApiToken(), account, user_logon);
             string url = "https://1chronicles/CallRptServices2012/CallRpt.aspx";
             double result = 0;
-            try {
-                result = Double.Parse(getResultFromWebService(url, postData)[0]);
-            } catch(Exception e) {
-            }
             return result;
         }
 
-        static private string[] getResultFromWebService(string url, string postString)
+        static private string getResultFromWebService(string url, string postString)
         {
             byte[] postData = Encoding.UTF8.GetBytes(postString);
             //send request
@@ -246,7 +262,7 @@ namespace StaffRmb
             dataStream.Close();
             response.Close();
 
-            return JsonConvert.DeserializeObject<string[]>(response_string);
+            return response_string;
         }
 
 

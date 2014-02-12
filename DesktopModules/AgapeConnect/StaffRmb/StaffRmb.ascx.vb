@@ -152,11 +152,18 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 ddlNewChargeTo.DataValueField = "CostCenter"
                 ddlNewChargeTo.DataBind()
 
-                ddlChargeTo.DataSource = From c In q Order By c.ViewOrder, c.DisplayName
-                ddlChargeTo.DataTextField = "DisplayName"
-                ddlChargeTo.DataValueField = "CostCenter"
-                ddlChargeTo.DataBind()
+                'ddlChargeTo.DataSource = From c In q Order By c.ViewOrder, c.DisplayName
+                'ddlChargeTo.DataTextField = "DisplayName"
+                'ddlChargeTo.DataValueField = "CostCenter"
+                'ddlChargeTo.DataBind()
 
+                'Dim myArrayValue = "var allAccounts = " & StaffRmbFunctions.getAccounts(StaffRmbFunctions.logonFromId(PortalId, UserId))
+                'Page.ClientScript.RegisterArrayDeclaration("allAccounts", myArrayValue)
+                'Page.ClientScript.RegisterClientScriptBlock(GetType(Page), "allAccounts", myArrayValue)
+
+                'Dim allAccounts = From a In ds.AP_StaffBroker_AccountCodes Where (a.AccountCodeType = AccountType.Exspnse)
+                '                Select label = a.AccountCodeName, value = a.AccountCode
+                '                Order By value
 
                 GridView1.Columns(0).HeaderText = Translate("TransDate")
                 GridView1.Columns(1).HeaderText = Translate("LineType")
@@ -1003,12 +1010,18 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
 
                     lblStatus.Text = Translate(RmbStatus.StatusName(q.First.Status))
-                    Dim findcc = ddlChargeTo.Items.FindByValue(q.First.CostCenter)
-                    If findcc Is Nothing Then
-                        ddlChargeTo.Items.Add(New ListItem(q.First.CostCenter, q.First.CostCenter))
-                        ddlCostcenter.Items.Add(New ListItem(q.First.CostCenter, q.First.CostCenter))
+
+                    'Dim findcc = ddlChargeTo.Items.FindByValue(q.First.CostCenter)
+                    'If findcc Is Nothing Then
+                    '    ddlChargeTo.Items.Add(New ListItem(q.First.CostCenter, q.First.CostCenter))
+                    '    ddlCostcenter.Items.Add(New ListItem(q.First.CostCenter, q.First.CostCenter))
+                    'End If
+                    'ddlChargeTo.SelectedValue = q.First.CostCenter
+                    If q.First.CostCenter Is Nothing Then
+                        tbChargeTo.Text = ""
+                    Else
+                        tbChargeTo.Text = q.First.CostCenter
                     End If
-                    ddlChargeTo.SelectedValue = q.First.CostCenter
 
 
 
@@ -1174,7 +1187,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
                     Select Case q.First.Status
                         Case RmbStatus.Draft, RmbStatus.MoreInfo
-                            ddlChargeTo.Enabled = True
+                            tbChargeTo.Enabled = True
                             ddlApprovedBy.Visible = True
                             ddlApprovedBy.Enabled = True
                             btnSubmit.Visible = True
@@ -1187,7 +1200,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             tbYouRef.Enabled = True
                             tbAdvanceAmount.Enabled = True
                         Case RmbStatus.Submitted
-                            ddlChargeTo.Enabled = False
+                            tbChargeTo.Enabled = False
                             ddlApprovedBy.Visible = False
                             lblApprovedBy.Visible = True
                             btnSubmit.Visible = False
@@ -1200,7 +1213,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             tbYouRef.Enabled = False
                             tbAdvanceAmount.Enabled = True
                         Case RmbStatus.Approved
-                            ddlChargeTo.Enabled = False
+                            tbChargeTo.Enabled = False
                             ddlApprovedBy.Visible = False
                             lblApprovedBy.Visible = True
                             btnSubmit.Visible = False
@@ -1214,7 +1227,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             tbYouRef.Enabled = False
                             tbAdvanceAmount.Enabled = True
                         Case RmbStatus.PendingDownload, RmbStatus.DownloadFailed
-                            ddlChargeTo.Enabled = False
+                            tbChargeTo.Enabled = False
                             ddlApprovedBy.Visible = False
                             lblApprovedBy.Visible = True
                             btnSubmit.Visible = False
@@ -1228,7 +1241,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             tbAdvanceAmount.Enabled = False
                             cbMoreInfo.Visible = False
                         Case RmbStatus.Processed
-                            ddlChargeTo.Enabled = False
+                            tbChargeTo.Enabled = False
                             ddlApprovedBy.Visible = False
                             lblApprovedBy.Visible = True
                             btnSubmit.Visible = False
@@ -1242,7 +1255,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             tbAdvanceAmount.Enabled = False
                             cbMoreInfo.Visible = False
                         Case RmbStatus.Cancelled
-                            ddlChargeTo.Enabled = True
+                            tbChargeTo.Enabled = True
                             ddlApprovedBy.Visible = True
                             ddlApprovedBy.Enabled = True
                             lblApprovedBy.Visible = False
@@ -1256,7 +1269,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             tbYouRef.Enabled = True
                             tbAdvanceAmount.Enabled = True
                         Case Else
-                            ddlChargeTo.Enabled = False
+                            tbChargeTo.Enabled = False
                             ddlApprovedBy.Visible = True
                             ddlApprovedBy.Enabled = True
                             lblApprovedBy.Visible = False
@@ -1266,7 +1279,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             btnCancel.Visible = False
                             btnPrint.Visible = False
                             btnApprove.Visible = False
-                            ddlChargeTo.Enabled = False
                             addLinebtn2.Visible = False
                             tbYouRef.Enabled = False
                             tbAdvanceAmount.Enabled = False
@@ -1347,7 +1359,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                         End If
                         If q.First.Status < RmbStatus.Processed Then
-                            ddlChargeTo.Enabled = True
+                            tbChargeTo.Enabled = True
                         End If
 
                     Else
@@ -2201,9 +2213,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 'End If
 
                 For Each row In (From c In rmb.First.AP_Staff_RmbLines Where c.CostCenter = rmb.First.CostCenter)
-                    row.CostCenter = ddlChargeTo.SelectedValue
+                    row.CostCenter = hfChargeToValue.Value
                 Next
-                rmb.First.CostCenter = ddlChargeTo.SelectedValue
+                rmb.First.CostCenter = hfChargeToValue.Value
                 If tbAdvanceAmount.Text = "" Then
                     tbAdvanceAmount.Text = 0
                 End If
@@ -2233,12 +2245,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
 
 
-            ddlCostcenter.SelectedValue = ddlChargeTo.SelectedValue
+            '            ddlCostcenter.SelectedValue = ddlChargeTo.SelectedValue
+            ddlCostcenter.SelectedValue = hfChargeToValue.Value
 
             ddlLineTypes.Items.Clear()
             Dim lineTypes = From c In d.AP_StaffRmb_PortalLineTypes Where c.PortalId = PortalId Order By c.ViewOrder Select c.AP_Staff_RmbLineType.LineTypeId, c.LocalName, c.PCode, c.DCode
 
-            If StaffBrokerFunctions.IsDept(PortalId, ddlChargeTo.SelectedValue) Then
+            '            If StaffBrokerFunctions.IsDept(PortalId, ddlChargeTo.SelectedValue) Then
+            If StaffBrokerFunctions.IsDept(PortalId, hfChargeToValue.Value) Then
                 lineTypes = lineTypes.Where(Function(x) x.DCode <> "")
 
             Else
@@ -2820,11 +2834,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
 
         End Sub
-        Protected Sub ddlChargeTo_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles ddlChargeTo.SelectedIndexChanged
+        Protected Sub hfChargeToValue_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles hfChargeToValue.ValueChanged
             'The User selected a new cost centre
 
             'Detect if Dept is now Personal or vica versa
-            Dim Dept = StaffBrokerFunctions.IsDept(PortalId, ddlChargeTo.SelectedValue)
+            Dim Dept = StaffBrokerFunctions.IsDept(PortalId, hfChargeToValue.Value)
             Dim RmbNo = CInt(hfRmbNo.Value)
             Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo And c.PortalId = PortalId
 
@@ -2834,13 +2848,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 For Each row In rmb.First.AP_Staff_RmbLines
                     If rmb.First.CostCenter = row.CostCenter Then
                         row.Department = Dept
-                        row.AccountCode = GetAccountCode(row.LineType, ddlChargeTo.SelectedValue)
-                        row.CostCenter = ddlChargeTo.SelectedValue
+                        row.AccountCode = GetAccountCode(row.LineType, hfChargeToValue.Value)
+                        row.CostCenter = hfChargeToValue.Value
                     End If
                 Next
             End If
 
-            rmb.First.CostCenter = ddlChargeTo.SelectedValue
+            rmb.First.CostCenter = hfChargeToValue.Value
             rmb.First.Department = Dept
             updateApproversList(rmb.First)
             d.SubmitChanges()

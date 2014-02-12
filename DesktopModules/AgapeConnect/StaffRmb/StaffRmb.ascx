@@ -11,8 +11,7 @@
 <script src="/js/jquery.watermarkinput.js" type="text/javascript"></script>
 <script type="text/javascript">
     optimizeYouTubeEmbeds();
-
-
+ 
     (function ($, Sys) {
         function setUpMyTabs() {
             var stop = false;
@@ -298,6 +297,8 @@
 
 
             });
+
+
         });
 
 
@@ -620,6 +621,23 @@
           
        }
    }
+
+    $(document).ready(function() {
+        $("#<%= tbChargeTo.ClientID%>").autocomplete({
+            source:<%=StaffRmb.StaffRmbFunctions.getCostCentres()%>, 
+            focus: function(event, ui) {
+                $('#<%= tbChargeTo.ClientID%>').val(ui.item.label);
+                return false;
+            },
+            select: function(event, ui) {
+                $('#<%= tbChargeTo.ClientID%>').val(ui.item.value);
+                return false;
+            },
+            minLength: 2
+        });
+
+    });
+
 
 
 </script>
@@ -1165,8 +1183,9 @@
 
                                     <asp:Label ID="Label17" runat="server" resourcekey="Reimbursement" Style="float: left; margin-right: 5px;"></asp:Label>
                                     <asp:Label ID="lblRmbNo" runat="server" Style="float: left; margin-right: 5px;"></asp:Label>:
-                            <asp:DropDownList ID="ddlChargeTo" runat="server" AutoPostBack="true" Style="float: right; font-size: small;">
-                            </asp:DropDownList>
+                                    <asp:TextBox ID="tbChargeTo" runat="server" AutoPostBack="true" Style="float: right; font-size: small;">
+                                    </asp:TextBox>
+                                    <asp:HiddenField ID="hfChargeToValue" runat="server" />
                                 </div>
                                 <asp:Label ID="lblStatus" runat="server" Style="float: left; font-style: italic;"></asp:Label>
 
