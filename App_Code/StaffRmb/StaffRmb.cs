@@ -106,7 +106,6 @@ namespace StaffRmb
         {
             var result = new StaffRmbDataContext().AP_StaffBroker_CostCenters.Select(s => new { label = s.CostCentreCode + ":" + s.CostCentreName, value = s.CostCentreCode}).OrderBy(o => o.value);
             return JsonConvert.SerializeObject(result).Replace('\'', ' ').Replace("\"label\"","label").Replace("\"value\"","value");
-            //return "[{label:\"920080:Brent Nesbitt\", value:\"920080\"},{label:\"123000:Advancement\", value:\"123000\"}]";
             
         }
 

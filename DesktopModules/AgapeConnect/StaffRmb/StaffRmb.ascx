@@ -631,6 +631,17 @@
             },
             select: function(event, ui) {
                 $('#<%= tbChargeTo.ClientID%>').val(ui.item.value);
+                $('#<%= hfChargeToValue.ClientID%>').val(ui.item.value);
+                return false;
+            },
+            change: function(event, ui) {
+                if (ui != null && ui.item != null) {
+                    $('#<%= tbChargeTo.ClientID%>').val(ui.item.value);
+                    $('#<%= hfChargeToValue.ClientID%>').val(ui.item.value);
+                } else {
+                    var old_value = $('#<%= hfChargeToValue.ClientID%>').val();
+                    $('#<%= tbChargeTo.ClientID%>').val(old_value);
+                }
                 return false;
             },
             minLength: 2
@@ -761,7 +772,7 @@
                                 </asp:Panel>
                             </a>
 
-                            </h3>
+                            <h3></h3>
                             <div id="SubmittedPane">
                                 <asp:UpdatePanel ID="UpdatePanel4" runat="server">
                                     <ContentTemplate>
@@ -863,8 +874,11 @@
                                     </Triggers>
                                 </asp:UpdatePanel>
                             </div>
+                            <h3></h3>
 
-                        </h3>
+                            <h3></h3>
+
+                            </h3>
 
 
                     </div>
@@ -878,7 +892,7 @@
                                     <asp:Label ID="lblToProcess" runat="server" Font-Bold="true"></asp:Label>
                                 </asp:Panel>
                             </a>
-                            </h3>
+                            <h3></h3>
                             <div id="ApprovedPane">
                                 <asp:UpdatePanel ID="UpdatePanel6" runat="server">
                                     <ContentTemplate>
@@ -1099,7 +1113,9 @@
                                     </Triggers>
                                 </asp:UpdatePanel>
                             </div>
-                        </h3>
+                            <h3></h3>
+                            <h3></h3>
+                            </h3>
 
                     </div>
                     <div>
