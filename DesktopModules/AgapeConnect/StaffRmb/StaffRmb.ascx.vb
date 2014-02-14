@@ -147,10 +147,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim q = From c In ds.AP_StaffBroker_Staffs Where (c.UserId1 = UserId Or c.UserId2 = UserId) And (Not PayOnly) And c.CostCenter.Trim().Length > 0 And c.PortalId = PortalId Select DisplayName = (c.DisplayName & "(" & c.CostCenter & ")"), c.CostCenter, ViewOrder = 1
                 q = q.Union(From c In ds.AP_StaffBroker_Departments Where c.CanRmb = True And c.CostCentre.Length > 0 And c.PortalId = PortalId Select DisplayName = (c.Name & "(" & c.CostCentre & ")"), CostCenter = c.CostCentre, ViewOrder = 2)
 
-                ddlNewChargeTo.DataSource = From c In q Order By c.ViewOrder, c.DisplayName
-                ddlNewChargeTo.DataTextField = "DisplayName"
-                ddlNewChargeTo.DataValueField = "CostCenter"
-                ddlNewChargeTo.DataBind()
+                'ddlNewChargeTo.DataSource = From c In q Order By c.ViewOrder, c.DisplayName
+                'ddlNewChargeTo.DataTextField = "DisplayName"
+                'ddlNewChargeTo.DataValueField = "CostCenter"
+                'ddlNewChargeTo.DataBind()
 
                 'ddlChargeTo.DataSource = From c In q Order By c.ViewOrder, c.DisplayName
                 'ddlChargeTo.DataTextField = "DisplayName"
@@ -1901,7 +1901,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 insert.UserRef = tbNewYourRef.Text
             End If
             insert.RID = StaffRmbFunctions.GetNewRID(PortalId)
-            insert.CostCenter = ddlNewChargeTo.SelectedValue
+            insert.CostCenter = tbNewChargeTo.Text
             insert.UserComment = tbNewComments.Text
             insert.UserId = UserId
             ' insert.PersonalCC = ddlNewChargeTo.Items(0).Value
@@ -1938,12 +1938,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             LoadRmb(insert.RMBNo)
             ResetMenu()
 
-            Dim t As Type = ddlNewChargeTo.GetType()
+            Dim t As Type = tbNewChargeTo.GetType()
             Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
             sb.Append("<script language='javascript'>")
             sb.Append("closePopup2();")
             sb.Append("</script>")
-            ScriptManager.RegisterClientScriptBlock(ddlNewChargeTo, t, "", sb.ToString, False)
+            ScriptManager.RegisterClientScriptBlock(tbNewChargeTo, t, "", sb.ToString, False)
 
         End Sub
 
@@ -2834,7 +2834,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
 
         End Sub
-        Protected Sub hfChargeToValue_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles hfChargeToValue.ValueChanged
+        Protected Sub tbChargeTo_ValueChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles tbChargeTo.TextChanged
             'The User selected a new cost centre
 
             'Detect if Dept is now Personal or vica versa
@@ -2858,8 +2858,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             rmb.First.Department = Dept
             updateApproversList(rmb.First)
             d.SubmitChanges()
-
             btnSave_Click(Me, Nothing)
+            'LoadRmb(hfRmbNo.Value)
         End Sub
 
         Protected Sub ddlApprovedBy_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles ddlApprovedBy.SelectedIndexChanged

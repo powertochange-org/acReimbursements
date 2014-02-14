@@ -122,6 +122,8 @@ namespace StaffRmb
             result.isDept = false;
             result.UserIds = new List<DotNetNuke.Entities.Users.UserInfo>();
 
+            if (rmb.CostCenter == null || rmb.CostCenter.Length == 0) return result;
+
             string[] potential_approvers = null;
             if (isStaffAccount(rmb.CostCenter))
             {

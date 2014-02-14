@@ -289,11 +289,12 @@
 
         $(document).ready(function () {
             setUpMyTabs();
+            setUpAutocomplete();
                   
 
             Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
                 setUpMyTabs();
-
+                setUpAutocomplete();
 
 
             });
@@ -622,32 +623,33 @@
        }
    }
 
-    $(document).ready(function() {
+    function setUpAutocomplete() {
         $("#<%= tbChargeTo.ClientID%>").autocomplete({
             source:<%=StaffRmb.StaffRmbFunctions.getCostCentres()%>, 
-            focus: function(event, ui) {
-                $('#<%= tbChargeTo.ClientID%>').val(ui.item.label);
-                return false;
-            },
             select: function(event, ui) {
-                $('#<%= tbChargeTo.ClientID%>').val(ui.item.value);
+                $('#<%= tbChargeTo.ClientID%>').val(ui.item.value).change();
                 $('#<%= hfChargeToValue.ClientID%>').val(ui.item.value);
-                return false;
             },
             change: function(event, ui) {
                 if (ui != null && ui.item != null) {
-                    $('#<%= tbChargeTo.ClientID%>').val(ui.item.value);
+                    $('#<%= tbChargeTo.ClientID%>').val(ui.item.value).change();
                     $('#<%= hfChargeToValue.ClientID%>').val(ui.item.value);
                 } else {
                     var old_value = $('#<%= hfChargeToValue.ClientID%>').val();
                     $('#<%= tbChargeTo.ClientID%>').val(old_value);
                 }
-                return false;
+            },
+            minLength: 2
+        });
+        $("#<%= tbNewChargeTo.ClientID%>").autocomplete({
+            source:<%=StaffRmb.StaffRmbFunctions.getCostCentres()%>, 
+            select: function(event, ui) {
+                $('#<%= tbNewChargeTo.ClientID%>').val(ui.item.value);
             },
             minLength: 2
         });
 
-    });
+    };
 
 
 
@@ -1201,7 +1203,7 @@
                                     <asp:Label ID="lblRmbNo" runat="server" Style="float: left; margin-right: 5px;"></asp:Label>:
                                     <asp:TextBox ID="tbChargeTo" runat="server" AutoPostBack="true" Style="float: right; font-size: small;">
                                     </asp:TextBox>
-                                    <asp:HiddenField ID="hfChargeToValue" runat="server" />
+                                    <asp:HiddenField ID="hfChargeToValue" runat="server"  />
                                 </div>
                                 <asp:Label ID="lblStatus" runat="server" Style="float: left; font-style: italic;"></asp:Label>
 
@@ -1653,7 +1655,6 @@
                         <asp:AsyncPostBackTrigger ControlID="btnCancel" EventName="Click" />
                         <asp:PostBackTrigger ControlID="btnDownload" />
                         <asp:PostBackTrigger ControlID="btnAdvDownload" />
-
                     </Triggers>
                 </asp:UpdatePanel>
             </td>
@@ -1843,8 +1844,8 @@
                             <td width="70px">Charge To:
                             </td>
                             <td>
-                                <asp:DropDownList ID="ddlNewChargeTo" runat="server">
-                                </asp:DropDownList>
+                                <asp:TextBox ID="tbNewChargeTo" runat="server">
+                                </asp:TextBox>
                             </td>
                         </tr>
                     </table>
