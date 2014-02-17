@@ -1098,6 +1098,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
 
                     lblAccountBalance.Text = "Unknown"
+                    ' lblAccountBalance.Text = StaffRmbFunctions.accountBalance("110100", "nicke")
                     lblAdvanceBalance.Text = "Unknown"
                     hfAccountBalance.Value = 0.0
                     Dim AdvPay = From c In ds.AP_Staff_SuggestedPayments Where c.PortalId = PortalId And c.CostCenter.StartsWith(theStaff.CostCenter)
