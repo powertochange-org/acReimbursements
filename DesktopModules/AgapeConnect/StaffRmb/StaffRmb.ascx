@@ -183,7 +183,7 @@
             $("#divSignin").dialog({
                 autoOpen: false,
                 position:['middle', 150],
-                height:550,
+                height:700,
                 width: 750,
                 modal: true,
                 title: '<%= Translate("AddEditRmb") %>',
