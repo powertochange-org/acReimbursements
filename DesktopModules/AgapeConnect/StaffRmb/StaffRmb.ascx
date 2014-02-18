@@ -182,6 +182,7 @@
 
             $("#divSignin").dialog({
                 autoOpen: false,
+                position:['middle', 150],
                 height:550,
                 width: 750,
                 modal: true,
@@ -194,6 +195,7 @@
 
             $("#divSignin2").dialog({
                 autoOpen: false,
+                position:['middle', 150],
                 height: 350,
                 width: 600,
                 modal: true,
@@ -206,6 +208,7 @@
 
             $("#divSignin3").dialog({
                 autoOpen: false,
+                position:['middle', 150],
                 height: 400,
                 width: 600,
                 modal: true,
@@ -217,6 +220,7 @@
 
             $("#divDownload").dialog({
                 autoOpen: false,
+                position:['middle', 150],
                 height: 350,
                 width: 500,
                 modal: true,
@@ -228,6 +232,7 @@
             $("#divDownload").parent().appendTo($("form:first"));
             $("#divAccountWarning").dialog({
                 autoOpen: false,
+                position:['middle', 150],
                 height: 150,
                 width: 500,
                 modal: true,
@@ -242,6 +247,7 @@
 
             $("#divSuggestedPayments").dialog({
                 autoOpen: false,
+                position:['middle', 150],
                 height: 235,
                 width: 625,
                 modal: true,
@@ -774,7 +780,7 @@
                                 </asp:Panel>
                             </a>
 
-                            <h3></h3>
+                           </h3>
                             <div id="SubmittedPane">
                                 <asp:UpdatePanel ID="UpdatePanel4" runat="server">
                                     <ContentTemplate>
@@ -876,11 +882,7 @@
                                     </Triggers>
                                 </asp:UpdatePanel>
                             </div>
-                            <h3></h3>
 
-                            <h3></h3>
-
-                            </h3>
 
 
                     </div>
@@ -894,7 +896,7 @@
                                     <asp:Label ID="lblToProcess" runat="server" Font-Bold="true"></asp:Label>
                                 </asp:Panel>
                             </a>
-                            <h3></h3>
+                            </h3>
                             <div id="ApprovedPane">
                                 <asp:UpdatePanel ID="UpdatePanel6" runat="server">
                                     <ContentTemplate>
@@ -1115,9 +1117,6 @@
                                     </Triggers>
                                 </asp:UpdatePanel>
                             </div>
-                            <h3></h3>
-                            <h3></h3>
-                            </h3>
 
                     </div>
                     <div>
