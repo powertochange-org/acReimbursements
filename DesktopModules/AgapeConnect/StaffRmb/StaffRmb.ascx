@@ -784,7 +784,7 @@
                             <div id="SubmittedPane">
                                 <asp:UpdatePanel ID="UpdatePanel4" runat="server">
                                     <ContentTemplate>
-                                        <asp:TreeView ID="tvAllSubmitted" runat="server" NodeIndent="10">
+                                        <asp:TreeView ID="tvAllSubmitted" class="accounts_team" runat="server" NodeIndent="10">
                                         </asp:TreeView>
                                         <asp:Panel ID="pnlSubmittedView" runat="server">
                                             <asp:Label ID="Label10" runat="server" class="Agape_SubTitle" ResourceKey="RmbsToApprove" Style="font-size: 8pt;"></asp:Label>
@@ -1132,11 +1132,14 @@
                         <div id="ProcessedPane">
                             <asp:UpdatePanel ID="UpdatePanel7" runat="server">
                                 <ContentTemplate>
+                                    <asp:TreeView ID="tvAllProcessed" class="accounts_team" runat="server" NodeIndent="10">
+                                    </asp:TreeView>
                                     <asp:TreeView ID="tvProcessed" runat="server" NodeIndent="10">
                                     </asp:TreeView>
                                 </ContentTemplate>
                                 <Triggers>
                                     <asp:PostBackTrigger ControlID="tvProcessed" />
+                                    <asp:PostBackTrigger ControlID="tvAllProcessed" />
                                 </Triggers>
                             </asp:UpdatePanel>
                         </div>

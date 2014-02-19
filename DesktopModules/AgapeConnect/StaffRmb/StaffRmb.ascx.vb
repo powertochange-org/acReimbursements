@@ -182,7 +182,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 pnlAccountsOptions.Visible = acc
                 pnlVAT.Visible = Settings("VatAttrib")
 
-                lblHighlight.Visible = acc
+                lblHighlight.Visible = acc '--this is the label to indicate that you are on the finance team
                 If acc Then
                     Dim errors = From c In d.AP_Staff_Rmbs Where c.PortalId = PortalId And c.Error = True And (c.Status = RmbStatus.PendingDownload Or c.Status = RmbStatus.DownloadFailed Or c.Status = RmbStatus.Approved)
 
@@ -275,11 +275,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 #Region "Loading Functions"
         Public Sub ResetMenu()
 
-
             Try
-
-
-
                 Dim MenuSize = Settings("MenuSize")
                 Dim isAcc = IsAccounts()  '--is the user on the accounts team? 
                 Dim Spouse = From c In ds.AP_StaffBroker_Staffs Where c.UserId1 = UserId Or c.UserId2 = UserId Select c.UserId1, c.UserId2
@@ -295,9 +291,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 End If
 
 
-
-
-
                 'Select Reimbursements that you submitted that are awaiting approval
                 Dim allStaff = StaffBrokerFunctions.GetStaff()
                 Dim Team = StaffBrokerFunctions.GetTeam(UserId)
@@ -305,9 +298,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 'Dim CostCentres = StaffBrokerFunctions.GetDepartments(UserId) '--departments that user manages (or have been delegated to him)
 
                 If isAcc Then '--if user is on the accounts team...
-                    pnlSubmittedView.Visible = False
+                    'pnlSubmittedView.Visible = False
                     pnlApprovedAcc.Visible = True
-                    pnlApprovedView.Visible = False
+                    'pnlApprovedView.Visible = False
 
                     '--Build a tree of all reimbursements in "submitted" state
                     'allStaff = StaffBrokerFunctions.GetStaff()
@@ -319,100 +312,44 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     AllStaffProcessedNode.SelectAction = TreeNodeSelectAction.Expand
                     AllStaffProcessedNode.Expanded = False
 
-                    '--Divide the list by first letter of last name
-                    tvProcessed.Nodes.Clear()
-                    tvAllSubmitted.Nodes.Clear()
-                    For Each c In "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray()
-                        Dim sNode As New TreeNode(c)
-                        Dim pNode As New TreeNode(c)
-                        sNode.Expanded = False
-                        pNode.Expanded = False
-                        sNode.SelectAction = TreeNodeSelectAction.Expand
-                        pNode.SelectAction = TreeNodeSelectAction.Expand
-                        AllStaffSubmittedNode.ChildNodes.Add(sNode)
-                        AllStaffProcessedNode.ChildNodes.Add(pNode)
-                    Next
-
                     '--list submitted/processed reimbursements by person
                     For Each person In allStaff
-                        Dim letterIndex = Asc(person.LastName.ElementAt(0)) - Asc("A")
-                        Dim sAlphabetNode = AllStaffSubmittedNode.ChildNodes.Item(letterIndex)
-                        Dim pAlphabetNode = AllStaffProcessedNode.ChildNodes.Item(letterIndex)
-                        '--here are the submitted reimbursements
-                        Dim Submitted = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Submitted And c.PortalId = PortalId And (c.UserId = person.UserID) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
 
-                        Dim submittedNode As New TreeNode(person.DisplayName)
-                        submittedNode.Expanded = False
-                        submittedNode.SelectAction = TreeNodeSelectAction.Expand
+                        '-- sort by first letter of last name
+                        Dim letter = person.LastName.Substring(0, 1)
 
-                        For Each row In Submitted '--get details of each reimbursement
-                            Dim reimbursementNode As New TreeNode()
-                            reimbursementNode.Text = GetRmbTitleTeamShort(row.RID, row.RmbDate)
-                            reimbursementNode.NavigateUrl = NavigateURL() & "?RmbNo=" & row.RMBNo
-
-                            submittedNode.ChildNodes.Add(reimbursementNode)
-
-                            If IsSelected(row.RMBNo) Then
-                                submittedNode.Expanded = True
-                                sAlphabetNode.Expanded = True
-                                AllStaffSubmittedNode.Expanded = True
-                            End If
-                        Next
-
-                        '--...and each advance requests
+                        '--here are the submitted reimbursements & advances
+                        Dim SubmittedRmb = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Submitted And c.PortalId = PortalId And (c.UserId = person.UserID) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
                         Dim SubmittedAdv = (From c In d.AP_Staff_AdvanceRequests Where c.RequestStatus = RmbStatus.Submitted And c.PortalId = PortalId And c.UserId = person.UserID Order By c.LocalAdvanceId Descending Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId).Take(MenuSize)
-                        For Each row In SubmittedAdv
-                            Dim advanceNode As New TreeNode()
-                            advanceNode.Text = GetAdvTitleTeamShort(row.LocalAdvanceId, row.RequestDate)
-                            advanceNode.NavigateUrl = NavigateURL() & "?RmbNo=" & -row.AdvanceId
-                            submittedNode.ChildNodes.Add(advanceNode)
-                            If IsSelected(-row.AdvanceId) Then
-                                submittedNode.Expanded = True
-                                sAlphabetNode.Expanded = True
-                                AllStaffSubmittedNode.Expanded = True
+                        If SubmittedRmb.Count() > 0 Or SubmittedAdv.Count() > 0 Then
+                            Dim submittedNode As New TreeNode(person.DisplayName)
+                            If SubmittedRmb.Count() > 0 Then
+                                addItemsToTree(AllStaffSubmittedNode, submittedNode, letter, SubmittedRmb, "rmb")
                             End If
-                        Next
-
-                        '--list processed reimbursements
-                        Dim processedNode As New TreeNode(person.DisplayName)
-                        processedNode.Expanded = False
-                        processedNode.SelectAction = TreeNodeSelectAction.Expand
-                        Dim Processed = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Processed And c.PortalId = PortalId And (c.UserId = person.UserID) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
-                        For Each row In Processed
-                            Dim reimbursementNode As New TreeNode()
-                            reimbursementNode.Text = GetRmbTitleTeamShort(row.RID, row.RmbDate)
-                            reimbursementNode.NavigateUrl = NavigateURL() & "?RmbNo=" & row.RMBNo
-
-                            processedNode.ChildNodes.Add(reimbursementNode)
-                            If IsSelected(row.RMBNo) Then
-                                processedNode.Expanded = True
-                                pAlphabetNode.Expanded = True
-                                AllStaffProcessedNode.Expanded = True
+                            If SubmittedAdv.Count() > 0 Then
+                                addItemsToTree(AllStaffSubmittedNode, submittedNode, letter, SubmittedAdv, "adv")
                             End If
-                        Next
+                        End If
 
-                        '--...and list processed advances
+
+                        '--list processed reimbursements & advances
+                        Dim ProcessedRmb = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Processed And c.PortalId = PortalId And (c.UserId = person.UserID) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
                         Dim ProcessedAdv = (From c In d.AP_Staff_AdvanceRequests Where c.RequestStatus = RmbStatus.Processed And c.PortalId = PortalId And c.UserId = person.UserID Order By c.LocalAdvanceId Descending Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId).Take(MenuSize)
-                        For Each row In ProcessedAdv
-                            Dim advanceNode As New TreeNode()
-                            advanceNode.Text = GetAdvTitleTeamShort(row.LocalAdvanceId, row.RequestDate)
-                            advanceNode.NavigateUrl = NavigateURL() & "?RmbNo=" & -row.AdvanceId
-                            processedNode.ChildNodes.Add(advanceNode)
-                            If IsSelected(-row.AdvanceId) Then
-                                processedNode.Expanded = True
-                                AllStaffProcessedNode.Expanded = True
+                        If (ProcessedRmb.Count() > 0 Or ProcessedAdv.Count() > 0) Then
+                            Dim processedNode As New TreeNode(person.DisplayName)
+                            If ProcessedRmb.Count() > 0 Then
+                                addItemsToTree(AllStaffProcessedNode, processedNode, letter, ProcessedRmb, "rmb")
                             End If
-                        Next
+                            If ProcessedAdv.Count() > 0 Then
+                                addItemsToTree(AllStaffProcessedNode, processedNode, letter, ProcessedAdv, "adv")
+                            End If
+                        End If
 
-
-                        pAlphabetNode.ChildNodes.Add(processedNode)
-                        sAlphabetNode.ChildNodes.Add(submittedNode
-                                                             )
                     Next
-                    tvProcessed.Nodes.Clear()
                     tvAllSubmitted.Nodes.Clear()
                     tvAllSubmitted.Nodes.Add(AllStaffSubmittedNode)
-                    tvProcessed.Nodes.Add(AllStaffProcessedNode)
+                    tvAllProcessed.Nodes.Clear()
+                    tvAllProcessed.Nodes.Add(AllStaffProcessedNode)
 
                     '--This is the key part for the ACCOUNTS team (approved, but not processed requests)
                     '--lookup all approved reimbursements
@@ -463,209 +400,209 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         pnlToProcess.CssClass = ""
                     End If
 
-
-
-                Else
-                    '--Highlight reimbursements that need more information in a bar at the top
-                    Dim MoreInfo = From c In d.AP_Staff_Rmbs Where c.MoreInfoRequested = True And c.Status <> RmbStatus.Processed And c.Status <> RmbStatus.Processed And c.PortalId = PortalId And c.UserId = UserId Select c.UserRef, c.RID, c.RMBNo
-
-                    For Each row In MoreInfo
-                        Dim hyp As New HyperLink()
-                        hyp.CssClass = "ui-state-highlight ui-corner-all AgapeWarning"
-                        hyp.Font.Size = FontUnit.Small
-                        hyp.Font.Bold = True
-
-                        hyp.Text = Translate("MoreInfo").Replace("[RMBNO]", row.RID).Replace("[USERREF]", row.UserRef)
-                        hyp.NavigateUrl = NavigateURL() & "?RmbNo=" & row.RMBNo
-
-
-                        PlaceHolder1.Controls.Add(hyp)
-                    Next
-
-                    pnlSubmittedView.Visible = True
+                Else '--if not on accounts team
                     pnlApprovedAcc.Visible = False
-                    pnlApprovedView.Visible = True
-
-                    '--*** EVERYBODY ***
-                    '--User sees his own items
-                    Dim Pending = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Draft And c.PortalId = PortalId And (c.UserId = UserId) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
-                    dlPending.DataSource = Pending
-                    dlPending.DataBind()
-
-                    Dim Submitted = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Submitted And c.PortalId = PortalId And (c.UserId = UserId) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
-                    dlSubmitted.DataSource = Submitted
-                    dlSubmitted.DataBind()
-
-                    Dim AdvSubmitted = (From c In d.AP_Staff_AdvanceRequests Where c.RequestStatus = RmbStatus.Submitted And c.PortalId = PortalId And c.UserId = UserId Order By c.LocalAdvanceId Descending Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, UserId).Take(MenuSize)
-                    dlAdvSubmitted.DataSource = AdvSubmitted
-                    dlAdvSubmitted.DataBind()
-                    dlAdvSubmitted.AlternatingItemStyle.CssClass = IIf(dlSubmitted.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
-                    dlAdvSubmitted.ItemStyle.CssClass = IIf(dlSubmitted.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
-
-                    Dim Approved = (From c In d.AP_Staff_Rmbs Where (c.Status = RmbStatus.Approved Or c.Status = RmbStatus.PendingDownload Or c.Status = RmbStatus.DownloadFailed) And c.PortalId = PortalId And (c.UserId = UserId) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
-                    dlApproved.DataSource = Approved
-                    dlApproved.DataBind()
-
-                    Dim AdvApproved = (From c In d.AP_Staff_AdvanceRequests Where c.PortalId = PortalId And (c.RequestStatus = RmbStatus.Approved Or c.RequestStatus = RmbStatus.PendingDownload Or c.RequestStatus = RmbStatus.DownloadFailed) And c.UserId = UserId Order By c.LocalAdvanceId Descending Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId).Take(MenuSize)
-                    dlAdvApproved.DataSource = AdvApproved
-                    dlAdvApproved.DataBind()
-                    dlAdvApproved.AlternatingItemStyle.CssClass = IIf(dlApproved.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
-                    dlAdvApproved.ItemStyle.CssClass = IIf(dlApproved.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
-
-                    Dim Complete = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Processed And c.PortalId = PortalId And (c.UserId = UserId) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
-                    Dim CompleteAdv = (From c In d.AP_Staff_AdvanceRequests Where c.PortalId = PortalId And c.RequestStatus = RmbStatus.Processed And c.UserId = UserId Order By c.LocalAdvanceId Descending Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId).Take(MenuSize)
-
-                    Dim Cancelled = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Cancelled And c.PortalId = PortalId And (c.UserId = UserId) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
-                    dlCancelled.DataSource = Cancelled
-                    dlCancelled.DataBind()
-
-                    '--Build a tree of users' completed reimbursements
-                    tvProcessed.Nodes.Clear()
-                    Dim YouNode As New TreeNode("You")
-                    YouNode.SelectAction = TreeNodeSelectAction.Expand
-                    For Each row In Complete
-                        Dim node2 As New TreeNode()
-                        node2.Text = GetRmbTitleTeamShort(row.RID, row.RmbDate)
-                        node2.NavigateUrl = NavigateURL() & "?RmbNo=" & row.RMBNo
-                        YouNode.ChildNodes.Add(node2)
-                    Next
-                    For Each row In CompleteAdv
-                        Dim node2 As New TreeNode()
-                        node2.Text = GetAdvTitleTeamShort(row.LocalAdvanceId, row.RequestDate)
-                        node2.NavigateUrl = NavigateURL() & "?RmbNo=" & -row.AdvanceId
-                        YouNode.ChildNodes.Add(node2)
-                    Next
-                    tvProcessed.Nodes.Add(YouNode)
-
-
-
-
-                    '--*** APPROVERS ***
-
-                    '--list unapproved reimbursements submitted to this user for approval
-                    Dim list As New ArrayList
-                    Dim Advlist As New ArrayList
-
-                    Dim tRmbs = (From c In d.AP_Staff_Rmbs
-                                Where c.Status = RmbStatus.Submitted And c.PortalId = PortalId And c.ApprUserId = UserId And c.ApprDate Is Nothing
-                                Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId)
-                    For Each row In tRmbs
-                        list.Add(row)
-                    Next
-
-                    Dim tAdvs = (From c In d.AP_Staff_AdvanceRequests
-                                 Where c.RequestStatus = RmbStatus.Submitted And c.PortalId = PortalId And c.ApproverId = UserId And c.ApprovedDate Is Nothing
-                                 Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId)
-                    For Each row In tAdvs
-                        Advlist.Add(row)
-                    Next
-
-                    dlToApprove.DataSource = (From c In list Order By c.RMBNo Descending)
-                    dlToApprove.DataBind()
-                    dlAdvToApprove.DataSource = From c In Advlist Order By c.LocalAdvanceId Descending
-                    dlAdvToApprove.DataBind()
-                    dlAdvToApprove.AlternatingItemStyle.CssClass = IIf(dlToApprove.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
-                    dlAdvToApprove.ItemStyle.CssClass = IIf(dlToApprove.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
-
-                    '-- Add a count of items to the 'Submitted' heading
-                    If list.Count + Advlist.Count + Submitted.Count + AdvSubmitted.Count > 0 Then
-                        lblSubmittedCount.Text = "(" & list.Count + Advlist.Count + Submitted.Count + AdvSubmitted.Count & ")"
-                        pnlSubmitted.CssClass = "ui-state-highlight ui-corner-all"
-                    Else
-                        lblSubmittedCount.Text = ""
-                        pnlSubmitted.CssClass = ""
-                    End If
-
-
-
-
-
-                    '--*** SUPERVISORS ***
-
-                    Dim myteamIds = From c In Team Select c.UserID
-
-                    Dim myteamApproved = From c In d.AP_Staff_Rmbs Where myteamIds.Contains(c.UserId) And (c.Status = RmbStatus.Approved Or c.Status = RmbStatus.PendingDownload Or c.Status = RmbStatus.DownloadFailed) And c.PortalId = PortalId And c.UserId <> UserId Select c.RMBNo, c.RmbDate, c.UserRef, c.UserId, c.RID
-
-                    dlTeamApproved.DataSource = myteamApproved
-                    dlTeamApproved.DataBind()
-
-                    Dim myteamAdvApproved = From c In d.AP_Staff_AdvanceRequests Where myteamIds.Contains(c.UserId) And (c.RequestStatus = RmbStatus.Approved Or c.RequestStatus = RmbStatus.PendingDownload Or c.RequestStatus = RmbStatus.DownloadFailed) And c.PortalId = PortalId And c.UserId <> UserId Select c.AdvanceId, c.RequestDate, c.UserId, c.LocalAdvanceId
-                    dlAdvTeamApproved.DataSource = myteamAdvApproved
-                    dlAdvTeamApproved.DataBind()
-                    dlAdvTeamApproved.AlternatingItemStyle.CssClass = IIf(dlTeamApproved.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
-                    dlAdvTeamApproved.ItemStyle.CssClass = IIf(dlTeamApproved.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
-
-
-                    '--For team leaders, build a tree of subordinates' completed reimbursements
-                    If Team.Count > 0 Then
-                        Dim TeamNode As New TreeNode("Team")
-                        TeamNode.SelectAction = TreeNodeSelectAction.Expand
-                        TeamNode.Expanded = False
-                        For Each row In Team
-                            Dim node As New TreeNode(row.DisplayName)
-                            node.Expanded = False
-                            node.SelectAction = TreeNodeSelectAction.Expand
-                            Dim teamApproved = From c In d.AP_Staff_Rmbs Join b In d.AP_StaffBroker_CostCenters On c.CostCenter Equals b.CostCentreCode And c.PortalId Equals b.PortalId
-                                Where c.UserId = row.UserID And c.Status = RmbStatus.Processed And c.PortalId = PortalId And b.Type = CostCentreType.Staff Select c.RMBNo, c.RmbDate, c.UserRef, c.UserId, c.RID
-
-                            Dim teamApprovedAdv = From c In d.AP_Staff_AdvanceRequests Where c.RequestStatus = RmbStatus.Processed And c.UserId = row.UserID And c.PortalId = PortalId Select c.AdvanceId, c.RequestDate, c.UserId, c.LocalAdvanceId
-
-                            For Each row2 In teamApproved
-                                Dim node2 As New TreeNode()
-                                node2.Text = GetRmbTitleTeamShort(row2.RID, row2.RmbDate)
-                                node2.NavigateUrl = NavigateURL() & "?RmbNo=" & row2.RMBNo
-
-                                node.ChildNodes.Add(node2)
-                                If IsSelected(row2.RMBNo) Then
-                                    node.Expanded = True
-                                    TeamNode.Expanded = True
-                                End If
-                            Next
-                            For Each row2 In teamApprovedAdv
-                                Dim node2 As New TreeNode()
-                                node2.Text = GetAdvTitleTeamShort(row2.LocalAdvanceId, row2.RequestDate)
-                                node2.NavigateUrl = NavigateURL() & "?RmbNo=" & -row2.AdvanceId
-                                node.ChildNodes.Add(node2)
-                                If IsSelected(-row2.AdvanceId) Then
-                                    node.Expanded = True
-                                    TeamNode.Expanded = True
-                                End If
-                            Next
-
-
-                            TeamNode.ChildNodes.Add(node)
-                        Next
-                        tvProcessed.Nodes.Add(TeamNode)
-                    End If
-
-                    ''add the approved Departements 
-                    'If CostCentres.Count > 0 Then
-                    '    Dim DeptNode As New TreeNode("Departments")
-                    '    DeptNode.SelectAction = TreeNodeSelectAction.Expand
-                    '    DeptNode.Expanded = False
-                    '    For Each row In CostCentres
-                    '        Dim node As New TreeNode(row.Name)
-                    '        node.Expanded = False
-                    '        node.SelectAction = TreeNodeSelectAction.Expand
-                    '        'Dim tCC = From c In d.AP_Staff_Rmbs Where StaffBrokerFunctions.IsDept(PortalId, c.CostCenter) And c.CostCenter = row.CostCentre And c.PortalId = PortalId And c.Status = RmbStatus.Processed And c.UserId <> UserId Select c.RMBNo, c.RmbDate, c.UserRef, c.UserId
-                    '        Dim tCC = From c In d.AP_Staff_Rmbs Join b In d.AP_StaffBroker_CostCenters On c.CostCenter Equals b.CostCentreCode And c.PortalId Equals b.PortalId
-                    '             Where c.CostCenter = row.CostCentre And c.PortalId = PortalId And b.Type = CostCentreType.Department And c.Status = RmbStatus.Processed And c.UserId <> UserId Select c.RMBNo, c.RmbDate, c.UserRef, c.UserId, c.RID
-
-                    '        For Each row2 In tCC
-                    '            Dim node2 As New TreeNode()
-                    '            node2.Text = GetRmbTitleTeamShort(row2.RID, row2.RmbDate)
-                    '            node2.NavigateUrl = NavigateURL() & "?RmbNo=" & row2.RMBNo
-                    '            node.ChildNodes.Add(node2)
-                    '            If IsSelected(row2.RMBNo) Then
-                    '                node.Expanded = True
-                    '                DeptNode.Expanded = True
-                    '            End If
-                    '        Next
-                    '        DeptNode.ChildNodes.Add(node)
-                    '    Next
-                    '    tvProcessed.Nodes.Add(DeptNode)
-                    'End If
                 End If
+
+                '--Highlight reimbursements that need more information in a bar at the top
+                Dim MoreInfo = From c In d.AP_Staff_Rmbs Where c.MoreInfoRequested = True And c.Status <> RmbStatus.Processed And c.Status <> RmbStatus.Processed And c.PortalId = PortalId And c.UserId = UserId Select c.UserRef, c.RID, c.RMBNo
+
+                For Each row In MoreInfo
+                    Dim hyp As New HyperLink()
+                    hyp.CssClass = "ui-state-highlight ui-corner-all AgapeWarning"
+                    hyp.Font.Size = FontUnit.Small
+                    hyp.Font.Bold = True
+
+                    hyp.Text = Translate("MoreInfo").Replace("[RMBNO]", row.RID).Replace("[USERREF]", row.UserRef)
+                    hyp.NavigateUrl = NavigateURL() & "?RmbNo=" & row.RMBNo
+
+
+                    PlaceHolder1.Controls.Add(hyp)
+                Next
+
+                pnlSubmittedView.Visible = True
+                'pnlApprovedAcc.Visible = False
+                pnlApprovedView.Visible = True
+
+                '--*** EVERYBODY ***
+                '--User sees his own items
+                Dim Pending = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Draft And c.PortalId = PortalId And (c.UserId = UserId) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
+                dlPending.DataSource = Pending
+                dlPending.DataBind()
+
+                Dim Submitted = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Submitted And c.PortalId = PortalId And (c.UserId = UserId) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
+                dlSubmitted.DataSource = Submitted
+                dlSubmitted.DataBind()
+
+                Dim AdvSubmitted = (From c In d.AP_Staff_AdvanceRequests Where c.RequestStatus = RmbStatus.Submitted And c.PortalId = PortalId And c.UserId = UserId Order By c.LocalAdvanceId Descending Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, UserId).Take(MenuSize)
+                dlAdvSubmitted.DataSource = AdvSubmitted
+                dlAdvSubmitted.DataBind()
+                dlAdvSubmitted.AlternatingItemStyle.CssClass = IIf(dlSubmitted.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
+                dlAdvSubmitted.ItemStyle.CssClass = IIf(dlSubmitted.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
+
+                Dim Approved = (From c In d.AP_Staff_Rmbs Where (c.Status = RmbStatus.Approved Or c.Status = RmbStatus.PendingDownload Or c.Status = RmbStatus.DownloadFailed) And c.PortalId = PortalId And (c.UserId = UserId) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
+                dlApproved.DataSource = Approved
+                dlApproved.DataBind()
+
+                Dim AdvApproved = (From c In d.AP_Staff_AdvanceRequests Where c.PortalId = PortalId And (c.RequestStatus = RmbStatus.Approved Or c.RequestStatus = RmbStatus.PendingDownload Or c.RequestStatus = RmbStatus.DownloadFailed) And c.UserId = UserId Order By c.LocalAdvanceId Descending Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId).Take(MenuSize)
+                dlAdvApproved.DataSource = AdvApproved
+                dlAdvApproved.DataBind()
+                dlAdvApproved.AlternatingItemStyle.CssClass = IIf(dlApproved.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
+                dlAdvApproved.ItemStyle.CssClass = IIf(dlApproved.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
+
+                Dim Complete = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Processed And c.PortalId = PortalId And (c.UserId = UserId) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
+                Dim CompleteAdv = (From c In d.AP_Staff_AdvanceRequests Where c.PortalId = PortalId And c.RequestStatus = RmbStatus.Processed And c.UserId = UserId Order By c.LocalAdvanceId Descending Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId).Take(MenuSize)
+
+                Dim Cancelled = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Cancelled And c.PortalId = PortalId And (c.UserId = UserId) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
+                dlCancelled.DataSource = Cancelled
+                dlCancelled.DataBind()
+
+                '--Build a tree of users' completed reimbursements
+                tvProcessed.Nodes.Clear()
+                Dim YouNode As New TreeNode("You")
+                YouNode.SelectAction = TreeNodeSelectAction.Expand
+                For Each row In Complete
+                    Dim node2 As New TreeNode()
+                    node2.Text = GetRmbTitleTeamShort(row.RID, row.RmbDate)
+                    node2.NavigateUrl = NavigateURL() & "?RmbNo=" & row.RMBNo
+                    YouNode.ChildNodes.Add(node2)
+                Next
+                For Each row In CompleteAdv
+                    Dim node2 As New TreeNode()
+                    node2.Text = GetAdvTitleTeamShort(row.LocalAdvanceId, row.RequestDate)
+                    node2.NavigateUrl = NavigateURL() & "?RmbNo=" & -row.AdvanceId
+                    YouNode.ChildNodes.Add(node2)
+                Next
+                tvProcessed.Nodes.Add(YouNode)
+
+
+
+
+                '--*** APPROVERS ***
+
+                '--list unapproved reimbursements submitted to this user for approval
+                Dim list As New ArrayList
+                Dim Advlist As New ArrayList
+
+                Dim tRmbs = (From c In d.AP_Staff_Rmbs
+                            Where c.Status = RmbStatus.Submitted And c.PortalId = PortalId And c.ApprUserId = UserId And c.ApprDate Is Nothing
+                            Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId)
+                For Each row In tRmbs
+                    list.Add(row)
+                Next
+
+                Dim tAdvs = (From c In d.AP_Staff_AdvanceRequests
+                             Where c.RequestStatus = RmbStatus.Submitted And c.PortalId = PortalId And c.ApproverId = UserId And c.ApprovedDate Is Nothing
+                             Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId)
+                For Each row In tAdvs
+                    Advlist.Add(row)
+                Next
+
+                dlToApprove.DataSource = (From c In list Order By c.RMBNo Descending)
+                dlToApprove.DataBind()
+                dlAdvToApprove.DataSource = From c In Advlist Order By c.LocalAdvanceId Descending
+                dlAdvToApprove.DataBind()
+                dlAdvToApprove.AlternatingItemStyle.CssClass = IIf(dlToApprove.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
+                dlAdvToApprove.ItemStyle.CssClass = IIf(dlToApprove.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
+
+                '-- Add a count of items to the 'Submitted' heading
+                If list.Count + Advlist.Count + Submitted.Count + AdvSubmitted.Count > 0 Then
+                    lblSubmittedCount.Text = "(" & list.Count + Advlist.Count + Submitted.Count + AdvSubmitted.Count & ")"
+                    pnlSubmitted.CssClass = "ui-state-highlight ui-corner-all"
+                Else
+                    lblSubmittedCount.Text = ""
+                    pnlSubmitted.CssClass = ""
+                End If
+
+
+
+
+
+                '--*** SUPERVISORS ***
+
+                Dim myteamIds = From c In Team Select c.UserID
+
+                Dim myteamApproved = From c In d.AP_Staff_Rmbs Where myteamIds.Contains(c.UserId) And (c.Status = RmbStatus.Approved Or c.Status = RmbStatus.PendingDownload Or c.Status = RmbStatus.DownloadFailed) And c.PortalId = PortalId And c.UserId <> UserId Select c.RMBNo, c.RmbDate, c.UserRef, c.UserId, c.RID
+
+                dlTeamApproved.DataSource = myteamApproved
+                dlTeamApproved.DataBind()
+
+                Dim myteamAdvApproved = From c In d.AP_Staff_AdvanceRequests Where myteamIds.Contains(c.UserId) And (c.RequestStatus = RmbStatus.Approved Or c.RequestStatus = RmbStatus.PendingDownload Or c.RequestStatus = RmbStatus.DownloadFailed) And c.PortalId = PortalId And c.UserId <> UserId Select c.AdvanceId, c.RequestDate, c.UserId, c.LocalAdvanceId
+                dlAdvTeamApproved.DataSource = myteamAdvApproved
+                dlAdvTeamApproved.DataBind()
+                dlAdvTeamApproved.AlternatingItemStyle.CssClass = IIf(dlTeamApproved.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
+                dlAdvTeamApproved.ItemStyle.CssClass = IIf(dlTeamApproved.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
+
+
+                '--For team leaders, build a tree of subordinates' completed reimbursements
+                If Team.Count > 0 Then
+                    Dim TeamNode As New TreeNode("Team")
+                    TeamNode.SelectAction = TreeNodeSelectAction.Expand
+                    TeamNode.Expanded = False
+                    For Each row In Team
+                        Dim node As New TreeNode(row.DisplayName)
+                        node.Expanded = False
+                        node.SelectAction = TreeNodeSelectAction.Expand
+                        Dim teamApproved = From c In d.AP_Staff_Rmbs Join b In d.AP_StaffBroker_CostCenters On c.CostCenter Equals b.CostCentreCode And c.PortalId Equals b.PortalId
+                            Where c.UserId = row.UserID And c.Status = RmbStatus.Processed And c.PortalId = PortalId And b.Type = CostCentreType.Staff Select c.RMBNo, c.RmbDate, c.UserRef, c.UserId, c.RID
+
+                        Dim teamApprovedAdv = From c In d.AP_Staff_AdvanceRequests Where c.RequestStatus = RmbStatus.Processed And c.UserId = row.UserID And c.PortalId = PortalId Select c.AdvanceId, c.RequestDate, c.UserId, c.LocalAdvanceId
+
+                        For Each row2 In teamApproved
+                            Dim node2 As New TreeNode()
+                            node2.Text = GetRmbTitleTeamShort(row2.RID, row2.RmbDate)
+                            node2.NavigateUrl = NavigateURL() & "?RmbNo=" & row2.RMBNo
+
+                            node.ChildNodes.Add(node2)
+                            If IsSelected(row2.RMBNo) Then
+                                node.Expanded = True
+                                TeamNode.Expanded = True
+                            End If
+                        Next
+                        For Each row2 In teamApprovedAdv
+                            Dim node2 As New TreeNode()
+                            node2.Text = GetAdvTitleTeamShort(row2.LocalAdvanceId, row2.RequestDate)
+                            node2.NavigateUrl = NavigateURL() & "?RmbNo=" & -row2.AdvanceId
+                            node.ChildNodes.Add(node2)
+                            If IsSelected(-row2.AdvanceId) Then
+                                node.Expanded = True
+                                TeamNode.Expanded = True
+                            End If
+                        Next
+
+
+                        TeamNode.ChildNodes.Add(node)
+                    Next
+                    tvProcessed.Nodes.Add(TeamNode)
+                End If
+
+                ''add the approved Departements 
+                'If CostCentres.Count > 0 Then
+                '    Dim DeptNode As New TreeNode("Departments")
+                '    DeptNode.SelectAction = TreeNodeSelectAction.Expand
+                '    DeptNode.Expanded = False
+                '    For Each row In CostCentres
+                '        Dim node As New TreeNode(row.Name)
+                '        node.Expanded = False
+                '        node.SelectAction = TreeNodeSelectAction.Expand
+                '        'Dim tCC = From c In d.AP_Staff_Rmbs Where StaffBrokerFunctions.IsDept(PortalId, c.CostCenter) And c.CostCenter = row.CostCentre And c.PortalId = PortalId And c.Status = RmbStatus.Processed And c.UserId <> UserId Select c.RMBNo, c.RmbDate, c.UserRef, c.UserId
+                '        Dim tCC = From c In d.AP_Staff_Rmbs Join b In d.AP_StaffBroker_CostCenters On c.CostCenter Equals b.CostCentreCode And c.PortalId Equals b.PortalId
+                '             Where c.CostCenter = row.CostCentre And c.PortalId = PortalId And b.Type = CostCentreType.Department And c.Status = RmbStatus.Processed And c.UserId <> UserId Select c.RMBNo, c.RmbDate, c.UserRef, c.UserId, c.RID
+
+                '        For Each row2 In tCC
+                '            Dim node2 As New TreeNode()
+                '            node2.Text = GetRmbTitleTeamShort(row2.RID, row2.RmbDate)
+                '            node2.NavigateUrl = NavigateURL() & "?RmbNo=" & row2.RMBNo
+                '            node.ChildNodes.Add(node2)
+                '            If IsSelected(row2.RMBNo) Then
+                '                node.Expanded = True
+                '                DeptNode.Expanded = True
+                '            End If
+                '        Next
+                '        DeptNode.ChildNodes.Add(node)
+                '    Next
+                '    tvProcessed.Nodes.Add(DeptNode)
+                'End If
 
             Catch ex As Exception
                 lblError.Text = "Error loading Menu: " & ex.Message
@@ -1297,7 +1234,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         btnUnProcess.Visible = (q.First.Status = RmbStatus.Processed Or q.First.Status = RmbStatus.PendingDownload Or q.First.Status = RmbStatus.DownloadFailed)
 
                         addLinebtn2.Visible = (q.First.Status <> RmbStatus.Processed And q.First.Status <> RmbStatus.PendingDownload And q.First.Status <> RmbStatus.DownloadFailed)
-                        btnSubmit.Visible = False
+                        'btnSubmit.Visible = False  '--accounts needs to be able to submit reimbursements too
                         btnApprove.Visible = False
                         btnDownload.Visible = True
                         pnlPeriodYear.Visible = True
@@ -3071,9 +3008,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Return 0
         End Function
         Protected Function IsAccounts() As Boolean
-            If Not ModuleContext.IsEditable Then
-                Return False
-            End If
+            'If Not ModuleContext.IsEditable Then
+            '    Return False
+            'End If
             Try
 
 
@@ -4949,6 +4886,51 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Property
 
 #End Region
+
+
+
+        Private Sub addItemsToTree(AllStaffSubmittedNode As TreeNode, submittedNode As TreeNode, letter As String, queryResult As Object, type As String)
+            submittedNode.Expanded = False
+            submittedNode.SelectAction = TreeNodeSelectAction.Expand
+            getAlphabeticNode(AllStaffSubmittedNode, letter).ChildNodes.Add(submittedNode)
+
+            For Each row In queryResult '--get details of each reimbursement or advance
+                Dim newNode As New TreeNode()
+                If (type.Equals("rmb")) Then
+                    newNode.Text = GetRmbTitleTeamShort(row.RID, row.RmbDate)
+                    newNode.NavigateUrl = NavigateURL() & "?RmbNo=" & row.RMBNo
+                Else
+                    newNode.Text = GetAdvTitleTeamShort(row.LocalAdvanceId, row.RequestDate)
+                    newNode.NavigateUrl = NavigateURL() & "?RmbNo=" & -row.AdvanceId
+                End If
+                submittedNode.ChildNodes.Add(newNode)
+
+                If IsSelected(row.RMBNo) Then
+                    submittedNode.Expanded = True
+                    submittedNode.Parent.Expanded = True
+                    submittedNode.Parent.Parent.Expanded = True
+                End If
+            Next
+        End Sub
+
+        Private Function getAlphabeticNode(mainTree As TreeNode, letter As String) As TreeNode
+            For Each child As TreeNode In mainTree.ChildNodes
+                If child.Text.Equals(letter) Then
+                    Return child
+                End If
+            Next
+            Dim newChild As New TreeNode(letter)
+            newChild.Expanded = False
+            newChild.SelectAction = TreeNodeSelectAction.Expand
+            For index As Integer = 0 To mainTree.ChildNodes.Count() - 1
+                If mainTree.ChildNodes.Item(index).Text > letter Then
+                    mainTree.ChildNodes.AddAt(index, newChild)
+                    Return newChild
+                End If
+            Next
+            mainTree.ChildNodes.Add(newChild)
+            Return newChild
+        End Function
 
     End Class
 End Namespace
