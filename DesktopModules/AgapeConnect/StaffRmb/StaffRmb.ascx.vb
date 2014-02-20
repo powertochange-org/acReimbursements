@@ -297,6 +297,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim SpouseList = StaffBrokerFunctions.GetTeam(SpouseId)
                 'Dim CostCentres = StaffBrokerFunctions.GetDepartments(UserId) '--departments that user manages (or have been delegated to him)
 
+                '--***Finance Team***
+
                 If isAcc Then '--if user is on the accounts team...
                     'pnlSubmittedView.Visible = False
                     pnlApprovedAcc.Visible = True
@@ -459,7 +461,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 '--Build a tree of users' completed reimbursements
                 tvProcessed.Nodes.Clear()
-                Dim YouNode As New TreeNode("You")
+                Dim YouNode As New TreeNode("Your Reimbursements")
                 YouNode.SelectAction = TreeNodeSelectAction.Expand
                 For Each row In Complete
                     Dim node2 As New TreeNode()
@@ -513,6 +515,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     lblSubmittedCount.Text = ""
                     pnlSubmitted.CssClass = ""
                 End If
+
+                If (list.Count = 0 And Advlist.Count = 0) Then
+                    lblApproveHeading.Visible = False '--hide the heading, if empty
+                    divApproveHeading.Visible = False
+                End If
+
 
 
 
@@ -574,6 +582,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         TeamNode.ChildNodes.Add(node)
                     Next
                     tvProcessed.Nodes.Add(TeamNode)
+                Else '--if they are not a team leader
+                    lblYourTeamHeading.Visible = False '--hide team label, if not a team leader
+                    divYourTeamHeading.Visible = False
                 End If
 
                 ''add the approved Departements 

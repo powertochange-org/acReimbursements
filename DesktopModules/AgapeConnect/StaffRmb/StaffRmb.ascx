@@ -787,8 +787,7 @@
                                         <asp:TreeView ID="tvAllSubmitted" class="accounts_team" runat="server" NodeIndent="10">
                                         </asp:TreeView>
                                         <asp:Panel ID="pnlSubmittedView" runat="server">
-                                            <asp:Label ID="Label10" runat="server" class="Agape_SubTitle" ResourceKey="RmbsToApprove" Style="font-size: 8pt;"></asp:Label>
-                                            <br />
+                                            <asp:Label ID="lblApproveHeading" runat="server" class="Agape_SubTitle" ResourceKey="RmbsToApprove" Style="font-size: 8pt;"></asp:Label>
                                             <asp:DataList ID="dlToApprove" runat="server" Width="100%">
                                                 <ItemStyle CssClass="dnnGridItem" />
                                                 <AlternatingItemStyle CssClass="dnnGridAltItem" />
@@ -829,9 +828,9 @@
                                                     </table>
                                                 </ItemTemplate>
                                             </asp:DataList>
-                                            <div style="width: 100%; border-bottom: dashed 1px black;">
-                                                &nbsp;
-                                            </div>
+                                            <asp:Panel ID="divApproveHeading" runat="server" style="width: 100%; border-bottom: dashed 1px black;">
+                                                &nbsp;<br />
+                                            </asp:Panel>
                                             <asp:Label ID="Label11" runat="server" class="Agape_SubTitle" ResourceKey="YourRmbs" Style="font-size: 8pt;"></asp:Label>
                                             <br />
                                             <asp:DataList ID="dlSubmitted" runat="server" Width="100%">
@@ -1055,10 +1054,10 @@
                                                     </table>
                                                 </ItemTemplate>
                                             </asp:DataList>
-                                            <div style="width: 100%; border-bottom: dashed 1px black;">
+                                            <asp:panel ID="divYourTeamHeading" runat="server" style="width: 100%; border-bottom: dashed 1px black;">
                                                 &nbsp;
-                                            </div>
-                                            <asp:Label ID="Label16" runat="server" class="Agape_SubTitle" ResourceKey="TeamRmbs" Style="font-size: 8pt;"></asp:Label>
+                                            </asp:panel>
+                                            <asp:Label ID="lblYourTeamHeading" runat="server" class="Agape_SubTitle" ResourceKey="TeamRmbs" Style="font-size: 8pt;"></asp:Label>
                                             <br />
                                             <asp:DataList ID="dlTeamApproved" runat="server" Width="100%">
                                                 <ItemStyle CssClass="dnnGridItem" />
