@@ -4334,20 +4334,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
 
         Public Function GetProfileImage(ByVal UserId As Integer) As String
-            Dim FileId = UserController.GetUserById(PortalId, UserId).Profile.GetPropertyValue("Photo")
-            If FileId Is Nothing Or FileId = "" Then
-                Return "/images/no_avatar.gif"
-            Else
-                Try
-
-
-                    Dim theFile = DotNetNuke.Services.FileSystem.FileManager.Instance.GetFile(FileId)
-                    Return DotNetNuke.Services.FileSystem.FileManager.Instance.GetUrl(theFile)
-                Catch ex As Exception
-                    Return "/images/no_avatar.gif"
-                End Try
-            End If
-
+            Dim username = UserController.GetUserById(PortalId, UserId).Username
+			username = Left(username, Len(username) - 1)
+			Return "https://staff.powertochange.org/custom-pages/webService.php?type=staff_photo&api_token=V7qVU7n59743KNVgPdDMr3T8&staff_username=" + username
         End Function
 
         Protected Sub cbMoreInfo_CheckedChanged(sender As Object, e As System.EventArgs) Handles cbMoreInfo.CheckedChanged
