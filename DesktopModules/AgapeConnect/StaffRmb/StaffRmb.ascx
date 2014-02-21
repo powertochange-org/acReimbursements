@@ -292,7 +292,6 @@
 
 
 
-
         $(document).ready(function () {
             setUpMyTabs();
             setUpAutocomplete();
@@ -1057,7 +1056,7 @@
                                             <asp:panel ID="divYourTeamHeading" runat="server" style="width: 100%; border-bottom: dashed 1px black;">
                                                 &nbsp;
                                             </asp:panel>
-                                            <asp:Label ID="lblYourTeamHeading" runat="server" class="Agape_SubTitle" ResourceKey="TeamRmbs" Style="font-size: 8pt;"></asp:Label>
+                                            <asp:Label ID="lblYourTeamHeading" runat="server" CssClass="Agape_SubTitle" ResourceKey="TeamRmbs" Style="font-size: 8pt;"></asp:Label>
                                             <br />
                                             <asp:DataList ID="dlTeamApproved" runat="server" Width="100%">
                                                 <ItemStyle CssClass="dnnGridItem" />
@@ -1135,6 +1134,8 @@
                                     </asp:TreeView>
                                     <asp:TreeView ID="tvProcessed" runat="server" NodeIndent="10">
                                     </asp:TreeView>
+                                    <asp:TreeView ID="tvTeamProcessed" class="team_leader" runat="server" NodeIndent="10">
+                                    </asp:TreeView>
                                 </ContentTemplate>
                                 <Triggers>
                                     <asp:PostBackTrigger ControlID="tvProcessed" />
@@ -1206,17 +1207,19 @@
                                     </asp:TextBox>
                                     <asp:HiddenField ID="hfChargeToValue" runat="server"  />
                                 </div>
-                                <asp:Label ID="lblStatus" runat="server" Style="float: left; font-style: italic;"></asp:Label>
+                                <div class="inverse" style="width:648px; margin-left:-5px; padding-bottom:3px; padding-left:8px; padding-right:5px; float: right">
+                                    <asp:Label ID="lblStatus" runat="server" Style="float: left; font-style: italic; font-size:13px;"></asp:Label>
 
-                                <asp:Label ID="lblAccountBalance" runat="server" Style="float: right; font-style: italic; margin-right: 3px;" Text="searching..."></asp:Label>
-                                <asp:Label ID="ttlAccountBalance" runat="server" Style="float: right; margin-right: 3px; font-style: italic;"
-                                    resourceKey="AccountBalance"></asp:Label>
-                                <asp:HiddenField ID="hfAccountBalance" runat="server" />
+                                    <asp:Label ID="lblAccountBalance" runat="server" Style="float: right; font-style: italic; margin-right: 3px;  font-size:13px;" Text="searching..."></asp:Label>
+                                    <asp:Label ID="ttlAccountBalance" runat="server" Style="float: right; margin-right: 3px; font-style: italic;  font-size:13px;"
+                                        resourceKey="AccountBalance"></asp:Label>
+                                    <asp:HiddenField ID="hfAccountBalance" runat="server" />
+                                    </div>
                                 <div style="clear: both;">
                                 </div>
                             </div>
                             <div style="margin-top: 10px; padding: 10px;">
-                                <table width="100%">
+                                <table  class="rmbHeader" width="100%">
                                     <tr class="Agape_SubTitle">
                                         <td class="hdrTitle">
                                             <asp:Label ID="Label18" runat="server" resourcekey="SubmittedOn"></asp:Label>
@@ -1351,7 +1354,7 @@
                                 <br />
                                 <asp:Label ID="lblTest" runat="server" Text="Label" Visible="false"></asp:Label>
                                 <div style="padding: 0 20px 0 20px;">
-                                    <asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="False" DataKeyNames="RmbLineNo"
+                                    <asp:GridView ID="GridView1" class="rmbDetails" runat="server" AutoGenerateColumns="False" DataKeyNames="RmbLineNo"
                                         CellPadding="4" ForeColor="#333333" GridLines="None" Width="100%" ShowFooter="True">
                                         <RowStyle CssClass="dnnGridItem" />
                                         <AlternatingRowStyle CssClass="dnnGridAltItem" />

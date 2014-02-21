@@ -544,7 +544,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 '--For team leaders, build a tree of subordinates' completed reimbursements
                 If Team.Count > 0 Then
-                    Dim TeamNode As New TreeNode("Team")
+                    Dim TeamNode As New TreeNode("Your Team")
                     TeamNode.SelectAction = TreeNodeSelectAction.Expand
                     TeamNode.Expanded = False
                     For Each row In Team
@@ -581,10 +581,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                         TeamNode.ChildNodes.Add(node)
                     Next
-                    tvProcessed.Nodes.Add(TeamNode)
+                    tvTeamProcessed.Nodes.Add(TeamNode)
                 Else '--if they are not a team leader
                     lblYourTeamHeading.Visible = False '--hide team label, if not a team leader
                     divYourTeamHeading.Visible = False
+                    tvTeamProcessed.Visible = False
                 End If
 
                 ''add the approved Departements 
