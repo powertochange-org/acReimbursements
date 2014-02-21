@@ -1244,8 +1244,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         End If
 
                         btnUnProcess.Visible = (q.First.Status = RmbStatus.Processed Or q.First.Status = RmbStatus.PendingDownload Or q.First.Status = RmbStatus.DownloadFailed)
-
-                        addLinebtn2.Visible = (q.First.Status <> RmbStatus.Processed And q.First.Status <> RmbStatus.PendingDownload And q.First.Status <> RmbStatus.DownloadFailed)
+                        'addLinebtn2.Visible = (q.First.Status <> RmbStatus.Processed And q.First.Status <> RmbStatus.PendingDownload And q.First.Status <> RmbStatus.DownloadFailed)
                         'btnSubmit.Visible = False  '--accounts needs to be able to submit reimbursements too
                         btnApprove.Visible = False
                         btnDownload.Visible = True
@@ -1274,7 +1273,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         pnlPeriodYear.Visible = False
                     End If
 
-
+                    tbComments.Visible = False
+                    lbComments.Visible = True
+                    addLinebtn2.Visible = False
                     Select Case RmbRel
                         Case RmbAccess.Owner, RmbAccess.Spouse
                             tbComments.Visible = True
@@ -1282,6 +1283,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             lbComments.Visible = False
                             tbApprComments.Visible = False
                             lblApprComments.Visible = True
+                            addLinebtn2.Visible = True
                         Case RmbAccess.Approver, RmbAccess.Leader
                             tbComments.Visible = False
                             lbComments.Visible = True

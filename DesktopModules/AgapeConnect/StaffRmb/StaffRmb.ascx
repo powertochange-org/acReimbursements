@@ -1328,30 +1328,9 @@
                                     </tr>
                                 </table>
                                 <br />
-                                <asp:Button ID="addLinebtn2" runat="server" resourcekey="btnAddExpenseItem" class="aButton" />
-                                <asp:Button ID="btnSubmit" runat="server" resourcekey="btnSubmit" class="aButton" />
-                                <asp:Button ID="btnSave" runat="server" resourcekey="btnSave" class="aButton" />
-                                <asp:Button ID="btnApprove" runat="server" resourcekey="btnApprove" class="aButton" />
-                                <asp:Button ID="btnPrint" runat="server" resourcekey="btnPrint" class="aButton" />
-                                <asp:Button ID="btnProcess" runat="server" resourcekey="btnProcess" class="aButton" />
-                                <asp:Button ID="btnUnProcess" runat="server" resourcekey="btnUnProcess" class="aButton" />
-                                <asp:Button ID="btnCancel" runat="server" resourcekey="btnCancel" class="aButton" />
-                                <asp:LinkButton ID="btnDownload" runat="server">
-                                    <div style="vertical-align: middle; float: right; padding-top: 8px;">
-                                        <img src="/DesktopModules/AgapeConnect/StaffRmb/Images/Excel_icon.gif" alt="" />
-                                        <asp:Label ID="lblDownload" runat="server" resourcekey="btnDownload"></asp:Label>
-                                    </div>
-                                    <div style="clear: both;">
-                                    </div>
-                                </asp:LinkButton>
-
-
-
-                                <%-- <button class="Excel" title="Download" >
-            <asp:Label ID="Label3" runat="server" Text="Download"></asp:Label>
-        </button>--%>
                                 <br />
-                                <br />
+
+
                                 <asp:Label ID="lblTest" runat="server" Text="Label" Visible="false"></asp:Label>
                                 <div style="padding: 0 20px 0 20px;">
                                     <asp:GridView ID="GridView1" class="rmbDetails" runat="server" AutoGenerateColumns="False" DataKeyNames="RmbLineNo"
@@ -1460,6 +1439,28 @@
                                     </asp:Panel>
                                 </div>
 
+                               <br />
+                                <asp:Button ID="addLinebtn2" runat="server" resourcekey="btnAddExpenseItem" class="aButton" />
+                                <asp:Button ID="btnSubmit" runat="server" resourcekey="btnSubmit" class="aButton" />
+                                <asp:Button ID="btnSave" runat="server" resourcekey="btnSave" class="aButton" />
+                                <asp:Button ID="btnApprove" runat="server" resourcekey="btnApprove" class="aButton" />
+                                <asp:Button ID="btnPrint" runat="server" resourcekey="btnPrint" class="aButton" />
+                                <asp:Button ID="btnProcess" runat="server" resourcekey="btnProcess" class="aButton" />
+                                <asp:Button ID="btnUnProcess" runat="server" resourcekey="btnUnProcess" class="aButton" />
+                                <asp:Button ID="btnCancel" runat="server" resourcekey="btnCancel" class="aButton" />
+                                <asp:LinkButton ID="btnDownload" runat="server">
+                                    <div style="vertical-align: middle; float: right; padding-top: 8px;">
+                                        <img src="/DesktopModules/AgapeConnect/StaffRmb/Images/Excel_icon.gif" alt="" />
+                                        <asp:Label ID="lblDownload" runat="server" resourcekey="btnDownload"></asp:Label>
+                                    </div>
+                                    <div style="clear: both;">
+                                    </div>
+                                </asp:LinkButton>
+                                <%-- <button class="Excel" title="Download" >
+                                    <asp:Label ID="Label3" runat="server" Text="Download"></asp:Label>
+                                </button>--%>
+                                <br />
+                                <br />
 
                                 <div style="margin-top: 15px;">
                                     <fieldset id="pnlAdvance" runat="server" visible="false" style="float: left;">
