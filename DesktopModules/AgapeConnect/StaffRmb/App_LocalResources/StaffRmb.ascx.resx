@@ -573,13 +573,13 @@
   <data name="OpenNewTab.Text" xml:space="preserve">
     <value>Click to view in new tab...</value>
   </data>
-  <data name="lblDesc" xml:space="preserve">
+  <data name="lblDesc.Text" xml:space="preserve">
     <value>Destination or Description of travel</value>
   </data>
-  <data name="lblDistance" xml:space="preserve">
+  <data name="lblDistance.Text" xml:space="preserve">
     <value>Distance:</value>
   </data>
-  <data name="lblDistUnits" xml:space="preserve">
+  <data name="lblDistUnits.Text" xml:space="preserve">
     <value>Distance units:</value>
   </data>
 </root>
