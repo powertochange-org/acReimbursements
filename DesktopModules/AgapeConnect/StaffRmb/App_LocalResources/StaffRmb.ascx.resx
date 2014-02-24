@@ -573,7 +573,7 @@
   <data name="OpenNewTab.Text" xml:space="preserve">
     <value>Click to view in new tab...</value>
   </data>
-  <data name="lblDesc" xml:space="preserve">
+  <data name="lblDesc.Text" xml:space="preserve">
     <value>Destination or Description of travel</value>
   </data>
 </root>
