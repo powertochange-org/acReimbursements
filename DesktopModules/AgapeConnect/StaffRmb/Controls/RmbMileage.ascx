@@ -4,7 +4,7 @@
 
 
 <asp:HiddenField ID="hfAddStaffRate" runat="server" />
-<asp:HiddenField ID="hfCanAddPass" runat="server" />
+
 <div class="Agape_SubTitle"> <asp:HiddenField ID="hfNoReceiptLimit" runat="server" Value="0" />
     <asp:Label ID="Label2" runat="server" Font-Italic="true" ForeColor="Gray" resourcekey="Explanation"></asp:Label>
 </div><br />
@@ -12,11 +12,11 @@
 <ContentTemplate>
 <table style="font-size:9pt; ">
 <tr>
-    <td ><b><dnn:label id="Label4"  runat="server" controlname="tbDesc" ResourceKey="lblDesc"  /></b></td>
+    <td ><b><dnn:label id="lblDesc"  runat="server" controlname="tbDesc" ResourceKey="lblDesc"  /></b></td>
     <td colspan="2"><asp:TextBox ID="tbDesc" runat="server" Width="450px"></asp:TextBox></td>
 </tr>
 <tr>
-    <td><b><dnn:label id="Label3" runat="server" controlname="dtDate"  ResourceKey="lblDate" /></b></td>
+    <td><b><dnn:label id="lblDate" runat="server" controlname="dtDate"  ResourceKey="lblDate" /></b></td>
     <td colspan="2">
       
         <asp:TextBox ID="dtDate" runat="server" Width="90px" class="datepicker"></asp:TextBox>
@@ -27,19 +27,19 @@
     <tr>
         <td>
             <b>
-                <dnn:Label ID="lblAmount" runat="server" ControlName="tbMiles"   />
+                <dnn:Label ID="lblDistance" runat="server" ControlName="dbDistance"   />
             </b>
 
         </td>
         <td>
-            <asp:TextBox ID="tbMiles" runat="server" Width="90px" class="numeric"></asp:TextBox>
+            <asp:TextBox ID="tbDistance" runat="server" Width="90px" class="numeric"></asp:TextBox>
         </td>
 </tr>
 
-<tr id="pnlVehicle" runat="server">
-    <td><b><dnn:label id="lblTitle" runat="server" controlname="ddlVehicleType"  resourcekey="lblVehicle" /></b></td>
+<tr id="pnlDistUnits" runat="server">
+    <td><b><dnn:label id="lblDistUnits" runat="server" controlname="ddlDistUnits"  resourcekey="lblDistUnits" /></b></td>
     <td>
-        <asp:DropDownList ID="ddlVehicleType" runat="server" AutoPostBack="true" >
+        <asp:DropDownList ID="ddlDistUnits" runat="server" AutoPostBack="true" >
            
         </asp:DropDownList>
        <%-- <asp:DropDownList ID="DropDownList1" runat="server" AutoPostBack="true">
@@ -80,7 +80,7 @@
 </td>
 </tr>
 
-<tr id="PassengersRow" runat="server">
+<%--<tr id="PassengersRow" runat="server">
     <td><b><dnn:label id="Label6" runat="server" controlname="ddlStaff" ResourceKey="lblStaff"  text="How many staff<br />passengers did you take?" HelpText="You get an additional 5p for every staff passenger that you take. The passenger must be on the UK payroll - so interns and children do not count (sorry!). Interns also cannot claim additional allowance for staff passengers." /></b></td>
     <td>
         <asp:DropDownList ID="ddlStaff" runat="server" AutoPostBack="true" >
@@ -113,7 +113,7 @@
        <div id="pnlDDL8" runat="server"> <asp:DropDownList ID="DDL8" runat="server" ></asp:DropDownList></div>
     </td>
    
-</tr>
+</tr>--%>
 
 </table>
  <asp:Label ID="ErrorLbl" runat="server" Font-Size="9pt" ForeColor="Red" />
