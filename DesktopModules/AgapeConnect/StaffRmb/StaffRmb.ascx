@@ -1326,6 +1326,12 @@
                                             </fieldset>
                                         </td>
                                     </tr>
+                                    <tr valign="top">
+                                        <td colspan="6">
+                                            <asp:Button ID="btnCancel" runat="server" resourcekey="btnCancel" class="aButton"  style="float:left"/>
+                                            <asp:Button ID="btnSave" runat="server" resourcekey="btnSave" class="aButton" style="float:right"/>
+                                        </td>
+                                    </tr>
                                 </table>
                                 <br />
                                 <br />
@@ -1440,14 +1446,16 @@
                                 </div>
 
                                <br />
-                                <asp:Button ID="addLinebtn2" runat="server" resourcekey="btnAddExpenseItem" class="aButton" />
-                                <asp:Button ID="btnSubmit" runat="server" resourcekey="btnSubmit" class="aButton" />
-                                <asp:Button ID="btnSave" runat="server" resourcekey="btnSave" class="aButton" />
-                                <asp:Button ID="btnApprove" runat="server" resourcekey="btnApprove" class="aButton" />
-                                <asp:Button ID="btnPrint" runat="server" resourcekey="btnPrint" class="aButton" />
-                                <asp:Button ID="btnProcess" runat="server" resourcekey="btnProcess" class="aButton" />
-                                <asp:Button ID="btnUnProcess" runat="server" resourcekey="btnUnProcess" class="aButton" />
-                                <asp:Button ID="btnCancel" runat="server" resourcekey="btnCancel" class="aButton" />
+                                <div style="float:left">
+                                    <asp:Button ID="addLinebtn2" runat="server" resourcekey="btnAddExpenseItem" class="aButton" />
+                                </div>
+                                <div style="float:right">
+                                    <asp:Button ID="btnPrint" runat="server" resourcekey="btnPrint" class="aButton" />
+                                    <asp:Button ID="btnSubmit" runat="server" resourcekey="btnSubmit" class="aButton" />
+                                    <asp:Button ID="btnApprove" runat="server" resourcekey="btnApprove" class="aButton" />
+                                    <asp:Button ID="btnProcess" runat="server" resourcekey="btnProcess" class="aButton" />
+                                    <asp:Button ID="btnUnProcess" runat="server" resourcekey="btnUnProcess" class="aButton" />
+                                </div>
                                 <asp:LinkButton ID="btnDownload" runat="server">
                                     <div style="vertical-align: middle; float: right; padding-top: 8px;">
                                         <img src="/DesktopModules/AgapeConnect/StaffRmb/Images/Excel_icon.gif" alt="" />

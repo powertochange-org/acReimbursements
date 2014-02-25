@@ -27,7 +27,7 @@
     <tr>
         <td>
             <b>
-                <dnn:Label ID="lblDistance" runat="server" ControlName="dbDistance"   />
+                <dnn:Label ID="lblDistance" runat="server" ControlName="dbDistance" ResourceKey="lblDistance"   />
             </b>
 
         </td>
