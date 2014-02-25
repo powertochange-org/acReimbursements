@@ -732,8 +732,8 @@
                         <div id="DraftPane" class="AcPane">
                             <asp:UpdatePanel ID="UpdatePanel5" runat="server">
                                 <ContentTemplate>
-                                    <asp:Label ID="lblHighlight" runat="server" class="ui-state-highlight ui-corner-all"
-                                        Style="padding: 3px; display: block;" resourcekey="AccountsMode" Visible="false"></asp:Label>
+                                    <h4><asp:Label ID="lblHighlight" runat="server" class="ui-state-highlight ui-corner-all"
+                                        Style="padding: 3px; display: block;" resourcekey="AccountsMode" Visible="false"></asp:Label></h4>
                                     <asp:Label ID="lblErrors" runat="server" class="ui-state-error ui-corner-all"
                                         Style="padding: 3px; margin-top: 3px; display: block;" Visible="false"></asp:Label>
                                     <asp:DataList ID="dlPending" runat="server" Width="100%">
