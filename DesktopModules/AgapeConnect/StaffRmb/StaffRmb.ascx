@@ -1311,8 +1311,9 @@
                                                 <legend class="AgapeH4">
                                                     <asp:Label ID="Label26" runat="server" resourcekey="ApproversComments"></asp:Label></legend>
                                                 <asp:Label ID="lblApprComments" runat="server" Height="60px"></asp:Label>
-                                                <asp:TextBox ID="tbApprComments" runat="server" Height="55px" TextMode="MultiLine"
+                                                <asp:TextBox ID="tbApprComments" runat="server" Height="35px" TextMode="MultiLine"
                                                     Width="100%" Visible="false"></asp:TextBox>
+                                                <asp:CheckBox ID="cbApprMoreInfo" runat="server" AutoPostBack="true" resourcekey="btnMoreInfo" />
                                             </fieldset>
                                         </td>
                                         <td colspan="2" style="font-size: 8pt; width: 33%;">
@@ -1440,12 +1441,21 @@
                                         <SelectedRowStyle CssClass="dnnFormError" />
                                     </asp:GridView>
 
-                                    <asp:Panel ID="pnlTaxable" runat="server" Visible="false">
-                                        <asp:Label ID="Label28" runat="server" Font-Italic="true" resourcekey="Taxable"></asp:Label>
+                                    <asp:Panel ID="pnlTaxable" runat="server" Visible="false" >
+                                        <div style="float:left">
+                                            <asp:Label ID="Label28" runat="server" Font-Italic="true" resourcekey="Taxable"></asp:Label>
+                                        </div>
                                     </asp:Panel>
+                                    <asp:LinkButton ID="btnDownload" runat="server">
+                                        <div style="vertical-align: middle; float: right; padding-top: 8px; padding-bottom: 2px">
+                                            <img src="/DesktopModules/AgapeConnect/StaffRmb/Images/Excel_icon.gif" alt="" />
+                                            <asp:Label ID="lblDownload" runat="server" resourcekey="btnDownload"></asp:Label>
+                                        </div>
+                                        <div style="clear: both;">
+                                        </div>
+                                    </asp:LinkButton>
                                 </div>
 
-                               <br />
                                 <div style="float:left">
                                     <asp:Button ID="addLinebtn2" runat="server" resourcekey="btnAddExpenseItem" class="aButton" />
                                 </div>
@@ -1456,14 +1466,6 @@
                                     <asp:Button ID="btnProcess" runat="server" resourcekey="btnProcess" class="aButton" />
                                     <asp:Button ID="btnUnProcess" runat="server" resourcekey="btnUnProcess" class="aButton" />
                                 </div>
-                                <asp:LinkButton ID="btnDownload" runat="server">
-                                    <div style="vertical-align: middle; float: right; padding-top: 8px;">
-                                        <img src="/DesktopModules/AgapeConnect/StaffRmb/Images/Excel_icon.gif" alt="" />
-                                        <asp:Label ID="lblDownload" runat="server" resourcekey="btnDownload"></asp:Label>
-                                    </div>
-                                    <div style="clear: both;">
-                                    </div>
-                                </asp:LinkButton>
                                 <%-- <button class="Excel" title="Download" >
                                     <asp:Label ID="Label3" runat="server" Text="Download"></asp:Label>
                                 </button>--%>
