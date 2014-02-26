@@ -205,7 +205,7 @@
     <value>Yes</value>
   </data>
   <data name="Cancelled.Text" xml:space="preserve">
-    <value>Cancelled</value>
+    <value>Deleted</value>
   </data>
   <data name="Comment.Text" xml:space="preserve">
     <value>Comment</value>
@@ -490,7 +490,7 @@
     <value> Request more info</value>
   </data>
   <data name="MoreInfo.Text" xml:space="preserve">
-    <value>The finance team have requested that you supply more information for Reimbursement [RMBNO] - [USERREF].</value>
+    <value>You have been requested to provide more information for Reimbursement [RMBNO] - [USERREF].</value>
   </data>
   <data name="MoreInfoMsg.Text" xml:space="preserve">
     <value>This reimbursment will be highlighted to the staff member on this page. However, you should email the staff member directly, to let him/her know what information you need.</value>
@@ -581,5 +581,11 @@
   </data>
   <data name="lblDistUnits.Text" xml:space="preserve">
     <value>Distance units:</value>
+  </data>
+  <data name="btnDelete.Help" xml:space="preserve">
+    <value>Cancel this reimbursement, and move it to the "Deleted" section</value>
+  </data>
+  <data name="btnDelete.Text" xml:space="preserve">
+    <value>Delete</value>
   </data>
 </root>

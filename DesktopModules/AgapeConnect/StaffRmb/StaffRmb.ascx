@@ -1329,7 +1329,7 @@
                                     </tr>
                                     <tr valign="top">
                                         <td colspan="6">
-                                            <asp:Button ID="btnCancel" runat="server" resourcekey="btnCancel" class="aButton"  style="float:left"/>
+                                            <asp:Button ID="btnDelete" runat="server" resourcekey="btnDelete" class="aButton"  style="float:left"/>
                                             <asp:Button ID="btnSave" runat="server" resourcekey="btnSave" class="aButton" style="float:right"/>
                                         </td>
                                     </tr>
@@ -1447,7 +1447,7 @@
                                         </div>
                                     </asp:Panel>
                                     <asp:LinkButton ID="btnDownload" runat="server">
-                                        <div style="vertical-align: middle; float: right; padding-top: 8px; padding-bottom: 2px">
+                                        <div style="vertical-align: middle; float: right; padding-top: 8px; padding-bottom: 2px; font-size:11px">
                                             <img src="/DesktopModules/AgapeConnect/StaffRmb/Images/Excel_icon.gif" alt="" />
                                             <asp:Label ID="lblDownload" runat="server" resourcekey="btnDownload"></asp:Label>
                                         </div>
@@ -1472,8 +1472,8 @@
                                 <br />
                                 <br />
 
-                                <div style="margin-top: 15px;">
-                                    <fieldset id="pnlAdvance" runat="server" visible="false" style="float: left;">
+                                <div id="advanceSection" style="margin-top: 15px;">
+                                    <fieldset id="pnlAdvance" runat="server" visible="false" style="width:100%; font-size:12px">
                                         <legend><span class="AgapeH4">Pay Off Advance</span> </legend>
                                         <asp:Label ID="ttlAdvanceBalance" runat="server" ForeColor="Gray" resourcekey="AdvanceBalance"></asp:Label>
                                         &nbsp;
@@ -1643,7 +1643,7 @@
                                             <asp:Button ID="btnAdvApprove" runat="server" ResourceKey="btnApprove" CssClass="aButton" />
                                             <asp:Button ID="btnAdvReject" runat="server" ResourceKey="btnReject" CssClass="aButton" />
                                             <asp:Button ID="btnAdvSave" runat="server" ResourceKey="btnSave" CssClass="aButton" />
-                                            <asp:Button ID="btnAdvCancel" runat="server" ResourceKey="btnCancel" CssClass="aButton" />
+                                            <asp:Button ID="btnAdvCancel" runat="server" ResourceKey="btnDelete" CssClass="aButton" />
                                             <asp:Button ID="btnAdvProcess" runat="server" ResourceKey="btnProcess" CssClass="aButton" />
                                             <asp:Button ID="btnAdvUnProcess" runat="server" ResourceKey="btnUnProcess" CssClass="aButton" />
                                             <asp:LinkButton ID="btnAdvDownload" runat="server">
@@ -1667,7 +1667,7 @@
                         <asp:HiddenField ID="hfRmbNo" runat="server" />
                     </ContentTemplate>
                     <Triggers>
-                        <asp:AsyncPostBackTrigger ControlID="btnCancel" EventName="Click" />
+                        <asp:AsyncPostBackTrigger ControlID="btnDelete" EventName="Click" />
                         <asp:PostBackTrigger ControlID="btnDownload" />
                         <asp:PostBackTrigger ControlID="btnAdvDownload" />
                     </Triggers>

@@ -859,6 +859,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim PROCESSING = Rmb.Status = RmbStatus.PendingDownload Or Rmb.Status = RmbStatus.DownloadFailed
                     Dim PROCESSED = Rmb.Status = RmbStatus.Processed
                     Dim CANCELLED = Rmb.Status = RmbStatus.Cancelled
+                    Dim FORM_HAS_ITEMS = Rmb.AP_Staff_RmbLines.Count > 0
 
                     Dim user = UserController.GetUserById(PortalId, Rmb.UserId)
                     Dim staff_member = StaffBrokerFunctions.GetStaffMember(Rmb.UserId)
@@ -883,6 +884,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     SetYear(ddlYear, Rmb.Year)
                     '--hidden fields
                     hfRmbNo.Value = RmbNo
+                    hfChargeToValue.Value = If(Rmb.CostCenter Is Nothing, "", Rmb.CostCenter)
                     hfAccountBalance.Value = 0.0
 
                     '*** ERRORS ***
@@ -954,7 +956,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     '--buttons
                     btnSave.Visible = Not PROCESSING Or PROCESSED
                     btnSaveAdv.Visible = Not PROCESSING Or PROCESSED
-                    btnCancel.Visible = Not PROCESSING Or PROCESSED
+                    btnDelete.Visible = Not PROCESSING Or PROCESSED
 
 
                     '*** REIMBURSEMENT DETAILS ***
@@ -969,10 +971,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     btnAddLine.Visible = (isOwner Or isSpouse) And Not (PROCESSING Or PROCESSED Or APPROVED)
                     addLinebtn2.Visible = (isOwner Or isSpouse) And Not (PROCESSING Or PROCESSED Or APPROVED)
 
-                    btnPrint.Visible = True
+                    btnPrint.Visible = FORM_HAS_ITEMS
                     btnPrint.OnClientClick = "window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & RmbNo & "&UID=" & Rmb.UserId & "', '_blank'); "
-                    btnSubmit.Visible = (isOwner Or isSpouse) And DRAFT_OR_MOREINFO Or CANCELLED
-                    btnSubmit.Enabled = btnSubmit.Visible And (Rmb.CostCenter.Length = 6) And (Rmb.ApprUserId >= 0)
+                    btnSubmit.Visible = (isOwner Or isSpouse) And (DRAFT_OR_MOREINFO Or CANCELLED) And FORM_HAS_ITEMS
+                    btnSubmit.Enabled = btnSubmit.Visible And Rmb.CostCenter IsNot Nothing And Rmb.ApprUserId IsNot Nothing AndAlso (Rmb.CostCenter.Length = 6) And (Rmb.ApprUserId >= 0)
                     btnSubmit.ToolTip = If(btnSubmit.Enabled, "", "Please select an account and an approver in order to submit")
                     btnSubmit.OnClientClick = "window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & RmbNo & "&UID=" & Rmb.UserId & "&mode=1', '_blank'); "
                     btnApprove.Visible = isApprover And SUBMITTED
@@ -981,7 +983,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     btnProcess.Enabled = btnProcess.Visible
                     btnUnProcess.Visible = isFinance And PROCESSING Or PROCESSED
                     btnUnProcess.Enabled = btnUnProcess.Visible
-                    btnDownload.Visible = isFinance Or isOwner Or isSpouse
+                    btnDownload.Visible = (isFinance Or isOwner Or isSpouse) And FORM_HAS_ITEMS
 
 
                     '*** ADVANCES ***
@@ -993,7 +995,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim qAdvPayments = From c In ds.AP_Staff_SuggestedPayments
                                  Where c.CostCenter.StartsWith(staff_member.CostCenter) And c.PortalId = PortalId
                     If (qAdvPayments.Count > 0) Then
-                        If (Not qAdvPayments.First.AdvanceBalance Is Nothing) Then
+                        If (qAdvPayments.First.AdvanceBalance IsNot Nothing) Then
                             lblAdvanceBalance.Text = StaffBrokerFunctions.GetFormattedCurrency(PortalId, qAdvPayments.First.AdvanceBalance.Value.ToString("0.00"))
                         End If
                     End If
@@ -1001,7 +1003,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim qAccPayments = From c In ds.AP_Staff_SuggestedPayments
                                  Where c.CostCenter.StartsWith(q.First.CostCenter) And c.PortalId = PortalId
                     If (qAccPayments.Count > 0) Then
-                        If (Not qAccPayments.First.AccountBalance Is Nothing) Then
+                        If (qAccPayments.First.AccountBalance IsNot Nothing) Then
                             lblAccountBalance.Text = StaffBrokerFunctions.GetFormattedCurrency(PortalId, qAccPayments.First.AccountBalance.Value.ToString("0.00"))
                             hfAccountBalance.Value = qAccPayments.First.AccountBalance.Value
                         End If
@@ -1653,7 +1655,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             End If
         End Sub
-        Protected Sub btnCancel_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnCancel.Click
+        Protected Sub btnDelete_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnDelete.Click
 
             Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value
             If rmb.Count > 0 Then
@@ -1665,14 +1667,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     LoadRmb(hfRmbNo.Value)
                     ResetMenu()
 
-                    Dim t As Type = btnCancel.GetType()
+                    Dim t As Type = btnDelete.GetType()
                     Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
                     sb.Append("<script language='javascript'>")
                     sb.Append("selectIndex(4);")
 
                     sb.Append("</script>")
-                    ScriptManager.RegisterStartupScript(btnCancel, t, "select4", sb.ToString, False)
-                    btnCancel.Visible = False
+                    ScriptManager.RegisterStartupScript(btnDelete, t, "select4", sb.ToString, False)
+                    btnDelete.Visible = False
                     Log(rmb.First.RMBNo, "CANCELLED by owner")
                 Else
                     'Send an email to the end user
@@ -1715,12 +1717,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Log(rmb.First.RMBNo, "CANCELLED")
                     ResetMenu()
 
-                    Dim t As Type = btnCancel.GetType()
+                    Dim t As Type = btnDelete.GetType()
                     Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
                     sb.Append("<script language='javascript'>")
                     sb.Append("selectIndex(0);")
                     sb.Append("</script>")
-                    ScriptManager.RegisterStartupScript(btnCancel, t, "select0", sb.ToString, False)
+                    ScriptManager.RegisterStartupScript(btnDelete, t, "select0", sb.ToString, False)
 
                 End If
 
@@ -1831,7 +1833,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 rmb.First.UserComment = tbComments.Text
                 rmb.First.UserRef = tbYouRef.Text
                 rmb.First.ApprComment = tbApprComments.Text
-                rmb.First.MoreInfoRequested = cbMoreInfo.Checked
+                rmb.First.MoreInfoRequested = cbMoreInfo.Checked Or cbApprMoreInfo.Checked
                 rmb.First.ApprUserId = ddlApprovedBy.SelectedValue
                 'If ddlPeriod.SelectedIndex > 0 Then
                 '    rmb.First.Period = ddlPeriod.SelectedValue
@@ -4021,6 +4023,23 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Protected Sub cbMoreInfo_CheckedChanged(sender As Object, e As System.EventArgs) Handles cbMoreInfo.CheckedChanged
             btnSave_Click(Me, Nothing)
             If cbMoreInfo.Checked Then
+
+
+                Dim theRmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value) And c.PortalId = PortalId Select c.UserId, c.RID
+
+                If theRmb.Count > 0 Then
+                    Dim theUser = UserController.GetUserById(PortalId, theRmb.First.UserId)
+
+                    SendMessage(Translate("MoreInfoMsg"), "window.open('mailto:" & theUser.Email & "?subject=Reimbursment " & theRmb.First.RID & ": More info requested');")
+                End If
+
+            End If
+
+        End Sub
+
+        Protected Sub cbApprMoreInfo_CheckedChanged(sender As Object, e As System.EventArgs) Handles cbApprMoreInfo.CheckedChanged
+            btnSave_Click(Me, Nothing)
+            If cbApprMoreInfo.Checked Then
 
 
                 Dim theRmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value) And c.PortalId = PortalId Select c.UserId, c.RID
