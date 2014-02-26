@@ -1302,7 +1302,7 @@
                                                 <legend class="AgapeH4">
                                                     <asp:Label ID="ttlYourComments" runat="server" resourcekey="YourComments" Visible="false" /><asp:Label
                                                         ID="ttlUserComments" runat="server" Text="User's Comments" /></legend>
-                                                <asp:Label ID="lbComments" runat="server" Height="60px" Visible="false"></asp:Label>
+                                                <asp:Label ID="lblComments" runat="server" Height="60px" Visible="false"></asp:Label>
                                                 <asp:TextBox ID="tbComments" runat="server" Height="55px" TextMode="MultiLine" Width="100%"></asp:TextBox>
                                             </fieldset>
                                         </td>

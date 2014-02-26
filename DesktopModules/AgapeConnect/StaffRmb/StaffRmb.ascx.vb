@@ -842,486 +842,160 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Sub
 
         Public Sub LoadRmb(ByVal RmbNo As Integer)
+
+            pnlMain.Visible = True
+            pnlSplash.Visible = False
+            '--Set visibility and enabled attributes for different parts of the form
+            '--Based on form state and user privileges
             Try
-
-
-                pnlError.Visible = False
-                btnSubmit.Enabled = True
-                btnProcess.Enabled = True
-                btnApprove.Enabled = True
-                pnlMain.Visible = True
-                pnlMainAdvance.Visible = False
-                hfRmbNo.Value = RmbNo
                 Dim q = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo
                 If q.Count > 0 Then
+                    Dim Rmb = q.First
+                    'GridView1.DataSource = Rmb.AP_Staff_RmbLines
+                    'GridView1.DataBind()
 
+                    Dim DRAFT_OR_MOREINFO = Rmb.Status = RmbStatus.Draft Or Rmb.Status = RmbStatus.MoreInfo
+                    Dim SUBMITTED = Rmb.Status = RmbStatus.Submitted
+                    Dim APPROVED = Rmb.Status = RmbStatus.Approved
+                    Dim PROCESSING = Rmb.Status = RmbStatus.PendingDownload Or Rmb.Status = RmbStatus.DownloadFailed
+                    Dim PROCESSED = Rmb.Status = RmbStatus.Processed
+                    Dim CANCELLED = Rmb.Status = RmbStatus.Cancelled
 
+                    Dim user = UserController.GetUserById(PortalId, Rmb.UserId)
+                    Dim staff_member = StaffBrokerFunctions.GetStaffMember(Rmb.UserId)
+                    Dim PACMode = (String.IsNullOrEmpty(staff_member.CostCenter) And StaffBrokerFunctions.GetStaffProfileProperty(staff_member.StaffId, "PersonalAccountCode") <> "")
 
-                    'Dim lineTypes = From c In d.AP_StaffRmb_PortalLineTypes Where c.PortalId = PortalId Order By c.LocalName Select c.AP_Staff_RmbLineType.LineTypeId, c.LocalName, c.PCode, c.DCode
+                    Dim isOwner = (UserId = Rmb.UserId)
+                    Dim isSpouse = (StaffBrokerFunctions.GetSpouseId(UserId) = Rmb.UserId)
+                    Dim isApprover = (UserId = Rmb.ApprUserId) And Not isOwner
+                    Dim isSupervisor = (Not isOwner) And StaffBrokerFunctions.isLeaderOf(UserId, Rmb.UserId)
+                    Dim isFinance = IsAccounts() And Not isOwner
 
-                    'If q.First.Department Then
-                    '    lineTypes = lineTypes.Where(Function(x) Not String.IsNullOrEmpty(x.DCode))
-
-                    'Else
-                    '    lineTypes = lineTypes.Where(Function(x) Not String.IsNullOrEmpty(x.DCode))
-                    'End If
-                    'ddlLineTypes.DataSource = lineTypes
-                    'ddlLineTypes.DataBind()
-
-
-
+                    '--Ensure the user is authorized to view this reimbursement
                     Dim RmbRel As Integer = StaffRmbFunctions.Authenticate(UserId, RmbNo, PortalId)
-
-                    If RmbRel = RmbAccess.Denied And Not IsAccounts() And Not (UserId = Settings("AuthUser") Or UserId = Settings("AuthAuthUser")) Then
-                        pnlMain.Visible = False
+                    If RmbRel = RmbAccess.Denied And Not (isApprover Or isFinance) Then
                         'Need an access denied warning
+                        pnlMain.Visible = False
                         pnlSplash.Visible = True
                         Return
                     End If
-                    pnlMain.Visible = True
-                    pnlSplash.Visible = False
+
+                    updateApproversList(Rmb)
+                    SetYear(ddlYear, Rmb.Year)
 
 
-
-                    btnPrint.OnClientClick = "window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & RmbNo & "&UID=" & q.First.UserId & "', '_blank'); "
-                    btnSubmit.OnClientClick = "window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & RmbNo & "&UID=" & q.First.UserId & "&mode=1', '_blank'); "
-
-
-                    lblRmbNo.Text = ZeroFill(q.First.RID, 5)
-                    imgAvatar.ImageUrl = GetProfileImage(q.First.UserId)
-
-                    If Not q.First.UserRef Is Nothing Then
-                        tbYouRef.Text = q.First.UserRef
-                    Else
-                        tbYouRef.Text = ""
-
-                    End If
-                    If Not q.First.RmbDate Is Nothing Then
-                        lblSubmittedDate.Text = q.First.RmbDate.Value.ToShortDateString
-                    Else
-                        lblSubmittedDate.Text = ""
-                    End If
-
-                    updateApproversList(q.First)
-                    If q.First.ApprDate Is Nothing Then
-                        ttlWaitingApp.Visible = True
-                        ttlApprovedBy.Visible = False
-                        lblApprovedDate.Text = ""
-                    Else
-                        ttlWaitingApp.Visible = False
-                        ttlApprovedBy.Visible = True
-                        Dim approver = UserController.GetUserById(PortalId, q.First.ApprUserId)
-                        ttlApprovedBy.Text = approver.DisplayName
-                        lblApprovedDate.Text = q.First.ApprDate.Value.ToShortDateString
-                    End If
-
-                    If q.First.ProcUserId Is Nothing Then
-                        lblProcessedBy.Text = ""
-                    Else
-                        lblProcessedBy.Text = UserController.GetUserById(PortalId, q.First.ProcUserId).DisplayName
-                    End If
-                    If q.First.ProcDate Is Nothing Then
-                        lblProcessedDate.Text = ""
-                    Else
-                        lblProcessedDate.Text = q.First.ProcDate.Value.ToShortDateString
-
-                    End If
-
-                    If Not q.First.ApprDate Is Nothing Then
-                        lblApprovedDate.Text = q.First.ApprDate.Value.ToShortDateString
-                    Else
-                        lblApprovedDate.Text = ""
-                    End If
-
-
-                    ttlYourComments.Visible = (q.First.UserId = UserId)
-                    ttlUserComments.Visible = (q.First.UserId <> UserId)
-
-                    If q.First.MoreInfoRequested Is Nothing Then
-                        cbMoreInfo.Checked = False
-                    Else
-                        cbMoreInfo.Checked = q.First.MoreInfoRequested
-                    End If
-
-
-
-                    lblStatus.Text = Translate(RmbStatus.StatusName(q.First.Status))
-
-                    'Dim findcc = ddlChargeTo.Items.FindByValue(q.First.CostCenter)
-                    'If findcc Is Nothing Then
-                    '    ddlChargeTo.Items.Add(New ListItem(q.First.CostCenter, q.First.CostCenter))
-                    '    ddlCostcenter.Items.Add(New ListItem(q.First.CostCenter, q.First.CostCenter))
-                    'End If
-                    'ddlChargeTo.SelectedValue = q.First.CostCenter
-                    If q.First.CostCenter Is Nothing Then
-                        tbChargeTo.Text = ""
-                    Else
-                        tbChargeTo.Text = q.First.CostCenter
-                    End If
-
-
-
-
-
-
-                    tbComments.Text = q.First.UserComment
-                    lbComments.Text = q.First.UserComment
-
-
-
-                    If Not q.First.ApprComment Is Nothing Then
-                        lblApprComments.Text = q.First.ApprComment
-                        tbApprComments.Text = q.First.ApprComment
-                    Else
-                        lblApprComments.Text = ""
-                        tbApprComments.Text = ""
-                    End If
-                    If Not q.First.AcctComment Is Nothing Then
-
-                        lblAccComments.Text = q.First.AcctComment
-                        tbAccComments.Text = q.First.AcctComment
-
-                    Else
-                        lblAccComments.Text = ""
-                        tbAccComments.Text = ""
-                    End If
-                    Dim theUser = UserController.GetUserById(PortalId, q.First.UserId)
-                    lblSubBy.Text = theUser.DisplayName
-                    staffInitials.Value = theUser.FirstName.Substring(0, 1) & theUser.LastName.Substring(0, 1)
-
-
-                    lblWrongType.Visible = False
-
-
-
-
-
-                    ' btnAddLine.Visible = Not q.First.Locked
-                    ' tbComments.Enabled = Not q.First.Locked
-                    ' tbYouRef.Enabled = Not q.First.Locked
-
-                    'Try
-
-
-                    Dim theStaff = StaffBrokerFunctions.GetStaffMember(q.First.UserId)
-                    'Dim AdvanceCode As String = ""
-                    'Dim accountCode As String = ""
-
-                    'If Not String.IsNullOrEmpty(theStaff.CostCenter) Then
-
-
-                    '    AdvanceCode = theStaff.CostCenter.Trim() & "-" & StaffBrokerFunctions.GetSetting("AdvanceSuffix", PortalId).Trim()
-
-
-                    '    accountCode = q.First.CostCenter.Trim
-                    'Else
-
-                    'End If
-
-
-
-                    Dim PACMode = (String.IsNullOrEmpty(theStaff.CostCenter) And StaffBrokerFunctions.GetStaffProfileProperty(theStaff.StaffId, "PersonalAccountCode") <> "")
-
-
-                    pnlAdvance.Visible = (q.First.AP_Staff_RmbLines.Count > 0) And Not PACMode
-
-
-
-
-                    'Dim JsonMessage As String = "GetAccountBalance('" & GetJsonAccountString(accountCode) & "'); "
-                    'JsonMessage &= "GetAdvanceBalance('" & GetJsonAccountString(AdvanceCode) & "'); "
-                    'SendMessage("", JsonMessage, True)
-
-
-                    lblAccountBalance.Text = "Unknown"
-                    ' lblAccountBalance.Text = StaffRmbFunctions.accountBalance("110100", "nicke")
-                    lblAdvanceBalance.Text = "Unknown"
+                    '--hidden fields
+                    hfRmbNo.Value = RmbNo
                     hfAccountBalance.Value = 0.0
-                    Dim AdvPay = From c In ds.AP_Staff_SuggestedPayments Where c.PortalId = PortalId And c.CostCenter.StartsWith(theStaff.CostCenter)
 
-                    If AdvPay.Count > 0 Then
-                        If Not AdvPay.First.AdvanceBalance Is Nothing Then
-                            lblAdvanceBalance.Text = StaffBrokerFunctions.GetFormattedCurrency(PortalId, AdvPay.First.AdvanceBalance.Value.ToString("0.00"))
-                        End If
+                    '-- initialize label values
+                    lblRmbNo.Text = ZeroFill(Rmb.RID, 5)
+                    imgAvatar.ImageUrl = GetProfileImage(Rmb.UserId)
+                    lblStatus.Text = Translate(RmbStatus.StatusName(Rmb.Status))
+                    lblAccountBalance.Text = "Unknown"
+                    lblAdvanceBalance.Text = "Unknown"
+                    lblSubBy.Text = user.DisplayName
+                    staffInitials.Value = user.FirstName.Substring(0, 1) & user.LastName.Substring(0, 1)
+                    lblSubmittedDate.Text = If(Rmb.RmbDate Is Nothing, "", Rmb.RmbDate.Value.ToShortDateString)
+                    ttlWaitingApp.Visible = Rmb.ApprDate Is Nothing
+                    ttlApprovedBy.Visible = Not Rmb.ApprDate Is Nothing
+                    lblApprovedDate.Text = If(Rmb.ApprDate Is Nothing, "", Rmb.ApprDate.Value.ToShortDateString)
+                    ttlApprovedBy.Text = If(Rmb.ApprUserId Is Nothing Or Rmb.ApprUserId = -1, "", UserController.GetUserById(PortalId, Rmb.ApprUserId).DisplayName)
+                    lblProcessedBy.Text = If(Rmb.ProcUserId Is Nothing, "", UserController.GetUserById(PortalId, Rmb.ProcUserId).DisplayName)
+                    lblProcessedDate.Text = If(Rmb.ProcDate Is Nothing, "", Rmb.ProcDate.Value.ToShortDateString)
+                    lblApprovedDate.Text = If(Rmb.ApprDate Is Nothing, "", Rmb.ApprDate.Value.ToShortDateString)
+                    ttlYourComments.Visible = (Rmb.UserId = UserId)
+                    ttlUserComments.Visible = (Rmb.UserId <> UserId)
+                    lblComments.Text = Rmb.UserComment
+                    lblComments.Visible = Not (isOwner Or isSpouse)
+                    lblApprComments.Text = If(Rmb.ApprComment Is Nothing, "", Rmb.ApprComment)
+                    lblApprComments.Visible = Not isApprover
+                    lblAccComments.Text = If(Rmb.AcctComment Is Nothing, "", Rmb.AcctComment)
+                    lblAccComments.Visible = Not isFinance
+                    lblWrongType.Visible = False
+                    lblErrorMessage.Text = Rmb.ErrorMessage & "<br /><i>" & Translate("ErrorHelp") & "</i>"
 
+
+                    '--fields
+                    tbYouRef.Text = If(Rmb.UserRef Is Nothing, "", Rmb.UserRef)
+                    tbYouRef.Enabled = Rmb.Status = RmbStatus.Draft
+                    cbMoreInfo.Checked = If(Rmb.MoreInfoRequested, Rmb.MoreInfoRequested, False)
+                    cbMoreInfo.Visible = isFinance And APPROVED
+                    tbComments.Text = Rmb.UserComment
+                    tbComments.Visible = isOwner Or isSpouse
+                    tbComments.Enabled = Not Rmb.Locked And Not (PROCESSING Or PROCESSED)
+                    tbApprComments.Text = If(Rmb.ApprComment Is Nothing, "", Rmb.ApprComment)
+                    tbApprComments.Visible = isApprover
+                    tbApprComments.Enabled = isApprover And Not (PROCESSING Or PROCESSED)
+                    tbAccComments.Text = If(Rmb.AcctComment Is Nothing, "", Rmb.AcctComment)
+                    tbAccComments.Visible = isFinance
+                    tbAccComments.Enabled = isFinance And Not (PROCESSING Or PROCESSED)
+                    tbAdvanceAmount.Text = If(Rmb.AdvanceRequest = Nothing, "", Rmb.AdvanceRequest.ToString("0.00", New CultureInfo("en-US").NumberFormat))
+                    tbAdvanceAmount.Enabled = DRAFT_OR_MOREINFO Or SUBMITTED Or APPROVED
+                    tbChargeTo.Text = If(Rmb.CostCenter Is Nothing, "", Rmb.CostCenter)
+                    tbChargeTo.Enabled = DRAFT_OR_MOREINFO Or CANCELLED Or (isFinance And SUBMITTED)
+                    ddlApprovedBy.Visible = DRAFT_OR_MOREINFO Or CANCELLED
+                    ddlApprovedBy.Enabled = DRAFT_OR_MOREINFO Or CANCELLED
+                    lblApprovedBy.Visible = Not DRAFT_OR_MOREINFO Or CANCELLED
+                    If Rmb.Period Is Nothing Then
+                        ddlPeriod.SelectedIndex = 0
+                    Else
+                        ddlPeriod.SelectedValue = Rmb.Period
                     End If
 
-                    Dim AccPay = From c In ds.AP_Staff_SuggestedPayments Where c.PortalId = PortalId And c.CostCenter.StartsWith(q.First.CostCenter)
-
-                    If AccPay.Count > 0 Then
-                        If Not AccPay.First.AccountBalance Is Nothing Then
-                            lblAccountBalance.Text = StaffBrokerFunctions.GetFormattedCurrency(PortalId, AccPay.First.AccountBalance.Value.ToString("0.00"))
-                            hfAccountBalance.Value = AccPay.First.AccountBalance.Value
-                        End If
-
-                    End If
-
-
-
-                    GridView1.DataSource = q.First.AP_Staff_RmbLines
-                    GridView1.DataBind()
-
-
+                    '--Panels
+                    pnlError.Visible = isFinance And Rmb.Error
+                    pnlMain.Visible = True
+                    pnlMainAdvance.Visible = False
+                    pnlAdvance.Visible = (Rmb.AP_Staff_RmbLines.Count > 0) And Not PACMode
                     pnlTaxable.Visible = (From c In q.First.AP_Staff_RmbLines Where c.Taxable = True).Count > 0
+                    pnlPeriodYear.Visible = isFinance And (APPROVED Or PROCESSING Or PROCESSED)
 
-                    'StaffBrokerFunctions.GetSetting("DataserverURL", PortalId)
-                    '   Dim CountryURL = "https://tntdataserver.eu/dataserver/devtest/dataquery/dataqueryservice.asmx"
+                    '--Buttons
+                    btnPrint.Visible = True
+                    btnPrint.OnClientClick = "window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & RmbNo & "&UID=" & Rmb.UserId & "', '_blank'); "
 
-                    '  AccountCode
+                    btnSave.Visible = Not PROCESSING Or PROCESSED
+                    btnSaveAdv.Visible = Not PROCESSING Or PROCESSED
+                    btnCancel.Visible = Not PROCESSING Or PROCESSED
 
+                    btnSubmit.Visible = (isOwner Or isSpouse) And DRAFT_OR_MOREINFO Or CANCELLED
+                    btnSubmit.Enabled = btnSubmit.Visible And (Rmb.CostCenter.Length = 6) And (Rmb.ApprUserId >= 0)
+                    btnSubmit.ToolTip = If(btnSubmit.Enabled, "", "Please select an account and an approver in order to submit")
+                    btnSubmit.OnClientClick = "window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & RmbNo & "&UID=" & Rmb.UserId & "&mode=1', '_blank'); "
 
-                    ' Dim dsa As New DSAccount(CountryURL, UserInfo.Profile.GetPropertyValue("ssoGUID"), "012226", New Date(2012, 1, 1), Today, "")
+                    btnApprove.Visible = isApprover And SUBMITTED
+                    btnApprove.Enabled = btnApprove.Visible
 
+                    btnProcess.Visible = isFinance And APPROVED
+                    btnProcess.Enabled = btnProcess.Visible
 
-                    '  lblAccountBalance.Text = dsa.BalanceForAccount("012226")
+                    btnUnProcess.Visible = isFinance And PROCESSING Or PROCESSED
+                    btnUnProcess.Enabled = btnUnProcess.Visible
 
-                    'lblAccountBalance.Text = DSAccount.getAccountBalance(UserInfo.Profile.GetPropertyValue("ssoGUID"), UserInfo.Profile.GetPropertyValue("GCXPGTIOU"), CountryURL, "012226")
+                    btnDownload.Visible = isFinance Or isOwner Or isSpouse
 
+                    btnAddLine.Visible = (isOwner Or isSpouse) And Not (PROCESSING Or PROCESSED Or APPROVED)
+                    addLinebtn2.Visible = (isOwner Or isSpouse) And Not (PROCESSING Or PROCESSED Or APPROVED)
 
-
-
-
-
-
-
-
-
-
-                    'lblLoanBalance.Text = dsa.Transactions.Count
-                    'Dim dsa As New DSAccount(CountryURL, UserInfo.Profile.GetPropertyValue("ssoGUID"))
-                    '  Dim dsa As New DSAccount(CountryURL, UserInfo.Profile.GetPropertyValue("ssoGUID"))
-                    'Dim Dsa As New DSAccount("https://tntdataserver.eu/dataserver/devtest/dataquery/DataQueryService.asmx", UserInfo.Profile.GetPropertyValue("ssoGUID"), AccountCode)
-                    ' lblAccBal.Text = dsa.BalanceForAccount(AccountCode)
-
-
-
-
-                    ' lblLoanBalance.Text = Dsa.Account.Countries.Where(Function(p) p.Name = "devtest").First.Profiles.First.Accounts.Where(Function(p) p.AccountID = AccountCode).First.Balance
-
-                    '  Dsa.AccountBalanceForAccount(StaffBrokerFunctions.GetStaffMember(q.First.UserId).CostCenter.Trim() & "-" & StaffBrokerFunctions.GetSetting("AdvanceSuffix", PortalId).Trim(), ).ToString("0.00")
-
-                    ' Catch ex As Exception
-                    'lblLoanBalance.Text = ex.Message
-                    'End Try
-
-
-                    ' lblLoanBalance.Text = StaffBrokerFunctions.GetStaffMember(q.First.UserId).CostCenter.Trim() & "-" & StaffBrokerFunctions.GetSetting("AdvanceSuffix", PortalId).Trim()
-                    ' lblLoanBalance.Visible = True
-
-                    If q.First.AdvanceRequest = Nothing Then
-                        tbAdvanceAmount.Text = ""
-                    Else
-                        tbAdvanceAmount.Text = q.First.AdvanceRequest.ToString("0.00", New CultureInfo("en-US").NumberFormat)
+                    '--more complex formulas
+                    Dim qAdvPayments = From c In ds.AP_Staff_SuggestedPayments
+                                 Where c.CostCenter.StartsWith(staff_member.CostCenter) And c.PortalId = PortalId
+                    If ((qAdvPayments.Count > 0) And (Not qAdvPayments.First.AdvanceBalance Is Nothing)) Then
+                        lblAdvanceBalance.Text = StaffBrokerFunctions.GetFormattedCurrency(PortalId, qAdvPayments.First.AdvanceBalance.Value.ToString("0.00"))
                     End If
 
-
-
-                    If ddlApprovedBy.SelectedValue = Nothing Or ddlApprovedBy.SelectedValue.Equals("-1") Then
-                        btnSubmit.Enabled = False
-                        btnSubmit.ToolTip = "Please select an 'Approver' before submitting"
-                    Else
-                        btnSubmit.ToolTip = ""
-                    End If
-                    Select Case q.First.Status
-                        Case RmbStatus.Draft, RmbStatus.MoreInfo
-                            tbChargeTo.Enabled = True
-                            ddlApprovedBy.Visible = True
-                            ddlApprovedBy.Enabled = True
-                            btnSubmit.Visible = True
-                            btnSave.Visible = True
-                            btnSaveAdv.Visible = True
-                            btnCancel.Visible = True
-                            btnPrint.Visible = True
-                            btnApprove.Visible = False
-                            addLinebtn2.Visible = True
-                            tbYouRef.Enabled = True
-                            tbAdvanceAmount.Enabled = True
-                        Case RmbStatus.Submitted
-                            tbChargeTo.Enabled = False
-                            ddlApprovedBy.Visible = False
-                            lblApprovedBy.Visible = True
-                            btnSubmit.Visible = False
-                            btnSave.Visible = True
-                            btnSaveAdv.Visible = True
-                            btnCancel.Visible = True
-                            btnPrint.Visible = True
-                            btnApprove.Visible = (q.First.UserId <> UserId)
-                            addLinebtn2.Visible = True
-                            tbYouRef.Enabled = False
-                            tbAdvanceAmount.Enabled = True
-                        Case RmbStatus.Approved
-                            tbChargeTo.Enabled = False
-                            ddlApprovedBy.Visible = False
-                            lblApprovedBy.Visible = True
-                            btnSubmit.Visible = False
-                            btnSave.Visible = True
-                            btnSaveAdv.Visible = True
-                            btnCancel.Visible = True
-                            btnPrint.Visible = True
-
-                            btnApprove.Visible = False
-                            addLinebtn2.Visible = False
-                            tbYouRef.Enabled = False
-                            tbAdvanceAmount.Enabled = True
-                        Case RmbStatus.PendingDownload, RmbStatus.DownloadFailed
-                            tbChargeTo.Enabled = False
-                            ddlApprovedBy.Visible = False
-                            lblApprovedBy.Visible = True
-                            btnSubmit.Visible = False
-                            btnSave.Visible = False
-                            btnSaveAdv.Visible = False
-                            btnCancel.Visible = False
-                            btnPrint.Visible = True
-                            btnApprove.Visible = False
-                            addLinebtn2.Visible = False
-                            tbYouRef.Enabled = False
-                            tbAdvanceAmount.Enabled = False
-                            cbMoreInfo.Visible = False
-                        Case RmbStatus.Processed
-                            tbChargeTo.Enabled = False
-                            ddlApprovedBy.Visible = False
-                            lblApprovedBy.Visible = True
-                            btnSubmit.Visible = False
-                            btnSave.Visible = False
-                            btnSaveAdv.Visible = False
-                            btnCancel.Visible = False
-                            btnPrint.Visible = True
-                            btnApprove.Visible = False
-                            addLinebtn2.Visible = False
-                            tbYouRef.Enabled = False
-                            tbAdvanceAmount.Enabled = False
-                            cbMoreInfo.Visible = False
-                        Case RmbStatus.Cancelled
-                            tbChargeTo.Enabled = True
-                            ddlApprovedBy.Visible = True
-                            ddlApprovedBy.Enabled = True
-                            lblApprovedBy.Visible = False
-                            btnSubmit.Visible = True
-                            btnSave.Visible = True
-                            btnSaveAdv.Visible = True
-                            btnCancel.Visible = True
-                            btnPrint.Visible = True
-                            btnApprove.Visible = False
-                            addLinebtn2.Visible = True
-                            tbYouRef.Enabled = True
-                            tbAdvanceAmount.Enabled = True
-                        Case Else
-                            tbChargeTo.Enabled = False
-                            ddlApprovedBy.Visible = True
-                            ddlApprovedBy.Enabled = True
-                            lblApprovedBy.Visible = False
-                            btnSubmit.Visible = False
-                            btnSave.Visible = False
-                            btnSaveAdv.Visible = False
-                            btnCancel.Visible = False
-                            btnPrint.Visible = False
-                            btnApprove.Visible = False
-                            addLinebtn2.Visible = False
-                            tbYouRef.Enabled = False
-                            tbAdvanceAmount.Enabled = False
-                    End Select
-
-
-
-                    If IsAccounts() And (q.First.UserId = UserId Or q.First.Status = RmbStatus.Approved Or q.First.Status = RmbStatus.Processed Or q.First.Status >= RmbStatus.PendingDownload) Then
-
-                        btnProcess.Visible = (q.First.Status <> RmbStatus.Processed And q.First.Status <> RmbStatus.PendingDownload And q.First.Status <> RmbStatus.DownloadFailed)
-                        If q.First.UserId = UserId And q.First.Status <> RmbStatus.Approved Then
-                            btnProcess.Visible = False
-                        End If
-
-                        btnUnProcess.Visible = (q.First.Status = RmbStatus.Processed Or q.First.Status = RmbStatus.PendingDownload Or q.First.Status = RmbStatus.DownloadFailed)
-                        'addLinebtn2.Visible = (q.First.Status <> RmbStatus.Processed And q.First.Status <> RmbStatus.PendingDownload And q.First.Status <> RmbStatus.DownloadFailed)
-                        'btnSubmit.Visible = False  '--accounts needs to be able to submit reimbursements too
-                        btnApprove.Visible = False
-                        btnDownload.Visible = True
-                        pnlPeriodYear.Visible = True
-                        SetYear(ddlYear, q.First.Year)
-
-
-
-                        If q.First.Period Is Nothing Then
-                            ddlPeriod.SelectedIndex = 0
-                            'ddlPeriod.SelectedValue = Month(Now)
-                        Else
-                            ddlPeriod.SelectedValue = q.First.Period
-                        End If
-
-                        cbMoreInfo.Enabled = True
-
-
-
-                    Else
-                        btnDownload.Visible = False
-                        cbMoreInfo.Enabled = False
-
-                        btnProcess.Visible = False
-                        btnUnProcess.Visible = False
-                        pnlPeriodYear.Visible = False
+                    Dim qAccPayments = From c In ds.AP_Staff_SuggestedPayments
+                                 Where c.CostCenter.StartsWith(q.First.CostCenter) And c.PortalId = PortalId
+                    If ((qAccPayments.Count > 0) And (Not qAccPayments.First.AccountBalance Is Nothing)) Then
+                        lblAccountBalance.Text = StaffBrokerFunctions.GetFormattedCurrency(PortalId, qAccPayments.First.AccountBalance.Value.ToString("0.00"))
+                        hfAccountBalance.Value = qAccPayments.First.AccountBalance.Value
                     End If
 
-                    tbComments.Visible = False
-                    lbComments.Visible = True
-                    addLinebtn2.Visible = False
-                    Select Case RmbRel
-                        Case RmbAccess.Owner, RmbAccess.Spouse
-                            tbComments.Visible = True
-                            tbComments.Enabled = True
-                            lbComments.Visible = False
-                            tbApprComments.Visible = False
-                            lblApprComments.Visible = True
-                            addLinebtn2.Visible = True
-                        Case RmbAccess.Approver, RmbAccess.Leader
-                            tbComments.Visible = False
-                            lbComments.Visible = True
-                            tbApprComments.Visible = True
-                            tbApprComments.Enabled = True
-                            lblApprComments.Visible = False
-
-
-                    End Select
-
-
-
-
-
-
-                    If IsAccounts() Then
-                        tbAccComments.Visible = True
-                        tbAccComments.Enabled = True
-                        lblAccComments.Visible = False
-                        cbMoreInfo.Visible = q.First.Status = RmbStatus.Approved
-
-                        If q.First.Error Then
-                            pnlError.Visible = True
-                            lblErrorMessage.Text = q.First.ErrorMessage & "<br /><i>" & Translate("ErrorHelp") & "</i>"
-
-                        End If
-                        If q.First.Status < RmbStatus.Processed Then
-                            tbChargeTo.Enabled = True
-                        End If
-
-                    Else
-                        tbAccComments.Visible = False
-                        lblAccComments.Visible = True
-                        cbMoreInfo.Visible = False
-                    End If
-                    If q.First.Status >= RmbStatus.Processed Then
-                        tbComments.Enabled = False
-                        tbApprComments.Enabled = False
-                        tbAccComments.Enabled = False
-                    End If
-                    If q.First.Status = RmbStatus.Cancelled Then
-                        tbComments.Enabled = True
-                    End If
-
-                    'pnlMain.Visible = True
-                    'pnlSplash.Visible = False  
                 Else
                     pnlMain.Visible = False
                     pnlSplash.Visible = True
                 End If
-
 
             Catch ex As Exception
                 lblError.Text = "Error loading Rmb: " & ex.Message & ex.StackTrace
