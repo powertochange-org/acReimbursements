@@ -1199,22 +1199,22 @@
 
                             <div class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all">
                                 <div style="width: 100%; vertical-align: middle; font-size: 20pt; font-weight: bold; border-width: 2pt; border-bottom-style: solid;">
-                                    <asp:Image ID="imgAvatar" runat="server" Width="50px" ImageUrl="/images/no_avatar.gif" Style="float: left; margin-right: 5px; border-width: 2pt; border-style: solid;" />
-
-                                    <asp:Label ID="Label17" runat="server" resourcekey="Reimbursement" Style="float: left; margin-right: 5px;"></asp:Label>
+                                    <div style="float:left; width:54px;">&nbsp;</div>
+                                    <asp:Label ID="Label17" runat="server" resourcekey="Reimbursement" Style="float: left; margin-right: 5px; margin-left:10px"></asp:Label>
                                     <asp:Label ID="lblRmbNo" runat="server" Style="float: left; margin-right: 5px;"></asp:Label>:
                                     <asp:TextBox ID="tbChargeTo" runat="server" AutoPostBack="true" Style="float: right; font-size: small;">
                                     </asp:TextBox>
                                     <asp:HiddenField ID="hfChargeToValue" runat="server"  />
                                 </div>
-                                <div class="inverse" style="width:648px; margin-left:-5px; padding-bottom:3px; padding-left:8px; padding-right:5px; float: right">
-                                    <asp:Label ID="lblStatus" runat="server" Style="float: left; font-style: italic; font-size:13px;"></asp:Label>
+                                <div class="inverse" style="width:100%; margin-top:1px; margin-right:5px; padding-bottom:3px; float: left">
+                                    <asp:Label ID="lblStatus" runat="server" Style="float: left; font-style: italic; font-size:13px; padding-left:70px"></asp:Label>
 
                                     <asp:Label ID="lblAccountBalance" runat="server" Style="float: right; font-style: italic; margin-right: 3px;  font-size:13px;" Text="searching..."></asp:Label>
                                     <asp:Label ID="ttlAccountBalance" runat="server" Style="float: right; margin-right: 3px; font-style: italic;  font-size:13px;"
                                         resourceKey="AccountBalance"></asp:Label>
                                     <asp:HiddenField ID="hfAccountBalance" runat="server" />
                                     </div>
+                                    <asp:Image ID="imgAvatar" runat="server" Width="50px" ImageUrl="/images/no_avatar.gif" Style="float: left; margin-top:-54px; margin-right: 5px; border-width: 2pt; border-style: solid;" />
                                 <div style="clear: both;">
                                 </div>
                             </div>
