@@ -896,7 +896,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     lblRmbNo.Text = ZeroFill(Rmb.RID, 5)
                     imgAvatar.ImageUrl = GetProfileImage(Rmb.UserId)
                     tbChargeTo.Text = If(Rmb.CostCenter Is Nothing, "", Rmb.CostCenter)
-                    tbChargeTo.Enabled = DRAFT_OR_MOREINFO Or CANCELLED Or (isFinance And SUBMITTED)
+                    tbChargeTo.Enabled = DRAFT_OR_MOREINFO Or CANCELLED Or (SUBMITTED And (isOwner Or isSpouse))
                     lblStatus.Text = Translate(RmbStatus.StatusName(Rmb.Status))
                     lblAccountBalance.Text = "Unknown"
                     lblAdvanceBalance.Text = "Unknown"
@@ -911,9 +911,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ttlWaitingApp.Visible = Rmb.ApprDate Is Nothing
                     ttlApprovedBy.Visible = Not Rmb.ApprDate Is Nothing
                     ttlApprovedBy.Text = If(Rmb.ApprUserId Is Nothing Or Rmb.ApprUserId = -1, "", UserController.GetUserById(PortalId, Rmb.ApprUserId).DisplayName)
-                    ddlApprovedBy.Visible = DRAFT_OR_MOREINFO Or CANCELLED
-                    ddlApprovedBy.Enabled = DRAFT_OR_MOREINFO Or CANCELLED
-                    lblApprovedBy.Visible = Not DRAFT_OR_MOREINFO Or CANCELLED
+                    ddlApprovedBy.Visible = DRAFT_OR_MOREINFO Or CANCELLED Or ((isApprover Or isOwner Or isSpouse) And SUBMITTED)
+                    ddlApprovedBy.Enabled = DRAFT_OR_MOREINFO Or CANCELLED Or ((isApprover Or isOwner Or isSpouse) And SUBMITTED)
+                    lblApprovedBy.Visible = Not ddlApprovedBy.Visible
 
                     lblProcessedDate.Text = If(Rmb.ProcDate Is Nothing, "", Rmb.ProcDate.Value.ToShortDateString)
                     lblProcessedBy.Text = If(Rmb.ProcUserId Is Nothing, "", UserController.GetUserById(PortalId, Rmb.ProcUserId).DisplayName)
@@ -2468,6 +2468,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             'The User selected a new cost centre
 
             'Detect if Dept is now Personal or vica versa
+            Dim reset_menu = False
             Dim Dept = StaffBrokerFunctions.IsDept(PortalId, hfChargeToValue.Value)
             Dim RmbNo = CInt(hfRmbNo.Value)
             Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo And c.PortalId = PortalId
@@ -2486,23 +2487,38 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             rmb.First.CostCenter = hfChargeToValue.Value
             rmb.First.Department = Dept
+            If (rmb.First.Status <> RmbStatus.Draft) Then
+                rmb.First.Status = RmbStatus.Draft
+                reset_menu = True
+            End If
             updateApproversList(rmb.First)
             d.SubmitChanges()
             btnSave_Click(Me, Nothing)
             'LoadRmb(hfRmbNo.Value)
+            If (reset_menu) Then
+                ResetMenu()
+            End If
         End Sub
 
         Protected Sub ddlApprovedBy_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles ddlApprovedBy.SelectedIndexChanged
             Dim RmbNo = CInt(hfRmbNo.Value)
+            Dim menu_redraw = False
             Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo And c.PortalId = PortalId
             Try
                 rmb.First.ApprUserId = ddlApprovedBy.SelectedValue
             Catch
                 rmb.First.ApprUserId = Nothing
             End Try
+            If (rmb.First.Status <> RmbStatus.Draft) Then
+                rmb.First.Status = RmbStatus.Draft
+                menu_redraw = True
+            End If
             d.SubmitChanges()
             btnSave_Click(Me, Nothing)
             LoadRmb(hfRmbNo.Value)
+            If (menu_redraw) Then
+                ResetMenu()
+            End If
         End Sub
 
 
