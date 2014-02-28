@@ -327,18 +327,18 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                     And c.UserId = UserId And c.PortalId = PortalId
                                 Order By c.RID Descending
                                 Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
-                dlApproved.DataSource = Approved
-                dlApproved.DataBind()
+                'dlApproved.DataSource = Approved
+                'dlApproved.DataBind()
 
                 Dim AdvApproved = (From c In d.AP_Staff_AdvanceRequests
                                    Where (c.RequestStatus = RmbStatus.Approved Or c.RequestStatus = RmbStatus.PendingDownload Or c.RequestStatus = RmbStatus.DownloadFailed) _
                                         And c.UserId = UserId And c.PortalId = PortalId
                                    Order By c.LocalAdvanceId Descending
                                    Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId).Take(MenuSize)
-                dlAdvApproved.DataSource = AdvApproved
-                dlAdvApproved.DataBind()
-                dlAdvApproved.AlternatingItemStyle.CssClass = IIf(dlApproved.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
-                dlAdvApproved.ItemStyle.CssClass = IIf(dlApproved.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
+                'dlAdvApproved.DataSource = AdvApproved
+                'dlAdvApproved.DataBind()
+                'dlAdvApproved.AlternatingItemStyle.CssClass = IIf(dlApproved.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
+                'dlAdvApproved.ItemStyle.CssClass = IIf(dlApproved.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
 
                 '--Processed (build a tree)
                 tvProcessed.Nodes.Clear()
@@ -427,25 +427,51 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 If isSupervisor Then
                     Dim TeamIds = From c In Team Select c.UserID
 
-                    '--Team Approved
-                    Dim TeamApproved = From c In d.AP_Staff_Rmbs
-                                       Where TeamIds.Contains(c.UserId) _
-                                            And (c.Status = RmbStatus.Approved Or c.Status = RmbStatus.PendingDownload Or c.Status = RmbStatus.DownloadFailed) _
-                                            And c.UserId <> UserId And c.PortalId = PortalId
-                                       Select c.RMBNo, c.RmbDate, c.UserRef, c.UserId, c.RID
-                    dlTeamApproved.DataSource = TeamApproved
-                    dlTeamApproved.DataBind()
+                    '--Team Approved (build a tree)
+                    Dim TeamApprovedNode As New TreeNode("Your Team")
+                    TeamApprovedNode.SelectAction = TreeNodeSelectAction.Expand
+                    TeamApprovedNode.Expanded = False
 
-                    Dim TeamAdvApproved = From c In d.AP_Staff_AdvanceRequests
-                                          Where TeamIds.Contains(c.UserId) _
-                                            And (c.RequestStatus = RmbStatus.Approved Or c.RequestStatus = RmbStatus.PendingDownload Or c.RequestStatus = RmbStatus.DownloadFailed) _
-                                            And c.UserId <> UserId And c.PortalId = PortalId
-                                          Select c.AdvanceId, c.RequestDate, c.UserId, c.LocalAdvanceId
-                    dlAdvTeamApproved.DataSource = TeamAdvApproved
-                    dlAdvTeamApproved.DataBind()
-                    dlAdvTeamApproved.AlternatingItemStyle.CssClass = IIf(dlTeamApproved.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
-                    dlAdvTeamApproved.ItemStyle.CssClass = IIf(dlTeamApproved.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
+                    For Each team_member In Team
+                        Dim TeamMemberApprovedNode As New TreeNode(team_member.DisplayName)
+                        TeamMemberApprovedNode.SelectAction = TreeNodeSelectAction.Expand
+                        TeamMemberApprovedNode.Expanded = False
 
+                        Dim TeamApproved = From c In d.AP_Staff_Rmbs
+                                           Where c.UserId = team_member.UserID _
+                                                And (c.Status = RmbStatus.Approved Or c.Status = RmbStatus.PendingDownload Or c.Status = RmbStatus.DownloadFailed) _
+                                                And c.UserId <> UserId And c.PortalId = PortalId
+                                           Select c.RMBNo, c.RmbDate, c.UserRef, c.UserId, c.RID
+                        For Each rmb In TeamApproved
+                            Dim rmb_node As New TreeNode()
+                            rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate)
+                            rmb_node.NavigateUrl = NavigateURL() & "?RmbNo=" & rmb.RMBNo
+                            TeamMemberApprovedNode.ChildNodes.Add(rmb_node)
+                            If IsSelected(rmb.RMBNo) Then
+                                TeamMemberApprovedNode.Expanded = True
+                                TeamApprovedNode.Expanded = True
+                            End If
+                        Next
+
+                        Dim TeamAdvApproved = From c In d.AP_Staff_AdvanceRequests
+                                              Where c.UserId = team_member.UserID _
+                                                And (c.RequestStatus = RmbStatus.Approved Or c.RequestStatus = RmbStatus.PendingDownload Or c.RequestStatus = RmbStatus.DownloadFailed) _
+                                                And c.UserId <> UserId And c.PortalId = PortalId
+                                              Select c.AdvanceId, c.RequestDate, c.UserId, c.LocalAdvanceId
+                        For Each adv In TeamAdvApproved
+                            Dim adv_node As New TreeNode()
+                            adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate)
+                            adv_node.NavigateUrl = NavigateURL() & "?RmbNo=" & -adv.AdvanceId
+                            TeamMemberApprovedNode.ChildNodes.Add(adv_node)
+                            If IsSelected(-adv.AdvanceId) Then
+                                TeamMemberApprovedNode.Expanded = True
+                                TeamApprovedNode.Expanded = True
+                            End If
+                        Next
+                        TeamApprovedNode.ChildNodes.Add(TeamMemberApprovedNode)
+                    Next
+                    tvTeamApproved.Nodes.Clear()
+                    tvTeamApproved.Nodes.Add(TeamApprovedNode)
 
                     '--Team Processed (build a tree)
                     Dim TeamProcessedNode As New TreeNode("Your Team")
@@ -490,15 +516,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         TeamProcessedNode.ChildNodes.Add(TeamMemberProcessedNode)
 
                     Next
+                    tvTeamProcessed.Nodes.Clear()
                     tvTeamProcessed.Nodes.Add(TeamProcessedNode)
 
-                    lblYourTeamHeading.Visible = True
-                    divYourTeamHeading.Visible = True
+                    tvTeamApproved.Visible = True
                     tvTeamProcessed.Visible = True
 
                 Else '--They are not a supervisor
-                    lblYourTeamHeading.Visible = False
-                    divYourTeamHeading.Visible = False
+                    tvTeamApproved.Visible = False
                     tvTeamProcessed.Visible = False
                 End If
 
@@ -555,6 +580,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     '--This is the key part for the FINANCE team (approved, but not processed requests)
                     '--lookup all approved reimbursements & advances
+                    Dim finance_node As New TreeNode("Finance Team")
+                    finance_node.SelectAction = TreeNodeSelectAction.Expand
+                    finance_node.Expanded = False
+
                     Dim AllApproved = (From c In d.AP_Staff_Rmbs
                                        Where (c.Status = RmbStatus.Approved Or c.Status >= RmbStatus.PendingDownload) And c.PortalId = PortalId
                                        Order By c.RID Descending
@@ -569,25 +598,86 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim nonRecAdv = From c In AllApprovedAdv Where c.RequestStatus = RmbStatus.Approved
                     Dim PendingDownload = From c In AllApproved Where c.Status >= RmbStatus.PendingDownload
                     If (PendingDownload.Count > 0) Then
-                        dlPendingDownload.DataSource = PendingDownload
-                        dlPendingDownload.DataBind()
+                        'dlPendingDownload.DataSource = PendingDownload
+                        'dlPendingDownload.DataBind()
                     End If
                     Dim PendingDownloadAdv = From c In AllApprovedAdv Where c.RequestStatus >= RmbStatus.PendingDownload
                     If (PendingDownloadAdv.Count > 0) Then
-                        dlAdvPendingDownload.DataSource = PendingDownloadAdv
-                        dlAdvPendingDownload.DataBind()
-                        dlAdvPendingDownload.AlternatingItemStyle.CssClass = IIf(dlPendingDownload.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
-                        dlAdvPendingDownload.ItemStyle.CssClass = IIf(dlPendingDownload.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
+                        'dlAdvPendingDownload.DataSource = PendingDownloadAdv
+                        'dlAdvPendingDownload.DataBind()
+                        'dlAdvPendingDownload.AlternatingItemStyle.CssClass = IIf(dlPendingDownload.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
+                        'dlAdvPendingDownload.ItemStyle.CssClass = IIf(dlPendingDownload.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
                     End If
 
-                    dlReceipts.DataSource = rec
-                    dlReceipts.DataBind()
-                    dlNoReceipts.DataSource = nonRec
-                    dlNoReceipts.DataBind()
-                    dlAdvNoReceipts.DataSource = nonRecAdv
-                    dlAdvNoReceipts.DataBind()
-                    dlAdvNoReceipts.AlternatingItemStyle.CssClass = IIf(dlNoReceipts.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
-                    dlAdvNoReceipts.ItemStyle.CssClass = IIf(dlNoReceipts.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
+                    Dim receipts_node As New TreeNode("Receipts")
+                    receipts_node.SelectAction = TreeNodeSelectAction.Expand
+                    receipts_node.Expanded = False
+                    For Each rmb In rec
+                        Dim rmb_node As New TreeNode()
+                        rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate)
+                        rmb_node.NavigateUrl = NavigateURL() & "?RmbNo=" & rmb.RMBNo
+                        receipts_node.ChildNodes.Add(rmb_node)
+                        If IsSelected(rmb.RMBNo) Then
+                            receipts_node.Expanded = True
+                            finance_node.Expanded = True
+                        End If
+                    Next
+
+                    Dim no_receipts_node As New TreeNode("No Receipts")
+                    no_receipts_node.SelectAction = TreeNodeSelectAction.Expand
+                    no_receipts_node.Expanded = False
+                    For Each rmb In nonRec
+                        Dim rmb_node As New TreeNode()
+                        rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate)
+                        rmb_node.NavigateUrl = NavigateURL() & "?RmbNo=" & rmb.RMBNo
+                        no_receipts_node.ChildNodes.Add(rmb_node)
+                        If IsSelected(rmb.RMBNo) Then
+                            no_receipts_node.Expanded = True
+                            finance_node.Expanded = True
+                        End If
+                    Next
+                    For Each adv In nonRecAdv
+                        Dim adv_node As New TreeNode()
+                        adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate)
+                        adv_node.NavigateUrl = NavigateURL() & "?RmbNo=" & -adv.AdvanceId
+                        no_receipts_node.ChildNodes.Add(adv_node)
+                        If IsSelected(-adv.AdvanceId) Then
+                            no_receipts_node.Expanded = True
+                            finance_node.Expanded = True
+                        End If
+                    Next
+
+                    Dim pending_download_node As New TreeNode("Pending Download")
+                    pending_download_node.SelectAction = TreeNodeSelectAction.Expand
+                    pending_download_node.Expanded = False
+                    For Each rmb In PendingDownload
+                        Dim rmb_node As New TreeNode()
+                        rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate)
+                        rmb_node.NavigateUrl = NavigateURL() & "?RmbNo=" & rmb.RMBNo
+                        pending_download_node.ChildNodes.Add(rmb_node)
+                        If IsSelected(rmb.RMBNo) Then
+                            pending_download_node.Expanded = True
+                            finance_node.Expanded = True
+                        End If
+                    Next
+                    For Each adv In PendingDownloadAdv
+                        Dim adv_node As New TreeNode()
+                        adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate)
+                        adv_node.NavigateUrl = NavigateURL() & "?RmbNo=" & -adv.AdvanceId
+                        pending_download_node.ChildNodes.Add(adv_node)
+                        If IsSelected(-adv.AdvanceId) Then
+                            pending_download_node.Expanded = True
+                            finance_node.Expanded = True
+                        End If
+                    Next
+
+                    finance_node.ChildNodes.Add(receipts_node)
+                    finance_node.ChildNodes.Add(no_receipts_node)
+                    finance_node.ChildNodes.Add(pending_download_node)
+
+                    tvFinance.Nodes.Clear()
+                    tvFinance.Nodes.Add(finance_node)
+
 
                     '-- Add a count of items to the 'Approved' heading
                     If AllApproved.Count + AllApprovedAdv.Count > 0 Then
@@ -598,11 +688,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         pnlToProcess.CssClass = ""
                     End If
 
-                    pnlPendingDownload.Visible = ((PendingDownload.Count + PendingDownloadAdv.Count) > 0)
-                    pnlApprovedAcc.Visible = True
+                    tvFinance.Visible = True
+                    'pnlPendingDownload.Visible = ((PendingDownload.Count + PendingDownloadAdv.Count) > 0)
+                    'pnlApprovedAcc.Visible = True
                 Else
-                    pnlPendingDownload.Visible = False
-                    pnlApprovedAcc.Visible = False
+                    tvFinance.Visible = False
+                    'pnlPendingDownload.Visible = False
+                    'pnlApprovedAcc.Visible = False
                 End If
 
             Catch ex As Exception
@@ -2425,16 +2517,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
 
         End Sub
-        Protected Sub dlTeamApproved_ItemCommand(ByVal source As Object, ByVal e As System.Web.UI.WebControls.DataListCommandEventArgs) Handles dlTeamApproved.ItemCommand, dlApproved.ItemCommand, dlCancelled.ItemCommand, dlToApprove.ItemCommand, dlSubmitted.ItemCommand, dlPending.ItemCommand, dlReceipts.ItemCommand, dlNoReceipts.ItemCommand, dlPendingDownload.ItemCommand, dlAdvSubmitted.ItemCommand, dlAdvToApprove.ItemCommand, dlAdvApproved.ItemCommand, dlAdvTeamApproved.ItemCommand, dlAdvNoReceipts.ItemCommand, dlAdvPendingDownload.ItemCommand
+        'Protected Sub dlApproved_ItemCommand(ByVal source As Object, ByVal e As System.Web.UI.WebControls.DataListCommandEventArgs) Handles dlApproved.ItemCommand, dlCancelled.ItemCommand, dlToApprove.ItemCommand, dlSubmitted.ItemCommand, dlPending.ItemCommand, dlReceipts.ItemCommand, dlNoReceipts.ItemCommand, dlPendingDownload.ItemCommand, dlAdvSubmitted.ItemCommand, dlAdvToApprove.ItemCommand, dlAdvApproved.ItemCommand, dlAdvTeamApproved.ItemCommand, dlAdvNoReceipts.ItemCommand, dlAdvPendingDownload.ItemCommand
 
-            If e.CommandName = "Goto" Then
-                LoadRmb(e.CommandArgument)
-                ResetMenu()
-            ElseIf e.CommandName = "GotoAdvance" Then
-                LoadAdv(e.CommandArgument)
-                ResetMenu()
-            End If
-        End Sub
+        '    If e.CommandName = "Goto" Then
+        '        LoadRmb(e.CommandArgument)
+        '        ResetMenu()
+        '    ElseIf e.CommandName = "GotoAdvance" Then
+        '        LoadAdv(e.CommandArgument)
+        '        ResetMenu()
+        '    End If
+        'End Sub
 
 
 
