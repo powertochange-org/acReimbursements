@@ -897,7 +897,7 @@
                             </h3>
                             <div id="ApprovedPane">
                                 <asp:TreeView ID="tvTeamApproved" class="team_leader" runat="server" ResourceKey="TeamRmbs" NodeIndent="10">
-                                </asp:TreeView><br />
+                                </asp:TreeView>
                                 <asp:TreeView ID="tvFinance" class="accounts_team" runat="server" NodeIndent="10">
                                 </asp:TreeView>
                             </div>
@@ -917,14 +917,55 @@
                             <asp:UpdatePanel ID="UpdatePanel7" runat="server">
                                 <ContentTemplate>
                                     <asp:TreeView ID="tvAllProcessed" class="accounts_team" runat="server" NodeIndent="10">
-                                    </asp:TreeView><br />
-                                    <asp:TreeView ID="tvTeamProcessed" class="team_leader" runat="server" NodeIndent="10">
-                                    </asp:TreeView><br />
-                                    <asp:TreeView ID="tvProcessed" runat="server" NodeIndent="10">
                                     </asp:TreeView>
+                                    <asp:TreeView ID="tvTeamProcessed" class="team_leader" runat="server" NodeIndent="10">
+                                    </asp:TreeView>
+                                    <asp:Panel ID="lblProcessedDivider" runat="server" style="width: 100%; border-bottom: dashed 1px black;">
+                                        &nbsp;<br />
+                                    </asp:Panel>
+                                    <asp:Label ID="lblYourProcessed" runat="server" class="Agape_SubTitle" ResourceKey="YourRmbs" Style="font-size: 8pt;">
+                                        <br />
+                                    </asp:Label>
+                                    <asp:DataList ID="dlProcessed" runat="server" Width="100%">
+                                        <ItemStyle CssClass="dnnGridItem" />
+                                        <AlternatingItemStyle CssClass="dnnGridAltItem" />
+                                        <ItemTemplate>
+                                            <table width="100%">
+                                                <tr valign="middle">
+                                                    <td>
+                                                        <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
+                                                    </td>
+                                                    <td align="left" width="100%">
+                                                        <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Bold="true" Font-Size="9pt" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' Visible='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
+                                                        <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' Visible='<%# Not IsSelected(Eval("RmbNo"))  %>' Width="100%"></asp:LinkButton>
+                                                    </td>
+                                                    <td>
+                                                        <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsSelected(Eval("RmbNo")) %>' />
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </ItemTemplate>
+                                    </asp:DataList>
+                                    <asp:DataList ID="dlAdvProcessed" runat="server" Width="100%">
+                                        <ItemTemplate>
+                                            <table width="100%">
+                                                <tr valign="middle">
+                                                    <td>
+                                                        <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
+                                                    </td>
+                                                    <td align="left" width="100%">
+                                                        <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Bold="true" Font-Size="9pt" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>' Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' Width="100%"></asp:LinkButton>
+                                                        <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Size="10pt" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>' Visible='<%# Not IsAdvSelected(Eval("AdvanceId"))  %>' Width="100%"></asp:LinkButton>
+                                                    </td>
+                                                    <td>
+                                                        <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' />
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </ItemTemplate>
+                                    </asp:DataList>                                
                                 </ContentTemplate>
                                 <Triggers>
-                                    <asp:PostBackTrigger ControlID="tvProcessed" />
                                     <asp:PostBackTrigger ControlID="tvAllProcessed" />
                                 </Triggers>
                             </asp:UpdatePanel>

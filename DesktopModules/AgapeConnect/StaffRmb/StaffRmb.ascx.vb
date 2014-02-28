@@ -340,35 +340,21 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 'dlAdvApproved.AlternatingItemStyle.CssClass = IIf(dlApproved.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
                 'dlAdvApproved.ItemStyle.CssClass = IIf(dlApproved.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
 
-                '--Processed (build a tree)
-                tvProcessed.Nodes.Clear()
-                Dim YourCompletedNode As New TreeNode("Your Reimbursements")
-                YourCompletedNode.SelectAction = TreeNodeSelectAction.Expand
-                YourCompletedNode.Expanded = False
-
+                '--Processed 
                 Dim Complete = (From c In d.AP_Staff_Rmbs
                                 Where c.Status = RmbStatus.Processed And c.UserId = UserId And c.PortalId = PortalId
                                 Order By c.RID Descending
                                 Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
-                For Each row In Complete
-                    Dim rmb_node As New TreeNode()
-                    rmb_node.Text = GetRmbTitleTeamShort(row.RID, row.RmbDate)
-                    rmb_node.NavigateUrl = NavigateURL() & "?RmbNo=" & row.RMBNo
-                    YourCompletedNode.ChildNodes.Add(rmb_node)
-                Next
+                dlProcessed.DataSource = Complete
+                dlProcessed.DataBind()
 
                 Dim CompleteAdv = (From c In d.AP_Staff_AdvanceRequests
                                    Where c.RequestStatus = RmbStatus.Processed And c.UserId = UserId And c.PortalId = PortalId
                                    Order By c.LocalAdvanceId Descending
-                                   Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId).Take(MenuSize)
-                For Each row In CompleteAdv
-                    Dim adv_node As New TreeNode()
-                    adv_node.Text = GetAdvTitleTeamShort(row.LocalAdvanceId, row.RequestDate)
-                    adv_node.NavigateUrl = NavigateURL() & "?RmbNo=" & -row.AdvanceId
-                    YourCompletedNode.ChildNodes.Add(adv_node)
-                Next
+                                   Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId).Take(MenuSize)
+                dlAdvProcessed.DataSource = CompleteAdv
+                dlAdvProcessed.DataBind()
 
-                tvProcessed.Nodes.Add(YourCompletedNode)
 
                 '--Cancelled
                 Dim Cancelled = (From c In d.AP_Staff_Rmbs
@@ -444,7 +430,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                            Select c.RMBNo, c.RmbDate, c.UserRef, c.UserId, c.RID
                         For Each rmb In TeamApproved
                             Dim rmb_node As New TreeNode()
-                            rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate)
+                            Dim rmbUser = UserController.GetUserById(PortalId, rmb.UserId).DisplayName
+                            rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser)
                             rmb_node.NavigateUrl = NavigateURL() & "?RmbNo=" & rmb.RMBNo
                             TeamMemberApprovedNode.ChildNodes.Add(rmb_node)
                             If IsSelected(rmb.RMBNo) Then
@@ -460,7 +447,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                               Select c.AdvanceId, c.RequestDate, c.UserId, c.LocalAdvanceId
                         For Each adv In TeamAdvApproved
                             Dim adv_node As New TreeNode()
-                            adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate)
+                            Dim advUser = UserController.GetUserById(PortalId, adv.UserId).DisplayName
+                            adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate, advUser)
                             adv_node.NavigateUrl = NavigateURL() & "?RmbNo=" & -adv.AdvanceId
                             TeamMemberApprovedNode.ChildNodes.Add(adv_node)
                             If IsSelected(-adv.AdvanceId) Then
@@ -491,7 +479,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                             Select c.RMBNo, c.RmbDate, c.UserRef, c.UserId, c.RID
                         For Each rmb In TeamProcessed
                             Dim rmb_node As New TreeNode()
-                            rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate)
+                            Dim rmbUser = UserController.GetUserById(PortalId, rmb.UserId).DisplayName
+                            rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser)
                             rmb_node.NavigateUrl = NavigateURL() & "?RmbNo=" & rmb.RMBNo
                             TeamMemberProcessedNode.ChildNodes.Add(rmb_node)
                             If IsSelected(rmb.RMBNo) Then
@@ -505,7 +494,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                                Select c.AdvanceId, c.RequestDate, c.UserId, c.LocalAdvanceId
                         For Each adv In TeamAdvProcessed
                             Dim adv_node As New TreeNode()
-                            adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate)
+                            Dim advUser = UserController.GetUserById(PortalId, adv.UserId).DisplayName
+                            adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate, advUser)
                             adv_node.NavigateUrl = NavigateURL() & "?RmbNo=" & -adv.AdvanceId
                             TeamMemberProcessedNode.ChildNodes.Add(adv_node)
                             If IsSelected(-adv.AdvanceId) Then
@@ -580,7 +570,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     '--This is the key part for the FINANCE team (approved, but not processed requests)
                     '--lookup all approved reimbursements & advances
-                    Dim finance_node As New TreeNode("Finance Team")
+                    Dim finance_node As New TreeNode("Finance")
                     finance_node.SelectAction = TreeNodeSelectAction.Expand
                     finance_node.Expanded = False
 
@@ -597,24 +587,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim nonRec = From c In AllApproved Where c.Status = RmbStatus.Approved And Not c.Receipts
                     Dim nonRecAdv = From c In AllApprovedAdv Where c.RequestStatus = RmbStatus.Approved
                     Dim PendingDownload = From c In AllApproved Where c.Status >= RmbStatus.PendingDownload
-                    If (PendingDownload.Count > 0) Then
-                        'dlPendingDownload.DataSource = PendingDownload
-                        'dlPendingDownload.DataBind()
-                    End If
                     Dim PendingDownloadAdv = From c In AllApprovedAdv Where c.RequestStatus >= RmbStatus.PendingDownload
-                    If (PendingDownloadAdv.Count > 0) Then
-                        'dlAdvPendingDownload.DataSource = PendingDownloadAdv
-                        'dlAdvPendingDownload.DataBind()
-                        'dlAdvPendingDownload.AlternatingItemStyle.CssClass = IIf(dlPendingDownload.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
-                        'dlAdvPendingDownload.ItemStyle.CssClass = IIf(dlPendingDownload.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
-                    End If
-
-                    Dim receipts_node As New TreeNode("Receipts")
+                    Dim receipts_node As New TreeNode("Receipts (" & rec.Count & ")")
                     receipts_node.SelectAction = TreeNodeSelectAction.Expand
                     receipts_node.Expanded = False
                     For Each rmb In rec
                         Dim rmb_node As New TreeNode()
-                        rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate)
+                        Dim rmbUser = UserController.GetUserById(PortalId, rmb.UserId).DisplayName
+                        rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser)
                         rmb_node.NavigateUrl = NavigateURL() & "?RmbNo=" & rmb.RMBNo
                         receipts_node.ChildNodes.Add(rmb_node)
                         If IsSelected(rmb.RMBNo) Then
@@ -623,12 +603,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         End If
                     Next
 
-                    Dim no_receipts_node As New TreeNode("No Receipts")
+                    Dim no_receipts_node As New TreeNode("No Receipts (" & nonRec.Count + nonRecAdv.Count & ")")
                     no_receipts_node.SelectAction = TreeNodeSelectAction.Expand
                     no_receipts_node.Expanded = False
                     For Each rmb In nonRec
                         Dim rmb_node As New TreeNode()
-                        rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate)
+                        Dim rmbUser = UserController.GetUserById(PortalId, rmb.UserId).DisplayName
+                        rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser)
                         rmb_node.NavigateUrl = NavigateURL() & "?RmbNo=" & rmb.RMBNo
                         no_receipts_node.ChildNodes.Add(rmb_node)
                         If IsSelected(rmb.RMBNo) Then
@@ -638,7 +619,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Next
                     For Each adv In nonRecAdv
                         Dim adv_node As New TreeNode()
-                        adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate)
+                        Dim advUser = UserController.GetUserById(PortalId, adv.UserId).DisplayName
+                        adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate, advUser)
                         adv_node.NavigateUrl = NavigateURL() & "?RmbNo=" & -adv.AdvanceId
                         no_receipts_node.ChildNodes.Add(adv_node)
                         If IsSelected(-adv.AdvanceId) Then
@@ -647,12 +629,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         End If
                     Next
 
-                    Dim pending_download_node As New TreeNode("Pending Download")
+                    Dim pending_download_node As New TreeNode("Pending Download (" & PendingDownload.Count + PendingDownloadAdv.Count & ")")
                     pending_download_node.SelectAction = TreeNodeSelectAction.Expand
                     pending_download_node.Expanded = False
                     For Each rmb In PendingDownload
                         Dim rmb_node As New TreeNode()
-                        rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate)
+                        Dim rmbUser = UserController.GetUserById(PortalId, rmb.UserId).DisplayName
+                        rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser)
                         rmb_node.NavigateUrl = NavigateURL() & "?RmbNo=" & rmb.RMBNo
                         pending_download_node.ChildNodes.Add(rmb_node)
                         If IsSelected(rmb.RMBNo) Then
@@ -662,7 +645,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Next
                     For Each adv In PendingDownloadAdv
                         Dim adv_node As New TreeNode()
-                        adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate)
+                        Dim advUser = UserController.GetUserById(PortalId, adv.UserId).DisplayName
+                        adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate, advUser)
                         adv_node.NavigateUrl = NavigateURL() & "?RmbNo=" & -adv.AdvanceId
                         pending_download_node.ChildNodes.Add(adv_node)
                         If IsSelected(-adv.AdvanceId) Then
@@ -689,13 +673,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
 
                     tvFinance.Visible = True
-                    'pnlPendingDownload.Visible = ((PendingDownload.Count + PendingDownloadAdv.Count) > 0)
-                    'pnlApprovedAcc.Visible = True
+                    tvAllSubmitted.Visible = True
+                    tvAllProcessed.Visible = True
                 Else
                     tvFinance.Visible = False
-                    'pnlPendingDownload.Visible = False
-                    'pnlApprovedAcc.Visible = False
+                    tvAllSubmitted.Visible = False
+                    tvAllProcessed.Visible = False
                 End If
+                lblProcessedDivider.Visible = (tvFinance.Visible Or tvAllProcessed.Visible Or tvTeamProcessed.Visible)
+                lblYourProcessed.Visible = lblProcessedDivider.Visible
 
             Catch ex As Exception
                 lblError.Text = "Error loading Menu: " & ex.Message
@@ -2730,28 +2716,32 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             ' Return Left("RMB#" & RmbNo & " " & UserController.GetUser(PortalId, UID, False).DisplayName, 24)
         End Function
-        Protected Function GetRmbTitleTeamShort(ByVal RID As Integer, ByVal RmbDate As Date) As String
+        Protected Function GetRmbTitleTeamShort(ByVal RID As Integer, ByVal RmbDate As Date, ByVal name As String) As String
 
             Dim rtn As String = "<span style=""font-size: 6.5pt; color: #999999;"">#" & ZeroFill(RID.ToString, 5)
 
             If RmbDate > (New Date(2010, 1, 1)) Then
-                rtn = rtn & ": " & RmbDate.ToShortDateString & "</span>"
-            Else
-                rtn = rtn & "</span>"
+                rtn = rtn & ": " & RmbDate.ToShortDateString
             End If
+            If (name IsNot Nothing) Then
+                rtn = rtn & " - " & name
+            End If
+            rtn = rtn & "</span>"
             Return rtn
 
             ' Return Left("RMB#" & RmbNo & " " & UserController.GetUser(PortalId, UID, False).DisplayName, 24)
         End Function
-        Protected Function GetAdvTitleTeamShort(ByVal LocalAdvanceId As Integer, ByVal RequestDate As Date) As String
+        Protected Function GetAdvTitleTeamShort(ByVal LocalAdvanceId As Integer, ByVal RequestDate As Date, ByVal name As String) As String
 
             Dim rtn As String = "<span style=""font-size: 6.5pt; color: #999999;"">Adv#" & ZeroFill(LocalAdvanceId.ToString, 4)
 
             If RequestDate > (New Date(2010, 1, 1)) Then
-                rtn = rtn & ": " & RequestDate.ToShortDateString & "</span>"
-            Else
-                rtn = rtn & "</span>"
+                rtn = rtn & ": " & RequestDate.ToShortDateString
             End If
+            If (name IsNot Nothing) Then
+                rtn = rtn & " - " & name
+            End If
+            rtn = rtn & "</span>"
             Return rtn
 
             ' Return Left("RMB#" & RmbNo & " " & UserController.GetUser(PortalId, UID, False).DisplayName, 24)
@@ -4703,10 +4693,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             For Each row In queryResult '--get details of each reimbursement or advance
                 Dim newNode As New TreeNode()
                 If (type.Equals("rmb")) Then
-                    newNode.Text = GetRmbTitleTeamShort(row.RID, row.RmbDate)
+                    Dim rmbUser = UserController.GetUserById(PortalId, row.UserId).DisplayName
+                    newNode.Text = GetRmbTitleTeamShort(row.RID, row.RmbDate, rmbUser)
                     newNode.NavigateUrl = NavigateURL() & "?RmbNo=" & row.RMBNo
                 Else
-                    newNode.Text = GetAdvTitleTeamShort(row.LocalAdvanceId, row.RequestDate)
+                    Dim advUser = UserController.GetUserById(PortalId, row.UserId).DisplayName
+                    newNode.Text = GetAdvTitleTeamShort(row.LocalAdvanceId, row.RequestDate, advUser)
                     newNode.NavigateUrl = NavigateURL() & "?RmbNo=" & -row.AdvanceId
                 End If
                 submittedNode.ChildNodes.Add(newNode)
