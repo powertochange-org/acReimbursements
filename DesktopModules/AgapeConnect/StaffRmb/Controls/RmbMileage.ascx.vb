@@ -1,6 +1,7 @@
 ﻿Imports System.Linq
 Partial Class controls_Mileage
     Inherits Entities.Modules.PortalModuleBase
+
     Protected Sub Page_Init(sender As Object, e As System.EventArgs) Handles Me.Init
         Dim FileName As String = System.IO.Path.GetFileNameWithoutExtension(Me.AppRelativeVirtualPath)
         If Not (Me.ID Is Nothing) Then
@@ -40,11 +41,9 @@ Partial Class controls_Mileage
         End Get
         Set(ByVal value As String)
             tbDesc.Text = value
-
-           
-
         End Set
     End Property
+
     Public Property theDate() As Date
         Get
             Return CDate(dtDate.Text)
@@ -55,25 +54,6 @@ Partial Class controls_Mileage
             Else
                 dtDate.Text = value
             End If
-        End Set
-    End Property
-    Public Property VAT() As Boolean
-        Get
-            If Not VatRow.Visible Then
-                Return False
-            Else
-                Return (ddlVATReceipt.SelectedItem.Text = "Yes")
-            End If
-
-        End Get
-        Set(ByVal value As Boolean)
-            If value = True Then
-                ddlVATReceipt.SelectedValue = "Yes"
-            Else
-                ddlVATReceipt.SelectedValue = "No"
-            End If
-
-
         End Set
     End Property
 
@@ -90,6 +70,7 @@ Partial Class controls_Mileage
             'tbDistance.Text = CInt(value / ((ddlVehicleType.SelectedValue + (5 * CInt(ddlStaff.SelectedValue))) / 100))
         End Set
     End Property
+
     'Public Property Spare1() As String
     '    Get
     '        Return ddlStaff.SelectedValue
@@ -103,9 +84,9 @@ Partial Class controls_Mileage
     '        End If
     '    End Set
     'End Property
-    Public Property Spare2() As String
+
+    Public Property theDistance() As String
         Get
-           
             Return tbDistance.Text
         End Get
         Set(ByVal value As String)
@@ -114,10 +95,9 @@ Partial Class controls_Mileage
             Catch ex As Exception
                 tbDistance.Text = 0
             End Try
-
-
         End Set
     End Property
+
     Public Property Spare3() As String
         Get
             Return CInt(ddlDistUnits.SelectedValue)
@@ -147,27 +127,15 @@ Partial Class controls_Mileage
 
     '    End Set
     'End Property
-    Public Property Receipt() As Boolean
-        Get
-            Return False ' ddlVATReceipt.SelectedValue = "Yes"
-        End Get
-        Set(ByVal value As Boolean)
-            'If value = False Then
-            '    ddlVATReceipt.SelectedValue = "No"
-            'Else
-            '    ddlVATReceipt.SelectedValue = "Yes"
-            'End If
-        End Set
-    End Property
 
-    Public Property Taxable() As Boolean
+    Public Property Receipt() As Boolean
         Get
             Return False
         End Get
         Set(ByVal value As Boolean)
-
         End Set
     End Property
+
     Public Function ValidateForm(ByVal userId As Integer) As Boolean
         If tbDesc.Text = "" Then
             ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Description.Error", LocalResourceFile)
@@ -185,8 +153,8 @@ Partial Class controls_Mileage
         End Try
 
         Try
-            Dim theMiles As Double = tbDistance.Text
-            If theMiles <= 0 Then
+            Dim theDistance As Double = tbDistance.Text
+            If theDistance <= 0 Then
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Reverse.Error", LocalResourceFile)
                 Return False
             End If
@@ -227,7 +195,6 @@ Partial Class controls_Mileage
         End If
 
 
-        VatRow.Visible = Settings("VatAttrib")
         lblDistance.Text = DotNetNuke.Services.Localization.Localization.GetString("lblAmount.Text", LocalResourceFile).Replace("[UNIT]", Settings("DistanceUnit"))
         lblDistance.HelpText = DotNetNuke.Services.Localization.Localization.GetString("lblAmount.Help", LocalResourceFile)
 

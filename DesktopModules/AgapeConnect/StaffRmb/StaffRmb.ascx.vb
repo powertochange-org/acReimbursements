@@ -327,18 +327,18 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                     And c.UserId = UserId And c.PortalId = PortalId
                                 Order By c.RID Descending
                                 Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
-                'dlApproved.DataSource = Approved
-                'dlApproved.DataBind()
+                dlApproved.DataSource = Approved
+                dlApproved.DataBind()
 
                 Dim AdvApproved = (From c In d.AP_Staff_AdvanceRequests
                                    Where (c.RequestStatus = RmbStatus.Approved Or c.RequestStatus = RmbStatus.PendingDownload Or c.RequestStatus = RmbStatus.DownloadFailed) _
                                         And c.UserId = UserId And c.PortalId = PortalId
                                    Order By c.LocalAdvanceId Descending
                                    Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId).Take(MenuSize)
-                'dlAdvApproved.DataSource = AdvApproved
-                'dlAdvApproved.DataBind()
-                'dlAdvApproved.AlternatingItemStyle.CssClass = IIf(dlApproved.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
-                'dlAdvApproved.ItemStyle.CssClass = IIf(dlApproved.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
+                dlAdvApproved.DataSource = AdvApproved
+                dlAdvApproved.DataBind()
+                dlAdvApproved.AlternatingItemStyle.CssClass = IIf(dlApproved.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
+                dlAdvApproved.ItemStyle.CssClass = IIf(dlApproved.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
 
                 '--Processed 
                 Dim Complete = (From c In d.AP_Staff_Rmbs
@@ -680,6 +680,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     tvAllSubmitted.Visible = False
                     tvAllProcessed.Visible = False
                 End If
+                lblApprovedDivider.Visible = (tvTeamApproved.Visible)
                 lblProcessedDivider.Visible = (tvFinance.Visible Or tvAllProcessed.Visible Or tvTeamProcessed.Visible)
                 lblYourProcessed.Visible = lblProcessedDivider.Visible
 
@@ -931,7 +932,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 If q.Count > 0 Then
                     Dim Rmb = q.First
 
-                    Dim DRAFT_OR_MOREINFO = Rmb.Status = RmbStatus.Draft Or Rmb.Status = RmbStatus.MoreInfo
+                    Dim DRAFT = Rmb.Status = RmbStatus.Draft
+                    Dim MORE_INFO = Rmb.MoreInfoRequested
                     Dim SUBMITTED = Rmb.Status = RmbStatus.Submitted
                     Dim APPROVED = Rmb.Status = RmbStatus.Approved
                     Dim PROCESSING = Rmb.Status = RmbStatus.PendingDownload Or Rmb.Status = RmbStatus.DownloadFailed
@@ -974,7 +976,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     lblRmbNo.Text = ZeroFill(Rmb.RID, 5)
                     imgAvatar.ImageUrl = GetProfileImage(Rmb.UserId)
                     tbChargeTo.Text = If(Rmb.CostCenter Is Nothing, "", Rmb.CostCenter)
-                    tbChargeTo.Enabled = DRAFT_OR_MOREINFO Or CANCELLED Or (SUBMITTED And (isOwner Or isSpouse))
+                    tbChargeTo.Enabled = DRAFT Or MORE_INFO Or CANCELLED Or (SUBMITTED And (isOwner Or isSpouse))
                     lblStatus.Text = Translate(RmbStatus.StatusName(Rmb.Status))
                     lblAccountBalance.Text = "Unknown"
                     lblAdvanceBalance.Text = "Unknown"
@@ -989,8 +991,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ttlWaitingApp.Visible = Rmb.ApprDate Is Nothing
                     ttlApprovedBy.Visible = Not Rmb.ApprDate Is Nothing
                     ttlApprovedBy.Text = If(Rmb.ApprUserId Is Nothing Or Rmb.ApprUserId = -1, "", UserController.GetUserById(PortalId, Rmb.ApprUserId).DisplayName)
-                    ddlApprovedBy.Visible = DRAFT_OR_MOREINFO Or CANCELLED Or ((isApprover Or isOwner Or isSpouse) And SUBMITTED)
-                    ddlApprovedBy.Enabled = DRAFT_OR_MOREINFO Or CANCELLED Or ((isApprover Or isOwner Or isSpouse) And SUBMITTED)
+                    ddlApprovedBy.Visible = DRAFT Or MORE_INFO Or CANCELLED Or ((isApprover Or isOwner Or isSpouse) And SUBMITTED)
+                    ddlApprovedBy.Enabled = DRAFT Or MORE_INFO Or CANCELLED Or ((isApprover Or isOwner Or isSpouse) And SUBMITTED)
                     lblApprovedBy.Visible = Not ddlApprovedBy.Visible
 
                     lblProcessedDate.Text = If(Rmb.ProcDate Is Nothing, "", Rmb.ProcDate.Value.ToShortDateString)
@@ -1051,7 +1053,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     btnPrint.Visible = FORM_HAS_ITEMS
                     btnPrint.OnClientClick = "window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & RmbNo & "&UID=" & Rmb.UserId & "', '_blank'); "
-                    btnSubmit.Visible = (isOwner Or isSpouse) And (DRAFT_OR_MOREINFO Or CANCELLED) And FORM_HAS_ITEMS
+                    btnSubmit.Visible = (isOwner Or isSpouse) And (DRAFT Or MORE_INFO Or CANCELLED) And FORM_HAS_ITEMS
                     btnSubmit.Enabled = btnSubmit.Visible And Rmb.CostCenter IsNot Nothing And Rmb.ApprUserId IsNot Nothing AndAlso (Rmb.CostCenter.Length = 6) And (Rmb.ApprUserId >= 0)
                     btnSubmit.ToolTip = If(btnSubmit.Enabled, "", "Please select an account and an approver in order to submit")
                     btnSubmit.OnClientClick = "window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & RmbNo & "&UID=" & Rmb.UserId & "&mode=1', '_blank'); "
@@ -1067,7 +1069,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     '*** ADVANCES ***
                     pnlAdvance.Visible = (Rmb.AP_Staff_RmbLines.Count > 0) And Not PACMode
 
-                    tbAdvanceAmount.Enabled = DRAFT_OR_MOREINFO Or SUBMITTED Or APPROVED
+                    tbAdvanceAmount.Enabled = DRAFT Or MORE_INFO Or SUBMITTED Or APPROVED
                     tbAdvanceAmount.Text = If(Rmb.AdvanceRequest = Nothing, "", Rmb.AdvanceRequest.ToString("0.00", New CultureInfo("en-US").NumberFormat))
 
                     Dim qAdvPayments = From c In ds.AP_Staff_SuggestedPayments
@@ -2503,16 +2505,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
 
         End Sub
-        'Protected Sub dlApproved_ItemCommand(ByVal source As Object, ByVal e As System.Web.UI.WebControls.DataListCommandEventArgs) Handles dlApproved.ItemCommand, dlCancelled.ItemCommand, dlToApprove.ItemCommand, dlSubmitted.ItemCommand, dlPending.ItemCommand, dlReceipts.ItemCommand, dlNoReceipts.ItemCommand, dlPendingDownload.ItemCommand, dlAdvSubmitted.ItemCommand, dlAdvToApprove.ItemCommand, dlAdvApproved.ItemCommand, dlAdvTeamApproved.ItemCommand, dlAdvNoReceipts.ItemCommand, dlAdvPendingDownload.ItemCommand
+        Protected Sub dlApproved_ItemCommand(ByVal source As Object, ByVal e As System.Web.UI.WebControls.DataListCommandEventArgs) Handles dlProcessed.ItemCommand, dlAdvProcessed.ItemCommand, dlApproved.ItemCommand, dlCancelled.ItemCommand, dlToApprove.ItemCommand, dlSubmitted.ItemCommand, dlPending.ItemCommand, dlAdvApproved.ItemCommand, dlAdvSubmitted.ItemCommand, dlAdvToApprove.ItemCommand, dlAdvApproved.ItemCommand
 
-        '    If e.CommandName = "Goto" Then
-        '        LoadRmb(e.CommandArgument)
-        '        ResetMenu()
-        '    ElseIf e.CommandName = "GotoAdvance" Then
-        '        LoadAdv(e.CommandArgument)
-        '        ResetMenu()
-        '    End If
-        'End Sub
+            If e.CommandName = "Goto" Then
+                LoadRmb(e.CommandArgument)
+                ResetMenu()
+            ElseIf e.CommandName = "GotoAdvance" Then
+                LoadAdv(e.CommandArgument)
+                ResetMenu()
+            End If
+        End Sub
 
 
 
