@@ -978,6 +978,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     tbChargeTo.Text = If(Rmb.CostCenter Is Nothing, "", Rmb.CostCenter)
                     tbChargeTo.Enabled = DRAFT Or MORE_INFO Or CANCELLED Or (SUBMITTED And (isOwner Or isSpouse))
                     lblStatus.Text = Translate(RmbStatus.StatusName(Rmb.Status))
+                    If (Rmb.MoreInfoRequested) Then
+                        lblStatus.Text = lblStatus.Text & " - " & Translate("StatusMoreInfo")
+                    End If
                     lblAccountBalance.Text = "Unknown"
                     lblAdvanceBalance.Text = "Unknown"
 
@@ -1054,6 +1057,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     btnPrint.Visible = FORM_HAS_ITEMS
                     btnPrint.OnClientClick = "window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & RmbNo & "&UID=" & Rmb.UserId & "', '_blank'); "
                     btnSubmit.Visible = (isOwner Or isSpouse) And (DRAFT Or MORE_INFO Or CANCELLED) And FORM_HAS_ITEMS
+                    btnSubmit.Text = If(DRAFT, Translate("btnSubmit"), Translate("btnResubmit"))
                     btnSubmit.Enabled = btnSubmit.Visible And Rmb.CostCenter IsNot Nothing And Rmb.ApprUserId IsNot Nothing AndAlso (Rmb.CostCenter.Length = 6) And (Rmb.ApprUserId >= 0)
                     btnSubmit.ToolTip = If(btnSubmit.Enabled, "", "Please select an account and an approver in order to submit")
                     btnSubmit.OnClientClick = "window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & RmbNo & "&UID=" & Rmb.UserId & "&mode=1', '_blank'); "
@@ -1659,24 +1663,30 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Protected Sub btnSubmit_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSubmit.Click
 
-
-
             Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value
             If rmb.Count > 0 Then
                 '--Ensure form is saved first
                 btnSave_Click(Me, Nothing)
 
-
-                Dim NewStatus As Integer = RmbStatus.Submitted
+                Dim NewStatus As Integer = rmb.First.Status
                 Dim message As String = Translate("Printout")
 
-                If rmb.First.Status = RmbStatus.MoreInfo Then
-                    NewStatus = RmbStatus.Approved
-                    message = Translate("MoreInfo")
+                If (rmb.First.MoreInfoRequested) Then
+                    rmb.First.MoreInfoRequested = False
                     rmb.First.Locked = True
                 Else
+                    NewStatus = RmbStatus.Submitted
                     rmb.First.Locked = False
                 End If
+
+                '--DISABLED - I think rmb.moreinforequested is being used instead of the MoreInfo status now.
+                'If rmb.First.Status = RmbStatus.MoreInfo Then
+                '    NewStatus = RmbStatus.Approved
+                '    message = Translate("MoreInfo")
+                '    rmb.First.Locked = True
+                'Else
+                '    rmb.First.Locked = False
+                'End If
 
 
                 rmb.First.Status = NewStatus
@@ -1914,7 +1924,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 rmb.First.UserRef = tbYouRef.Text
                 rmb.First.ApprComment = tbApprComments.Text
                 rmb.First.MoreInfoRequested = cbMoreInfo.Checked Or cbApprMoreInfo.Checked
+                If (cbMoreInfo.Checked Or cbApprMoreInfo.Checked) Then
+                    rmb.First.Locked = False
+                End If
                 rmb.First.ApprUserId = ddlApprovedBy.SelectedValue
+                rmb.First.AcctComment = tbAccComments.Text
                 'If ddlPeriod.SelectedIndex > 0 Then
                 '    rmb.First.Period = ddlPeriod.SelectedValue
                 'End If
@@ -2772,8 +2786,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo
                 If rmb.Count > 0 Then
                     Select Case rmb.First.Status
-                        Case RmbStatus.MoreInfo
-                            Return 0
+                        'Case RmbStatus.MoreInfo
+                        '    Return 0
                         Case Is >= RmbStatus.PendingDownload
                             Return 2
                         Case Else
@@ -2787,8 +2801,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 If adv.Count > 0 Then
                     Select Case adv.First.RequestStatus
-                        Case RmbStatus.MoreInfo
-                            Return 0
+                        'Case RmbStatus.MoreInfo
+                        '    Return 0
                         Case Is >= RmbStatus.PendingDownload
                             Return 2
                         Case Else
@@ -4121,35 +4135,26 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Function
 
         Protected Sub cbMoreInfo_CheckedChanged(sender As Object, e As System.EventArgs) Handles cbMoreInfo.CheckedChanged
-            btnSave_Click(Me, Nothing)
-            If cbMoreInfo.Checked Then
-
-
-                Dim theRmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value) And c.PortalId = PortalId Select c.UserId, c.RID
-
-                If theRmb.Count > 0 Then
+            cbApprMoreInfo.Checked = cbMoreInfo.Checked
+            Dim theRmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value) And c.PortalId = PortalId
+            If theRmb.Count > 0 Then
+                If cbMoreInfo.Checked Then
                     Dim theUser = UserController.GetUserById(PortalId, theRmb.First.UserId)
-
                     SendMessage(Translate("MoreInfoMsg"), "window.open('mailto:" & theUser.Email & "?subject=Reimbursment " & theRmb.First.RID & ": More info requested');")
                 End If
-
+                btnSave_Click(Me, Nothing)
             End If
-
         End Sub
 
         Protected Sub cbApprMoreInfo_CheckedChanged(sender As Object, e As System.EventArgs) Handles cbApprMoreInfo.CheckedChanged
-            btnSave_Click(Me, Nothing)
-            If cbApprMoreInfo.Checked Then
-
-
-                Dim theRmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value) And c.PortalId = PortalId Select c.UserId, c.RID
-
-                If theRmb.Count > 0 Then
+            cbMoreInfo.Checked = cbApprMoreInfo.Checked
+            Dim theRmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value) And c.PortalId = PortalId
+            If theRmb.Count > 0 Then
+                If cbApprMoreInfo.Checked Then
                     Dim theUser = UserController.GetUserById(PortalId, theRmb.First.UserId)
-
                     SendMessage(Translate("MoreInfoMsg"), "window.open('mailto:" & theUser.Email & "?subject=Reimbursment " & theRmb.First.RID & ": More info requested');")
                 End If
-
+                btnSave_Click(Me, Nothing)
             End If
 
         End Sub

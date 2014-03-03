@@ -490,7 +490,7 @@
     <value> Request more info</value>
   </data>
   <data name="MoreInfo.Text" xml:space="preserve">
-    <value>You have been requested to provide more information for Reimbursement [RMBNO] - [USERREF].</value>
+    <value>More information is required in order to continue processing Reimbursement [RMBNO] - [USERREF].</value>
   </data>
   <data name="MoreInfoMsg.Text" xml:space="preserve">
     <value>This reimbursment will be highlighted to the staff member on this page. However, you should email the staff member directly, to let him/her know what information you need.</value>
@@ -587,5 +587,11 @@
   </data>
   <data name="btnDelete.Text" xml:space="preserve">
     <value>Delete</value>
+  </data>
+  <data name="StatusMoreInfo.Text" xml:space="preserve">
+    <value>More Information Requested</value>
+  </data>
+  <data name="btnResubmit.Text" xml:space="preserve">
+    <value>Re-Submit</value>
   </data>
 </root>
