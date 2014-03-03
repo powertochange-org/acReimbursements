@@ -1341,7 +1341,7 @@
                                 </div>
                                 <div style="float:right">
                                     <asp:Button ID="btnPrint" runat="server" resourcekey="btnPrint" class="aButton" />
-                                    <asp:Button ID="btnSubmit" runat="server" resourcekey="btnSubmit" class="aButton" />
+                                    <asp:Button ID="btnSubmit" runat="server"  class="aButton" />
                                     <asp:Button ID="btnApprove" runat="server" resourcekey="btnApprove" class="aButton" />
                                     <asp:Button ID="btnProcess" runat="server" resourcekey="btnProcess" class="aButton" />
                                     <asp:Button ID="btnUnProcess" runat="server" resourcekey="btnUnProcess" class="aButton" />
