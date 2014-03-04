@@ -656,6 +656,11 @@
 
     };
 
+    function show_loading_spinner() {
+        $("#loading").show();
+        return true;
+    }
+
 
 
 </script>
@@ -691,11 +696,16 @@
         height: 280px;
     }
 </style>
-<div style="text-align: center; width: 100%;">
+
+<div id="loading" class="loading_overlay" style="display:none" >
+    &nbsp;
+</div>
+
+<div style="position:relative; text-align: center; width: 100%;">
     <asp:Label ID="lblError" runat="server" class="ui-state-error ui-corner-all"
         Style="padding: 3px; margin-top: 3px; display: inline-block; width: 50%;" Visible="false"></asp:Label>
 </div>
-<asp:Panel ID="pnlEverything" runat="server">
+<asp:Panel ID="pnlEverything" runat="server" >
 
 
 
@@ -749,10 +759,10 @@
                                                     <td width="100%" align="left">
 
                                                         <asp:LinkButton ID="LinkButton1" runat="server" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>'
-                                                            CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Width="100%" BorderStyle="Solid"
+                                                            CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Width="100%" BorderStyle="Solid" OnClientClick="show_loading_spinner()"
                                                             BorderColor="#CCCCCC" BorderWidth="1px" Font-Bold="true" Font-Size="9pt" Visible='<%# IsSelected(Eval("RmbNo")) %>'></asp:LinkButton>
                                                         <asp:LinkButton ID="LinkButton2" runat="server" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>'
-                                                            CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Width="100%"
+                                                            CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Width="100%" OnClientClick="show_loading_spinner()"
                                                             Visible='<%# Not IsSelected(Eval("RmbNo"))  %>'></asp:LinkButton>
                                                     </td>
                                                     <td>
@@ -797,8 +807,8 @@
                                                                 <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
                                                             </td>
                                                             <td align="left" width="100%">
-                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Bold="true" Font-Size="9pt" Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>' Visible='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
-                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>' Visible='<%# Not IsSelected(Eval("RmbNo"))  %>' Width="100%"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Bold="true" Font-Size="9pt" Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>' Visible='<%# IsSelected(Eval("RmbNo")) %>' Width="100%" OnClientClick="show_loading_spinner()"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>' Visible='<%# Not IsSelected(Eval("RmbNo"))  %>' Width="100%" OnClientClick="show_loading_spinner()"></asp:LinkButton>
                                                             </td>
                                                             <td>
                                                                 <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsSelected(Eval("RmbNo")) %>' />
@@ -817,8 +827,8 @@
                                                                 <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
                                                             </td>
                                                             <td align="left" width="100%">
-                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Bold="true" Font-Size="9pt" Text='<%# GetAdvTitleTeam(Eval("LocalAdvanceId"), Eval("UserId"), Eval("RequestDate"))  %>' Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' Width="100%"></asp:LinkButton>
-                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Size="10pt" Text='<%# GetAdvTitleTeam(Eval("LocalAdvanceId"),Eval("UserId"),  Eval("RequestDate"))  %>' Visible='<%# Not IsAdvSelected(Eval("AdvanceId"))  %>' Width="100%"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Bold="true" Font-Size="9pt" Text='<%# GetAdvTitleTeam(Eval("LocalAdvanceId"), Eval("UserId"), Eval("RequestDate"))  %>' Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' Width="100%" OnClientClick="show_loading_spinner()"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Size="10pt" Text='<%# GetAdvTitleTeam(Eval("LocalAdvanceId"),Eval("UserId"),  Eval("RequestDate"))  %>' Visible='<%# Not IsAdvSelected(Eval("AdvanceId"))  %>' Width="100%" OnClientClick="show_loading_spinner()"></asp:LinkButton>
                                                             </td>
                                                             <td>
                                                                 <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' />
@@ -842,8 +852,8 @@
                                                                 <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
                                                             </td>
                                                             <td align="left" width="100%">
-                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Bold="true" Font-Size="9pt" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' Visible='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
-                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' Visible='<%# Not IsSelected(Eval("RmbNo"))  %>' Width="100%"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Bold="true" Font-Size="9pt" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' Visible='<%# IsSelected(Eval("RmbNo")) %>' Width="100%" OnClientClick="show_loading_spinner()"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' Visible='<%# Not IsSelected(Eval("RmbNo"))  %>' Width="100%" OnClientClick="show_loading_spinner()"></asp:LinkButton>
                                                             </td>
                                                             <td>
                                                                 <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsSelected(Eval("RmbNo")) %>' />
@@ -860,8 +870,8 @@
                                                                 <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
                                                             </td>
                                                             <td align="left" width="100%">
-                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Bold="true" Font-Size="9pt" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>' Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' Width="100%"></asp:LinkButton>
-                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Size="10pt" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>' Visible='<%# Not IsAdvSelected(Eval("AdvanceId"))  %>' Width="100%"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Bold="true" Font-Size="9pt" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>' Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' Width="100%" OnClientClick="show_loading_spinner()"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Size="10pt" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>' Visible='<%# Not IsAdvSelected(Eval("AdvanceId"))  %>' Width="100%" OnClientClick="show_loading_spinner()"></asp:LinkButton>
                                                             </td>
                                                             <td>
                                                                 <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' />
@@ -918,8 +928,8 @@
                                                                 <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
                                                             </td>
                                                             <td align="left" width="100%">
-                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Bold="true" Font-Size="9pt" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' Visible='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
-                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' Visible='<%# Not IsSelected(Eval("RmbNo"))  %>' Width="100%"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Bold="true" Font-Size="9pt" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' Visible='<%# IsSelected(Eval("RmbNo")) %>' Width="100%" OnClientClick="show_loading_spinner()"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' Visible='<%# Not IsSelected(Eval("RmbNo"))  %>' Width="100%" OnClientClick="show_loading_spinner()"></asp:LinkButton>
                                                             </td>
                                                             <td>
                                                                 <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsSelected(Eval("RmbNo")) %>' />
@@ -936,8 +946,8 @@
                                                                 <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
                                                             </td>
                                                             <td align="left" width="100%">
-                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Bold="true" Font-Size="9pt" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>' Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' Width="100%"></asp:LinkButton>
-                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Size="10pt" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>' Visible='<%# Not IsAdvSelected(Eval("AdvanceId"))  %>' Width="100%"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Bold="true" Font-Size="9pt" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>' Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' Width="100%" OnClientClick="show_loading_spinner()"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Size="10pt" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>' Visible='<%# Not IsAdvSelected(Eval("AdvanceId"))  %>' Width="100%" OnClientClick="show_loading_spinner()"></asp:LinkButton>
                                                             </td>
                                                             <td>
                                                                 <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' />
@@ -1020,6 +1030,7 @@
                                 </ContentTemplate>
                                 <Triggers>
                                     <asp:PostBackTrigger ControlID="tvAllProcessed" />
+                                    <asp:PostBackTrigger ControlID="tvTeamProcessed" />
                                 </Triggers>
                             </asp:UpdatePanel>
                         </div>
@@ -1039,10 +1050,10 @@
                                                 <tr valign="middle">
                                                     <td width="100%">
                                                         <asp:LinkButton ID="LinkButton3" runat="server" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>'
-                                                            CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Bold="true" Font-Size="9pt"
-                                                            Visible='<%# IsSelected(Eval("RmbNo")) %>'></asp:LinkButton>
-                                                        <asp:LinkButton ID="LinkButton2" runat="server" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>'
-                                                            CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Visible='<%# Not IsSelected(Eval("RmbNo"))  %>'></asp:LinkButton>
+                                                            CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Bold="true" Font-Size="9pt" 
+                                                            Visible='<%# IsSelected(Eval("RmbNo")) %>' OnClientClick="show_loading_spinner()"></asp:LinkButton>
+                                                        <asp:LinkButton ID="LinkButton2" runat="server" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' 
+                                                            CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Visible='<%# Not IsSelected(Eval("RmbNo"))  %>' OnClientClick="show_loading_spinner()"></asp:LinkButton>
                                                     </td>
                                                     <td>
                                                         <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsSelected(Eval("RmbNo")) %>' />
@@ -1756,16 +1767,10 @@
                             </td>
                         </tr>
                     </table>
-                    <asp:Button ID="btnCreate" runat="server" resourcekey="btnCreate" UseSubmitBehavior="false"
+                    <asp:Button ID="btnCreate" runat="server" resourcekey="btnCreate" UseSubmitBehavior="false" OnClientClick="show_loading_spinner()"
                         class="aButton" />
                     <input id="btnCancel2" type="button" value='<%= Translate("btnCancel") %>' onclick="closePopup2();"
                         class="aButton" />
-                    <asp:UpdateProgress ID="UpdateProgress2" runat="server" DisplayAfter="0" DynamicLayout="true"
-                        AssociatedUpdatePanelID="UpdatePanel3">
-                        <ProgressTemplate>
-                            <asp:Image ID="updating2" ImageUrl="~/Images/progressbar2.gif" runat="server" />
-                        </ProgressTemplate>
-                    </asp:UpdateProgress>
                 </ContentTemplate>
                 <Triggers>
                     <%-- <asp:AsyncPostBackTrigger ControlID="btnCreate" EventName="Click" />--%>
@@ -1773,6 +1778,7 @@
                 </Triggers>
             </asp:UpdatePanel>
         </div>
+ 
     </div>
     <div id="divSignin3" class="ui-widget">
         <%--Not Used?--%>

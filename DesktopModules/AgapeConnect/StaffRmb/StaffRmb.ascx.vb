@@ -431,7 +431,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         For Each rmb In TeamApproved
                             Dim rmb_node As New TreeNode()
                             Dim rmbUser = UserController.GetUserById(PortalId, rmb.UserId).DisplayName
-                            rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser)
+                            rmb_node.Text = "<span onClick='show_loading_spinner()'>" & GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser) & "</span>"
                             rmb_node.NavigateUrl = NavigateURL() & "?RmbNo=" & rmb.RMBNo
                             TeamMemberApprovedNode.ChildNodes.Add(rmb_node)
                             If IsSelected(rmb.RMBNo) Then
@@ -448,7 +448,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         For Each adv In TeamAdvApproved
                             Dim adv_node As New TreeNode()
                             Dim advUser = UserController.GetUserById(PortalId, adv.UserId).DisplayName
-                            adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate, advUser)
+                            adv_node.Text = "<span onClick='show_loading_spinner()'>" & GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate, advUser) & "</span>"
                             adv_node.NavigateUrl = NavigateURL() & "?RmbNo=" & -adv.AdvanceId
                             TeamMemberApprovedNode.ChildNodes.Add(adv_node)
                             If IsSelected(-adv.AdvanceId) Then
@@ -480,7 +480,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         For Each rmb In TeamProcessed
                             Dim rmb_node As New TreeNode()
                             Dim rmbUser = UserController.GetUserById(PortalId, rmb.UserId).DisplayName
-                            rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser)
+                            rmb_node.Text = "<span onClick='show_loading_spinner()'>" & GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser) & "</span>"
                             rmb_node.NavigateUrl = NavigateURL() & "?RmbNo=" & rmb.RMBNo
                             TeamMemberProcessedNode.ChildNodes.Add(rmb_node)
                             If IsSelected(rmb.RMBNo) Then
@@ -495,7 +495,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         For Each adv In TeamAdvProcessed
                             Dim adv_node As New TreeNode()
                             Dim advUser = UserController.GetUserById(PortalId, adv.UserId).DisplayName
-                            adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate, advUser)
+                            adv_node.Text = "<span onClick='show_loading_spinner()'>" & GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate, advUser) & "</span>"
                             adv_node.NavigateUrl = NavigateURL() & "?RmbNo=" & -adv.AdvanceId
                             TeamMemberProcessedNode.ChildNodes.Add(adv_node)
                             If IsSelected(-adv.AdvanceId) Then
@@ -594,7 +594,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     For Each rmb In rec
                         Dim rmb_node As New TreeNode()
                         Dim rmbUser = UserController.GetUserById(PortalId, rmb.UserId).DisplayName
-                        rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser)
+                        rmb_node.Text = "<span onClick='show_loading_spinner()'>" & GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser) & "</span>"
                         rmb_node.NavigateUrl = NavigateURL() & "?RmbNo=" & rmb.RMBNo
                         receipts_node.ChildNodes.Add(rmb_node)
                         If IsSelected(rmb.RMBNo) Then
@@ -609,7 +609,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     For Each rmb In nonRec
                         Dim rmb_node As New TreeNode()
                         Dim rmbUser = UserController.GetUserById(PortalId, rmb.UserId).DisplayName
-                        rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser)
+                        rmb_node.Text = "<span onClick='show_loading_spinner()'>" & GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser) & "</span>"
                         rmb_node.NavigateUrl = NavigateURL() & "?RmbNo=" & rmb.RMBNo
                         no_receipts_node.ChildNodes.Add(rmb_node)
                         If IsSelected(rmb.RMBNo) Then
@@ -620,7 +620,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     For Each adv In nonRecAdv
                         Dim adv_node As New TreeNode()
                         Dim advUser = UserController.GetUserById(PortalId, adv.UserId).DisplayName
-                        adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate, advUser)
+                        adv_node.Text = "<span onClick='show_loading_spinner()'>" & GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate, advUser) & "</span>"
                         adv_node.NavigateUrl = NavigateURL() & "?RmbNo=" & -adv.AdvanceId
                         no_receipts_node.ChildNodes.Add(adv_node)
                         If IsSelected(-adv.AdvanceId) Then
@@ -635,7 +635,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     For Each rmb In PendingDownload
                         Dim rmb_node As New TreeNode()
                         Dim rmbUser = UserController.GetUserById(PortalId, rmb.UserId).DisplayName
-                        rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser)
+                        rmb_node.Text = "<span onClick='show_loading_spinner()'>" & GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser) & "</span>"
                         rmb_node.NavigateUrl = NavigateURL() & "?RmbNo=" & rmb.RMBNo
                         pending_download_node.ChildNodes.Add(rmb_node)
                         If IsSelected(rmb.RMBNo) Then
@@ -646,7 +646,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     For Each adv In PendingDownloadAdv
                         Dim adv_node As New TreeNode()
                         Dim advUser = UserController.GetUserById(PortalId, adv.UserId).DisplayName
-                        adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate, advUser)
+                        adv_node.Text = "<span onClick='show_loading_spinner()'>" & GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate, advUser) & "</span>"
                         adv_node.NavigateUrl = NavigateURL() & "?RmbNo=" & -adv.AdvanceId
                         pending_download_node.ChildNodes.Add(adv_node)
                         If IsSelected(-adv.AdvanceId) Then
@@ -4701,11 +4701,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim newNode As New TreeNode()
                 If (type.Equals("rmb")) Then
                     Dim rmbUser = UserController.GetUserById(PortalId, row.UserId).DisplayName
-                    newNode.Text = GetRmbTitleTeamShort(row.RID, row.RmbDate, rmbUser)
+                    newNode.Text = "<span onClick='show_loading_spinner()'>" & GetRmbTitleTeamShort(row.RID, row.RmbDate, rmbUser) & "</span>"
                     newNode.NavigateUrl = NavigateURL() & "?RmbNo=" & row.RMBNo
                 Else
                     Dim advUser = UserController.GetUserById(PortalId, row.UserId).DisplayName
-                    newNode.Text = GetAdvTitleTeamShort(row.LocalAdvanceId, row.RequestDate, advUser)
+                    newNode.Text = "<span onClick='show_loading_spinner()'>" & GetAdvTitleTeamShort(row.LocalAdvanceId, row.RequestDate, advUser) & "</span>"
                     newNode.NavigateUrl = NavigateURL() & "?RmbNo=" & -row.AdvanceId
                 End If
                 submittedNode.ChildNodes.Add(newNode)
