@@ -193,4 +193,16 @@
   <data name="Electronic.Text" xml:space="preserve">
     <value>Electronic Receipt</value>
   </data>
+  <data name="lblDistance.Help" xml:space="preserve">
+    <value>Enter the distance traveled that you are being reimbursed for</value>
+  </data>
+  <data name="lblDistance.Text" xml:space="preserve">
+    <value>Distance and Units:</value>
+  </data>
+  <data name="lblDistUnit.Help" xml:space="preserve">
+    <value>Unit the above distance is measured in</value>
+  </data>
+  <data name="lblDistUnit.Text" xml:space="preserve">
+    <value>Distance Unit:</value>
+  </data>
 </root>

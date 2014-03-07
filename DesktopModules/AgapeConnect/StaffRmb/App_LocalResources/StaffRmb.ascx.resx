@@ -447,7 +447,7 @@
     <value>Reject</value>
   </data>
   <data name="AccountBalance.Text" xml:space="preserve">
-    <value>Account Balance</value>
+    <value>Account Balance:</value>
     <comment>This is a comment</comment>
   </data>
   <data name="AdvanceApproved.Text" xml:space="preserve">

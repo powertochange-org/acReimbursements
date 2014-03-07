@@ -35,8 +35,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 #Region "Page Events"
         Protected Sub Page_Load1(sender As Object, e As System.EventArgs) Handles Me.Load
             hfPortalId.Value = PortalId
+            hfStaffLogon.Value = StaffRmbFunctions.logonFromId(PortalId, UserId)
             lblMovedMenu.Visible = IsEditable
-
 
             For i As Integer = 2 To hfRows.Value
                 Dim insert As New TableRow()
@@ -965,7 +965,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     '--hidden fields
                     hfRmbNo.Value = RmbNo
                     hfChargeToValue.Value = If(Rmb.CostCenter Is Nothing, "", Rmb.CostCenter)
-                    hfAccountBalance.Value = 0.0
+                    hfAccountBalance.Value = 0
 
                     '*** ERRORS ***
                     lblWrongType.Visible = False
@@ -983,7 +983,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
                     lblAccountBalance.Text = "Unknown"
                     lblAdvanceBalance.Text = "Unknown"
-
+                    refreshAccountBalance()
+                    'System.Threading.ThreadPool.QueueUserWorkItem(AddressOf refreshAccountBalance)
 
                     '*** FORM HEADER ***
                     '--dates
@@ -4736,6 +4737,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             mainTree.ChildNodes.Add(newChild)
             Return newChild
         End Function
+
+        Private Sub refreshAccountBalance()
+            Dim accountBalance = StaffRmbFunctions.getAccountBalance(hfChargeToValue.Value, hfStaffLogon.Value)
+            Try
+                hfAccountBalance.Value = Double.Parse(accountBalance)
+            Catch
+                hfAccountBalance.Value = 0
+            End Try
+            lblAccountBalance.Text = accountBalance
+        End Sub
 
     End Class
 End Namespace

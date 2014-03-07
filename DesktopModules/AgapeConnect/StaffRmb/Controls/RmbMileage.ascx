@@ -27,24 +27,23 @@
             <td>
                 <b><dnn:Label ID="lblDistance" runat="server" ControlName="tbDistance" ResourceKey="lblDistance"   /></b>
             </td>
-            <td>
+            <td style="width:100px">
                 <asp:TextBox ID="tbDistance" runat="server" Width="90px" class="numeric"></asp:TextBox>
             </td>
+            <td>
+                <asp:DropDownList ID="ddlDistUnits" runat="server" ></asp:DropDownList>
+            </td>
+
         </tr>
 
-        <tr id="pnlDistUnits" runat="server">
-            <td><b><dnn:label id="lblDistUnits" runat="server" controlname="ddlDistUnits"  resourcekey="lblDistUnits" /></b></td>
-            <td>
-                <asp:DropDownList ID="ddlDistUnits" runat="server" AutoPostBack="true" ></asp:DropDownList>
-            </td>
-        </tr>
+
     </table>
     <asp:Label ID="ErrorLbl" runat="server" Font-Size="9pt" ForeColor="Red" />
 </ContentTemplate>
 <Triggers>
     <asp:PostBackTrigger ControlID="dtDate" />
-    <asp:PostBackTrigger ControlID="lblDistance" />
-    <asp:PostBackTrigger ControlID="ddlDistUnits" />
+    <asp:AsyncPostBackTrigger ControlID="lblDistance" />
+    <asp:AsyncPostBackTrigger ControlID="ddlDistUnits" />
 </Triggers>
 
 </asp:UpdatePanel>

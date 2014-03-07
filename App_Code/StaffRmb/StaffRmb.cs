@@ -234,36 +234,50 @@ namespace StaffRmb
             return result;
         }
 
-        static public string accountBalance(string account, string user_logon)
-        // Returns the balance of the account, or 0 if the specified user does not have View Finanicals access to the account
+        static public string getAccountBalance(string account, string user_logon)
+        // Returns the balance of the account, or "-------" if the specified user does not have View Finanicals access to the account
         {
             string postData = string.Format("_reportPath=/General/Account%20Balance&_renderFormat=CSV&_apiToken={0}&ProjectCodeSearch={1}&ExecuteAsUser={2}", Constants.getApiToken(), account, user_logon);
-            string url = "https://1chronicles/CallRptServices2012/CallRpt.aspx";
-            string result = getResultFromWebService(url, postData);
+            string url = "https://1chronicles/CallRptServicesTest/CallRpt.aspx";
+            string response = getResultFromWebService(url, postData);
+            string result = "-------";
+            Match match = Regex.Match(response, @"\""([0-9,\-\.]+)\""\r?\n?$");  //Look at digits, comma, period and minus in quotes at the end of the string.
+            if (match.Success) {
+                result = match.Groups[1].Value;
+            }
             return result;
         }
 
         static private string getResultFromWebService(string url, string postString)
         {
-            byte[] postData = Encoding.UTF8.GetBytes(postString);
-            //send request
-            WebRequest request = WebRequest.Create(url);
-            request.Method = "POST";
-            request.ContentType = "application/x-www-form-urlencoded";
-            request.ContentLength = postData.Length;
-            Stream dataStream = request.GetRequestStream();
-            dataStream.Write(postData, 0, postData.Length);
-            dataStream.Close();
-            //get response
-            WebResponse response = request.GetResponse();
-            dataStream = response.GetResponseStream();
-            StreamReader reader = new StreamReader(dataStream);
-            String response_string = reader.ReadToEnd();
-            reader.Close();
-            dataStream.Close();
-            response.Close();
+            try
+            {
+                byte[] postData = Encoding.UTF8.GetBytes(postString);
+                //send request
+                HttpWebRequest request = (HttpWebRequest) WebRequest.Create(url);
+                request.KeepAlive = false; //This and the following line are required to prevent "connection closed" problems
+                request.ProtocolVersion = HttpVersion.Version10;
+                request.Method = "POST";
+                request.ContentType = "application/x-www-form-urlencoded";
+                request.ContentLength = postData.Length;
+                Stream requestStream = request.GetRequestStream();
+                requestStream.Write(postData, 0, postData.Length);
+                requestStream.Close();
+                //get response
+                WebResponse response = request.GetResponse();
+                Stream responseStream = response.GetResponseStream();
+                StreamReader reader = new StreamReader(responseStream, Encoding.ASCII);
+                String response_string = reader.ReadToEnd();
+                reader.Close();
+                responseStream.Close();
+                response.Close();
 
-            return response_string;
+                return response_string;
+            }
+            catch (Exception e)
+            {
+                return "ERROR";
+            }
         }
 
 

@@ -714,6 +714,7 @@
     </div>
     <asp:HiddenField ID="hfNoReceiptLimit" runat="server" Value="0" />
     <asp:HiddenField ID="hfPortalId" runat="server" Value="-1" />
+    <asp:HiddenField ID="hfStaffLogon" runat="server" Value=""  />
     <asp:HiddenField ID="hfAccountingCurrency" runat="server" Value="USD" />
     <asp:HiddenField ID="hfExchangeRate" runat="server" Value="1" />
     <asp:HiddenField ID="hfOrigCurrency" runat="server" Value="" />
@@ -1352,10 +1353,10 @@
                                 </div>
                                 <div style="float:right">
                                     <asp:Button ID="btnPrint" runat="server" resourcekey="btnPrint" class="aButton" />
-                                    <asp:Button ID="btnSubmit" runat="server"  class="aButton" />
-                                    <asp:Button ID="btnApprove" runat="server" resourcekey="btnApprove" class="aButton" />
-                                    <asp:Button ID="btnProcess" runat="server" resourcekey="btnProcess" class="aButton" />
-                                    <asp:Button ID="btnUnProcess" runat="server" resourcekey="btnUnProcess" class="aButton" />
+                                    <asp:Button ID="btnSubmit" runat="server" resourcekey="btnSubmit" class="aButton" visible="false"/>
+                                    <asp:Button ID="btnApprove" runat="server" resourcekey="btnApprove" class="aButton" visible="false"/>
+                                    <asp:Button ID="btnProcess" runat="server" resourcekey="btnProcess" class="aButton" visible="false"/>
+                                    <asp:Button ID="btnUnProcess" runat="server" resourcekey="btnUnProcess" class="aButton" visible="false"/>
                                 </div>
                                 <%-- <button class="Excel" title="Download" >
                                     <asp:Label ID="Label3" runat="server" Text="Download"></asp:Label>
