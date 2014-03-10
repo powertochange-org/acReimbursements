@@ -11,7 +11,9 @@ Imports System.Web.UI.HtmlControls
 Imports System.Web.UI.WebControls
 Imports System.Web.UI.WebControls.WebParts
 Imports System.IO
+Imports System.Threading.Tasks
 Imports System.Net
+Imports System.Net.Http
 Imports DotNetNuke
 Imports DotNetNuke.Security
 Imports StaffRmb
@@ -29,7 +31,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Dim objEventLog As New DotNetNuke.Services.Log.EventLog.EventLogController
         'Dim SpouseList As IQueryable(Of StaffBroker.User)  '= AgapeStaffFunctions.SpouseIsLeader()
         Dim VAT3ist As String() = {"111X", "112X", "113", "116", "514X"}
-
 #End Region
 
 #Region "Page Events"
@@ -60,31 +61,22 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Next
         End Sub
 
-        
-
-        Private Sub Page_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Me.Init
-
-           
-
-            If Not Page.IsPostBack And Request.QueryString("RmbNo") <> "" Then
-                hfRmbNo.Value = CInt(Request.QueryString("RmbNo"))
-            End If
+        Private Async Sub Page_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Me.Init
 
             lblError.Visible = False
             If Not String.IsNullOrEmpty(Settings("NoReceipt")) Then
                 hfNoReceiptLimit.Value = Settings("NoReceipt")
             End If
 
-
-
             If Not Page.IsPostBack Then
+                If Request.QueryString("RmbNo") <> "" Then
+                    hfRmbNo.Value = CInt(Request.QueryString("RmbNo"))
+                End If
                 If Settings("isLoaded") = "" Then
                     LoadDefaultSettings()
                 End If
                 Try
                     If Not ddlBankAccount.Items.FindByValue(Settings("BankAccount")) Is Nothing Then
-
-
                         ddlBankAccount.SelectedValue = CStr(Settings("BankAccount"))
                     End If
                 Catch ex As Exception
@@ -98,9 +90,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     cbSalaries.Enabled = False
 
                 End If
-
-
-
                 hfAccountingCurrency.Value = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)
                 If hfAccountingCurrency.Value = "" Then
                     hfAccountingCurrency.Value = "USD"
@@ -210,45 +199,21 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 '  btnSettings.Visible = IsEditable
 
-
-
-
-
                 If hfRmbNo.Value <> "" Then
                     If CInt(hfRmbNo.Value) < 0 Then
-                        LoadAdv(-hfRmbNo.Value)
+                        Await LoadAdv(-hfRmbNo.Value)
                     Else
-                        LoadRmb(hfRmbNo.Value)
+                        Await LoadRmb(hfRmbNo.Value)
                     End If
                 Else
                     ltSplash.Text = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbSplash", PortalId))
+                    Await ResetMenu()
                 End If
-
-
-
-                'Dim lineTypes = From c In d.AP_StaffRmb_PortalLineTypes Where c.PortalId = PortalId Order By c.LocalName Select c.AP_Staff_RmbLineType.LineTypeId, c.LocalName
-                'ddlLineTypes.DataSource = lineTypes
-                'ddlLineTypes.DataBind()
-
-                ResetMenu()
-
-
-
-
-
-
-
             End If
-
         End Sub
+
         Protected Sub UpdatePanel2_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles UpdatePanel2.Load
-
-
-
-
             Try
-
-
                 Dim lt = From c In d.AP_Staff_RmbLineTypes Where c.LineTypeId = ddlLineTypes.SelectedValue
 
                 If lt.Count > 0 Then
@@ -258,28 +223,33 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     theControl.ID = "theControl"
                     phLineDetail.Controls.Add(theControl)
 
-
                 End If
-
-
             Catch ex As Exception
 
             End Try
-
-
-
-
         End Sub
 #End Region
 
 #Region "Loading Functions"
-        Public Sub ResetMenu()
-
+        Public Async Function ResetMenu() As Task
             Try
-                Dim MenuSize = Settings("MenuSize")
+                Dim loadBasicMenuTask = LoadBasicMenu()
+                Dim loadSupervisorMenuTask = LoadSupervisorMenu()
+                Dim loadFinanceMenuTask = LoadFinanceMenu()
 
+                Await loadBasicMenuTask
+                Await loadSupervisorMenuTask
+                Await loadFinanceMenuTask
+            Catch ex As Exception
+                lblError.Text = "Error loading Menu: " & ex.Message
+                lblError.Visible = True
+            End Try
+        End Function
+
+        Private Async Function LoadBasicMenu() As Task
+            Try
                 '*** EVERYONE SEES THIS STUFF ***
-
+                Dim MenuSize = Settings("MenuSize")
                 '--Highlight reimbursements that need more information in a bar at the top
                 Dim MoreInfo = From c In d.AP_Staff_Rmbs
                                 Where c.MoreInfoRequested = True And c.Status <> RmbStatus.Processed And c.UserId = UserId And c.PortalId = PortalId
@@ -364,7 +334,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 dlCancelled.DataSource = Cancelled
                 dlCancelled.DataBind()
 
-
                 '***APPROVERS***
 
                 '--list any unapproved reimbursements submitted to this user for approval
@@ -405,7 +374,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     divApproveHeading.Visible = False
                 End If
 
+            Catch ex As Exception
+                Throw New Exception("Error loading basic menu: " + ex.Message)
+            End Try
+        End Function
 
+        Private Async Function LoadSupervisorMenu() As Task
+            Try
                 '***SUPERVISORS***
 
                 Dim Team = StaffBrokerFunctions.GetTeam(UserId)
@@ -533,9 +508,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     tvTeamProcessed.Visible = False
                 End If
 
+            Catch ex As Exception
+                Throw New Exception("Error loading supervisor menu: " + ex.Message)
+            End Try
+        End Function
 
+        Private Async Function LoadFinanceMenu() As Task
+            Try
                 '***FINANCE DEPARTMENT***
-
+                Dim MenuSize = Settings("MenuSize")
                 Dim isFinance = IsAccounts()
                 If isFinance Then
                     Dim allStaff = StaffBrokerFunctions.GetStaff()
@@ -719,23 +700,18 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 lblApprovedDivider.Visible = (tvTeamApproved.Visible)
                 lblProcessedDivider.Visible = (tvFinance.Visible Or tvAllProcessed.Visible Or tvTeamProcessed.Visible)
                 lblYourProcessed.Visible = lblProcessedDivider.Visible
-
             Catch ex As Exception
-                lblError.Text = "Error loading Menu: " & ex.Message
-                lblError.Visible = True
+                Throw New Exception("Error loading finance menu: " + ex.Message)
             End Try
+        End Function
 
-        End Sub
-
-
-        Public Sub LoadAdv(ByVal AdvanceId As Integer)
+        Public Async Function LoadAdv(ByVal AdvanceId As Integer) As Task
             Try
-
-
                 pnlMain.Visible = False
                 pnlMainAdvance.Visible = True
                 pnlSplash.Visible = False
                 hfRmbNo.Value = -AdvanceId
+                Dim resetMenuTask = ResetMenu()
 
                 Dim q = From c In d.AP_Staff_AdvanceRequests Where c.AdvanceId = AdvanceId And c.PortalId = PortalId
 
@@ -793,7 +769,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     AdvReason.Text = q.First.RequestText
                     AdvDate.Text = Translate("AdvDate").Replace("[DATE]", q.First.RequestDate.Value.ToShortDateString)
                     If q.First.ApprovedDate Is Nothing Then
-                        updateApproversList(q.First)
+                        Await updateApproversListAsync(q.First)
                     Else
                         Dim Approver = UserController.GetUserById(PortalId, q.First.ApproverId).DisplayName
                         AdvDate.Text &= "<br />" & Translate("AdvApproved").Replace("[DATE]", q.First.ApprovedDate.Value.ToShortDateString).Replace("[STAFFNAME]", Approver)
@@ -928,15 +904,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Else
                         pnlAdvPeriodYear.Visible = False
                     End If
-
                     AdvAmount.Enabled = btnAdvSave.Visible
                 End If
+                Await resetMenuTask
             Catch ex As Exception
                 lblError.Text = "Error loading Advance: " & ex.Message
                 lblError.Visible = True
             End Try
-        End Sub
-
+        End Function
 
         Public Sub SetYear(ByRef ddlYearIn As DropDownList, ByVal selectedYear As Integer?)
             ddlYearIn.Items.Clear()
@@ -956,7 +931,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
         End Sub
 
-        Public Sub LoadRmb(ByVal RmbNo As Integer)
+        Public Async Function LoadRmb(ByVal RmbNo As Integer) As Task
 
             pnlMain.Visible = True
             pnlMainAdvance.Visible = False
@@ -967,6 +942,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim q = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo
                 If q.Count > 0 Then
                     Dim Rmb = q.First
+
+                    '--hidden fields
+                    hfRmbNo.Value = RmbNo
+                    Dim resetMenuTask = ResetMenu()
+                    hfChargeToValue.Value = If(Rmb.CostCenter Is Nothing, "", Rmb.CostCenter)
+                    hfAccountBalance.Value = 0
+
+                    Dim updateApproversListTask As Task = updateApproversListAsync(Rmb)
+                    Dim refreshAccountBalanceTask As Task = refreshAccountBalanceAsync()
 
                     Dim DRAFT = Rmb.Status = RmbStatus.Draft
                     Dim MORE_INFO = Rmb.MoreInfoRequested
@@ -996,12 +980,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         Return
                     End If
 
-                    updateApproversList(Rmb)
                     SetYear(ddlYear, Rmb.Year)
-                    '--hidden fields
-                    hfRmbNo.Value = RmbNo
-                    hfChargeToValue.Value = If(Rmb.CostCenter Is Nothing, "", Rmb.CostCenter)
-                    hfAccountBalance.Value = 0
 
                     '*** ERRORS ***
                     lblWrongType.Visible = False
@@ -1019,8 +998,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
                     lblAccountBalance.Text = "Unknown"
                     lblAdvanceBalance.Text = "Unknown"
-                    refreshAccountBalance()
-                    'System.Threading.ThreadPool.QueueUserWorkItem(AddressOf refreshAccountBalance)
 
                     '*** FORM HEADER ***
                     '--dates
@@ -1130,6 +1107,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         End If
                     End If
 
+                    Await updateApproversListTask
+                    Await refreshAccountBalanceTask
+                    Await resetMenuTask
                 Else
                     pnlMain.Visible = False
                     pnlSplash.Visible = True
@@ -1140,16 +1120,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 lblError.Visible = True
             End Try
 
-        End Sub
+        End Function
 
-        Private Sub updateApproversList(ByRef obj As Object)
+        Private Async Function updateApproversListAsync(ByVal obj As Object) As Task
             Dim approvers As Object
             Dim approverId = -1
             If (obj.GetType() Is GetType(AP_Staff_Rmb)) Then
-                approvers = StaffRmbFunctions.getApprovers(obj, Nothing, Nothing)
+                approvers = Await StaffRmbFunctions.getApproversAsync(obj, Nothing, Nothing)
                 approverId = obj.ApprUserId
             Else
-                approvers = StaffRmbFunctions.getAdvApprovers(obj, 0D, Nothing, Nothing)
+                approvers = Await StaffRmbFunctions.getAdvApproversAsync(obj, 0D, Nothing, Nothing)
                 approverId = obj.ApproverId
             End If
 
@@ -1170,7 +1150,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 ddlApprovedBy.SelectedValue = -1
                 lblApprovedBy.Text = "[NOBODY]"
             End Try
-        End Sub
+        End Function
 #End Region
 
 #Region "Button Events"
@@ -1782,7 +1762,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             End If
         End Sub
-        Protected Sub btnDelete_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnDelete.Click
+        Protected Async Sub btnDelete_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnDelete.Click
 
             Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value
             If rmb.Count > 0 Then
@@ -1791,7 +1771,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
 
                 If rmb.First.UserId = UserId Then
-                    LoadRmb(hfRmbNo.Value)
+                    Dim LoadRmbTask = LoadRmb(hfRmbNo.Value)
                     ResetMenu()
 
                     Dim t As Type = btnDelete.GetType()
@@ -1803,6 +1783,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ScriptManager.RegisterStartupScript(btnDelete, t, "select4", sb.ToString, False)
                     btnDelete.Visible = False
                     Log(rmb.First.RMBNo, "CANCELLED by owner")
+                    Await LoadRmbTask
                 Else
                     'Send an email to the end user
                     Dim Message = ""
@@ -1864,7 +1845,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         End Sub
 
-        Protected Sub btnApprove_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnApprove.Click
+        Protected Async Sub btnApprove_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnApprove.Click
             Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value
             If rmb.Count > 0 Then
 
@@ -1878,7 +1859,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 'SEND EMAIL TO OTHER APPROVERS
                 Dim Auth = UserController.GetUserById(PortalId, Settings("AuthUser"))
                 Dim AuthAuth = UserController.GetUserById(PortalId, Settings("AuthAuthUser"))
-                Dim myApprovers = StaffRmbFunctions.getApprovers(rmb.First, Auth, AuthAuth)
+                Dim myApprovers = Await StaffRmbFunctions.getApproversAsync(rmb.First, Auth, AuthAuth)
                 Dim SpouseId As Integer = StaffBrokerFunctions.GetSpouseId(rmb.First.UserId)
 
                 Dim ObjAppr As UserInfo = UserController.GetUserById(PortalId, Me.UserId)
@@ -1951,8 +1932,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
         End Sub
 
-        Protected Sub btnSave_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSave.Click, btnSaveAdv.Click
+        Protected Async Sub btnSave_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSave.Click, btnSaveAdv.Click
             Dim RmbNo = CInt(hfRmbNo.Value)
+            Dim rmbLoadTask = LoadRmb(RmbNo)
 
             Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo And c.PortalId = PortalId
             lblAdvError.Text = ""
@@ -1994,7 +1976,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 d.SubmitChanges()
             End If
-            LoadRmb(hfRmbNo.Value)
+            Await rmbLoadTask
 
         End Sub
 
@@ -2556,14 +2538,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
 
         End Sub
-        Protected Sub dlApproved_ItemCommand(ByVal source As Object, ByVal e As System.Web.UI.WebControls.DataListCommandEventArgs) Handles dlProcessed.ItemCommand, dlAdvProcessed.ItemCommand, dlApproved.ItemCommand, dlCancelled.ItemCommand, dlToApprove.ItemCommand, dlSubmitted.ItemCommand, dlPending.ItemCommand, dlAdvApproved.ItemCommand, dlAdvSubmitted.ItemCommand, dlAdvToApprove.ItemCommand, dlAdvApproved.ItemCommand
+        Protected Async Sub dlApproved_ItemCommand(ByVal source As Object, ByVal e As System.Web.UI.WebControls.DataListCommandEventArgs) Handles dlProcessed.ItemCommand, dlAdvProcessed.ItemCommand, dlApproved.ItemCommand, dlCancelled.ItemCommand, dlToApprove.ItemCommand, dlSubmitted.ItemCommand, dlPending.ItemCommand, dlAdvApproved.ItemCommand, dlAdvSubmitted.ItemCommand, dlAdvToApprove.ItemCommand, dlAdvApproved.ItemCommand
 
             If e.CommandName = "Goto" Then
-                LoadRmb(e.CommandArgument)
-                ResetMenu()
+                Await LoadRmb(e.CommandArgument)
             ElseIf e.CommandName = "GotoAdvance" Then
-                LoadAdv(e.CommandArgument)
-                ResetMenu()
+                Await LoadAdv(e.CommandArgument)
             End If
         End Sub
 
@@ -2595,7 +2575,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
 
         End Sub
-        Protected Sub tbChargeTo_ValueChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles tbChargeTo.TextChanged
+        Protected Async Sub tbChargeTo_ValueChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles tbChargeTo.TextChanged
             'The User selected a new cost centre
 
             'Detect if Dept is now Personal or vica versa
@@ -2622,7 +2602,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 rmb.First.Status = RmbStatus.Draft
                 reset_menu = True
             End If
-            updateApproversList(rmb.First)
+            Await updateApproversListAsync(rmb.First)
             d.SubmitChanges()
             btnSave_Click(Me, Nothing)
             'LoadRmb(hfRmbNo.Value)
@@ -3262,7 +3242,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 StaffBrokerFunctions.EventLog("Error Resetting Expense Popup", ex.ToString, UserId)
             End Try
         End Sub
-        Protected Sub SendStaffMail(ByVal theRmb As AP_Staff_Rmb)
+        Protected Async Sub SendStaffMail(ByVal theRmb As AP_Staff_Rmb)
             Dim SpouseSpecial As Boolean = False
             Dim AmountSpecial As Boolean = False
             Dim CCMSpecial As Boolean = False
@@ -3290,7 +3270,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             'Dim Auth = UserController.GetUserById(PortalId, Settings("AuthUser"))
             'Dim AuthAuth = UserController.GetUserById(PortalId, Settings("AuthAuthUser"))
-            Dim myApprovers = StaffRmbFunctions.getApprovers(theRmb, Nothing, Nothing)
+            Dim myApprovers = Await StaffRmbFunctions.getApproversAsync(theRmb, Nothing, Nothing)
             ' Dim message As String = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbConfirmation", PortalId))
             Dim message As String = StaffBrokerFunctions.GetTemplate("RmbConfirmation", PortalId)
 
@@ -3864,7 +3844,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 #End Region
 
 
-        Protected Sub btnAdvanceRequest_Click(sender As Object, e As System.EventArgs) Handles btnAdvanceRequest.Click
+        Protected Async Sub btnAdvanceRequest_Click(sender As Object, e As System.EventArgs) Handles btnAdvanceRequest.Click
             Dim insert As New AP_Staff_AdvanceRequest
             insert.Error = False
             insert.ErrorMessage = ""
@@ -3885,7 +3865,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim Auth = UserController.GetUserById(PortalId, Settings("AuthUser"))
             Dim AuthAuth = UserController.GetUserById(PortalId, Settings("AuthAuthUser"))
 
-            Dim myApprovers = StaffRmbFunctions.getAdvApprovers(insert, Settings("TeamLeaderLimit"), Nothing, Nothing)
+            Dim myApprovers = Await StaffRmbFunctions.getAdvApproversAsync(insert, Settings("TeamLeaderLimit"), Nothing, Nothing)
             'Dim ConfMessage As String = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("AdvConfirmation", PortalId))
             Dim ConfMessage As String = StaffBrokerFunctions.GetTemplate("AdvConfirmation", PortalId)
             ConfMessage = ConfMessage.Replace("[STAFFNAME]", UserInfo.DisplayName).Replace("[ADVNO]", insert.LocalAdvanceId)
@@ -3943,7 +3923,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         End Function
 
-        Protected Sub btnAdvApprove_Click(sender As Object, e As System.EventArgs) Handles btnAdvApprove.Click
+        Protected Async Sub btnAdvApprove_Click(sender As Object, e As System.EventArgs) Handles btnAdvApprove.Click
             btnAdvSave_Click(Me, Nothing)
             Dim q = From c In d.AP_Staff_AdvanceRequests Where c.AdvanceId = -CInt(hfRmbNo.Value) And c.PortalId = PortalId
             If q.Count > 0 Then
@@ -3959,7 +3939,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     Dim Auth = UserController.GetUserById(PortalId, Settings("AuthUser"))
                     Dim AuthAuth = UserController.GetUserById(PortalId, Settings("AuthAuthUser"))
-                    Dim myApprovers = StaffRmbFunctions.getAdvApprovers(q.First, Settings("TeamLeaderLimit"), Auth, AuthAuth)
+                    Dim myApprovers = Await StaffRmbFunctions.getAdvApproversAsync(q.First, Settings("TeamLeaderLimit"), Auth, AuthAuth)
                     Dim SpouseId As Integer = StaffBrokerFunctions.GetSpouseId(q.First.UserId)
 
                     Dim ObjAppr As UserInfo = UserController.GetUserById(PortalId, Me.UserId)
@@ -4167,8 +4147,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Public Function GetProfileImage(ByVal UserId As Integer) As String
             Dim username = UserController.GetUserById(PortalId, UserId).Username
-			username = Left(username, Len(username) - 1)
-			Return "https://staff.powertochange.org/custom-pages/webService.php?type=staff_photo&api_token=V7qVU7n59743KNVgPdDMr3T8&staff_username=" + username
+            username = Left(username, Len(username) - 1)
+            Return "https://staff.powertochange.org/custom-pages/webService.php?type=staff_photo&api_token=V7qVU7n59743KNVgPdDMr3T8&staff_username=" + username
         End Function
 
         Protected Sub cbMoreInfo_CheckedChanged(sender As Object, e As System.EventArgs) Handles cbMoreInfo.CheckedChanged
@@ -4774,15 +4754,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Return newChild
         End Function
 
-        Private Sub refreshAccountBalance()
-            Dim accountBalance = StaffRmbFunctions.getAccountBalance(hfChargeToValue.Value, hfStaffLogon.Value)
+        Private Async Function refreshAccountBalanceAsync() As Task
+            Dim accountBalance = Await StaffRmbFunctions.getAccountBalanceAsync(hfChargeToValue.Value, hfStaffLogon.Value)
             Try
                 hfAccountBalance.Value = Double.Parse(accountBalance)
             Catch
                 hfAccountBalance.Value = 0
             End Try
             lblAccountBalance.Text = accountBalance
-        End Sub
+        End Function
 
     End Class
 End Namespace

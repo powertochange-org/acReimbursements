@@ -10,6 +10,7 @@ using System.Web.Services;
 using System.Web.Services.Protocols;
 using DotNetNuke.Entities.Users;
 using System.Text;
+using System.Threading.Tasks;
 
 /// <summary>
 /// Summary description for StaffRmb
@@ -41,7 +42,7 @@ namespace StaffRmb
         public const int Approved = 2;
         public const int Processed = 3;
         public const int Cancelled = 4;
-        //public const int MoreInfo = 5; //replaced by rmb.moreinforequested flag
+        public const int MoreInfo = 5; 
         public const int PendingDownload = 10;
         public const int DownloadFailed = 20;
         static public string StatusName(int StatusNo)
@@ -53,7 +54,7 @@ namespace StaffRmb
                 case 2: return "Approved";
                 case 3: return "Processed";
                 case 4: return "Cancelled";
-                //case 5: return "MoreInfo";
+                case 5: return "MoreInfo";
                 case 10: return "PendingDownload";
                 case 20: return "DownloadFailed";
                 
@@ -110,7 +111,7 @@ namespace StaffRmb
         }
 
 
-        static public Approvers getApprovers(AP_Staff_Rmb rmb, DotNetNuke.Entities.Users.UserInfo authUser, DotNetNuke.Entities.Users.UserInfo authAuthUser)
+        static public async Task<Approvers> getApproversAsync(AP_Staff_Rmb rmb, DotNetNuke.Entities.Users.UserInfo authUser, DotNetNuke.Entities.Users.UserInfo authAuthUser)
         {
             String staff_logon = logonFromId(rmb.PortalId, rmb.UserId);
             String spouse_logon = logonFromId(rmb.PortalId, StaffBrokerFunctions.GetSpouseId(rmb.UserId));
@@ -127,13 +128,13 @@ namespace StaffRmb
             string[] potential_approvers = null;
             if (isStaffAccount(rmb.CostCenter))
             {
-                potential_approvers = combineArrays(managersInDepartment(staff_logon), managersInDepartment(spouse_logon));
+                potential_approvers = combineArrays(await managersInDepartmentAsync(staff_logon), await managersInDepartmentAsync(spouse_logon));
             }
             else //ministry account
             {
                 result.isDept = true;
                 Decimal amount = (from line in rmb.AP_Staff_RmbLines select line.GrossAmount).Sum();
-                potential_approvers = staffWithSigningAuthority(rmb.CostCenter, amount);
+                potential_approvers = await staffWithSigningAuthorityAsync(rmb.CostCenter, amount);
             }
 
             foreach (String potential_approver in potential_approvers) {
@@ -144,7 +145,7 @@ namespace StaffRmb
             return result;
         }
 
-        static public Approvers getAdvApprovers(AP_Staff_AdvanceRequest adv, Double largeTransaction, DotNetNuke.Entities.Users.UserInfo authUser, DotNetNuke.Entities.Users.UserInfo authAuthUser)
+        static public async Task<Approvers> getAdvApproversAsync(AP_Staff_AdvanceRequest adv, Double largeTransaction, DotNetNuke.Entities.Users.UserInfo authUser, DotNetNuke.Entities.Users.UserInfo authAuthUser)
         {
             String staff_logon = logonFromId(adv.PortalId , (int)adv.UserId);
             String spouse_logon = logonFromId(adv.PortalId, StaffBrokerFunctions.GetSpouseId((int)adv.UserId));
@@ -158,7 +159,7 @@ namespace StaffRmb
 
             string[] potential_approvers = null;
             Decimal amount = (Decimal)adv.RequestAmount;
-            potential_approvers = staffWithSigningAuthority(personalCostCenter((int)adv.UserId), amount);
+            potential_approvers = await staffWithSigningAuthorityAsync(personalCostCenter((int)adv.UserId), amount);
             foreach (String potential_approver in potential_approvers)
             {
                 if (!(potential_approver.Equals(staff_logon) || potential_approver.Equals(spouse_logon)))
@@ -197,49 +198,49 @@ namespace StaffRmb
             return false;
         }
 
-        static private string[] managersInDepartment(string logon)
+        static private async Task<string[]> managersInDepartmentAsync(string logon)
         // Returns a list of staff who supervise other staff in the same department.
         {
             if (logon.Equals("")) return new string[0];
             string postData = string.Format("logon={0}", logon);
             string url = "https://staffapps.powertochange.org/AuthManager/webservice/get_department_supervisors";
-            string result = getResultFromWebService(url, postData);
+            string result = await getResultFromWebServiceAsync(url, postData);
             return JsonConvert.DeserializeObject<string[]>(result);
         }
 
-        static private string[] staffWithSigningAuthority(string account, Decimal amount)
+        static private async Task<string[]> staffWithSigningAuthorityAsync(string account, Decimal amount)
         // Returns a list of staff with signing authority for a certain amount or greater on a given account
         {
             string postData = string.Format("account={0}&amount={1}", account, amount);
             string url = "https://staffapps.powertochange.org/AuthManager/webservice/get_signatories";
-            string result = getResultFromWebService(url, postData);
+            string result = await getResultFromWebServiceAsync(url, postData);
             return JsonConvert.DeserializeObject<string[]>(result);
         }
 
-        static public string[] staffWhoReportTo(string logon, Boolean directly)
+        static public async Task<string[]> staffWhoReportToAsync(string logon, Boolean directly)
         // Returns a list of staff who report (either directly or indirectly) to the given user
         {
             string postData = string.Format("logon={0}&directly{1}", logon, directly);
             string url = "https://staffapps.powertochange.org/Authmanager/webservice/get_subordinates";
-            string result = getResultFromWebService(url, postData);
+            string result = await getResultFromWebServiceAsync(url, postData);
             return JsonConvert.DeserializeObject<string[]>(result);
         }
 
-        static public string getAccounts(string logon)
+        static public async Task<string> getAccountsAsync(string logon)
         // Returns a list of all accounts, provided the given logon is valid (using checkAuthorizations where user==logon)
         {
             string postData = string.Format("logon={0}", logon);
             string url = "https://staffapps.powertochange.org/Authmanager/webservice/get_accounts";
-            string result = getResultFromWebService(url, postData);
+            string result = await getResultFromWebServiceAsync(url, postData);
             return result;
         }
 
-        static public string getAccountBalance(string account, string user_logon)
+        static public async Task<string> getAccountBalanceAsync(string account, string user_logon)
         // Returns the balance of the account, or "-------" if the specified user does not have View Finanicals access to the account
         {
             string postData = string.Format("_reportPath=/General/Account%20Balance&_renderFormat=CSV&_apiToken={0}&ProjectCodeSearch={1}&ExecuteAsUser={2}", Constants.getApiToken(), account, user_logon);
             string url = "https://1chronicles/CallRptServicesTest/CallRpt.aspx";
-            string response = getResultFromWebService(url, postData);
+            string response = await getResultFromWebServiceAsync(url, postData);
             string result = "-------";
             Match match = Regex.Match(response, @"\""([0-9,\-\.]+)\""\r?\n?$");  //Look at digits, comma, period and minus in quotes at the end of the string.
             if (match.Success) {
@@ -248,7 +249,7 @@ namespace StaffRmb
             return result;
         }
 
-        static private string getResultFromWebService(string url, string postString)
+        static private async Task<string> getResultFromWebServiceAsync(string url, string postString)
         {
             try
             {
@@ -264,10 +265,10 @@ namespace StaffRmb
                 requestStream.Write(postData, 0, postData.Length);
                 requestStream.Close();
                 //get response
-                WebResponse response = request.GetResponse();
+                WebResponse response = await request.GetResponseAsync();
                 Stream responseStream = response.GetResponseStream();
                 StreamReader reader = new StreamReader(responseStream, Encoding.ASCII);
-                String response_string = reader.ReadToEnd();
+                String response_string = await reader.ReadToEndAsync();
                 reader.Close();
                 responseStream.Close();
                 response.Close();

@@ -629,8 +629,9 @@
    }
 
     function setUpAutocomplete() {
+        var costcenters=<%=StaffRmb.StaffRmbFunctions.getCostCentres()%>
         $("#<%= tbChargeTo.ClientID%>").autocomplete({
-            source:<%=StaffRmb.StaffRmbFunctions.getCostCentres()%>, 
+            source: costcenters,
             select: function(event, ui) {
                 $('#<%= tbChargeTo.ClientID%>').val(ui.item.value).change();
                 $('#<%= hfChargeToValue.ClientID%>').val(ui.item.value);
@@ -647,7 +648,7 @@
             minLength: 2
         });
         $("#<%= tbNewChargeTo.ClientID%>").autocomplete({
-            source:<%=StaffRmb.StaffRmbFunctions.getCostCentres()%>, 
+            source:costcenters, 
             select: function(event, ui) {
                 $('#<%= tbNewChargeTo.ClientID%>').val(ui.item.value);
             },
@@ -1348,10 +1349,10 @@
                                     </asp:LinkButton>
                                 </div>
 
-                                <div style="float:left">
+                                <div style="float:left; margin-left:20px">
                                     <asp:Button ID="addLinebtn2" runat="server" resourcekey="btnAddExpenseItem" class="aButton" />
                                 </div>
-                                <div style="float:right">
+                                <div style="float:right; margin-right:20px">
                                     <asp:Button ID="btnPrint" runat="server" resourcekey="btnPrint" class="aButton" />
                                     <asp:Button ID="btnSubmit" runat="server" resourcekey="btnSubmit" class="aButton" visible="false"/>
                                     <asp:Button ID="btnApprove" runat="server" resourcekey="btnApprove" class="aButton" visible="false"/>
