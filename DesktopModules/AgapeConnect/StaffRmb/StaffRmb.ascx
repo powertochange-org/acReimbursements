@@ -654,6 +654,13 @@
             },
             minLength: 2
         });
+        $("#<%= tbCostCenter.ClientID%>").autocomplete({
+            source:costcenters,
+            select: function(event, ui) {
+                $('#<%= tbCostCenter.ClientID%>').val(ui.item.value);
+            },
+            minLength: 2
+        });
 
     };
 
@@ -1111,7 +1118,7 @@
                                 <div style="clear: both;">
                                 </div>
                             </div>
-                            <div style="margin-top: 10px; padding: 10px;">
+                            <div style="margin-top: 10px;" class="rmb_form">
                                 <table  class="rmbHeader" width="100%">
                                     <tr class="Agape_SubTitle">
                                         <td class="hdrTitle">
@@ -1560,7 +1567,7 @@
                         <asp:HiddenField ID="hfRmbNo" runat="server" />
                     </ContentTemplate>
                     <Triggers>
-                        <asp:AsyncPostBackTrigger ControlID="btnDelete" EventName="Click" />
+                        <asp:PostBackTrigger ControlID="btnDelete"/>
                         <asp:PostBackTrigger ControlID="btnDownload" />
                         <asp:PostBackTrigger ControlID="btnAdvDownload" />
                     </Triggers>
@@ -1609,11 +1616,8 @@
                                                     Type="Int32" />
                                             </WhereParameters>
                                         </asp:LinqDataSource>
-                                        <asp:DropDownList ID="ddlCostcenter" runat="server" Width="90px" Enabled="false"
-                                            DataSourceID="dsCostCenters" DataTextField="DisplayName" DataValueField="CostCentreCode"
-                                            AppendDataBoundItems="true">
-                                            <asp:ListItem Text="" Value="" />
-                                        </asp:DropDownList>
+                                        <asp:TextBox ID="tbCostcenter" runat="server" Width="90px" Enabled="false">
+                                        </asp:TextBox>
                                         <asp:LinqDataSource ID="dsCostCenters" runat="server" ContextTypeName="StaffBroker.StaffBrokerDataContext"
                                             EntityTypeName="" OrderBy="CostCentreCode" Select="new (CostCentreCode,CostCentreCode + ' ' + '-' + ' ' + CostCentreName as DisplayName)"
                                             TableName="AP_StaffBroker_CostCenters" Where="PortalId == @PortalId">
@@ -1890,7 +1894,7 @@
 
 <div style="text-align: left">
     <a onclick="showAdvanceReq();" style="cursor:pointer">
-        <asp:Label ID="Label39" runat="server" ResourceKey="btnAdvReq" ></asp:Label>
+        <asp:Label ID="lblAdvanceRequest" runat="server" ResourceKey="btnAdvReq" ></asp:Label>
     </a>
 
     <asp:Label ID="lblMovedMenu" runat="server" Font-Size="XX-Small" Font-Italic="true" ForeColor="Gray" Text="If you are looking for Settings, Suggested Payments or Download Batched Transactions, these links have moved. Click the faint wrench/screwdriver icon at the top right corner of this module. "></asp:Label>

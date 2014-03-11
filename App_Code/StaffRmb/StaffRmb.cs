@@ -128,7 +128,9 @@ namespace StaffRmb
             string[] potential_approvers = null;
             if (isStaffAccount(rmb.CostCenter))
             {
-                potential_approvers = combineArrays(await managersInDepartmentAsync(staff_logon), await managersInDepartmentAsync(spouse_logon));
+                Task<String[]> getStaffManagersTask = managersInDepartmentAsync(staff_logon);
+                Task<String[]> getSpouseManagersTask = managersInDepartmentAsync(spouse_logon);
+                potential_approvers = combineArrays(await getStaffManagersTask, await getSpouseManagersTask);
             }
             else //ministry account
             {
@@ -172,9 +174,7 @@ namespace StaffRmb
 
         static private string[] combineArrays(string[] a1, string[] a2)
         {
-            string[] result = new string[a1.Length + a2.Length];
-            Array.Copy(a1, 0, result, 0, a1.Length);
-            Array.Copy(a2, 0, result, a1.Length, a2.Length);
+            string[] result = a1.Concat(a2).Distinct().ToArray();
             return result;
         }
 
