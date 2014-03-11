@@ -1159,9 +1159,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 #Region "Button Events"
         Protected Async Sub btnAddLine_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnAddLine.Click
 
-
             Dim ucType As Type = theControl.GetType()
-            Dim loadRmbTask = LoadRmb(hfRmbNo.Value)
 
             If btnAddLine.CommandName = "Save" Then
                 Dim theUserId = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.UserId).First
@@ -1328,7 +1326,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         theRmb.Changed = True
                     End If
                     d.SubmitChanges()
-
+                    Dim loadRmbTask = LoadRmb(hfRmbNo.Value)
                     If ElectronicReceipt And Not theFile Is Nothing Then
                         FileManager.Instance.RenameFile(theFile, "R" & hfRmbNo.Value & "L" & insert.RmbLineNo & "." & theFile.Extension)
                     End If
@@ -1551,7 +1549,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     sb.Append("<script language='javascript'>")
                     sb.Append("closePopup();")
                     sb.Append("</script>")
-                    Await loadRmbTask
+                    Await LoadRmb(hfRmbNo.Value)
                     ScriptManager.RegisterClientScriptBlock(Page, t, "", sb.ToString, False)
                 End If
             End If
@@ -1559,7 +1557,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Protected Async Sub btnCreate_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnCreate.Click
             Dim insert As New AP_Staff_Rmb
-            Dim loadRmbTask = LoadRmb(insert.RMBNo)
             If tbNewYourRef.Text = "" Then
                 insert.UserRef = Translate("Expenses")
             Else
@@ -1605,7 +1602,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             sb.Append("<script language='javascript'>")
             sb.Append("closePopup2();")
             sb.Append("</script>")
-            Await loadRmbTask
+            Await LoadRmb(insert.RMBNo)
             ScriptManager.RegisterClientScriptBlock(tbNewChargeTo, t, "", sb.ToString, False)
 
         End Sub
