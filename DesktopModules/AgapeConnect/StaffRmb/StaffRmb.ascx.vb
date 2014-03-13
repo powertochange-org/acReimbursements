@@ -37,7 +37,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 #Region "Page Events"
         Protected Sub Page_Load1(sender As Object, e As System.EventArgs) Handles Me.Load
             hfPortalId.Value = PortalId
-            hfStaffLogon.Value = StaffRmbFunctions.logonFromId(PortalId, UserId)
             lblMovedMenu.Visible = IsEditable
 
             For i As Integer = 2 To hfRows.Value
@@ -242,6 +241,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Await loadBasicMenuTask
                 Await loadSupervisorMenuTask
                 Await loadFinanceMenuTask
+
             Catch ex As Exception
                 lblError.Text = "Error loading Menu: " & ex.Message
                 lblError.Visible = True
@@ -941,18 +941,19 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             '--Set visibility and enabled attributes for different parts of the form
             '--Based on form state and user privileges
             Try
+                hfRmbNo.Value = RmbNo
+                'Dim resetMenuTask As task = ResetMenu()
+                Dim authenticateTask = StaffRmbFunctions.AuthenticateAsync(UserId, RmbNo, PortalId)
                 Dim q = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo
                 If q.Count > 0 Then
                     Dim Rmb = q.First
 
+                    Dim updateApproversListTask As Task = updateApproversListAsync(Rmb)
+                    Dim refreshAccountBalanceTask As Task = refreshAccountBalanceAsync(Rmb.CostCenter, StaffRmbFunctions.logonFromId(PortalId, UserId))
+
                     '--hidden fields
-                    hfRmbNo.Value = RmbNo
-                    Dim resetMenuTask = ResetMenu()
                     hfChargeToValue.Value = If(Rmb.CostCenter Is Nothing, "", Rmb.CostCenter)
                     hfAccountBalance.Value = 0
-
-                    Dim updateApproversListTask As Task = updateApproversListAsync(Rmb)
-                    Dim refreshAccountBalanceTask As Task = refreshAccountBalanceAsync()
 
                     Dim DRAFT = Rmb.Status = RmbStatus.Draft
                     Dim MORE_INFO = Rmb.MoreInfoRequested
@@ -974,7 +975,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim isFinance = IsAccounts() And Not isOwner
 
                     '--Ensure the user is authorized to view this reimbursement
-                    Dim RmbRel As Integer = StaffRmbFunctions.Authenticate(UserId, RmbNo, PortalId)
+                    Dim RmbRel As Integer = Await authenticateTask
                     If RmbRel = RmbAccess.Denied And Not (isApprover Or isFinance) Then
                         'Need an access denied warning
                         pnlMain.Visible = False
@@ -1053,7 +1054,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     cbMoreInfo.Checked = If(Rmb.MoreInfoRequested, Rmb.MoreInfoRequested, False)
 
                     '--buttons
-                    btnSave.Visible = Not (PROCESSING Or PROCESSED)
+                    btnSave.Style.Add(HtmlTextWriterStyle.Display, "none") '--hide, but still generate the button
+                    'btnSave.Visible = Not (PROCESSING Or PROCESSED)
                     btnSaveAdv.Visible = Not (PROCESSING Or PROCESSED)
                     btnDelete.Visible = Not (PROCESSING Or PROCESSED Or CANCELLED)
 
@@ -1089,30 +1091,32 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     '*** ADVANCES ***
 
                     pnlAdvance.Visible = (Rmb.AP_Staff_RmbLines.Count > 0) And (Not PACMode) And ENABLE_ADVANCE_FUNCTIONALITY
+                    If (ENABLE_ADVANCE_FUNCTIONALITY) Then
+                        tbAdvanceAmount.Enabled = DRAFT Or MORE_INFO Or SUBMITTED Or APPROVED
+                        tbAdvanceAmount.Text = If(Rmb.AdvanceRequest = Nothing, "", Rmb.AdvanceRequest.ToString("0.00", New CultureInfo("en-US").NumberFormat))
 
-                    tbAdvanceAmount.Enabled = DRAFT Or MORE_INFO Or SUBMITTED Or APPROVED
-                    tbAdvanceAmount.Text = If(Rmb.AdvanceRequest = Nothing, "", Rmb.AdvanceRequest.ToString("0.00", New CultureInfo("en-US").NumberFormat))
-
-                    Dim qAdvPayments = From c In ds.AP_Staff_SuggestedPayments
-                                 Where c.CostCenter.StartsWith(staff_member.CostCenter) And c.PortalId = PortalId
-                    If (qAdvPayments.Count > 0) Then
-                        If (qAdvPayments.First.AdvanceBalance IsNot Nothing) Then
-                            lblAdvanceBalance.Text = StaffBrokerFunctions.GetFormattedCurrency(PortalId, qAdvPayments.First.AdvanceBalance.Value.ToString("0.00"))
+                        Dim qAdvPayments = From c In ds.AP_Staff_SuggestedPayments
+                                     Where c.CostCenter.StartsWith(staff_member.CostCenter) And c.PortalId = PortalId
+                        If (qAdvPayments.Count > 0) Then
+                            If (qAdvPayments.First.AdvanceBalance IsNot Nothing) Then
+                                lblAdvanceBalance.Text = StaffBrokerFunctions.GetFormattedCurrency(PortalId, qAdvPayments.First.AdvanceBalance.Value.ToString("0.00"))
+                            End If
                         End If
-                    End If
 
-                    Dim qAccPayments = From c In ds.AP_Staff_SuggestedPayments
-                                 Where c.CostCenter.StartsWith(q.First.CostCenter) And c.PortalId = PortalId
-                    If (qAccPayments.Count > 0) Then
-                        If (qAccPayments.First.AccountBalance IsNot Nothing) Then
-                            lblAccountBalance.Text = StaffBrokerFunctions.GetFormattedCurrency(PortalId, qAccPayments.First.AccountBalance.Value.ToString("0.00"))
-                            hfAccountBalance.Value = qAccPayments.First.AccountBalance.Value
+                        Dim qAccPayments = From c In ds.AP_Staff_SuggestedPayments
+                                     Where c.CostCenter.StartsWith(q.First.CostCenter) And c.PortalId = PortalId
+                        If (qAccPayments.Count > 0) Then
+                            If (qAccPayments.First.AccountBalance IsNot Nothing) Then
+                                lblAccountBalance.Text = StaffBrokerFunctions.GetFormattedCurrency(PortalId, qAccPayments.First.AccountBalance.Value.ToString("0.00"))
+                                hfAccountBalance.Value = qAccPayments.First.AccountBalance.Value
+                            End If
                         End If
                     End If
 
                     Await updateApproversListTask
                     Await refreshAccountBalanceTask
-                    Await resetMenuTask
+                    'Await resetMenuTask
+                    'ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), "selectIndex", "selectIndex(" & Rmb.Status & ");", True)
                 Else
                     pnlMain.Visible = False
                     pnlSplash.Visible = True
@@ -1678,22 +1682,19 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value
             If rmb.Count > 0 Then
                 rmb.First.Status = RmbStatus.Cancelled
+                Dim submitChangesTask = SubmitChangesAsync()
                 lblStatus.Text = Translate(RmbStatus.StatusName(RmbStatus.Cancelled))
-                d.SubmitChanges()
+                btnApprove.Visible = False
+                btnDelete.Visible = False
+                'btnDelete.Style.Add(HtmlTextWriterStyle.Display, "none")
 
                 If rmb.First.UserId = UserId Then
-                    Dim t As Type = btnDelete.GetType()
-                    Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
-                    sb.Append("<script language='javascript'>")
-                    sb.Append("selectIndex(4);")
-                    sb.Append("</script>")
-                    Await ResetMenu()
-                    ScriptManager.RegisterStartupScript(btnDelete, t, "select4", sb.ToString, False)
-
-                    btnDelete.Visible = False
                     Log(rmb.First.RMBNo, "DELETED by owner")
+
+                    Await submitChangesTask
+                    Await ResetMenu()
+                    ScriptManager.RegisterStartupScript(btnDelete, btnDelete.GetType(), "select4", "selectIndex(4)", True)
                 Else
-                    Dim resetMenuTask = ResetMenu()
                     'Send an email to the end user
                     Dim Message = ""
                     Dim dr As New TemplatesDataContext
@@ -1730,19 +1731,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     Log(rmb.First.RMBNo, "DELETED")
 
-                    Dim t As Type = btnDelete.GetType()
-                    Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
-                    sb.Append("<script language='javascript'>")
-                    sb.Append("selectIndex(0);")
-                    sb.Append("</script>")
-                    Await resetMenuTask
-                    ScriptManager.RegisterStartupScript(btnDelete, t, "select0", sb.ToString, False)
+                    Await submitChangesTask
+                    Await ResetMenu()
+                    ScriptManager.RegisterStartupScript(btnDelete, btnDelete.GetType(), "select0", "selectIndex(0)", True)
 
                 End If
 
-                If btnApprove.Visible = True Then
-                    btnApprove.Visible = False
-                End If
 
             End If
 
@@ -2442,6 +2436,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                 row.CostCenter = hfChargeToValue.Value
                             End If
                         Next
+                        Await SubmitChangesAsync()
                         Await updateApproversListTask
                     End If
 
@@ -2449,7 +2444,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         rmb.First.Status = RmbStatus.Draft
                         Await ResetMenu()
                     End If
-                    d.SubmitChanges()
                     btnSave_Click(Me, Nothing)
                 End If
             Catch ex As Exception
@@ -2467,13 +2461,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Catch
                 rmb.First.ApprUserId = Nothing
             End Try
-            If (rmb.First.Status <> RmbStatus.Draft) Then
-                rmb.First.Status = RmbStatus.Draft
-            End If
+            rmb.First.Status = RmbStatus.Draft
             d.SubmitChanges()
-            Dim loadRmbTask = LoadRmb(hfRmbNo.Value)
-            btnSave_Click(Me, Nothing)
-            Await loadRmbTask
+            lblStatus.Text = Translate(RmbStatus.StatusName(RmbStatus.Draft))
+            btnDelete.Visible = True
+            Await ResetMenu()
+            ScriptManager.RegisterStartupScript(ddlApprovedBy, ddlApprovedBy.GetType(), "selectDrafts", "selectIndex(0)", True)
         End Sub
 
 
@@ -2566,6 +2559,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             ' Return Left("RMB#" & RmbNo & " " & UserController.GetUser(PortalId, UID, False).DisplayName, 24)
         End Function
+
         Public Function GetAdvTitleTeam(ByVal LocalAdvanceId As Integer, ByVal UID As Integer, ByVal RequestDate As Date) As String
             Dim Sm = UserController.GetUserById(PortalId, UID)
 
@@ -2640,7 +2634,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
 #Region "GetValues"
         Public Function getSelectedTab() As Integer
-
             If hfRmbNo.Value = "" Then
                 Return 0
             End If
@@ -2648,18 +2641,21 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim RmbNo As Integer = hfRmbNo.Value
             If RmbNo > 0 Then
 
-                Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo
-                If rmb.Count > 0 Then
-                    Select Case rmb.First.Status
-                        'Case RmbStatus.MoreInfo
-                        '    Return 0
-                        Case Is >= RmbStatus.PendingDownload
+                Try
+                    Dim rmb_status = (From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo Select c.Status).First
+                    Select Case rmb_status
+                        Case 0 To 4
+                            Return rmb_status
+                        Case 10 To 20
                             Return 2
                         Case Else
-                            Return rmb.First.Status
+                            Return 0
                     End Select
+                Catch
+                    Return 0
+                End Try
 
-                End If
+
             Else
                 'Advance
                 Dim adv = From c In d.AP_Staff_AdvanceRequests Where c.AdvanceId = -RmbNo And c.PortalId = PortalId
@@ -2912,6 +2908,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 #End Region
 
 #Region "Utilities"
+        Private Async Function SubmitChangesAsync() As Task
+            d.SubmitChanges()
+        End Function
+
         Protected Sub Log(ByVal RmbNo As Integer, ByVal Message As String)
             objEventLog.AddLog("Rmb" & RmbNo, Message, PortalSettings, UserId, Services.Log.EventLog.EventLogController.EventLogType.ADMIN_ALERT)
         End Sub
@@ -4586,8 +4586,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Return newChild
         End Function
 
-        Private Async Function refreshAccountBalanceAsync() As Task
-            Dim accountBalance = Await StaffRmbFunctions.getAccountBalanceAsync(hfChargeToValue.Value, hfStaffLogon.Value)
+        Private Async Function refreshAccountBalanceAsync(account As String, logon As String) As Task
+            Dim accountBalance = Await StaffRmbFunctions.getAccountBalanceAsync(account, logon)
             Try
                 hfAccountBalance.Value = Double.Parse(accountBalance)
             Catch

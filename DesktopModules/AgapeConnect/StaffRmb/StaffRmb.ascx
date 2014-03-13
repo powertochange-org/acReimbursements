@@ -142,17 +142,12 @@
 
 
             
-               $("#accordion h3").click(function (event) {
-                   if (stop) {
-                       event.stopImmediatePropagation();
-                       event.preventDefault();
-                       stop = false;
-                   }
-               });
-               $("#accordion").accordion({
-                   header: "> div > h3",
-                   active: <%= getSelectedTab() %>,
-			    navigate: false
+            $("#accordion h3").click(function (event) {
+                if (stop) {
+                    event.stopImmediatePropagation();
+                    event.preventDefault();
+                    stop = false;
+                }
             });
 
 
@@ -287,20 +282,19 @@
 
 
 
-
-
-
-
-
         $(document).ready(function () {
             setUpMyTabs();
             setUpAutocomplete();
-                  
+            $("#accordion").accordion({
+                header: "> div > h3",
+                active: <%= getSelectedTab() %>,
+                navigate: false
+            });
+                         
 
             Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
                 setUpMyTabs();
                 setUpAutocomplete();
-
 
             });
 
@@ -355,9 +349,7 @@
  function closeAdvanceReq()  {$("#divAdvanceReq").dialog("close");}
 
  function selectIndex(tabIndex) {
-       
-     $("#accordion").accordion("activate", tabIndex);
-        
+     $("#accordion").accordion("option", "active", tabIndex);        
      return false;
  }
 
@@ -669,7 +661,9 @@
         return true;
     }
 
-
+    function showSaveButton() {
+        $('#<%=btnSave.ClientID%>').show();
+    }
 
 </script>
 <style type="text/css">
@@ -722,7 +716,6 @@
     </div>
     <asp:HiddenField ID="hfNoReceiptLimit" runat="server" Value="0" />
     <asp:HiddenField ID="hfPortalId" runat="server" Value="-1" />
-    <asp:HiddenField ID="hfStaffLogon" runat="server" Value=""  />
     <asp:HiddenField ID="hfAccountingCurrency" runat="server" Value="USD" />
     <asp:HiddenField ID="hfExchangeRate" runat="server" Value="1" />
     <asp:HiddenField ID="hfOrigCurrency" runat="server" Value="" />
@@ -749,7 +742,7 @@
                             <a href="#" id="Tab0" class="AcHdr">
                                 <asp:Label ID="Label5" runat="server" Font-Bold="true" ResourceKey="Draft"></asp:Label></a></h3>
                         <div id="DraftPane" class="AcPane">
-                            <asp:UpdatePanel ID="UpdatePanel5" runat="server">
+                            <asp:UpdatePanel ID="UpdatePanel5" runat="server" >
                                 <ContentTemplate>
                                     <h4><asp:Label ID="lblHighlight" runat="server" class="ui-state-highlight ui-corner-all"
                                         Style="padding: 3px; display: block;" resourcekey="AccountsMode" Visible="false"></asp:Label></h4>
@@ -768,10 +761,10 @@
                                                     <td width="100%" align="left">
 
                                                         <asp:LinkButton ID="LinkButton1" runat="server" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>'
-                                                            CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Width="100%" BorderStyle="Solid" OnClientClick="show_loading_spinner()"
+                                                            CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Width="100%" BorderStyle="Solid"
                                                             BorderColor="#CCCCCC" BorderWidth="1px" Font-Bold="true" Font-Size="9pt" Visible='<%# IsSelected(Eval("RmbNo")) %>'></asp:LinkButton>
                                                         <asp:LinkButton ID="LinkButton2" runat="server" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>'
-                                                            CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Width="100%" OnClientClick="show_loading_spinner()"
+                                                            CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Width="100%" 
                                                             Visible='<%# Not IsSelected(Eval("RmbNo"))  %>'></asp:LinkButton>
                                                     </td>
                                                     <td>
@@ -783,7 +776,7 @@
                                     </asp:DataList>
                                 </ContentTemplate>
                                 <Triggers>
-                                    <asp:PostBackTrigger ControlID="dlPending" />
+                                    <asp:AsyncPostBackTrigger ControlID="dlPending" />
                                 </Triggers>
                             </asp:UpdatePanel>
                         </div>
@@ -800,7 +793,7 @@
 
                            </h3>
                             <div id="SubmittedPane">
-                                <asp:UpdatePanel ID="UpdatePanel4" runat="server">
+                                <asp:UpdatePanel ID="UpdatePanel4" runat="server" >
                                     <ContentTemplate>
                                         <asp:TreeView ID="tvAllSubmitted" class="accounts_team" runat="server" NodeIndent="10">
                                         </asp:TreeView>
@@ -816,8 +809,8 @@
                                                                 <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
                                                             </td>
                                                             <td align="left" width="100%">
-                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Bold="true" Font-Size="9pt" Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>' Visible='<%# IsSelected(Eval("RmbNo")) %>' Width="100%" OnClientClick="show_loading_spinner()"></asp:LinkButton>
-                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>' Visible='<%# Not IsSelected(Eval("RmbNo"))  %>' Width="100%" OnClientClick="show_loading_spinner()"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Bold="true" Font-Size="9pt" Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>' Visible='<%# IsSelected(Eval("RmbNo")) %>' Width="100%" ></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>' Visible='<%# Not IsSelected(Eval("RmbNo"))  %>' Width="100%"></asp:LinkButton>
                                                             </td>
                                                             <td>
                                                                 <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsSelected(Eval("RmbNo")) %>' />
@@ -836,8 +829,8 @@
                                                                 <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
                                                             </td>
                                                             <td align="left" width="100%">
-                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Bold="true" Font-Size="9pt" Text='<%# GetAdvTitleTeam(Eval("LocalAdvanceId"), Eval("UserId"), Eval("RequestDate"))  %>' Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' Width="100%" OnClientClick="show_loading_spinner()"></asp:LinkButton>
-                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Size="10pt" Text='<%# GetAdvTitleTeam(Eval("LocalAdvanceId"),Eval("UserId"),  Eval("RequestDate"))  %>' Visible='<%# Not IsAdvSelected(Eval("AdvanceId"))  %>' Width="100%" OnClientClick="show_loading_spinner()"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Bold="true" Font-Size="9pt" Text='<%# GetAdvTitleTeam(Eval("LocalAdvanceId"), Eval("UserId"), Eval("RequestDate"))  %>' Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' Width="100%"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Size="10pt" Text='<%# GetAdvTitleTeam(Eval("LocalAdvanceId"),Eval("UserId"),  Eval("RequestDate"))  %>' Visible='<%# Not IsAdvSelected(Eval("AdvanceId"))  %>' Width="100%"></asp:LinkButton>
                                                             </td>
                                                             <td>
                                                                 <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' />
@@ -861,8 +854,8 @@
                                                                 <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
                                                             </td>
                                                             <td align="left" width="100%">
-                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Bold="true" Font-Size="9pt" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' Visible='<%# IsSelected(Eval("RmbNo")) %>' Width="100%" OnClientClick="show_loading_spinner()"></asp:LinkButton>
-                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' Visible='<%# Not IsSelected(Eval("RmbNo"))  %>' Width="100%" OnClientClick="show_loading_spinner()"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Bold="true" Font-Size="9pt" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' Visible='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' Visible='<%# Not IsSelected(Eval("RmbNo"))  %>' Width="100%"></asp:LinkButton>
                                                             </td>
                                                             <td>
                                                                 <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsSelected(Eval("RmbNo")) %>' />
@@ -879,8 +872,8 @@
                                                                 <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
                                                             </td>
                                                             <td align="left" width="100%">
-                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Bold="true" Font-Size="9pt" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>' Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' Width="100%" OnClientClick="show_loading_spinner()"></asp:LinkButton>
-                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Size="10pt" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>' Visible='<%# Not IsAdvSelected(Eval("AdvanceId"))  %>' Width="100%" OnClientClick="show_loading_spinner()"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Bold="true" Font-Size="9pt" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>' Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' Width="100%"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Size="10pt" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>' Visible='<%# Not IsAdvSelected(Eval("AdvanceId"))  %>' Width="100%"></asp:LinkButton>
                                                             </td>
                                                             <td>
                                                                 <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' />
@@ -892,10 +885,10 @@
                                         </asp:Panel>
                                     </ContentTemplate>
                                     <Triggers>
-                                        <asp:PostBackTrigger ControlID="dlToApprove" />
-                                        <asp:PostBackTrigger ControlID="dlSubmitted" />
-                                        <asp:PostBackTrigger ControlID="dlAdvSubmitted" />
-                                        <asp:PostBackTrigger ControlID="dlAdvToApprove" />
+                                        <asp:AsyncPostBackTrigger ControlID="dlToApprove" />
+                                        <asp:AsyncPostBackTrigger ControlID="dlSubmitted" />
+                                        <asp:AsyncPostBackTrigger ControlID="dlAdvSubmitted" />
+                                        <asp:AsyncPostBackTrigger ControlID="dlAdvToApprove" />
                                     </Triggers>
                                 </asp:UpdatePanel>
                             </div>
@@ -915,7 +908,7 @@
                             </a>
                             </h3>
                             <div id="ApprovedPane">
-                                <asp:UpdatePanel ID="UpdatePanel6" runat="server">
+                                <asp:UpdatePanel ID="UpdatePanel6" runat="server" >
                                     <ContentTemplate>
                                         <asp:TreeView ID="tvTeamApproved" class="team_leader" runat="server" ResourceKey="TeamRmbs" NodeIndent="10">
                                         </asp:TreeView>
@@ -937,8 +930,8 @@
                                                                 <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
                                                             </td>
                                                             <td align="left" width="100%">
-                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Bold="true" Font-Size="9pt" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' Visible='<%# IsSelected(Eval("RmbNo")) %>' Width="100%" OnClientClick="show_loading_spinner()"></asp:LinkButton>
-                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' Visible='<%# Not IsSelected(Eval("RmbNo"))  %>' Width="100%" OnClientClick="show_loading_spinner()"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Bold="true" Font-Size="9pt" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' Visible='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' Visible='<%# Not IsSelected(Eval("RmbNo"))  %>' Width="100%"></asp:LinkButton>
                                                             </td>
                                                             <td>
                                                                 <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsSelected(Eval("RmbNo")) %>' />
@@ -955,8 +948,8 @@
                                                                 <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
                                                             </td>
                                                             <td align="left" width="100%">
-                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Bold="true" Font-Size="9pt" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>' Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' Width="100%" OnClientClick="show_loading_spinner()"></asp:LinkButton>
-                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Size="10pt" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>' Visible='<%# Not IsAdvSelected(Eval("AdvanceId"))  %>' Width="100%" OnClientClick="show_loading_spinner()"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton3" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Bold="true" Font-Size="9pt" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>' Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' Width="100%"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton2" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Size="10pt" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>' Visible='<%# Not IsAdvSelected(Eval("AdvanceId"))  %>' Width="100%"></asp:LinkButton>
                                                             </td>
                                                             <td>
                                                                 <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' />
@@ -967,8 +960,8 @@
                                             </asp:DataList>                   
                                         </ContentTemplate>
                                         <Triggers>
-                                            <asp:PostBackTrigger ControlID="dlApproved" />
-                                            <asp:PostBackTrigger ControlID="dlAdvApproved" />
+                                            <asp:AsyncPostBackTrigger ControlID="dlApproved" />
+                                            <asp:AsyncPostBackTrigger ControlID="dlAdvApproved" />
                                         </Triggers>
                                     </asp:UpdatePanel>             
 
@@ -986,7 +979,7 @@
                             </a>
                         </h3>
                         <div id="ProcessedPane">
-                            <asp:UpdatePanel ID="UpdatePanel7" runat="server">
+                            <asp:UpdatePanel ID="UpdatePanel7" runat="server" >
                                 <ContentTemplate>
                                     <asp:TreeView ID="tvAllProcessed" class="accounts_team" runat="server" NodeIndent="10">
                                     </asp:TreeView>
@@ -1038,8 +1031,8 @@
                                     </asp:DataList>                                
                                 </ContentTemplate>
                                 <Triggers>
-                                    <asp:PostBackTrigger ControlID="tvAllProcessed" />
-                                    <asp:PostBackTrigger ControlID="tvTeamProcessed" />
+                                    <asp:AsyncPostBackTrigger ControlID="tvAllProcessed" />
+                                    <asp:AsyncPostBackTrigger ControlID="tvTeamProcessed" />
                                 </Triggers>
                             </asp:UpdatePanel>
                         </div>
@@ -1049,7 +1042,7 @@
                             <a href="#" class="aLink">
                                 <asp:Label ID="Label9" runat="server" Font-Bold="true" ResourceKey="Cancelled"></asp:Label></a></h3>
                         <div id="CancelledPane">
-                            <asp:UpdatePanel ID="UpdatePanel8" runat="server">
+                            <asp:UpdatePanel ID="UpdatePanel8" runat="server" >
                                 <ContentTemplate>
                                     <asp:DataList ID="dlCancelled" runat="server" Width="100%">
                                         <ItemStyle CssClass="dnnGridItem" />
@@ -1060,9 +1053,9 @@
                                                     <td width="100%">
                                                         <asp:LinkButton ID="LinkButton3" runat="server" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>'
                                                             CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Bold="true" Font-Size="9pt" 
-                                                            Visible='<%# IsSelected(Eval("RmbNo")) %>' OnClientClick="show_loading_spinner()"></asp:LinkButton>
+                                                            Visible='<%# IsSelected(Eval("RmbNo")) %>'></asp:LinkButton>
                                                         <asp:LinkButton ID="LinkButton2" runat="server" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' 
-                                                            CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Visible='<%# Not IsSelected(Eval("RmbNo"))  %>' OnClientClick="show_loading_spinner()"></asp:LinkButton>
+                                                            CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Visible='<%# Not IsSelected(Eval("RmbNo"))  %>'></asp:LinkButton>
                                                     </td>
                                                     <td>
                                                         <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsSelected(Eval("RmbNo")) %>' />
@@ -1073,7 +1066,7 @@
                                     </asp:DataList>
                                 </ContentTemplate>
                                 <Triggers>
-                                    <asp:PostBackTrigger ControlID="dlCancelled" />
+                                    <asp:AsyncPostBackTrigger ControlID="dlCancelled" />
                                 </Triggers>
                             </asp:UpdatePanel>
                         </div>
@@ -1083,13 +1076,16 @@
             <td width="100%" style="padding-left: 20px;">
 
 
+                <asp:UpdatePanel ID="splashUpdatePanel" runat="server">
+                    <ContentTemplate>
+                        <asp:Panel ID="pnlSplash" runat="server" Visible="false">
 
-                <asp:Panel ID="pnlSplash" runat="server" Visible="false">
+                            <asp:PlaceHolder ID="PlaceHolder1" runat="server"></asp:PlaceHolder>
 
-                    <asp:PlaceHolder ID="PlaceHolder1" runat="server"></asp:PlaceHolder>
-
-                    <asp:Literal runat="server" ID="ltSplash"></asp:Literal>
-                </asp:Panel>
+                            <asp:Literal runat="server" ID="ltSplash"></asp:Literal>
+                        </asp:Panel>
+                    </ContentTemplate>
+                </asp:UpdatePanel> 
 
 
 
@@ -1152,7 +1148,7 @@
                                             <asp:Label ID="ttlApprovedBy" runat="server" resourcekey="ApprovedBy" Visible="false"></asp:Label>
                                         </td>
                                         <td class="hdrValue" rowspan="2" valign="top">
-                                            <asp:DropDownList ID="ddlApprovedBy" AutoPostBack="true" runat="server"></asp:DropDownList>
+                                            <asp:DropDownList ID="ddlApprovedBy" AutoPostBack="true" runat="server" ></asp:DropDownList>
                                             <asp:Label ID="lblApprovedBy" runat="server" Visible="false"></asp:Label>
                                         </td>
                                         <td class="hdrTitle">
@@ -1170,7 +1166,7 @@
                                             <asp:Label ID="Label23" runat="server" resourcekey="YourRef"></asp:Label>
                                         </td>
                                         <td class="hdrValue">
-                                            <asp:TextBox ID="tbYouRef" runat="server" Width="150px"></asp:TextBox>
+                                            <asp:TextBox ID="tbYouRef" runat="server" Width="150px" onChange="showSaveButton();"></asp:TextBox>
                                         </td>
                                         <td id="pnlPeriodYear" runat="server" colspan="2" style="white-space: nowrap; color: Gray;">
                                             <asp:Label ID="Label24" runat="server" resourcekey="Period"></asp:Label>
@@ -1203,7 +1199,8 @@
                                                     <asp:Label ID="ttlYourComments" runat="server" resourcekey="YourComments" Visible="false" /><asp:Label
                                                         ID="ttlUserComments" runat="server" Text="User's Comments" /></legend>
                                                 <asp:Label ID="lblComments" runat="server" Height="60px" Visible="false"></asp:Label>
-                                                <asp:TextBox ID="tbComments" runat="server" Height="55px" TextMode="MultiLine" Width="100%"></asp:TextBox>
+                                                <asp:TextBox ID="tbComments" runat="server" Height="55px" TextMode="MultiLine" Width="100%"
+                                                    onChange="showSaveButton();"></asp:TextBox>
                                             </fieldset>
                                         </td>
                                         <td colspan="2" style="font-size: 8pt; width: 33%;">
@@ -1212,7 +1209,7 @@
                                                     <asp:Label ID="Label26" runat="server" resourcekey="ApproversComments"></asp:Label></legend>
                                                 <asp:Label ID="lblApprComments" runat="server" Height="60px"></asp:Label>
                                                 <asp:TextBox ID="tbApprComments" runat="server" Height="35px" TextMode="MultiLine"
-                                                    Width="100%" Visible="false"></asp:TextBox>
+                                                    Width="100%" Visible="false"  onChange="showSaveButton();"></asp:TextBox>
                                                 <asp:CheckBox ID="cbApprMoreInfo" runat="server" AutoPostBack="true" resourcekey="btnMoreInfo" />
                                             </fieldset>
                                         </td>
@@ -1222,7 +1219,7 @@
                                                     <asp:Label ID="Label27" runat="server" resourcekey="AccountsComments"></asp:Label></legend>
                                                 <asp:Label ID="lblAccComments" runat="server" Height="60px"></asp:Label>
                                                 <asp:TextBox ID="tbAccComments" runat="server" Height="35px" TextMode="MultiLine" Width="100%"
-                                                    Visible="false"></asp:TextBox>
+                                                    Visible="false"  onChange="showSaveButton();"></asp:TextBox>
                                                 <asp:CheckBox ID="cbMoreInfo" runat="server" AutoPostBack="true" resourcekey="btnMoreInfo" />
                                             </fieldset>
                                         </td>
@@ -1567,7 +1564,6 @@
                         <asp:HiddenField ID="hfRmbNo" runat="server" />
                     </ContentTemplate>
                     <Triggers>
-                        <asp:PostBackTrigger ControlID="btnDelete"/>
                         <asp:PostBackTrigger ControlID="btnDownload" />
                         <asp:PostBackTrigger ControlID="btnAdvDownload" />
                     </Triggers>
