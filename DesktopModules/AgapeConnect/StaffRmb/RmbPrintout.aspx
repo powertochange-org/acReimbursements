@@ -1,4 +1,4 @@
-﻿<%@ Page Language="VB" AutoEventWireup="false" CodeFile="RmbPrintout.aspx.vb" Inherits="DesktopModules_StaffRmb_RmbPrintout" %>
+﻿<%@ Page Language="VB" AutoEventWireup="false" CodeFile="RmbPrintout.aspx.vb" Async="true" Inherits="DesktopModules_StaffRmb_RmbPrintout" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 

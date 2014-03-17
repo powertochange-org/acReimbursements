@@ -280,16 +280,20 @@
 
         }
 
-
-
-        $(document).ready(function () {
-            setUpMyTabs();
-            setUpAutocomplete();
+        function setUpAccordion() {
             $("#accordion").accordion({
                 header: "> div > h3",
                 active: <%= getSelectedTab() %>,
                 navigate: false
             });
+        }
+
+
+
+        $(document).ready(function () {
+            setUpMyTabs();
+            setUpAutocomplete();
+            setUpAccordion();
                          
 
             Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
@@ -662,6 +666,7 @@
     }
 
     function showSaveButton() {
+        $('#<%=btnSave.ClientId%>').prop('value', '<%=Translate("btnSave")%>');
         $('#<%=btnSave.ClientID%>').show();
     }
 
@@ -1166,7 +1171,7 @@
                                             <asp:Label ID="Label23" runat="server" resourcekey="YourRef"></asp:Label>
                                         </td>
                                         <td class="hdrValue">
-                                            <asp:TextBox ID="tbYouRef" runat="server" Width="150px" onChange="showSaveButton();"></asp:TextBox>
+                                            <asp:TextBox ID="tbYouRef" runat="server" Width="150px" onKeyPress="showSaveButton();"></asp:TextBox>
                                         </td>
                                         <td id="pnlPeriodYear" runat="server" colspan="2" style="white-space: nowrap; color: Gray;">
                                             <asp:Label ID="Label24" runat="server" resourcekey="Period"></asp:Label>
@@ -1200,7 +1205,7 @@
                                                         ID="ttlUserComments" runat="server" Text="User's Comments" /></legend>
                                                 <asp:Label ID="lblComments" runat="server" Height="60px" Visible="false"></asp:Label>
                                                 <asp:TextBox ID="tbComments" runat="server" Height="55px" TextMode="MultiLine" Width="100%"
-                                                    onChange="showSaveButton();"></asp:TextBox>
+                                                    onKeyPress="showSaveButton();"></asp:TextBox>
                                             </fieldset>
                                         </td>
                                         <td colspan="2" style="font-size: 8pt; width: 33%;">
@@ -1219,7 +1224,7 @@
                                                     <asp:Label ID="Label27" runat="server" resourcekey="AccountsComments"></asp:Label></legend>
                                                 <asp:Label ID="lblAccComments" runat="server" Height="60px"></asp:Label>
                                                 <asp:TextBox ID="tbAccComments" runat="server" Height="35px" TextMode="MultiLine" Width="100%"
-                                                    Visible="false"  onChange="showSaveButton();"></asp:TextBox>
+                                                    Visible="false"  onKeyPress="showSaveButton();"></asp:TextBox>
                                                 <asp:CheckBox ID="cbMoreInfo" runat="server" AutoPostBack="true" resourcekey="btnMoreInfo" />
                                             </fieldset>
                                         </td>
@@ -1227,7 +1232,7 @@
                                     <tr valign="top">
                                         <td colspan="6">
                                             <asp:Button ID="btnDelete" runat="server" resourcekey="btnDelete" class="aButton"  style="float:left"/>
-                                            <asp:Button ID="btnSave" runat="server" resourcekey="btnSave" class="aButton" style="float:right"/>
+                                            <asp:Button ID="btnSave" runat="server" resourcekey="btnSaved" class="aButton" style="float:right"/>
                                         </td>
                                     </tr>
                                 </table>

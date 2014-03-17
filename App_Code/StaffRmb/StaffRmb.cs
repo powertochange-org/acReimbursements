@@ -136,6 +136,7 @@ namespace StaffRmb
             {
                 result.isDept = true;
                 Decimal amount = (from line in rmb.AP_Staff_RmbLines select line.GrossAmount).Sum();
+                amount += (Decimal) 0.00; //exclude staff with "view only" signing authority ($0)
                 potential_approvers = await staffWithSigningAuthorityAsync(rmb.CostCenter, amount);
             }
 
@@ -189,7 +190,7 @@ namespace StaffRmb
             return StaffBrokerFunctions.GetStaffMember(userId).CostCenter;
         }
 
-        static private bool isStaffAccount(string account)
+        static public bool isStaffAccount(string account)
         // Returns true if account# starts with an 8 or a 9
         {
             if (account.Length != 6) return false; //must be 6 characters long

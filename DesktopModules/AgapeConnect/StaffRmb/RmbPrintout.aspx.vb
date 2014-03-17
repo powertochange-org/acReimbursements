@@ -46,7 +46,7 @@ Partial Class DesktopModules_StaffRmb_RmbPrintout
 
     End Sub
 
-    Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+    Protected Async Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim PS = CType(HttpContext.Current.Items("PortalSettings"), PortalSettings)
         Dim Cur As String = StaffBrokerFunctions.GetSetting("Currency", PS.PortalId)
 
@@ -65,9 +65,9 @@ Partial Class DesktopModules_StaffRmb_RmbPrintout
                 Dim x = mc.GetModuleByDefinition(PS.PortalId, "acStaffRmb")
                 Dim RmbSettings = x.TabModuleSettings
 
-                Dim RmbRel = StaffRmbFunctions.Authenticate(User.UserID, q.First.RMBNo, PS.PortalId)
+                Dim RmbRel = Await StaffRmbFunctions.AuthenticateAsync(User.UserID, q.First.RMBNo, PS.PortalId)
                 If RmbRel = RmbAccess.Denied And Not User.IsInRole("Administrators") And Not (User.UserID = RmbSettings("AuthUser") Or User.UserID = RmbSettings("AuthAuthUser")) Then
-                    
+
                     Dim isAccounts = False
                     For Each role In CStr(RmbSettings("AccountsRoles")).Split(";")
                         If (User.Roles().Contains(role)) Then
@@ -80,7 +80,7 @@ Partial Class DesktopModules_StaffRmb_RmbPrintout
                         Return
                     End If
                 End If
-               
+
             Else
                 pnlAccessDenied.Visible = True
                 btnLogin.Visible = True
@@ -280,7 +280,7 @@ Partial Class DesktopModules_StaffRmb_RmbPrintout
                     ER &= "<iframe style='width: 747px; height: 1000px;' src='" & DotNetNuke.Services.FileSystem.FileManager.Instance.GetUrl(theFile) & "' ></iframe>"
                 Else
                     ER &= "<img src='" & DotNetNuke.Services.FileSystem.FileManager.Instance.GetUrl(theFile) & "'/>"
-                   
+
                 End If
                 ER &= "<div style='font-style: italic; color: #AAA; font-size: small; width: 100%; text-align: center;'>" & Translate("ReceiptNo") & ": " & row.ReceiptNo
                 Dim amount = row.GrossAmount.ToString("0.00")

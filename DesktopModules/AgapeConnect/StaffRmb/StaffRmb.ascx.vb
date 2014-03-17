@@ -942,7 +942,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             '--Based on form state and user privileges
             Try
                 hfRmbNo.Value = RmbNo
-                'Dim resetMenuTask As task = ResetMenu()
+                Dim resetMenuTask As task = ResetMenu()
                 Dim authenticateTask = StaffRmbFunctions.AuthenticateAsync(UserId, RmbNo, PortalId)
                 Dim q = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo
                 If q.Count > 0 Then
@@ -1054,6 +1054,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     cbMoreInfo.Checked = If(Rmb.MoreInfoRequested, Rmb.MoreInfoRequested, False)
 
                     '--buttons
+                    btnSave.Text = Translate("btnSaved")
                     btnSave.Style.Add(HtmlTextWriterStyle.Display, "none") '--hide, but still generate the button
                     'btnSave.Visible = Not (PROCESSING Or PROCESSED)
                     btnSaveAdv.Visible = Not (PROCESSING Or PROCESSED)
@@ -1115,8 +1116,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     Await updateApproversListTask
                     Await refreshAccountBalanceTask
-                    'Await resetMenuTask
-                    'ScriptManager.RegisterStartupScript(UpdatePanel1, UpdatePanel1.GetType(), "selectIndex", "selectIndex(" & Rmb.Status & ");", True)
+                    Await resetMenuTask
                 Else
                     pnlMain.Visible = False
                     pnlSplash.Visible = True
@@ -1611,14 +1611,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         End Sub
 
-        Protected Async Sub btnSubmit_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSubmit.Click
-
+        Protected Async Function btnSubmit_Click(ByVal sender As Object, ByVal e As System.EventArgs) As Task Handles btnSubmit.Click
+            Await saveIfNecessaryAsync()
             Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value
             If rmb.Count > 0 Then
-                '--Ensure form is saved first
-                btnSave_Click(Me, Nothing)
-                Dim loadRmbTask = LoadRmb(hfRmbNo.Value)
-
                 Dim NewStatus As Integer = rmb.First.Status
                 Dim message As String = Translate("Printout")
 
@@ -1630,52 +1626,34 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     rmb.First.Locked = False
                 End If
 
-                '--DISABLED - I think rmb.moreinforequested is being used instead of the MoreInfo status now.
-                'If rmb.First.Status = RmbStatus.MoreInfo Then
-                '    NewStatus = RmbStatus.Approved
-                '    message = Translate("MoreInfo")
-                '    rmb.First.Locked = True
-                'Else
-                '    rmb.First.Locked = False
-                'End If
-
-
                 rmb.First.Status = NewStatus
-
                 rmb.First.RmbDate = Now
                 rmb.First.Period = Nothing
                 rmb.First.Year = Nothing
 
-
-                'If NewStatus = 2 Then
-                '    rmb.First.Locked = True
-                'End If
-                d.SubmitChanges()
+                Await SubmitChangesAsync()
                 'dlPending.DataBind()
                 'dlSubmitted.DataBind()
 
-
                 'Send Email to Staff Member
-                If NewStatus = 1 Then
-                    SendStaffMail(rmb.First)
+                If NewStatus = RmbStatus.Submitted Then
+                    SendApprovalEmail(rmb.First)
                 End If
                 Log(rmb.First.RMBNo, "SUBMITTED")
 
-                'Load the printout in a new window
+                Dim loadRmbTask = LoadRmb(hfRmbNo.Value)
+                'use an alert to switch back to the main window from the printout window
                 Dim t As Type = Me.GetType()
                 Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
                 sb.Append("<script language='javascript'>")
                 sb.Append("alert(""" & message & """);")
-                Await loadRmbTask
-
                 sb.Append("</script>")
+                Await loadRmbTask
                 ScriptManager.RegisterStartupScript(Page, t, "popup", sb.ToString, False)
 
-                btnSubmit.Visible = False
-                ' blockedLink.NavigateUrl = "http://www.agape.org.uk/DesktopModules/StaffRmb/RmbPrintout.aspx?RmbNo=" & hfRmbNo.Value & "&UID=" & rmb.First.UserId
-
             End If
-        End Sub
+
+        End Function
 
         Protected Async Sub btnDelete_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnDelete.Click
 
@@ -1686,7 +1664,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 lblStatus.Text = Translate(RmbStatus.StatusName(RmbStatus.Cancelled))
                 btnApprove.Visible = False
                 btnDelete.Visible = False
-                'btnDelete.Style.Add(HtmlTextWriterStyle.Display, "none")
 
                 If rmb.First.UserId = UserId Then
                     Log(rmb.First.RMBNo, "DELETED by owner")
@@ -1821,14 +1798,20 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
         End Sub
 
-        Protected Sub btnSave_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSave.Click, btnSaveAdv.Click
-            Dim RmbNo = CInt(hfRmbNo.Value)
-            Dim PortalId = CInt(hfPortalId.Value)
-            '--Dim rmbLoadTask = LoadRmb(RmbNo)
+        Protected Async Function btnSave_Click(ByVal sender As Object, ByVal e As System.EventArgs) As Task Handles btnSave.Click, btnSaveAdv.Click
+            Dim RmbNo As Integer
+            Dim PortalId As Integer
+            Try
+                RmbNo = CInt(hfRmbNo.Value)
+                PortalId = CInt(hfPortalId.Value)
+            Catch
+                Return
+            End Try
 
             Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo And c.PortalId = PortalId
             lblAdvError.Text = ""
             If rmb.Count > 0 Then
+                '--Dim rmbLoadTask = LoadRmb(RmbNo)
                 rmb.First.UserComment = tbComments.Text
                 rmb.First.UserRef = tbYouRef.Text
                 rmb.First.ApprComment = tbApprComments.Text
@@ -1864,16 +1847,17 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Return
                 End Try
 
-                d.SubmitChanges()
+                Await SubmitChangesAsync()
+                '--Await rmbLoadTask  'Don't need to reload on a save.
             End If
-            '--Await rmbLoadTask  'Don't need to reload on a save.  In fact, save should be synchronous
 
-        End Sub
+        End Function
 
-        Protected Sub addLinebtn2_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles addLinebtn2.Click
+        Protected Async Sub addLinebtn2_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles addLinebtn2.Click
 
             'ddlLineTypes_SelectedIndexChanged(Me, Nothing)
             'ddlCostcenter.SelectedValue = ddlChargeTo.SelectedValue
+            saveIfNecessaryAsync()
             tbCostcenter.Text = hfChargeToValue.Value
 
             ddlLineTypes.Items.Clear()
@@ -2444,7 +2428,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         rmb.First.Status = RmbStatus.Draft
                         Await ResetMenu()
                     End If
-                    btnSave_Click(Me, Nothing)
+                    Await SubmitChangesAsync()
                 End If
             Catch ex As Exception
                 lblError.Text = "Error in ChargeTo OnChange event: " & ex.Message
@@ -2462,10 +2446,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 rmb.First.ApprUserId = Nothing
             End Try
             rmb.First.Status = RmbStatus.Draft
-            d.SubmitChanges()
-            lblStatus.Text = Translate(RmbStatus.StatusName(RmbStatus.Draft))
-            btnDelete.Visible = True
-            Await ResetMenu()
+            Await SubmitChangesAsync()
+            If btnSubmit.Visible And rmb.First.CostCenter IsNot Nothing And rmb.First.ApprUserId IsNot Nothing AndAlso (rmb.First.CostCenter.Length = 6) And (rmb.First.ApprUserId >= 0) Then
+                btnSubmit.Enabled = True
+            End If
             ScriptManager.RegisterStartupScript(ddlApprovedBy, ddlApprovedBy.GetType(), "selectDrafts", "selectIndex(0)", True)
         End Sub
 
@@ -2487,6 +2471,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
 
         End Function
+
         Public Function GetLineComment(ByVal comment As String, ByVal Currency As String, ByVal CurrencyValue As Double, ByVal ShortComment As String, Optional ByVal includeInitials As Boolean = True, Optional ByVal explicitStaffInitals As String = Nothing, Optional ByVal Mileage As String = "") As String
 
 
@@ -2912,6 +2897,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             d.SubmitChanges()
         End Function
 
+        Private Async Function saveIfNecessaryAsync() As task
+            If (btnSave.Text = Translate("btnSave")) Then
+                Await btnSave_Click(Me, Nothing)
+            End If
+        End Function
+
         Protected Sub Log(ByVal RmbNo As Integer, ByVal Message As String)
             objEventLog.AddLog("Rmb" & RmbNo, Message, PortalSettings, UserId, Services.Log.EventLog.EventLogController.EventLogType.ADMIN_ALERT)
         End Sub
@@ -3108,140 +3099,58 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End Try
         End Sub
 
-        Protected Async Sub SendStaffMail(ByVal theRmb As AP_Staff_Rmb)
-            Dim SpouseSpecial As Boolean = False
-            Dim AmountSpecial As Boolean = False
-            Dim CCMSpecial As Boolean = False
-            Dim AuthUserName As String = ""
-            Dim AuthAuthUserName As String = ""
+        Protected Sub SendApprovalEmail(ByVal theRmb As AP_Staff_Rmb)
+            Try
 
-            Dim ThisObjUser As UserInfo
-            'ThisObjUser = UserController.GetUserById(PortalId, Settings("AuthUser"))
-            'AuthUserName = ThisObjUser.DisplayName
-            'ThisObjUser = UserController.GetUserById(PortalId, Settings("AuthAuthUser"))
-            'AuthAuthUserName = ThisObjUser.DisplayName
-            Dim SpouseId As Integer = StaffBrokerFunctions.GetSpouseId(theRmb.UserId)
+                Dim SpouseId As Integer = StaffBrokerFunctions.GetSpouseId(theRmb.UserId)
+                Dim ownerMessage As String = StaffBrokerFunctions.GetTemplate("RmbConfirmation", PortalId)
+                Dim approverMessage As String = StaffBrokerFunctions.GetTemplate("RmbApproverEmail", PortalId)
+                Dim approver = UserController.GetUserById(theRmb.PortalId, theRmb.ApprUserId)
+                Dim toEmail = approver.Email
+                Dim toName = approver.FirstName
+                Dim Approvers = approver.DisplayName
 
-            'Generate the attachment
-            'Dim input As WebRequest = WebRequest.Create(Request.Url.Scheme & "://" & Request.Url.Authority & Request.ApplicationPath & "/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & theRmb.RMBNo & "&UID=" & theRmb.UserId)
+                ownerMessage = ownerMessage.Replace("[APPROVER]", Approvers).Replace("[EXTRA]", "")
+                If (From c In theRmb.AP_Staff_RmbLines Where c.Receipt = True And (Not c.ReceiptImageId Is Nothing)).Count > 0 Then
+                    ownerMessage = ownerMessage.Replace("[STAFFACTION]", Translate("PostReceipts"))
+                Else
+                    ownerMessage = ownerMessage.Replace("[STAFFACTION]", Translate("NoPostReceipts"))
+                End If
+                ownerMessage = ownerMessage.Replace("[PRINTOUT]", "<a href='" & Request.Url.Scheme & "://" & Request.Url.Authority & Request.ApplicationPath & "DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & theRmb.RMBNo & "&UID=" & theRmb.UserId & "' target-'_blank' style='width: 134px; display:block;)'><div style='text-align: center; width: 122px; margin: 10px;'><img src='" _
+                    & Request.Url.Scheme & "://" & Request.Url.Authority & Request.ApplicationPath & "DesktopModules/AgapeConnect/StaffRmb/Images/PrintoutIcon.jpg' /><br />Printout</div></a><style> a div:hover{border: solid 1px blue;}</style>")
 
-            'Dim webResponse As Stream = input.GetResponse().GetResponseStream
-            'Dim oReader As New StreamReader(webResponse, Encoding.ASCII)
-            'Dim oWriter As New StreamWriter(Server.MapPath("/Portals/" & PortalId & "/RmbForm" & theRmb.RMBNo & ".htm"))
-
-            'oWriter.Write(oReader.ReadToEnd)
-            'oWriter.Close()
-            'oReader.Close()
-            'webResponse.Close()
-
-            'Dim Auth = UserController.GetUserById(PortalId, Settings("AuthUser"))
-            'Dim AuthAuth = UserController.GetUserById(PortalId, Settings("AuthAuthUser"))
-            Dim myApprovers = Await StaffRmbFunctions.getApproversAsync(theRmb, Nothing, Nothing)
-            ' Dim message As String = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbConfirmation", PortalId))
-            Dim message As String = StaffBrokerFunctions.GetTemplate("RmbConfirmation", PortalId)
-
-            message = message.Replace("[STAFFNAME]", UserInfo.DisplayName).Replace("[RMBNO]", theRmb.RID).Replace("[USERREF]", IIf(theRmb.UserRef <> "", theRmb.UserRef, "None"))
-            If myApprovers.SpouseSpecial And theRmb.UserId <> Settings("AuthUser") Then
-                message = message.Replace("[EXTRA]", Translate("SpouseSpecial").Replace("[AUTHUSER]", AuthUserName))
-            ElseIf myApprovers.AmountSpecial And theRmb.UserId <> Settings("AuthUser") Then
-                message = message.Replace("[EXTRA]", Translate("AmountSpecial").Replace("[TEAMLEADERLIMIT]", StaffBrokerFunctions.GetSetting("Currency", PortalId) & Settings("TeamLeaderLimit")).Replace("[AUTHUSER]", AuthUserName) & " ")
-            ElseIf CCMSpecial Then
-            ElseIf theRmb.UserId = Settings("AuthUser") And (myApprovers.SpouseSpecial Or myApprovers.AmountSpecial) Then
-                message = message.Replace("[EXTRA]", Translate("AuthSpecial").Replace("[AUTHAUTHUSER]", AuthAuthUserName))
-            Else
-                message = message.Replace("[EXTRA]", "")
-            End If
-            If (From c In theRmb.AP_Staff_RmbLines Where c.Receipt = True And (Not c.ReceiptImageId Is Nothing)).Count > 0 Then
-                message = message.Replace("[STAFFACTION]", Translate("PostReceipts"))
-            Else
-                message = message.Replace("[STAFFACTION]", Translate("NoPostReceipts"))
-            End If
-
-            message = message.Replace("[PRINTOUT]", "<a href='" & Request.Url.Scheme & "://" & Request.Url.Authority & Request.ApplicationPath & "DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & theRmb.RMBNo & "&UID=" & theRmb.UserId & "' target-'_blank' style='width: 134px; display:block;)'><div style='text-align: center; width: 122px; margin: 10px;'><img src='" _
-                & Request.Url.Scheme & "://" & Request.Url.Authority & Request.ApplicationPath & "DesktopModules/AgapeConnect/StaffRmb/Images/PrintoutIcon.jpg' /><br />Printout</div></a><style> a div:hover{border: solid 1px blue;}</style>")
-
-
-            'Dim Approvers As String = ""
-            ' Dim message2 As String = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbApproverEmail", PortalId))
-            Dim message2 As String = StaffBrokerFunctions.GetTemplate("RmbApproverEmail", PortalId)
-
-
-            'Dim app As UserInfo
-
-
-            ' If myApprovers.AmountSpecial Then
-            'message2 = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbLargeTransaction", PortalId))
-            'End If
-
-
-            Dim approver = UserController.GetUserById(theRmb.PortalId, theRmb.ApprUserId)
-            Dim toEmail = approver.Email
-            Dim toName = approver.FirstName
-            Dim Approvers = approver.DisplayName
-
-            If myApprovers.isDept Then
-                'Department Reimbursement
-                'Dim toEmail As String = ""
-                'Dim toName As String = ""
-                'For Each row In myApprovers.UserIds
-                '    Approvers &= row.FirstName & " " & row.LastName & "<br/>"
-                '    toEmail &= row.Email & ";"
-                '    toName &= row.FirstName & ", "
-                'Next
-
+                'Email to the submitter here
+                DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agapeconnect.me", UserInfo.Email, "", Translate("EmailSubmittedSubject").Replace("[RMBNO]", theRmb.RID), ownerMessage, "", "HTML", "", "", "", "")
 
                 'Send Approvers Instructions Here
-                message2 = message2.Replace("[STAFFNAME]", UserInfo.DisplayName).Replace("[RMBNO]", theRmb.RMBNo).Replace("[USERREF]", IIf(theRmb.UserRef <> "", theRmb.UserRef, "None"))
-                message2 = message2.Replace("[APPRNAME]", Left(toName, Math.Max(toName.Length - 2, 0)))
-                message2 = message2.Replace("[TEAMLEADERLIMIT]", StaffBrokerFunctions.GetSetting("Currency", PortalId) & Settings("TeamLeaderLimit"))
-                If theRmb.UserComment <> "" Then
-                    message2 = message2.Replace("[COMMENTS]", Translate("EmailComments") & "<br />" & theRmb.UserComment)
-                Else
-                    message2 = message2.Replace("[COMMENTS]", "")
-                End If
-                'DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agape.org.uk", Left(toEmail, toEmail.Length - 1), "donotreply@agape.org.uk", "Reimbursement for " & UserInfo.FirstName & " " & UserInfo.LastName, message2, "", "HTML", "", "", "", "")
-                DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agapeconnect.me", Left(toEmail, toEmail.Length - 1), "", Translate("SubmittedApprEmailSubject").Replace("[STAFFNAME]", UserInfo.FirstName & " " & UserInfo.LastName), message2, "", "HTML", "", "", "", "")
-            Else
-                'Personal Reimbursement
-
-
-
-
-                'Dim toEmail As String = ""
-                'Dim toName As String = ""
-                'For Each row In myApprovers.UserIds
-                '    Approvers = Approvers & row.FirstName & " " & row.LastName & "<br />"
-                '    'Send Approvers Instructions Here
-                '    toEmail = toEmail & row.Email & ";"
-                '    toName = toName & row.FirstName & ", "
-                'Next
-                message2 = message2.Replace("[STAFFNAME]", UserInfo.DisplayName).Replace("[RMBNO]", theRmb.RMBNo).Replace("[USERREF]", IIf(theRmb.UserRef <> "", theRmb.UserRef, "None"))
-                message2 = message2.Replace("[APPRNAME]", toName)
-                message2 = message2.Replace("[TEAMLEADERLIMIT]", StaffBrokerFunctions.GetSetting("Currency", PortalId) & Settings("TeamLeaderLimit"))
-                If theRmb.UserComment <> "" Then
-                    message2 = message2.Replace("[COMMENTS]", Translate("EmailComments") & "<br />" & theRmb.UserComment)
-                Else
-                    message2 = message2.Replace("[COMMENTS]", "")
-                End If
                 If toEmail.Length > 0 Then
-                    ' DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agape.org.uk", Left(toEmail, toEmail.Length - 1), "donotreply@agape.org.uk", "Reimbursement for " & UserInfo.FirstName & " " & UserInfo.LastName, message2, "", "HTML", "", "", "", "")
-                    DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agapeconnect.me", toEmail, "", Translate("SubmittedApprEmailSubject").Replace("[STAFFNAME]", UserInfo.FirstName & " " & UserInfo.LastName), message2, "", "HTML", "", "", "", "")
-
+                    If StaffRmbFunctions.isStaffAccount(theRmb.CostCenter) Then
+                        'Personal Reimbursement
+                        approverMessage = approverMessage.Replace("[STAFFNAME]", UserInfo.DisplayName).Replace("[RMBNO]", theRmb.RMBNo).Replace("[USERREF]", IIf(theRmb.UserRef <> "", theRmb.UserRef, "None"))
+                        approverMessage = approverMessage.Replace("[APPRNAME]", toName)
+                        approverMessage = approverMessage.Replace("[TEAMLEADERLIMIT]", StaffBrokerFunctions.GetSetting("Currency", PortalId) & Settings("TeamLeaderLimit"))
+                        If theRmb.UserComment <> "" Then
+                            approverMessage = approverMessage.Replace("[COMMENTS]", Translate("EmailComments") & "<br />" & theRmb.UserComment)
+                        Else
+                            approverMessage = approverMessage.Replace("[COMMENTS]", "")
+                        End If
+                        DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agapeconnect.me", toEmail, "", Translate("SubmittedApprEmailSubject").Replace("[STAFFNAME]", UserInfo.FirstName & " " & UserInfo.LastName), approverMessage, "", "HTML", "", "", "", "")
+                    Else
+                        approverMessage = approverMessage.Replace("[STAFFNAME]", UserInfo.DisplayName).Replace("[RMBNO]", theRmb.RMBNo).Replace("[USERREF]", IIf(theRmb.UserRef <> "", theRmb.UserRef, "None"))
+                        approverMessage = approverMessage.Replace("[APPRNAME]", Left(toName, Math.Max(toName.Length - 2, 0)))
+                        approverMessage = approverMessage.Replace("[TEAMLEADERLIMIT]", StaffBrokerFunctions.GetSetting("Currency", PortalId) & Settings("TeamLeaderLimit"))
+                        If theRmb.UserComment <> "" Then
+                            approverMessage = approverMessage.Replace("[COMMENTS]", Translate("EmailComments") & "<br />" & theRmb.UserComment)
+                        Else
+                            approverMessage = approverMessage.Replace("[COMMENTS]", "")
+                        End If
+                        DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agapeconnect.me", Left(toEmail, toEmail.Length - 1), "", Translate("SubmittedApprEmailSubject").Replace("[STAFFNAME]", UserInfo.FirstName & " " & UserInfo.LastName), approverMessage, "", "HTML", "", "", "", "")
+                    End If
                 End If
-
-            End If
-
-            message = message.Replace("[APPROVER]", Approvers)
-
-
-
-
-            '  DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agape.org.uk", UserInfo.Email, "donotreply@agape.org.uk", "Reimbursement #" & theRmb.RMBNo, message, Server.MapPath("/Portals/0/RmbForm" & theRmb.RMBNo & ".htm"), "HTML", "", "", "", "")
-            DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agapeconnect.me", UserInfo.Email, "", Translate("EmailSubmittedSubject").Replace("[RMBNO]", theRmb.RID), message, "", "HTML", "", "", "", "")
-
-
-
-
+            Catch ex As Exception
+                lblError.Text = "Error Sending Approval eMail: " & ex.Message & ex.StackTrace
+                lblError.Visible = True
+            End Try
 
         End Sub
 

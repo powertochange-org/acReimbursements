@@ -594,4 +594,7 @@
   <data name="btnResubmit.Text" xml:space="preserve">
     <value>Re-Submit</value>
   </data>
+  <data name="btnSaved.Text" xml:space="preserve">
+    <value>Saved</value>
+  </data>
 </root>
