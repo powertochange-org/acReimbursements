@@ -448,7 +448,7 @@ namespace StaffRmb
                 return Convert.ToInt32(NextAdvID);
             }
         }
-        static async public Task<int> AuthenticateAsync(int UserId, int RmbNo, int PortalId )
+        static public int Authenticate(int UserId, int RmbNo, int PortalId )
         {
             StaffRmbDataContext d = new StaffRmbDataContext();
             var rmb = from c in d.AP_Staff_Rmbs where c.RMBNo == RmbNo  && c.PortalId == PortalId  select c;

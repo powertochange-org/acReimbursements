@@ -46,7 +46,7 @@ Partial Class DesktopModules_StaffRmb_RmbPrintout
 
     End Sub
 
-    Protected Async Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+    Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim PS = CType(HttpContext.Current.Items("PortalSettings"), PortalSettings)
         Dim Cur As String = StaffBrokerFunctions.GetSetting("Currency", PS.PortalId)
 
@@ -65,7 +65,7 @@ Partial Class DesktopModules_StaffRmb_RmbPrintout
                 Dim x = mc.GetModuleByDefinition(PS.PortalId, "acStaffRmb")
                 Dim RmbSettings = x.TabModuleSettings
 
-                Dim RmbRel = Await StaffRmbFunctions.AuthenticateAsync(User.UserID, q.First.RMBNo, PS.PortalId)
+                Dim RmbRel = StaffRmbFunctions.Authenticate(User.UserID, q.First.RMBNo, PS.PortalId)
                 If RmbRel = RmbAccess.Denied And Not User.IsInRole("Administrators") And Not (User.UserID = RmbSettings("AuthUser") Or User.UserID = RmbSettings("AuthAuthUser")) Then
 
                     Dim isAccounts = False

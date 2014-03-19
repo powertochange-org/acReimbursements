@@ -61,7 +61,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Next
         End Sub
 
-        Private Async Sub Page_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Me.Init
+        Private Async Function Page_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) As Task Handles Me.Init
 
             lblAdvanceRequest.Visible = ENABLE_ADVANCE_FUNCTIONALITY
             lblError.Visible = False
@@ -204,14 +204,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     If CInt(hfRmbNo.Value) < 0 Then
                         Await LoadAdv(-hfRmbNo.Value)
                     Else
-                        Await LoadRmb(hfRmbNo.Value)
+                        LoadRmb(PortalId, UserId, hfRmbNo.Value)
                     End If
                 Else
                     ltSplash.Text = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbSplash", PortalId))
-                    Await ResetMenu()
+                    Await ResetMenuAsync(PortalId, UserId)
                 End If
             End If
-        End Sub
+        End Function
 
         Protected Sub UpdatePanel2_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles UpdatePanel2.Load
             Try
@@ -232,15 +232,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 #End Region
 
 #Region "Loading Functions"
-        Public Async Function ResetMenu() As Task
+        Public Async Function ResetMenuAsync(PortalId As Integer, UserId As Integer) As Task
             Try
-                Dim loadBasicMenuTask = LoadBasicMenu()
-                Dim loadSupervisorMenuTask = LoadSupervisorMenu()
-                Dim loadFinanceMenuTask = LoadFinanceMenu()
-
-                Await loadBasicMenuTask
-                Await loadSupervisorMenuTask
-                Await loadFinanceMenuTask
+                Await LoadBasicMenuAsync(PortalId, UserId)
+                Await LoadSupervisorMenuAsync(PortalId, UserId)
+                Await LoadFinanceMenuAsync(PortalId)
 
             Catch ex As Exception
                 lblError.Text = "Error loading Menu: " & ex.Message
@@ -248,13 +244,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End Try
         End Function
 
-        Private Async Function LoadBasicMenu() As Task
+        Private Async Function LoadBasicMenuAsync(PID As Integer, UID As Integer) As Task
             Try
                 '*** EVERYONE SEES THIS STUFF ***
                 Dim MenuSize = Settings("MenuSize")
                 '--Highlight reimbursements that need more information in a bar at the top
                 Dim MoreInfo = From c In d.AP_Staff_Rmbs
-                                Where c.MoreInfoRequested = True And c.Status <> RmbStatus.Processed And c.UserId = UserId And c.PortalId = PortalId
+                                Where c.MoreInfoRequested = True And c.Status <> RmbStatus.Processed And c.UserId = UID And c.PortalId = PID
                                 Select c.UserRef, c.RID, c.RMBNo
                 For Each row In MoreInfo
                     Dim hyp As New HyperLink()
@@ -268,7 +264,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 '--Drafts
                 Dim Pending = (From c In d.AP_Staff_Rmbs
-                               Where c.Status = RmbStatus.Draft And c.PortalId = PortalId And (c.UserId = UserId)
+                               Where c.Status = RmbStatus.Draft And c.PortalId = PID And (c.UserId = UID)
                                Order By c.RID Descending
                                Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
                 dlPending.DataSource = Pending
@@ -276,16 +272,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 '--Submitted
                 Dim Submitted = (From c In d.AP_Staff_Rmbs
-                                 Where c.Status = RmbStatus.Submitted And c.UserId = UserId And c.PortalId = PortalId
+                                 Where c.Status = RmbStatus.Submitted And c.UserId = UID And c.PortalId = PID
                                  Order By c.RID Descending
                                  Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
                 dlSubmitted.DataSource = Submitted
                 dlSubmitted.DataBind()
 
                 Dim AdvSubmitted = (From c In d.AP_Staff_AdvanceRequests
-                                    Where c.RequestStatus = RmbStatus.Submitted And c.UserId = UserId And c.PortalId = PortalId
+                                    Where c.RequestStatus = RmbStatus.Submitted And c.UserId = UID And c.PortalId = PID
                                     Order By c.LocalAdvanceId Descending
-                                    Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, UserId).Take(MenuSize)
+                                    Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId).Take(MenuSize)
                 dlAdvSubmitted.DataSource = AdvSubmitted
                 dlAdvSubmitted.DataBind()
                 dlAdvSubmitted.AlternatingItemStyle.CssClass = IIf(dlSubmitted.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
@@ -296,7 +292,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 '--Approved
                 Dim Approved = (From c In d.AP_Staff_Rmbs
                                 Where (c.Status = RmbStatus.Approved Or c.Status = RmbStatus.PendingDownload Or c.Status = RmbStatus.DownloadFailed) _
-                                    And c.UserId = UserId And c.PortalId = PortalId
+                                    And c.UserId = UID And c.PortalId = PID
                                 Order By c.RID Descending
                                 Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
                 dlApproved.DataSource = Approved
@@ -304,7 +300,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 Dim AdvApproved = (From c In d.AP_Staff_AdvanceRequests
                                    Where (c.RequestStatus = RmbStatus.Approved Or c.RequestStatus = RmbStatus.PendingDownload Or c.RequestStatus = RmbStatus.DownloadFailed) _
-                                        And c.UserId = UserId And c.PortalId = PortalId
+                                        And c.UserId = UID And c.PortalId = PID
                                    Order By c.LocalAdvanceId Descending
                                    Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId).Take(MenuSize)
                 dlAdvApproved.DataSource = AdvApproved
@@ -314,14 +310,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 '--Processed 
                 Dim Complete = (From c In d.AP_Staff_Rmbs
-                                Where c.Status = RmbStatus.Processed And c.UserId = UserId And c.PortalId = PortalId
+                                Where c.Status = RmbStatus.Processed And c.UserId = UID And c.PortalId = PID
                                 Order By c.RID Descending
                                 Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
                 dlProcessed.DataSource = Complete
                 dlProcessed.DataBind()
 
                 Dim CompleteAdv = (From c In d.AP_Staff_AdvanceRequests
-                                   Where c.RequestStatus = RmbStatus.Processed And c.UserId = UserId And c.PortalId = PortalId
+                                   Where c.RequestStatus = RmbStatus.Processed And c.UserId = UID And c.PortalId = PID
                                    Order By c.LocalAdvanceId Descending
                                    Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId).Take(MenuSize)
                 dlAdvProcessed.DataSource = CompleteAdv
@@ -330,7 +326,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 '--Cancelled
                 Dim Cancelled = (From c In d.AP_Staff_Rmbs
-                                 Where c.Status = RmbStatus.Cancelled And c.UserId = UserId And c.PortalId = PortalId
+                                 Where c.Status = RmbStatus.Cancelled And c.UserId = UID And c.PortalId = PID
                                  Order By c.RID Descending
                                  Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
                 dlCancelled.DataSource = Cancelled
@@ -340,14 +336,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 '--list any unapproved reimbursements submitted to this user for approval
                 Dim ApprovableRmbs = (From c In d.AP_Staff_Rmbs
-                            Where c.Status = RmbStatus.Submitted And c.ApprUserId = UserId And c.ApprDate Is Nothing And c.PortalId = PortalId
+                            Where c.Status = RmbStatus.Submitted And c.ApprUserId = UID And c.ApprDate Is Nothing And c.PortalId = PID
                             Order By c.RMBNo Descending
                             Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId)
                 dlToApprove.DataSource = ApprovableRmbs
                 dlToApprove.DataBind()
 
                 Dim ApprovableAdvs = (From c In d.AP_Staff_AdvanceRequests
-                             Where c.RequestStatus = RmbStatus.Submitted And c.ApproverId = UserId And c.ApprovedDate Is Nothing And c.PortalId = PortalId
+                             Where c.RequestStatus = RmbStatus.Submitted And c.ApproverId = UID And c.ApprovedDate Is Nothing And c.PortalId = PID
                              Order By c.LocalAdvanceId Descending
                              Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId)
                 dlAdvToApprove.DataSource = ApprovableAdvs
@@ -381,11 +377,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End Try
         End Function
 
-        Private Async Function LoadSupervisorMenu() As Task
+        Private Async Function LoadSupervisorMenuAsync(PID As Integer, UID As Integer) As Task
             Try
                 '***SUPERVISORS***
 
-                Dim Team = StaffBrokerFunctions.GetTeam(UserId)
+                Dim Team = StaffBrokerFunctions.GetTeam(UID)
                 Dim isSupervisor = (Team.Count > 0)
                 If isSupervisor Then
                     Dim TeamIds = From c In Team Select c.UserID
@@ -403,11 +399,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         Dim TeamApproved = From c In d.AP_Staff_Rmbs
                                            Where c.UserId = team_member.UserID _
                                                 And (c.Status = RmbStatus.Approved Or c.Status = RmbStatus.PendingDownload Or c.Status = RmbStatus.DownloadFailed) _
-                                                And c.UserId <> UserId And c.PortalId = PortalId
+                                                And c.UserId <> UID And c.PortalId = PID
                                            Select c.RMBNo, c.RmbDate, c.UserRef, c.UserId, c.RID
                         For Each rmb In TeamApproved
                             Dim rmb_node As New TreeNode()
-                            Dim rmbUser = UserController.GetUserById(PortalId, rmb.UserId).DisplayName
+                            Dim rmbUser = UserController.GetUserById(PID, rmb.UserId).DisplayName
                             If (rmb.RmbDate Is Nothing) Then
                                 rmb_node.Text = "<span onClick='show_loading_spinner()'>" & GetRmbTitleTeamShort(rmb.RID, New Date(), rmbUser) & "</span>"
                             Else
@@ -424,11 +420,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         Dim TeamAdvApproved = From c In d.AP_Staff_AdvanceRequests
                                               Where c.UserId = team_member.UserID _
                                                 And (c.RequestStatus = RmbStatus.Approved Or c.RequestStatus = RmbStatus.PendingDownload Or c.RequestStatus = RmbStatus.DownloadFailed) _
-                                                And c.UserId <> UserId And c.PortalId = PortalId
+                                                And c.UserId <> UID And c.PortalId = PID
                                               Select c.AdvanceId, c.RequestDate, c.UserId, c.LocalAdvanceId
                         For Each adv In TeamAdvApproved
                             Dim adv_node As New TreeNode()
-                            Dim advUser = UserController.GetUserById(PortalId, adv.UserId).DisplayName
+                            Dim advUser = UserController.GetUserById(PID, adv.UserId).DisplayName
                             If (adv.RequestDate Is Nothing) Then
                                 adv_node.Text = "<span onClick='show_loading_spinner()'>" & GetAdvTitleTeamShort(adv.LocalAdvanceId, New Date(), advUser) & "</span>"
                             Else
@@ -464,7 +460,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                             Select c.RMBNo, c.RmbDate, c.UserRef, c.UserId, c.RID
                         For Each rmb In TeamProcessed
                             Dim rmb_node As New TreeNode()
-                            Dim rmbUser = UserController.GetUserById(PortalId, rmb.UserId).DisplayName
+                            Dim rmbUser = UserController.GetUserById(PID, rmb.UserId).DisplayName
                             If (rmb.RmbDate Is Nothing) Then
                                 rmb_node.Text = "<span onClick='show_loading_spinner()'>" & GetRmbTitleTeamShort(rmb.RID, New Date(), rmbUser) & "</span>"
                             Else
@@ -479,11 +475,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         Next
 
                         Dim TeamAdvProcessed = From c In d.AP_Staff_AdvanceRequests
-                                               Where c.RequestStatus = RmbStatus.Processed And c.UserId = team_member.UserID And c.PortalId = PortalId
+                                               Where c.RequestStatus = RmbStatus.Processed And c.UserId = team_member.UserID And c.PortalId = PID
                                                Select c.AdvanceId, c.RequestDate, c.UserId, c.LocalAdvanceId
                         For Each adv In TeamAdvProcessed
                             Dim adv_node As New TreeNode()
-                            Dim advUser = UserController.GetUserById(PortalId, adv.UserId).DisplayName
+                            Dim advUser = UserController.GetUserById(PID, adv.UserId).DisplayName
                             If (adv.RequestDate Is Nothing) Then
                                 adv_node.Text = "<span onClick='show_loading_spinner()'>" & GetAdvTitleTeamShort(adv.LocalAdvanceId, New Date(), advUser) & "</span>"
                             Else
@@ -515,7 +511,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End Try
         End Function
 
-        Private Async Function LoadFinanceMenu() As Task
+        Private Async Function LoadFinanceMenuAsync(PID As Integer) As Task
             Try
                 '***FINANCE DEPARTMENT***
                 Dim MenuSize = Settings("MenuSize")
@@ -537,8 +533,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         Dim letter = person.LastName.Substring(0, 1)
 
                         '--here are the submitted reimbursements & advances
-                        Dim SubmittedRmb = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Submitted And c.PortalId = PortalId And (c.UserId = person.UserID) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
-                        Dim SubmittedAdv = (From c In d.AP_Staff_AdvanceRequests Where c.RequestStatus = RmbStatus.Submitted And c.PortalId = PortalId And c.UserId = person.UserID Order By c.LocalAdvanceId Descending Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId).Take(MenuSize)
+                        Dim SubmittedRmb = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Submitted And c.PortalId = PID And (c.UserId = person.UserID) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
+                        Dim SubmittedAdv = (From c In d.AP_Staff_AdvanceRequests Where c.RequestStatus = RmbStatus.Submitted And c.PortalId = PID And c.UserId = person.UserID Order By c.LocalAdvanceId Descending Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId).Take(MenuSize)
                         If SubmittedRmb.Count() > 0 Or SubmittedAdv.Count() > 0 Then
                             Dim submittedNode As New TreeNode(person.DisplayName)
                             If SubmittedRmb.Count() > 0 Then
@@ -549,8 +545,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             End If
                         End If
                         '--here are the processed reimbursements & advances
-                        Dim ProcessedRmb = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Processed And c.PortalId = PortalId And (c.UserId = person.UserID) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
-                        Dim ProcessedAdv = (From c In d.AP_Staff_AdvanceRequests Where c.RequestStatus = RmbStatus.Processed And c.PortalId = PortalId And c.UserId = person.UserID Order By c.LocalAdvanceId Descending Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId).Take(MenuSize)
+                        Dim ProcessedRmb = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Processed And c.PortalId = PID And (c.UserId = person.UserID) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
+                        Dim ProcessedAdv = (From c In d.AP_Staff_AdvanceRequests Where c.RequestStatus = RmbStatus.Processed And c.PortalId = PID And c.UserId = person.UserID Order By c.LocalAdvanceId Descending Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId).Take(MenuSize)
                         If (ProcessedRmb.Count() > 0 Or ProcessedAdv.Count() > 0) Then
                             Dim processedNode As New TreeNode(person.DisplayName)
                             If ProcessedRmb.Count() > 0 Then
@@ -574,12 +570,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     finance_node.Expanded = False
 
                     Dim AllApproved = (From c In d.AP_Staff_Rmbs
-                                       Where (c.Status = RmbStatus.Approved Or c.Status >= RmbStatus.PendingDownload) And c.PortalId = PortalId
+                                       Where (c.Status = RmbStatus.Approved Or c.Status >= RmbStatus.PendingDownload) And c.PortalId = PID
                                        Order By c.RID Descending
                                        Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId, c.Status, _
                                            Receipts = ((c.AP_Staff_RmbLines.Where(Function(x) x.Receipt And (x.ReceiptImageId Is Nothing))).Count > 0)).Take(MenuSize)
                     Dim AllApprovedAdv = (From c In d.AP_Staff_AdvanceRequests
-                                          Where (c.RequestStatus = RmbStatus.Approved Or c.RequestStatus >= RmbStatus.PendingDownload) And c.PortalId = PortalId
+                                          Where (c.RequestStatus = RmbStatus.Approved Or c.RequestStatus >= RmbStatus.PendingDownload) And c.PortalId = PID
                                           Order By c.LocalAdvanceId Descending).Take(MenuSize)
 
                     Dim rec = From c In AllApproved Where c.Status = RmbStatus.Approved And c.Receipts
@@ -592,7 +588,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     receipts_node.Expanded = False
                     For Each rmb In rec
                         Dim rmb_node As New TreeNode()
-                        Dim rmbUser = UserController.GetUserById(PortalId, rmb.UserId).DisplayName
+                        Dim rmbUser = UserController.GetUserById(PID, rmb.UserId).DisplayName
                         If (rmb.RmbDate Is Nothing) Then
                             rmb_node.Text = "<span onClick='show_loading_spinner()'>" & GetRmbTitleTeamShort(rmb.RID, New Date(), rmbUser) & "</span>"
                         Else
@@ -611,7 +607,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     no_receipts_node.Expanded = False
                     For Each rmb In nonRec
                         Dim rmb_node As New TreeNode()
-                        Dim rmbUser = UserController.GetUserById(PortalId, rmb.UserId).DisplayName
+                        Dim rmbUser = UserController.GetUserById(PID, rmb.UserId).DisplayName
                         If (rmb.RmbDate Is Nothing) Then
                             rmb_node.Text = "<span onClick='show_loading_spinner()'>" & GetRmbTitleTeamShort(rmb.RID, New Date(), rmbUser) & "</span>"
                         Else
@@ -626,7 +622,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Next
                     For Each adv In nonRecAdv
                         Dim adv_node As New TreeNode()
-                        Dim advUser = UserController.GetUserById(PortalId, adv.UserId).DisplayName
+                        Dim advUser = UserController.GetUserById(PID, adv.UserId).DisplayName
                         If (adv.RequestDate Is Nothing) Then
                             adv_node.Text = "<span onClick='show_loading_spinner()'>" & GetAdvTitleTeamShort(adv.LocalAdvanceId, New Date(), advUser) & "</span>"
                         Else
@@ -645,7 +641,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     pending_download_node.Expanded = False
                     For Each rmb In PendingDownload
                         Dim rmb_node As New TreeNode()
-                        Dim rmbUser = UserController.GetUserById(PortalId, rmb.UserId).DisplayName
+                        Dim rmbUser = UserController.GetUserById(PID, rmb.UserId).DisplayName
                         If (rmb.RmbDate Is Nothing) Then
                             rmb_node.Text = "<span onClick='show_loading_spinner()'>" & GetRmbTitleTeamShort(rmb.RID, New Date(), rmbUser) & "</span>"
                         Else
@@ -660,7 +656,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Next
                     For Each adv In PendingDownloadAdv
                         Dim adv_node As New TreeNode()
-                        Dim advUser = UserController.GetUserById(PortalId, adv.UserId).DisplayName
+                        Dim advUser = UserController.GetUserById(PID, adv.UserId).DisplayName
                         If (adv.RequestDate Is Nothing) Then
                             adv_node.Text = "<span onClick='show_loading_spinner()'>" & GetAdvTitleTeamShort(adv.LocalAdvanceId, New Date(), advUser) & "</span>"
                         Else
@@ -713,7 +709,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 pnlMainAdvance.Visible = True
                 pnlSplash.Visible = False
                 hfRmbNo.Value = -AdvanceId
-                Dim resetMenuTask = ResetMenu()
 
                 Dim q = From c In d.AP_Staff_AdvanceRequests Where c.AdvanceId = AdvanceId And c.PortalId = PortalId
 
@@ -908,7 +903,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
                     AdvAmount.Enabled = btnAdvSave.Visible
                 End If
-                Await resetMenuTask
+                Await ResetMenuAsync(PortalId, UserId)
             Catch ex As Exception
                 lblError.Text = "Error loading Advance: " & ex.Message
                 lblError.Visible = True
@@ -933,7 +928,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
         End Sub
 
-        Public Async Function LoadRmb(ByVal RmbNo As Integer) As Task
+        Public Async Sub LoadRmb(PortalId As Integer, UserId As Integer, ByVal RmbNo As Integer)
 
             pnlMain.Visible = True
             pnlMainAdvance.Visible = False
@@ -942,14 +937,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             '--Based on form state and user privileges
             Try
                 hfRmbNo.Value = RmbNo
-                Dim resetMenuTask As task = ResetMenu()
                 Dim q = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo
                 If q.Count > 0 Then
                     Dim Rmb = q.First
-
-                    Dim authenticateTask = StaffRmbFunctions.AuthenticateAsync(UserId, RmbNo, PortalId)
-                    Dim updateApproversListTask As Task = updateApproversListAsync(Rmb)
-                    Dim refreshAccountBalanceTask As Task = refreshAccountBalanceAsync(Rmb.CostCenter, StaffRmbFunctions.logonFromId(PortalId, UserId))
 
                     '--hidden fields
                     hfChargeToValue.Value = If(Rmb.CostCenter Is Nothing, "", Rmb.CostCenter)
@@ -975,7 +965,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim isFinance = IsAccounts() And Not isOwner
 
                     '--Ensure the user is authorized to view this reimbursement
-                    Dim RmbRel As Integer = Await authenticateTask
+                    Dim RmbRel As Integer
+                    RmbRel = StaffRmbFunctions.Authenticate(UserId, RmbNo, PortalId)
                     If RmbRel = RmbAccess.Denied And Not (isApprover Or isFinance) Then
                         'Need an access denied warning
                         pnlMain.Visible = False
@@ -1113,20 +1104,20 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             End If
                         End If
                     End If
-                    Await updateApproversListTask
-                    Await refreshAccountBalanceTask
+                    Await updateApproversListAsync(Rmb)
+                    Await refreshAccountBalanceAsync(Rmb.CostCenter, StaffRmbFunctions.logonFromId(PortalId, UserId))
                 Else
                     pnlMain.Visible = False
                     pnlSplash.Visible = True
                 End If
-                Await resetMenuTask
+                Await ResetMenuAsync(PortalId, UserId)
 
             Catch ex As Exception
                 lblError.Text = "Error loading Rmb: " & ex.Message & ex.StackTrace
                 lblError.Visible = True
             End Try
 
-        End Function
+        End Sub
 
         Private Async Function updateApproversListAsync(ByVal obj As Object) As Task
             Dim approvers As Object
@@ -1329,7 +1320,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         theRmb.Changed = True
                     End If
                     d.SubmitChanges()
-                    Dim loadRmbTask = LoadRmb(hfRmbNo.Value)
                     If ElectronicReceipt And Not theFile Is Nothing Then
                         FileManager.Instance.RenameFile(theFile, "R" & hfRmbNo.Value & "L" & insert.RmbLineNo & "." & theFile.Extension)
                     End If
@@ -1339,7 +1329,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     sb.Append("<script language='javascript'>")
                     sb.Append("closePopup();")
                     sb.Append("</script>")
-                    Await loadRmbTask
+                    LoadRmb(PortalId, UserId, hfRmbNo.Value)
                     ScriptManager.RegisterClientScriptBlock(Page, t, "", sb.ToString, False)
 
                 End If
@@ -1552,7 +1542,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     sb.Append("<script language='javascript'>")
                     sb.Append("closePopup();")
                     sb.Append("</script>")
-                    Await LoadRmb(hfRmbNo.Value)
+                    LoadRmb(PortalId, UserId, hfRmbNo.Value)
                     ScriptManager.RegisterClientScriptBlock(Page, t, "", sb.ToString, False)
                 End If
             End If
@@ -1605,7 +1595,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             sb.Append("<script language='javascript'>")
             sb.Append("closePopup2();")
             sb.Append("</script>")
-            Await LoadRmb(insert.RMBNo)
+            LoadRmb(PortalId, UserId, insert.RMBNo)
             ScriptManager.RegisterClientScriptBlock(tbNewChargeTo, t, "", sb.ToString, False)
 
         End Sub
@@ -1640,14 +1630,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 End If
                 Log(rmb.First.RMBNo, "SUBMITTED")
 
-                Dim loadRmbTask = LoadRmb(hfRmbNo.Value)
                 'use an alert to switch back to the main window from the printout window
                 Dim t As Type = Me.GetType()
                 Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
                 sb.Append("<script language='javascript'>")
                 sb.Append("alert(""" & message & """);")
                 sb.Append("</script>")
-                Await loadRmbTask
+                LoadRmb(PortalId, UserId, hfRmbNo.Value)
                 ScriptManager.RegisterStartupScript(Page, t, "popup", sb.ToString, False)
 
             End If
@@ -1668,7 +1657,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Log(rmb.First.RMBNo, "DELETED by owner")
 
                     Await submitChangesTask
-                    Await ResetMenu()
+                    Await ResetMenuAsync(PortalId, UserId)
                     ScriptManager.RegisterStartupScript(btnDelete, btnDelete.GetType(), "select4", "selectIndex(4)", True)
                 Else
                     'Send an email to the end user
@@ -1708,7 +1697,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Log(rmb.First.RMBNo, "DELETED")
 
                     Await submitChangesTask
-                    Await ResetMenu()
+                    Await ResetMenuAsync(PortalId, UserId)
                     ScriptManager.RegisterStartupScript(btnDelete, btnDelete.GetType(), "select0", "selectIndex(0)", True)
 
                 End If
@@ -1778,7 +1767,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 btnApprove.Visible = False
 
-                Await ResetMenu()
+                Await ResetMenuAsync(PortalId, UserId)
 
                 Log(rmb.First.RMBNo, "Approved")
                 Dim message As String = Translate("RmbApproved").Replace("[RMBNO]", rmb.First.RID)
@@ -1810,7 +1799,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo And c.PortalId = PortalId
             lblAdvError.Text = ""
             If rmb.Count > 0 Then
-                '--Dim rmbLoadTask = LoadRmb(RmbNo)
+                '--Dim rmbLoadTask = LoadRmb(PortalId, UserId, RmbNo)
                 rmb.First.UserComment = tbComments.Text
                 rmb.First.UserRef = tbYouRef.Text
                 rmb.First.ApprComment = tbApprComments.Text
@@ -1856,7 +1845,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             'ddlLineTypes_SelectedIndexChanged(Me, Nothing)
             'ddlCostcenter.SelectedValue = ddlChargeTo.SelectedValue
-            saveIfNecessaryAsync()
+            Await saveIfNecessaryAsync()
             tbCostcenter.Text = hfChargeToValue.Value
 
             ddlLineTypes.Items.Clear()
@@ -1971,7 +1960,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             d.AP_Staff_RmbLines.DeleteAllOnSubmit(theLine)
             d.SubmitChanges()
             lblSplitError.Visible = False
-            Await LoadRmb(hfRmbNo.Value)
+            LoadRmb(PortalId, UserId, hfRmbNo.Value)
 
             Dim t As Type = btnOK.GetType()
             Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
@@ -2009,7 +1998,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             theRmb.First.MoreInfoRequested = False
             theRmb.First.ProcUserId = UserId
             d.SubmitChanges()
-            Await LoadRmb(hfRmbNo.Value)
+            LoadRmb(PortalId, UserId, hfRmbNo.Value)
             Log(theRmb.First.RMBNo, "Processed - this reimbursement will be added to the next download batch")
             Dim message = Translate("NextBatch")
             Dim t As Type = Me.GetType()
@@ -2070,7 +2059,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             'If hfRmbNo.Value <> "" Then
             '    If hfRmbNo.Value > 0 Then
-            '        LoadRmb(CInt(hfRmbNo.Value))
+            '        LoadRmb(PortalId, UserId, CInt(hfRmbNo.Value))
             '    Else
             '        LoadAdv(-CInt(hfRmbNo.Value))
             '    End If
@@ -2078,7 +2067,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             'End If
 
-            'ResetMenu()
+            'Await ResetMenuAsync(PortalId, UserId)
 
 
             'Dim t As Type = Me.GetType()
@@ -2153,7 +2142,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Log(theRmb.RMBNo, "UNPROCESSED - before it was downloaded")
                 End If
             End If
-            Await LoadRmb(CInt(hfRmbNo.Value))
+            LoadRmb(PortalId, UserId, hfRmbNo.Value)
         End Sub
 
         Protected Async Sub GridView1_RowCommand(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.GridViewCommandEventArgs) Handles GridView1.RowCommand
@@ -2161,7 +2150,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 ' d.AP_Staff_RmbLineAddStaffs.DeleteAllOnSubmit(From c In d.AP_Staff_RmbLineAddStaffs Where c.RmbLineId = CInt(e.CommandArgument))
                 d.AP_Staff_RmbLines.DeleteAllOnSubmit(From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(e.CommandArgument))
                 d.SubmitChanges()
-                Await LoadRmb(hfRmbNo.Value)
+                LoadRmb(PortalId, UserId, hfRmbNo.Value)
 
             ElseIf e.CommandName = "myEdit" Then
                 Dim theLine = From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(e.CommandArgument)
@@ -2355,7 +2344,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     sb.Append("<script language='javascript'>")
                     sb.Append("window.open('mailto:" & theUser.Email & "?subject=Reimbursment " & theLine.First.AP_Staff_Rmb.RID & ": Deferred Transactions');")
                     sb.Append("</script>")
-                    Await LoadRmb(hfRmbNo.Value)
+                    LoadRmb(PortalId, UserId, hfRmbNo.Value)
                     ScriptManager.RegisterStartupScript(GridView1, t, "email", sb.ToString, False)
 
                 End If
@@ -2365,7 +2354,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Protected Async Sub dlApproved_ItemCommand(ByVal source As Object, ByVal e As System.Web.UI.WebControls.DataListCommandEventArgs) Handles dlProcessed.ItemCommand, dlAdvProcessed.ItemCommand, dlApproved.ItemCommand, dlCancelled.ItemCommand, dlToApprove.ItemCommand, dlSubmitted.ItemCommand, dlPending.ItemCommand, dlAdvApproved.ItemCommand, dlAdvSubmitted.ItemCommand, dlAdvToApprove.ItemCommand, dlAdvApproved.ItemCommand
             If e.CommandName = "Goto" Then
-                Await LoadRmb(e.CommandArgument)
+                LoadRmb(PortalId, UserId, e.CommandArgument)
             ElseIf e.CommandName = "GotoAdvance" Then
                 Await LoadAdv(e.CommandArgument)
             End If
@@ -2410,7 +2399,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         'We now need to redetermine the AccountCodes
                         rmb.First.CostCenter = hfChargeToValue.Value
                         rmb.First.Department = Dept
-                        Dim updateApproversListTask = updateApproversListAsync(rmb.First)
 
                         For Each row In rmb.First.AP_Staff_RmbLines
                             If rmb.First.CostCenter = row.CostCenter Then
@@ -2420,12 +2408,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             End If
                         Next
                         Await SubmitChangesAsync()
-                        Await updateApproversListTask
+                        Await updateApproversListAsync(rmb.First)
                     End If
 
                     If (rmb.First.Status <> RmbStatus.Draft) Then
                         rmb.First.Status = RmbStatus.Draft
-                        Await ResetMenu()
+                        Await ResetMenuAsync(PortalId, UserId)
                     End If
                     Await SubmitChangesAsync()
                 End If
@@ -3472,7 +3460,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End Select
         End Function
 
-        Protected Sub DownloadBatch(Optional ByVal MarkAsProcessed As Boolean = False)
+        Protected Async Sub DownloadBatch(Optional ByVal MarkAsProcessed As Boolean = False)
             Dim downloadStatuses() As Integer = {RmbStatus.PendingDownload, RmbStatus.DownloadFailed}
             Log(0, "Downloading Batched Transactions")
 
@@ -3480,11 +3468,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             Dim export As String = "Account,Subaccount,Ref,Date," & GetOrderedString("Description", "Debit", "Credit", "Company")
             Dim RmbList As New List(Of Integer)
-            For Each rmb In pendDownload
-                Log(rmb.RMBNo, "Downloading Rmb")
-                export &= DownloadRmbSingle(rmb.RMBNo)
+            For Each Rmb In pendDownload
+                Log(Rmb.RMBNo, "Downloading Rmb")
+                export &= DownloadRmbSingle(Rmb.RMBNo)
 
-                RmbList.Add(rmb.RMBNo)
+                RmbList.Add(Rmb.RMBNo)
 
             Next
             Dim pendDownloadAdv = From c In d.AP_Staff_AdvanceRequests Where downloadStatuses.Contains(c.RequestStatus) And c.PortalId = PortalId
@@ -3531,15 +3519,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 If hfRmbNo.Value <> "" Then
                     If hfRmbNo.Value > 0 Then
-                        LoadRmb(CInt(hfRmbNo.Value))
+                        LoadRmb(PortalId, UserId, CInt(hfRmbNo.Value))
                     Else
-                        LoadAdv(-CInt(hfRmbNo.Value))
+                        Await LoadAdv(-CInt(hfRmbNo.Value))
                     End If
 
 
                 End If
 
-                ResetMenu()
+                Await ResetMenuAsync(PortalId, UserId)
 
 
 
@@ -3629,10 +3617,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             insert.OrigCurrency = hfOrigCurrency.Value
             insert.OrigCurrencyAmount = Double.Parse(hfOrigCurrencyValue.Value, New CultureInfo(""))
 
-            Dim getAdvApproversTask = StaffRmbFunctions.getAdvApproversAsync(insert, Settings("TeamLeaderLimit"), Nothing, Nothing)
             d.AP_Staff_AdvanceRequests.InsertOnSubmit(insert)
             d.SubmitChanges()
-            Dim resetMenuTask = ResetMenu()
             'Send Confirmation
             Dim Auth = UserController.GetUserById(PortalId, Settings("AuthUser"))
             Dim AuthAuth = UserController.GetUserById(PortalId, Settings("AuthAuthUser"))
@@ -3640,7 +3626,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             'Dim ConfMessage As String = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("AdvConfirmation", PortalId))
             Dim ConfMessage As String = StaffBrokerFunctions.GetTemplate("AdvConfirmation", PortalId)
             ConfMessage = ConfMessage.Replace("[STAFFNAME]", UserInfo.DisplayName).Replace("[ADVNO]", insert.LocalAdvanceId)
-            Dim myApprovers = Await getAdvApproversTask
+            Dim myApprovers = Await StaffRmbFunctions.getAdvApproversAsync(insert, Settings("TeamLeaderLimit"), Nothing, Nothing)
             If myApprovers.SpouseSpecial And insert.UserId <> Auth.UserID Then
                 ConfMessage = ConfMessage.Replace("[EXTRA]", Translate("AdvSpouseSpecial").Replace("[AUTHUSER]", Auth.DisplayName))
             ElseIf myApprovers.AmountSpecial And insert.UserId <> Auth.UserID Then
@@ -3682,7 +3668,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
 
             'Need to load the Advance!
-            Await resetMenuTask
+            Await ResetMenuAsync(PortalId, UserId)
 
         End Sub
 
@@ -3758,7 +3744,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     q.First.RequestStatus = RmbStatus.Cancelled
                     Log(q.First.AdvanceId, "Advance Cancelled")
                     d.SubmitChanges()
-                    Dim loadAdvTask = LoadAdv(-hfRmbNo.Value)
 
                     Dim Message As String = StaffBrokerFunctions.GetTemplate("AdvCancelled", PortalId)
 
@@ -3774,7 +3759,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ' DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agape.org.uk", theUser.Email, "donotreply@agape.org.uk", "Rmb#: " & hfRmbNo.Value & "-" & rmb.First.UserRef & " has been cancelled", Message, "", "HTML", "", "", "", "")
                     DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agapeconnect.me", StaffMbr.Email, "", Translate("AdvEmailCancelledSubject").Replace("[ADVNO]", q.First.LocalAdvanceId), Message, "", "HTML", "", "", "", "")
 
-                    Await loadAdvTask
+                    Await LoadAdv(-hfRmbNo.Value)
 
                 End If
             End If
@@ -3889,7 +3874,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Return "https://staff.powertochange.org/custom-pages/webService.php?type=staff_photo&api_token=V7qVU7n59743KNVgPdDMr3T8&staff_username=" + username
         End Function
 
-        Protected Sub cbMoreInfo_CheckedChanged(sender As Object, e As System.EventArgs) Handles cbMoreInfo.CheckedChanged
+        Protected Async Sub cbMoreInfo_CheckedChanged(sender As Object, e As System.EventArgs) Handles cbMoreInfo.CheckedChanged
             cbApprMoreInfo.Checked = cbMoreInfo.Checked
             Dim theRmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value) And c.PortalId = PortalId
             If theRmb.Count > 0 Then
@@ -3897,11 +3882,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim theUser = UserController.GetUserById(PortalId, theRmb.First.UserId)
                     SendMessage(Translate("MoreInfoMsg"), "window.open('mailto:" & theUser.Email & "?subject=Reimbursment " & theRmb.First.RID & ": More info requested');")
                 End If
-                btnSave_Click(Me, Nothing)
+                Await btnSave_Click(Me, Nothing)
             End If
         End Sub
 
-        Protected Sub cbApprMoreInfo_CheckedChanged(sender As Object, e As System.EventArgs) Handles cbApprMoreInfo.CheckedChanged
+        Protected Async Sub cbApprMoreInfo_CheckedChanged(sender As Object, e As System.EventArgs) Handles cbApprMoreInfo.CheckedChanged
             cbMoreInfo.Checked = cbApprMoreInfo.Checked
             Dim theRmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value) And c.PortalId = PortalId
             If theRmb.Count > 0 Then
@@ -3909,7 +3894,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim theUser = UserController.GetUserById(PortalId, theRmb.First.UserId)
                     SendMessage(Translate("MoreInfoMsg"), "window.open('mailto:" & theUser.Email & "?subject=Reimbursment " & theRmb.First.RID & ": More info requested');")
                 End If
-                btnSave_Click(Me, Nothing)
+                Await btnSave_Click(Me, Nothing)
             End If
 
         End Sub

@@ -709,8 +709,12 @@
 </div>
 
 <div style="position:relative; text-align: center; width: 100%;">
-    <asp:Label ID="lblError" runat="server" class="ui-state-error ui-corner-all"
-        Style="padding: 3px; margin-top: 3px; display: inline-block; width: 50%;" Visible="false"></asp:Label>
+    <asp:UpdatePanel ID="ErrorUpdatePanel" runat="server" >
+        <ContentTemplate>
+            <asp:Label ID="lblError" runat="server" class="ui-state-error ui-corner-all"
+                Style="padding: 3px; margin-top: 3px; display: inline-block; width: 50%;" Visible="false"></asp:Label>
+        </ContentTemplate>
+    </asp:UpdatePanel>
 </div>
 <asp:Panel ID="pnlEverything" runat="server" >
 
