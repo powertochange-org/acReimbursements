@@ -943,11 +943,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Try
                 hfRmbNo.Value = RmbNo
                 Dim resetMenuTask As task = ResetMenu()
-                Dim authenticateTask = StaffRmbFunctions.AuthenticateAsync(UserId, RmbNo, PortalId)
                 Dim q = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo
                 If q.Count > 0 Then
                     Dim Rmb = q.First
 
+                    Dim authenticateTask = StaffRmbFunctions.AuthenticateAsync(UserId, RmbNo, PortalId)
                     Dim updateApproversListTask As Task = updateApproversListAsync(Rmb)
                     Dim refreshAccountBalanceTask As Task = refreshAccountBalanceAsync(Rmb.CostCenter, StaffRmbFunctions.logonFromId(PortalId, UserId))
 
@@ -1113,14 +1113,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             End If
                         End If
                     End If
-
                     Await updateApproversListTask
                     Await refreshAccountBalanceTask
-                    Await resetMenuTask
                 Else
                     pnlMain.Visible = False
                     pnlSplash.Visible = True
                 End If
+                Await resetMenuTask
 
             Catch ex As Exception
                 lblError.Text = "Error loading Rmb: " & ex.Message & ex.StackTrace
