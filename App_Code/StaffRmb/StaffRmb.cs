@@ -262,7 +262,7 @@ namespace StaffRmb
                 request.Method = "POST";
                 request.ContentType = "application/x-www-form-urlencoded";
                 request.ContentLength = postData.Length;
-                Stream requestStream = request.GetRequestStream();
+                Stream requestStream = await request.GetRequestStreamAsync();
                 requestStream.Write(postData, 0, postData.Length);
                 requestStream.Close();
                 //get response
