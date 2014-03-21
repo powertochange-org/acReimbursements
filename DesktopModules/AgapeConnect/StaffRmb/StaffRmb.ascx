@@ -11,7 +11,6 @@
 <script src="/js/jquery.watermarkinput.js" type="text/javascript"></script>
 <script type="text/javascript">
     optimizeYouTubeEmbeds();
-    var prevSelectedMenuItem = null
  
     (function ($, Sys) {
         function setUpMyTabs() {
@@ -312,22 +311,6 @@
 
 
     } (jQuery, window.Sys));
-
-    function selectMenuItem() {
-        //deselect previous item
-        if (prevSelectedMenuItem != null) {
-            prevSelectedMenuItem.style.fontSize="9pt";
-            prevSelectedMenuItem.style.fontWeight="normal";
-            prevSelectedMenuItem.style.border="none";
-        }
-        //select current item
-        event.target.style.fontSize = "9pt";
-        event.target.style.fontWeight = "bold";
-        event.target.style.border = "1px solid #CCCCCC";
-
-        prevSelectedMenuItem = event.target;
-        return false;
-    }
 
     function GetAccountBalance(jsonQuery){
  
@@ -783,9 +766,8 @@
                                                         <asp:Image ID="Image2" runat="server" Width="35px" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' />
                                                     </td>
                                                     <td width="100%" align="left">
-                                                        <asp:LinkButton ID="LinkButton" runat="server" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>'
-                                                            CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Width="100%" 
-                                                            OnClientClick='selectMenuItem()'></asp:LinkButton>
+                                                        <asp:LinkButton ID="LinkButton" runat="server" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>'  CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" 
+                                                            Font-Size='<%# If(IsSelected(Eval("RmbNo")), "9", "10")%>' Font-Bold='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
                                                     </td>
                                                     <td>
                                                         <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsSelected(Eval("RmbNo")) %>' />
@@ -829,10 +811,11 @@
                                                                 <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
                                                             </td>
                                                             <td align="left" width="100%">
-                                                                <asp:LinkButton ID="LinkButton" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Font-Bold='<%# IsSelected(Eval("RmbNo"))%>' meta:code='<% DataBind(); %>' Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>' OnClientClick="selectMenuItem();" Width="100%"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Text='<%# GetRmbTitleTeam(Eval("RID"), Eval("UserId"), Eval("RmbDate"))  %>' 
+                                                                    Font-Size='<%# If(IsSelected(Eval("RmbNo")), "9", "10")%>' Font-Bold='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
                                                             </td>
                                                             <td>
-                                                                <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsSelected(Eval("RmbNo")) %>' meta:code='<% DataBind(); %>' />
+                                                                <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsSelected(Eval("RmbNo")) %>'/>
                                                             </td>
                                                         </tr>
                                                     </table>
@@ -848,7 +831,8 @@
                                                                 <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
                                                             </td>
                                                             <td align="left" width="100%">
-                                                                <asp:LinkButton ID="LinkButton" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Size="10pt" Text='<%# GetAdvTitleTeam(Eval("LocalAdvanceId"),Eval("UserId"),  Eval("RequestDate"))  %>'  OnClientClick="selectMenuItem()" Width="100%"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Text='<%# GetAdvTitleTeam(Eval("LocalAdvanceId"),Eval("UserId"),  Eval("RequestDate"))  %>' 
+                                                                    Font-Size='<%# If(IsSelected(Eval("RmbNo")), "9", "10")%>' Font-Bold='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
                                                             </td>
                                                             <td>
                                                                 <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' />
@@ -872,7 +856,8 @@
                                                                 <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
                                                             </td>
                                                             <td align="left" width="100%">
-                                                                <asp:LinkButton ID="LinkButton" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>'  OnClientClick="selectMenuItem()" Width="100%"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>'
+                                                                    Font-Size='<%# If(IsSelected(Eval("RmbNo")), "9", "10")%>' Font-Bold='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
                                                             </td>
                                                             <td>
                                                                 <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsSelected(Eval("RmbNo")) %>' />
@@ -889,7 +874,8 @@
                                                                 <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
                                                             </td>
                                                             <td align="left" width="100%">
-                                                                <asp:LinkButton ID="LinkButton" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Size="10pt" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>'  OnClientClick="selectMenuItem()" Width="100%"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>' 
+                                                                    Font-Size='<%# If(IsSelected(Eval("RmbNo")), "9", "10")%>' Font-Bold='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
                                                             </td>
                                                             <td>
                                                                 <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' />
@@ -900,17 +886,8 @@
                                             </asp:DataList>
                                         </asp:Panel>
                                     </ContentTemplate>
-                                    <Triggers>
-                                        <asp:AsyncPostBackTrigger ControlID="dlToApprove" />
-                                        <asp:AsyncPostBackTrigger ControlID="dlSubmitted" />
-                                        <asp:AsyncPostBackTrigger ControlID="dlAdvSubmitted" />
-                                        <asp:AsyncPostBackTrigger ControlID="dlAdvToApprove" />
-                                    </Triggers>
                                 </asp:UpdatePanel>
                             </div>
-
-
-
                     </div>
                     <div>
                         <h3>
@@ -946,7 +923,8 @@
                                                                 <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
                                                             </td>
                                                             <td align="left" width="100%">
-                                                                <asp:LinkButton ID="LinkButton" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>'  OnClientClick="selectMenuItem()" Width="100%"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>'  
+                                                                    Font-Size='<%# If(IsSelected(Eval("RmbNo")), "9", "10")%>' Font-Bold='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
                                                             </td>
                                                             <td>
                                                                 <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsSelected(Eval("RmbNo")) %>' />
@@ -963,7 +941,8 @@
                                                                 <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
                                                             </td>
                                                             <td align="left" width="100%">
-                                                                <asp:LinkButton ID="LinkButton" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Size="10pt" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>'  OnClientClick="selectMenuItem()" Width="100%"></asp:LinkButton>
+                                                                <asp:LinkButton ID="LinkButton" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>'
+                                                                    Font-Size='<%# If(IsSelected(Eval("RmbNo")), "9", "10")%>' Font-Bold='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
                                                             </td>
                                                             <td>
                                                                 <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' />
@@ -1015,7 +994,8 @@
                                                         <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
                                                     </td>
                                                     <td align="left" width="100%">
-                                                        <asp:LinkButton ID="LinkButton" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' OnClientClick="selectMenuItem()" Width="100%"></asp:LinkButton>
+                                                        <asp:LinkButton ID="LinkButton" runat="server" CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>'
+                                                            Font-Size='<%# If(IsSelected(Eval("RmbNo")), "9", "10")%>' Font-Bold='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
                                                     </td>
                                                     <td>
                                                         <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsSelected(Eval("RmbNo")) %>' />
@@ -1032,7 +1012,8 @@
                                                         <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
                                                     </td>
                                                     <td align="left" width="100%">
-                                                        <asp:LinkButton ID="LinkButton" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Font-Size="10pt" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>'  OnClientClick="selectMenuItem()" Width="100%"></asp:LinkButton>
+                                                        <asp:LinkButton ID="LinkButton" runat="server" CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>' 
+                                                            Font-Size='<%# If(IsSelected(Eval("RmbNo")), "9", "10")%>' Font-Bold='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
                                                     </td>
                                                     <td>
                                                         <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsAdvSelected(Eval("AdvanceId")) %>' />
@@ -1064,7 +1045,8 @@
                                                 <tr valign="middle">
                                                     <td width="100%">
                                                         <asp:LinkButton ID="LinkButton" runat="server" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' 
-                                                            CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Font-Size="10pt"  OnClientClick="selectMenuItem()" ></asp:LinkButton>
+                                                            CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" 
+                                                            Font-Size='<%# If(IsSelected(Eval("RmbNo")), "9", "10")%>' Font-Bold='<%# IsSelected(Eval("RmbNo")) %>' ></asp:LinkButton>
                                                     </td>
                                                     <td>
                                                         <asp:Image ID="Image1" runat="server" ImageUrl="~/images/action_right.gif" Visible='<%# IsSelected(Eval("RmbNo")) %>' />

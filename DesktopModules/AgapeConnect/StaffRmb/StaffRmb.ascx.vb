@@ -202,9 +202,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 If hfRmbNo.Value <> "" Then
                     If CInt(hfRmbNo.Value) < 0 Then
-                        Await LoadAdv(-hfRmbNo.Value)
+                        Await LoadAdvAsync(-hfRmbNo.Value)
                     Else
-                        Await LoadRmb(hfRmbNo.Value)
+                        Await LoadRmbAsync(hfRmbNo.Value)
                     End If
                 Else
                     ltSplash.Text = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbSplash", PortalId))
@@ -707,7 +707,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End Try
         End Function
 
-        Public Async Function LoadAdv(ByVal AdvanceId As Integer) As Task
+        Public Async Function LoadAdvAsync(ByVal AdvanceId As Integer) As Task
             Try
                 pnlMain.Visible = False
                 pnlMainAdvance.Visible = True
@@ -932,7 +932,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
         End Sub
 
-        Public Async Function LoadRmb(ByVal RmbNo As Integer) As Task
+        Public Async Function LoadRmbAsync(ByVal RmbNo As Integer) As Task
 
             pnlMain.Visible = True
             pnlMainAdvance.Visible = False
@@ -944,12 +944,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim q = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo
                 If q.Count > 0 Then
                     Dim Rmb = q.First
-                    Dim updateApproversTask = updateApproversListAsync(Rmb)
-                    Dim updateAccountBalanceTask = refreshAccountBalanceAsync(Rmb.CostCenter, StaffRmbFunctions.logonFromId(PortalId, UserId))
 
                     '--hidden fields
                     hfChargeToValue.Value = If(Rmb.CostCenter Is Nothing, "", Rmb.CostCenter)
                     hfAccountBalance.Value = 0
+                    Dim updateApproversTask = updateApproversListAsync(Rmb)
+                    Dim updateAccountBalanceTask = refreshAccountBalanceAsync(Rmb.CostCenter, StaffRmbFunctions.logonFromId(PortalId, UserId))
 
                     Dim DRAFT = Rmb.Status = RmbStatus.Draft
                     Dim MORE_INFO = (Rmb.MoreInfoRequested IsNot Nothing AndAlso Rmb.MoreInfoRequested = True)
@@ -1333,7 +1333,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     sb.Append("<script language='javascript'>")
                     sb.Append("closePopup();")
                     sb.Append("</script>")
-                    Await LoadRmb(hfRmbNo.Value)
+                    Await LoadRmbAsync(hfRmbNo.Value)
                     ScriptManager.RegisterClientScriptBlock(Page, t, "", sb.ToString, False)
 
                 End If
@@ -1546,7 +1546,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     sb.Append("<script language='javascript'>")
                     sb.Append("closePopup();")
                     sb.Append("</script>")
-                    Await LoadRmb(hfRmbNo.Value)
+                    Await LoadRmbAsync(hfRmbNo.Value)
                     ScriptManager.RegisterClientScriptBlock(Page, t, "", sb.ToString, False)
                 End If
             End If
@@ -1599,7 +1599,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             sb.Append("<script language='javascript'>")
             sb.Append("closePopup2();")
             sb.Append("</script>")
-            Await LoadRmb(insert.RMBNo)
+            Await LoadRmbAsync(insert.RMBNo)
             ScriptManager.RegisterClientScriptBlock(tbNewChargeTo, t, "", sb.ToString, False)
 
         End Sub
@@ -1640,7 +1640,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 sb.Append("<script language='javascript'>")
                 sb.Append("alert(""" & message & """);")
                 sb.Append("</script>")
-                Await LoadRmb(hfRmbNo.Value)
+                Await LoadRmbAsync(hfRmbNo.Value)
                 ScriptManager.RegisterStartupScript(Page, t, "popup", sb.ToString, False)
 
             End If
@@ -1803,7 +1803,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo And c.PortalId = PortalId
             lblAdvError.Text = ""
             If rmb.Count > 0 Then
-                '--Dim rmbLoadTask = Await LoadRmb(RmbNo)
+                '--Dim rmbLoadTask = Await LoadRmbAsync(RmbNo)
                 rmb.First.UserComment = tbComments.Text
                 rmb.First.UserRef = tbYouRef.Text
                 rmb.First.ApprComment = tbApprComments.Text
@@ -1964,7 +1964,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             d.AP_Staff_RmbLines.DeleteAllOnSubmit(theLine)
             d.SubmitChanges()
             lblSplitError.Visible = False
-            Await LoadRmb(hfRmbNo.Value)
+            Await LoadRmbAsync(hfRmbNo.Value)
 
             Dim t As Type = btnOK.GetType()
             Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
@@ -2002,7 +2002,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             theRmb.First.MoreInfoRequested = False
             theRmb.First.ProcUserId = UserId
             d.SubmitChanges()
-            Await LoadRmb(hfRmbNo.Value)
+            Await LoadRmbAsync(hfRmbNo.Value)
             Log(theRmb.First.RMBNo, "Processed - this reimbursement will be added to the next download batch")
             Dim message = Translate("NextBatch")
             Dim t As Type = Me.GetType()
@@ -2063,7 +2063,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             'If hfRmbNo.Value <> "" Then
             '    If hfRmbNo.Value > 0 Then
-            '        Await LoadRmb(CInt(hfRmbNo.Value))
+            '        Await LoadRmbAsync(CInt(hfRmbNo.Value))
             '    Else
             '        LoadAdv(-CInt(hfRmbNo.Value))
             '    End If
@@ -2146,7 +2146,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Log(theRmb.RMBNo, "UNPROCESSED - before it was downloaded")
                 End If
             End If
-            Await LoadRmb(hfRmbNo.Value)
+            Await LoadRmbAsync(hfRmbNo.Value)
         End Sub
 
         Protected Async Sub GridView1_RowCommand(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.GridViewCommandEventArgs) Handles GridView1.RowCommand
@@ -2154,7 +2154,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 ' d.AP_Staff_RmbLineAddStaffs.DeleteAllOnSubmit(From c In d.AP_Staff_RmbLineAddStaffs Where c.RmbLineId = CInt(e.CommandArgument))
                 d.AP_Staff_RmbLines.DeleteAllOnSubmit(From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(e.CommandArgument))
                 d.SubmitChanges()
-                Await LoadRmb(hfRmbNo.Value)
+                Await LoadRmbAsync(hfRmbNo.Value)
 
             ElseIf e.CommandName = "myEdit" Then
                 Dim theLine = From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(e.CommandArgument)
@@ -2348,7 +2348,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     sb.Append("<script language='javascript'>")
                     sb.Append("window.open('mailto:" & theUser.Email & "?subject=Reimbursment " & theLine.First.AP_Staff_Rmb.RID & ": Deferred Transactions');")
                     sb.Append("</script>")
-                    Await LoadRmb(hfRmbNo.Value)
+                    Await LoadRmbAsync(hfRmbNo.Value)
                     ScriptManager.RegisterStartupScript(GridView1, t, "email", sb.ToString, False)
 
                 End If
@@ -2357,11 +2357,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Sub
 
         Protected Async Sub dlApproved_ItemCommand(ByVal source As Object, ByVal e As System.Web.UI.WebControls.DataListCommandEventArgs) Handles dlProcessed.ItemCommand, dlAdvProcessed.ItemCommand, dlApproved.ItemCommand, dlCancelled.ItemCommand, dlToApprove.ItemCommand, dlSubmitted.ItemCommand, dlPending.ItemCommand, dlAdvApproved.ItemCommand, dlAdvSubmitted.ItemCommand, dlAdvToApprove.ItemCommand, dlAdvApproved.ItemCommand
+            hfRmbNo.Value = e.CommandArgument
             If e.CommandName = "Goto" Then
-                Await LoadRmb(e.CommandArgument)
-                UpdatePanel4.Update()
+                Dim loadRmbTask = LoadRmbAsync(e.CommandArgument)
+                Dim resetMenuTask = ResetMenuAsync()
+                Await loadRmbTask
+                Await resetMenuTask
             ElseIf e.CommandName = "GotoAdvance" Then
-                Await LoadAdv(e.CommandArgument)
+                Await LoadAdvAsync(e.CommandArgument)
+                Await ResetMenuAsync()
             End If
         End Sub
 
@@ -3524,9 +3528,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 If hfRmbNo.Value <> "" Then
                     If hfRmbNo.Value > 0 Then
-                        Await LoadRmb(CInt(hfRmbNo.Value))
+                        Await LoadRmbAsync(CInt(hfRmbNo.Value))
                     Else
-                        Await LoadAdv(-CInt(hfRmbNo.Value))
+                        Await LoadAdvAsync(-CInt(hfRmbNo.Value))
                     End If
 
 
@@ -3727,7 +3731,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ' DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agape.org.uk", theUser.Email, "donotreply@agape.org.uk", "Rmb#: " & hfRmbNo.Value & "-" & rmb.First.UserRef & " has been approved", Emessage, "", "HTML", "", "", "", "")
                     DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agapeconnect.me", theUser.Email, "", Translate("AdvEmailApprovedSubject").Replace("[ADVNO]", q.First.LocalAdvanceId).Replace("[APPROVER]", ObjAppr.DisplayName), Emessage, "", "HTML", "", "", "", "")
 
-                    Dim loadAdvTask = LoadAdv(-hfRmbNo.Value)
+                    Dim loadAdvTask = LoadAdvAsync(-hfRmbNo.Value)
 
                     Log(q.First.AdvanceId, "Advance Approved")
 
@@ -3764,7 +3768,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ' DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agape.org.uk", theUser.Email, "donotreply@agape.org.uk", "Rmb#: " & hfRmbNo.Value & "-" & rmb.First.UserRef & " has been cancelled", Message, "", "HTML", "", "", "", "")
                     DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agapeconnect.me", StaffMbr.Email, "", Translate("AdvEmailCancelledSubject").Replace("[ADVNO]", q.First.LocalAdvanceId), Message, "", "HTML", "", "", "", "")
 
-                    Await LoadAdv(-hfRmbNo.Value)
+                    Await LoadAdvAsync(-hfRmbNo.Value)
 
                 End If
             End If
@@ -3796,7 +3800,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     d.SubmitChanges()
                 End If
             End If
-            Await LoadAdv(-hfRmbNo.Value)
+            Await LoadAdvAsync(-hfRmbNo.Value)
         End Sub
 
         Protected Sub SendMessage(ByVal Message As String, Optional ByVal AppendLines As String = "", Optional ByVal Startup As Boolean = True)
@@ -3828,7 +3832,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 q.First.ProcessedDate = Today
                 d.SubmitChanges()
 
-                Await LoadAdv(-hfRmbNo.Value)
+                Await LoadAdvAsync(-hfRmbNo.Value)
                 Log(q.First.AdvanceId, "Advance Processed - this advance will be added to the next download batch")
                 SendMessage(Translate("NextBatchAdvance"))
 
@@ -3845,7 +3849,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 d.SubmitChanges()
 
-                Await LoadAdv(-hfRmbNo.Value)
+                Await LoadAdvAsync(-hfRmbNo.Value)
 
                 Log(q.First.AdvanceId, "Advance UnProcessed")
 
