@@ -1509,7 +1509,7 @@
                                         <td>
                                             <asp:Label ID="lblAdvReason" runat="server" ResourceKey="AdvReason" Font-Bold="true"></asp:Label>:
                                         </td>
-                                        <td class="ui-widget ui-widget-content ui-corner-all" style="width: 100%px; padding: 7px 7px 7px 7px;">
+                                        <td class="ui-widget ui-widget-content ui-corner-all" style="width: 100%; padding: 7px 7px 7px 7px;">
                                             <asp:Label ID="AdvReason" runat="server" Font-Italic="true" Font-Size="Medium"></asp:Label>
 
                                         </td>

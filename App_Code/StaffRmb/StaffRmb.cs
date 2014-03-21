@@ -252,31 +252,31 @@ namespace StaffRmb
 
         static private async Task<string> getResultFromWebServiceAsync(string url, string postString)
         {
+
+            byte[] postData = Encoding.UTF8.GetBytes(postString);
+            //send request
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.KeepAlive = false; //This and the following line are required to prevent "connection closed" problems
+            request.ProtocolVersion = HttpVersion.Version10;
+            request.Method = "POST";
+            request.ContentType = "application/x-www-form-urlencoded";
+            request.ContentLength = postData.Length;
+            using (var requestStream = await request.GetRequestStreamAsync())
+            {
+                await requestStream.WriteAsync(postData, 0, postData.Length);
+            }
             try
             {
-                byte[] postData = Encoding.UTF8.GetBytes(postString);
-                //send request
-                HttpWebRequest request = (HttpWebRequest) WebRequest.Create(url);
-                request.KeepAlive = false; //This and the following line are required to prevent "connection closed" problems
-                request.ProtocolVersion = HttpVersion.Version10;
-                request.Method = "POST";
-                request.ContentType = "application/x-www-form-urlencoded";
-                request.ContentLength = postData.Length;
-                Stream requestStream = await request.GetRequestStreamAsync();
-                requestStream.Write(postData, 0, postData.Length);
-                requestStream.Close();
-                //get response
-                WebResponse response = await request.GetResponseAsync();
-                Stream responseStream = response.GetResponseStream();
-                StreamReader reader = new StreamReader(responseStream, Encoding.ASCII);
-                String response_string = await reader.ReadToEndAsync();
-                reader.Close();
-                responseStream.Close();
-                response.Close();
-
-                return response_string;
+                var response = (HttpWebResponse)await request.GetResponseAsync();
+                if (response != null)
+                {
+                    var reader = new StreamReader(response.GetResponseStream());
+                    String response_string = await reader.ReadToEndAsync();
+                    return response_string;
+                }
+                return "NO-DATA";
             }
-            catch (Exception e)
+            catch (WebException e)
             {
                 return "ERROR";
             }
