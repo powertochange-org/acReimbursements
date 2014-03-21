@@ -668,6 +668,16 @@
         $('#<%=btnSave.ClientID%>').show();
     }
 
+    function showAccountBalance() {
+        $('#budgetBalanceDiv').hide(0);
+        $('#accountBalanceDiv').show(0);        
+    }
+
+    function showBudgetBalance() {
+        $('#accountBalanceDiv').hide(0);
+        $('#budgetBalanceDiv').show(0);
+    }
+
 </script>
 <style type="text/css">
     .AgapeWarning {
@@ -1093,15 +1103,22 @@
                                     </asp:TextBox>
                                     <asp:HiddenField ID="hfChargeToValue" runat="server"  />
                                 </div>
-                                <div class="inverse" style="width:100%; margin-top:1px; padding-top:3px; padding-bottom:3px; float: left">
+                                <div class="inverse" style="width:100%; margin-top:1px; padding-top:3px; padding-bottom:3px; float: left" onmouseover="showAccountBalance()" onmouseout="showBudgetBalance()">
                                     <asp:Label ID="lblStatus" runat="server" Style="float: left; font-style: italic; font-size:13px; padding-left:70px"></asp:Label>
-
-                                    <asp:Label ID="lblAccountBalance" runat="server" Style="float: right; font-style: italic; padding-right:10px; margin-right: 3px;  font-size:13px;" Text="searching..."></asp:Label>
-                                    <asp:Label ID="ttlAccountBalance" runat="server" Style="float: right; margin-right: 3px; font-style: italic;  font-size:13px;"
-                                        resourceKey="AccountBalance"></asp:Label>
-                                    <asp:HiddenField ID="hfAccountBalance" runat="server" />
+                                    <div style="float: right; padding-right:10px; margin-right: 3px;">
+                                        <div id="accountBalanceDiv" style="display:none">
+                                            <asp:Label ID="ttlAccountBalance" runat="server" Style="margin-right: 3px; font-style: italic;  font-size:13px;" resourceKey="AccountBalance"></asp:Label>
+                                            <asp:Label ID="lblAccountBalance" runat="server" Style="font-style: italic; font-size:13px;"></asp:Label>
+                                            <asp:HiddenField ID="hfAccountBalance" runat="server" />
+                                        </div>
+                                        <div id="budgetBalanceDiv">
+                                            <asp:Label ID="ttlBudgetBalance" runat="server" Style="margin-right: 3px; font-size:13px;" resourceKey="BudgetBalance"></asp:Label>
+                                            <asp:Label ID="lblBudgetBalance" runat="server" Style="font-size:13px;"></asp:Label>
+                                            <asp:HiddenField ID="hfBudgetBalance" runat="server" />
+                                        </div>
                                     </div>
-                                    <asp:Image ID="imgAvatar" runat="server" Width="50px" ImageUrl="/images/no_avatar.gif" Style="float: left; margin-top:-54px; margin-right: 5px; border-width: 2pt; border-style: solid;" />
+                                </div>
+                                <asp:Image ID="imgAvatar" runat="server" Width="50px" ImageUrl="/images/no_avatar.gif" Style="float: left; margin-top:-54px; margin-right: 5px; border-width: 2pt; border-style: solid;" />
                                 <div style="clear: both;">
                                 </div>
                             </div>

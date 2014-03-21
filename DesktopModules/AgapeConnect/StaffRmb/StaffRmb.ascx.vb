@@ -948,8 +948,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     '--hidden fields
                     hfChargeToValue.Value = If(Rmb.CostCenter Is Nothing, "", Rmb.CostCenter)
                     hfAccountBalance.Value = 0
+                    lblAccountBalance.Text = "searching..."
+                    lblBudgetBalance.Text = "searching..."
+
                     Dim updateApproversTask = updateApproversListAsync(Rmb)
                     Dim updateAccountBalanceTask = refreshAccountBalanceAsync(Rmb.CostCenter, StaffRmbFunctions.logonFromId(PortalId, UserId))
+                    Dim updateBudgetBalanceTask = refreshBudgetBalanceAsync(Rmb.CostCenter, StaffRmbFunctions.logonFromId(PortalId, UserId))
 
                     Dim DRAFT = Rmb.Status = RmbStatus.Draft
                     Dim MORE_INFO = (Rmb.MoreInfoRequested IsNot Nothing AndAlso Rmb.MoreInfoRequested = True)
@@ -996,8 +1000,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     If (Rmb.MoreInfoRequested) Then
                         lblStatus.Text = lblStatus.Text & " - " & Translate("StatusMoreInfo")
                     End If
-                    lblAccountBalance.Text = "Unknown"
-                    lblAdvanceBalance.Text = "Unknown"
+                    'accountBalanceDiv.Style.Add(HtmlTextWriterStyle.Display, "none")
 
                     '*** FORM HEADER ***
                     '--dates
@@ -1111,6 +1114,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
                     Await updateApproversTask
                     Await updateAccountBalanceTask
+                    Await updateBudgetBalanceTask
                 Else
                     pnlMain.Visible = False
                     pnlSplash.Visible = True
@@ -4506,6 +4510,17 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End Try
             lblAccountBalance.Text = accountBalance
         End Function
+
+        Private Async Function refreshBudgetBalanceAsync(account As String, logon As String) As Task
+            Dim budgetBalance = Await StaffRmbFunctions.getBudgetBalanceAsync(account, logon)
+            Try
+                hfBudgetBalance.Value = Double.Parse(budgetBalance)
+            Catch
+                hfBudgetBalance.Value = 0
+            End Try
+            lblBudgetBalance.Text = budgetBalance
+        End Function
+
 
     End Class
 End Namespace
