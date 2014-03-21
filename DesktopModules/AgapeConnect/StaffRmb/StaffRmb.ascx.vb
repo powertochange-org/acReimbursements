@@ -1721,6 +1721,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 rmb.First.ApprUserId = UserId
                 rmb.First.Period = Nothing
                 rmb.First.Year = Nothing
+                Dim submitChangesTask = SubmitChangesAsync()
+                Dim resetMenuTask = ResetMenuAsync()
 
                 'SEND EMAIL TO OTHER APPROVERS
                 Dim Auth = UserController.GetUserById(PortalId, Settings("AuthUser"))
@@ -1758,20 +1760,22 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 ' End If
                 Emessage = Emessage.Replace("[STAFFNAME]", theUser.DisplayName).Replace("[RMBNO]", rmb.First.RID).Replace("[USERREF]", IIf(rmb.First.UserRef <> "", rmb.First.UserRef, "None"))
                 Emessage = Emessage.Replace("[APPROVER]", ObjAppr.DisplayName)
+                Await submitChangesTask
                 If rmb.First.Changed = True Then
                     Emessage = Emessage.Replace("[CHANGES]", ". " & Translate("EmailApproverChanged"))
                     rmb.First.Changed = False
+                    Await SubmitChangesAsync()
                 Else
                     Emessage = Emessage.Replace("[CHANGES]", "")
                 End If
-                d.SubmitChanges()
+
 
                 ' DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agape.org.uk", theUser.Email, "donotreply@agape.org.uk", "Rmb#: " & hfRmbNo.Value & "-" & rmb.First.UserRef & " has been approved", Emessage, "", "HTML", "", "", "", "")
                 DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agapeconnect.me", theUser.Email, "", Translate("EmailApprovedSubjectP").Replace("[RMBNO]", rmb.First.RID).Replace("[USERREF]", rmb.First.UserRef), Emessage, "", "HTML", "", "", "", "")
 
                 btnApprove.Visible = False
 
-                Await ResetMenuAsync()
+                Await resetMenuTask
 
                 Log(rmb.First.RMBNo, "Approved")
                 Dim message As String = Translate("RmbApproved").Replace("[RMBNO]", rmb.First.RID)
@@ -2441,10 +2445,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Catch
                 rmb.First.ApprUserId = Nothing
             End Try
+            Dim refresh = (rmb.First.Status <> RmbStatus.Draft)
             rmb.First.Status = RmbStatus.Draft
+            lblStatus.Text = Translate(RmbStatus.StatusName(RmbStatus.Draft))
+            btnSubmit.Visible = rmb.First.AP_Staff_RmbLines.Count > 0
+            btnSubmit.Enabled = (rmb.First.CostCenter IsNot Nothing And rmb.First.ApprUserId IsNot Nothing _
+                                 AndAlso (rmb.First.CostCenter.Length = 6) And (rmb.First.ApprUserId >= 0))
             Await SubmitChangesAsync()
-            If btnSubmit.Visible And rmb.First.CostCenter IsNot Nothing And rmb.First.ApprUserId IsNot Nothing AndAlso (rmb.First.CostCenter.Length = 6) And (rmb.First.ApprUserId >= 0) Then
-                btnSubmit.Enabled = True
+            If refresh Then
+                Await ResetMenuAsync()
             End If
             ScriptManager.RegisterStartupScript(ddlApprovedBy, ddlApprovedBy.GetType(), "selectDrafts", "selectIndex(0)", True)
         End Sub

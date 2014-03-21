@@ -749,7 +749,7 @@
                             <a href="#" id="Tab0" class="AcHdr">
                                 <asp:Label ID="Label5" runat="server" Font-Bold="true" ResourceKey="Draft"></asp:Label></a></h3>
                         <div id="DraftPane" class="AcPane">
-                            <asp:UpdatePanel ID="UpdatePanel5" runat="server" updatemode="Conditional">
+                            <asp:UpdatePanel ID="UpdatePanel5" runat="server" >
                                 <ContentTemplate>
                                     <h4><asp:Label ID="lblHighlight" runat="server" class="ui-state-highlight ui-corner-all"
                                         Style="padding: 3px; display: block;" resourcekey="AccountsMode" Visible="false"></asp:Label></h4>
@@ -795,7 +795,7 @@
 
                            </h3>
                             <div id="SubmittedPane">
-                                <asp:UpdatePanel ID="UpdatePanel4" runat="server" updatemode="Conditional">
+                                <asp:UpdatePanel ID="UpdatePanel4" runat="server">
                                     <ContentTemplate>
                                         <asp:TreeView ID="tvAllSubmitted" class="accounts_team" runat="server" NodeIndent="10">
                                         </asp:TreeView>
@@ -901,7 +901,7 @@
                             </a>
                             </h3>
                             <div id="ApprovedPane">
-                                <asp:UpdatePanel ID="UpdatePanel6" runat="server" updatemode="Conditional" >
+                                <asp:UpdatePanel ID="UpdatePanel6" runat="server" >
                                     <ContentTemplate>
                                         <asp:TreeView ID="tvTeamApproved" class="team_leader" runat="server" ResourceKey="TeamRmbs" NodeIndent="10">
                                         </asp:TreeView>
@@ -972,7 +972,7 @@
                             </a>
                         </h3>
                         <div id="ProcessedPane">
-                            <asp:UpdatePanel ID="UpdatePanel7" runat="server" updatemode="Conditional" >
+                            <asp:UpdatePanel ID="UpdatePanel7" runat="server" >
                                 <ContentTemplate>
                                     <asp:TreeView ID="tvAllProcessed" class="accounts_team" runat="server" NodeIndent="10">
                                     </asp:TreeView>
@@ -1035,7 +1035,7 @@
                             <a href="#" class="aLink">
                                 <asp:Label ID="Label9" runat="server" Font-Bold="true" ResourceKey="Cancelled"></asp:Label></a></h3>
                         <div id="CancelledPane">
-                            <asp:UpdatePanel ID="UpdatePanel8" runat="server" updatemode="Conditional" >
+                            <asp:UpdatePanel ID="UpdatePanel8" runat="server">
                                 <ContentTemplate>
                                     <asp:DataList ID="dlCancelled" runat="server" Width="100%">
                                         <ItemStyle CssClass="dnnGridItem" />
