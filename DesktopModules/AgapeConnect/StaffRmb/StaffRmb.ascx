@@ -761,7 +761,7 @@
                         <div id="DraftPane" class="AcPane">
                             <asp:UpdatePanel ID="UpdatePanel5" runat="server" >
                                 <ContentTemplate>
-                                    <h5><asp:Label ID="lblHighlight" runat="server" class="ui-state-highlight ui-corner-all"
+                                    <h5><asp:Label ID="lblAccountsTeam" runat="server" class="ui-state-highlight ui-corner-all"
                                         Style="padding: 2px; border-radius:5px; background-color:black; color:#CCC; display: block; text-align:center;" 
                                         resourcekey="AccountsMode" Visible="false"></asp:Label></h5>
                                     <asp:Label ID="lblErrors" runat="server" class="ui-state-error ui-corner-all"
@@ -1241,8 +1241,6 @@
                                     </tr>
                                 </table>
                                 <br />
-                                <br />
-
 
                                 <asp:Label ID="lblTest" runat="server" Text="Label" Visible="false"></asp:Label>
                                 <div style="padding: 0 20px 0 20px;">

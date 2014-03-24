@@ -3,8 +3,6 @@
 <%@ Register TagPrefix="dnn" TagName="Label" Src="~/controls/LabelControl.ascx" %>
 
 
-<asp:HiddenField ID="hfAddStaffRate" runat="server" />
-
 <div class="Agape_SubTitle"> <asp:HiddenField ID="hfNoReceiptLimit" runat="server" Value="0" />
     <asp:Label ID="Label2" runat="server" Font-Italic="true" ForeColor="Gray" resourcekey="Explanation"></asp:Label>
 </div>
@@ -31,7 +29,7 @@
                 <asp:TextBox ID="tbDistance" runat="server" Width="90px" class="numeric"></asp:TextBox>
             </td>
             <td>
-                <asp:DropDownList ID="ddlDistUnits" runat="server" ></asp:DropDownList>
+                <asp:DropDownList ID="ddlDistUnits" runat="server"></asp:DropDownList>
             </td>
 
         </tr>

@@ -98,7 +98,7 @@ Partial Class controls_Mileage
         Set(ByVal value As String)
             Try
                 ddlDistUnits.ClearSelection()
-                ddlDistUnits.SelectedIndex = value
+                ddlDistUnits.SelectedIndex = CInt(value)
             Catch ex As Exception
                 ddlDistUnits.SelectedIndex = 0
 
@@ -208,9 +208,6 @@ Partial Class controls_Mileage
     End Sub
 
 
-   
-    Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
-    End Sub
 End Class
 
 

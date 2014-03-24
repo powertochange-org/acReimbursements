@@ -172,7 +172,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 pnlAccountsOptions.Visible = acc
                 pnlVAT.Visible = Settings("VatAttrib")
 
-                lblHighlight.Visible = acc '--this is the label to indicate that you are on the finance team
+                lblAccountsTeam.Visible = acc '--this is the label to indicate that you are on the finance team
                 If acc Then
                     Dim errors = From c In d.AP_Staff_Rmbs Where c.PortalId = PortalId And c.Error = True And (c.Status = RmbStatus.PendingDownload Or c.Status = RmbStatus.DownloadFailed Or c.Status = RmbStatus.Approved)
 
@@ -213,14 +213,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
         End Function
 
-        Protected Sub UpdatePanel2_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles UpdatePanel2.Load
+        Protected Async Sub UpdatePanel2_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles UpdatePanel2.Load
             Try
                 Dim lt = From c In d.AP_Staff_RmbLineTypes Where c.LineTypeId = ddlLineTypes.SelectedValue
 
                 If lt.Count > 0 Then
 
                     phLineDetail.Controls.Clear()
-                    theControl = LoadControl(lt.First.ControlPath)
+                    theControl = Await LoadControlAsync(lt.First.ControlPath)
                     theControl.ID = "theControl"
                     phLineDetail.Controls.Add(theControl)
 
@@ -1801,6 +1801,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Protected Async Function btnSave_Click(ByVal sender As Object, ByVal e As System.EventArgs) As Task Handles btnSave.Click, btnSaveAdv.Click
             Dim RmbNo As Integer
             Dim PortalId As Integer
+
             Try
                 RmbNo = CInt(hfRmbNo.Value)
                 PortalId = CInt(hfPortalId.Value)
@@ -1814,6 +1815,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 '--Dim rmbLoadTask = Await LoadRmbAsync(RmbNo)
                 rmb.First.UserComment = tbComments.Text
                 rmb.First.UserRef = tbYouRef.Text
+                Dim reloadMenu = (Not rmb.First.UserRef.Equals(tbYouRef.Text))
                 rmb.First.ApprComment = tbApprComments.Text
                 rmb.First.MoreInfoRequested = cbMoreInfo.Checked Or cbApprMoreInfo.Checked
                 If (cbMoreInfo.Checked Or cbApprMoreInfo.Checked) Then
@@ -1848,7 +1850,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 End Try
 
                 Await SubmitChangesAsync()
-                '--Await rmbLoadTask  'Don't need to reload on a save.
+                If (reloadMenu) Then
+                    Await ResetMenuAsync()
+                End If
             End If
 
         End Function
@@ -1857,13 +1861,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             'ddlLineTypes_SelectedIndexChanged(Me, Nothing)
             'ddlCostcenter.SelectedValue = ddlChargeTo.SelectedValue
-            Await saveIfNecessaryAsync()
+
+            Dim saveTask = saveIfNecessaryAsync()
             tbCostcenter.Text = hfChargeToValue.Value
 
             ddlLineTypes.Items.Clear()
             Dim lineTypes = From c In d.AP_StaffRmb_PortalLineTypes Where c.PortalId = PortalId Order By c.ViewOrder Select c.AP_Staff_RmbLineType.LineTypeId, c.LocalName, c.PCode, c.DCode
 
-            '            If StaffBrokerFunctions.IsDept(PortalId, ddlChargeTo.SelectedValue) Then
             If StaffBrokerFunctions.IsDept(PortalId, hfChargeToValue.Value) Then
                 lineTypes = lineTypes.Where(Function(x) x.DCode <> "")
 
@@ -1873,7 +1877,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             ddlLineTypes.DataSource = lineTypes
             ddlLineTypes.DataBind()
 
-            ResetNewExpensePopup(True)
+            Await ResetNewExpensePopupAsync(True)
+            Await saveTask
             cbRecoverVat.Checked = False
             tbVatRate.Text = ""
             tbShortComment.Text = ""
@@ -2161,7 +2166,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If e.CommandName = "myDelete" Then
                 ' d.AP_Staff_RmbLineAddStaffs.DeleteAllOnSubmit(From c In d.AP_Staff_RmbLineAddStaffs Where c.RmbLineId = CInt(e.CommandArgument))
                 d.AP_Staff_RmbLines.DeleteAllOnSubmit(From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(e.CommandArgument))
-                d.SubmitChanges()
+                Await SubmitChangesAsync()
                 Await LoadRmbAsync(hfRmbNo.Value)
 
             ElseIf e.CommandName = "myEdit" Then
@@ -2202,7 +2207,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
 
                     ddlLineTypes.SelectedValue = theLine.First.LineType
-                    ddlLineTypes_SelectedIndexChanged(Me, Nothing)
+                    Await ddlLineTypes_SelectedIndexChanged(Me, Nothing)
 
                     Dim ucType As Type = theControl.GetType()
                     ucType.GetProperty("Comment").SetValue(theControl, theLine.First.Comment, Nothing)
@@ -2289,7 +2294,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     sb.Append(jscript & "showPopup();")
                     sb.Append("</script>")
                     ScriptManager.RegisterStartupScript(GridView1, t, "popupedit", sb.ToString, False)
-
                 End If
             ElseIf e.CommandName = "mySplit" Then
                 hfRows.Value = 1
@@ -2348,7 +2352,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Else
                         theLine.First.AP_Staff_Rmb = q.First
                     End If
-                    d.SubmitChanges()
+                    Dim loadRmbTask = LoadRmbAsync(hfRmbNo.Value)
+                    Await SubmitChangesAsync()
 
                     Dim theUser = UserController.GetUserById(PortalId, theLine.First.AP_Staff_Rmb.UserId)
                     Dim t As Type = GridView1.GetType()
@@ -2356,7 +2361,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     sb.Append("<script language='javascript'>")
                     sb.Append("window.open('mailto:" & theUser.Email & "?subject=Reimbursment " & theLine.First.AP_Staff_Rmb.RID & ": Deferred Transactions');")
                     sb.Append("</script>")
-                    Await LoadRmbAsync(hfRmbNo.Value)
+                    Await loadRmbTask
+
                     ScriptManager.RegisterStartupScript(GridView1, t, "email", sb.ToString, False)
 
                 End If
@@ -2381,7 +2387,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
 #End Region
 #Region "OnChange Events"
-        Protected Sub ddlLineTypes_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles ddlLineTypes.SelectedIndexChanged
+        Protected Async Function ddlLineTypes_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) As Task Handles ddlLineTypes.SelectedIndexChanged
+            Dim resetTask = ResetNewExpensePopupAsync(False)
             If lblIncType.Visible And ddlLineTypes.SelectedIndex <> ddlLineTypes.Items.Count - 1 Then
                 Dim oldValue = ddlLineTypes.SelectedValue
                 ddlLineTypes.Items.Clear()
@@ -2399,8 +2406,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 btnAddLine.Enabled = True
             End If
 
-            ResetNewExpensePopup(False)
-        End Sub
+            Await resetTask
+        End Function
 
         Protected Async Sub tbChargeTo_ValueChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles tbChargeTo.TextChanged
             'The User selected a new cost centre
@@ -2906,10 +2913,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             d.SubmitChanges()
         End Function
 
-        Private Async Function saveIfNecessaryAsync() As task
-            If (btnSave.Text = Translate("btnSave")) Then
-                Await btnSave_Click(Me, Nothing)
-            End If
+        Private Async Function saveIfNecessaryAsync() As Task
+            'TODO: logic to determine if save is required or not
+            Await btnSave_Click(Me, Nothing)
         End Function
 
         Protected Sub Log(ByVal RmbNo As Integer, ByVal Message As String)
@@ -3024,10 +3030,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         End Function
 
-        Protected Sub ResetNewExpensePopup(ByVal blankValues As Boolean)
+        Protected Async Function ResetNewExpensePopupAsync(ByVal blankValues As Boolean) As task
             Try
-
-
                 Dim lt = From c In d.AP_Staff_RmbLineTypes Where c.LineTypeId = ddlLineTypes.SelectedValue
                 If lt.Count > 0 Then
                     Dim Comment As String = ""
@@ -3037,10 +3041,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim Receipt As Boolean = True
 
                     If Not blankValues Then
-
-
                         Try
-
                             If Not (theControl Is Nothing) Then
                                 Dim ucTypeOld As Type = theControl.GetType()
                                 Comment = CStr(ucTypeOld.GetProperty("Comment").GetValue(theControl, Nothing))
@@ -3048,30 +3049,19 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                 Amount = CDbl(ucTypeOld.GetProperty("Amount").GetValue(theControl, Nothing))
                                 VAT = CStr(ucTypeOld.GetProperty("VAT").GetValue(theControl, Nothing))
                                 Receipt = CStr(ucTypeOld.GetProperty("Receipt").GetValue(theControl, Nothing))
-
-
-
                             End If
-
                         Catch ex As Exception
-
                         End Try
                     End If
                     ' Save the standard values
-
-
-
                     phLineDetail.Controls.Clear()
-
                     ddlOverideTax.SelectedIndex = 0
-
-                    theControl = LoadControl(lt.First.ControlPath)
+                    theControl = Await LoadControlAsync(lt.First.ControlPath)
 
                     theControl.ID = "theControl"
                     phLineDetail.Controls.Add(theControl)
 
                     Dim ucType As Type = theControl.GetType()
-
                     ucType.GetProperty("Comment").SetValue(theControl, Comment, Nothing)
                     ucType.GetProperty("Amount").SetValue(theControl, Amount, Nothing)
                     ucType.GetProperty("theDate").SetValue(theControl, theDate, Nothing)
@@ -3084,29 +3074,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ucType.GetProperty("Spare5").SetValue(theControl, "", Nothing)
                     ucType.GetMethod("Initialize").Invoke(theControl, New Object() {Settings})
 
-
-                    'Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value)
-                    'If rmb.Count > 0 Then
-                    '    'Dim codes = From c In lt.First.AP_StaffRmb_PortalLineTypes Where c.PortalId = PortalId
-                    '    'If codes.Count > 0 Then
-                    '    '    If codes.First.DCode.Length = 0 Or rmb.First.CostCenter = StaffBrokerFunctions.GetStaffMember(rmb.First.UserId).CostCenter Then
-                    '    '        ddlAccountCode.SelectedValue = codes.First.PCode
-                    '    '    Else
-                    '    '        ddlAccountCode.SelectedValue = codes.First.DCode
-                    '    '    End If
-                    '    'End If
-
-                    'End If
                     ddlAccountCode.SelectedValue = GetAccountCode(lt.First.LineTypeId, tbCostcenter.Text)
-
-
                 End If
-
-
             Catch ex As Exception
                 StaffBrokerFunctions.EventLog("Error Resetting Expense Popup", ex.ToString, UserId)
             End Try
-        End Sub
+        End Function
 
         Protected Sub SendApprovalEmail(ByVal theRmb As AP_Staff_Rmb)
             Try
@@ -4519,6 +4492,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 hfBudgetBalance.Value = 0
             End Try
             lblBudgetBalance.Text = budgetBalance
+        End Function
+
+        Private Async Function LoadControlAsync(path As String) As Task(Of Object)
+            Return LoadControl(path)
         End Function
 
 
