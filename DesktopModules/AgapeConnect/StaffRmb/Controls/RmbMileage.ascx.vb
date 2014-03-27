@@ -163,6 +163,9 @@ Partial Class controls_Mileage
             If theMiles <= 0 Then
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Reverse.Error", LocalResourceFile)
                 Return False
+            ElseIf theMiles <= 1 Then
+                ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Miles.Error", LocalResourceFile)
+                Return False
             End If
         Catch ex As Exception
             ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Miles.Error", LocalResourceFile)

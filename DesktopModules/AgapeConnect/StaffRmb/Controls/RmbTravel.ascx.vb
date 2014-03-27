@@ -215,7 +215,7 @@ Partial Class controls_RmbTravel
             '    ErrorLbl.Text = "*For transactions £5 and over, a receipt must be supplied."
             '    Return False
             'End If
-            If Amount <= 0 Then
+            If Amount <= 0.01 Then
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Amount.Error", LocalResourceFile)
                 Return False
             End If

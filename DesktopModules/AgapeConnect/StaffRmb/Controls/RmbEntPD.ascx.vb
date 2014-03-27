@@ -173,7 +173,7 @@ Partial Class controls_RmbEntPD
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Limit.Error", LocalResourceFile)
                 Return False
             End If
-            If theAmount <= 0 Then
+            If theAmount <= 0.01 Then
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Amount.Error", LocalResourceFile)
                 Return False
             End If

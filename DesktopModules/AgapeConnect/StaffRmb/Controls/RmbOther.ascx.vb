@@ -199,7 +199,7 @@ Partial Class controls_RmbOther
 
         Try
             Dim theAmount As Double = Double.Parse(tbAmount.Text, New CultureInfo("en-US").NumberFormat)
-            If theAmount <= 0 Then
+            If theAmount <= 0.01 Then
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Amount.Error", LocalResourceFile)
                 Return False
             End If
