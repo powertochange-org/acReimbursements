@@ -623,9 +623,26 @@
    }
 
     function setUpAutocomplete() {
-        var costcenters=<%=StaffRmb.StaffRmbFunctions.getCostCentres()%>
+        var costcenters = {};
+        var cache = {};
         $("#<%= tbChargeTo.ClientID%>").autocomplete({
-            source: costcenters,
+            source:  function(request, response) {
+                var term = request.term;
+                if (term in cache) {
+                    response(cache[term]);
+                    return;
+                }
+                $.ajax({
+                    url:"DesktopModules/AgapeConnect/StaffRmb/WebService.asmx/GetAccountNumbers",
+                    dataType: "json",
+                    data: {term: term},
+                    type: "POST",
+                    success: function(data) {
+                        cache[term] = data;
+                        response(data);
+                    }
+                });
+            },
             select: function(event, ui) {
                 $('#<%= tbChargeTo.ClientID%>').val(ui.item.value).change();
                 $('#<%= hfChargeToValue.ClientID%>').val(ui.item.value);
