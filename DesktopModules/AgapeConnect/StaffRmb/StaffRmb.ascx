@@ -623,7 +623,6 @@
    }
 
     function setUpAutocomplete() {
-        var costcenters = {};
         var cache = {};
         $("#<%= tbChargeTo.ClientID%>").autocomplete({
             source:  function(request, response) {
@@ -664,14 +663,56 @@
             minLength: 2
         });
         $("#<%= tbNewChargeTo.ClientID%>").autocomplete({
-            source:costcenters, 
+            source:  function(request, response) {
+                var term = request.term;
+                if (term in cache) {
+                    console.info('accounts list from cache');
+                    response(cache[term]);
+                    return;
+                }
+                console.info('looking up accounts list');
+                $.ajax({
+                    url:"DesktopModules/AgapeConnect/StaffRmb/WebService.asmx/GetAccountNumbers",
+                    dataType: "json",
+                    data: {term: term},
+                    type: "POST",
+                    success: function(data) {
+                        cache[term] = data;
+                        response(data);
+                    },
+                    error: function(a, b, c) {
+                        console.error('failure :'+b);
+                    }
+                });
+            },
             select: function(event, ui) {
                 $('#<%= tbNewChargeTo.ClientID%>').val(ui.item.value);
             },
             minLength: 2
         });
         $("#<%= tbCostCenter.ClientID%>").autocomplete({
-            source:costcenters,
+            source:  function(request, response) {
+                var term = request.term;
+                if (term in cache) {
+                    console.info('accounts list from cache');
+                    response(cache[term]);
+                    return;
+                }
+                console.info('looking up accounts list');
+                $.ajax({
+                    url:"DesktopModules/AgapeConnect/StaffRmb/WebService.asmx/GetAccountNumbers",
+                    dataType: "json",
+                    data: {term: term},
+                    type: "POST",
+                    success: function(data) {
+                        cache[term] = data;
+                        response(data);
+                    },
+                    error: function(a, b, c) {
+                        console.error('failure :'+b);
+                    }
+                });
+            },
             select: function(event, ui) {
                 $('#<%= tbCostCenter.ClientID%>').val(ui.item.value);
             },
