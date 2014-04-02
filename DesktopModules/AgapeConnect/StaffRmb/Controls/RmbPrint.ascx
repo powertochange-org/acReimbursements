@@ -13,9 +13,9 @@
     <td><asp:TextBox ID="tbDesc" runat="server" Width="550px"></asp:TextBox></td>
 </tr>
 <tr>
-    <td><b><dnn:label id="Label1"  runat="server" controlname="dtTransDate"  ResourceKey="lblDate"  /></b></td>
+    <td><b><dnn:label id="Label1"  runat="server" controlname="dtDate"  ResourceKey="lblDate"  /></b></td>
     <td  colspan="2">
-       <asp:TextBox ID="dtTransDate" runat="server" Width="90px" class="datepicker"></asp:TextBox>
+       <asp:TextBox ID="dtDate" runat="server" Width="90px" class="datepicker"></asp:TextBox>
         
     </td>
 </tr>

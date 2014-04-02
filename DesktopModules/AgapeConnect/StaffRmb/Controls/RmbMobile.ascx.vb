@@ -43,14 +43,14 @@ Partial Class controls_RmbLandline
 
             End If
             ddlVATReceipt.Items(3).Enabled = False
-        Else
-            hfNoReceiptLimit.Value = settings("NoReceipt")
-            Dim _LIMIT As String = StaffBrokerFunctions.GetSetting("Currency", PortalId) & settings("NoReceipt")
-            ddlVATReceipt.Items(3).Text = DotNetNuke.Services.Localization.Localization.GetString("NoReceipt.Text", LocalResourceFile).Replace("[LIMIT]", _LIMIT)
-            'ttlReceipt.Text = DotNetNuke.Services.Localization.Localization.GetString("lblReceipt.Text", LocalResourceFile)
-            'ttlReceipt.HelpText = DotNetNuke.Services.Localization.Localization.GetString("lblReceipt.Help", LocalResourceFile).Replace("[LIMIT]", _LIMIT)
-            ReceiptLine.Visible = True
-            ddlVATReceipt.Items(3).Enabled = True
+            'Else
+            '    hfNoReceiptLimit.Value = settings("NoReceipt")
+            '    Dim _LIMIT As String = StaffBrokerFunctions.GetSetting("Currency", PortalId) & settings("NoReceipt")
+            '    ddlVATReceipt.Items(3).Text = DotNetNuke.Services.Localization.Localization.GetString("NoReceipt.Text", LocalResourceFile).Replace("[LIMIT]", _LIMIT)
+            '    'ttlReceipt.Text = DotNetNuke.Services.Localization.Localization.GetString("lblReceipt.Text", LocalResourceFile)
+            '    'ttlReceipt.HelpText = DotNetNuke.Services.Localization.Localization.GetString("lblReceipt.Help", LocalResourceFile).Replace("[LIMIT]", _LIMIT)
+            '    ReceiptLine.Visible = True
+            '    ddlVATReceipt.Items(3).Enabled = True
         End If
 
         ddlVATReceipt.Items(0).Enabled = settings("VatAttrib")

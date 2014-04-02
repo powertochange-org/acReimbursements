@@ -40,11 +40,10 @@
             <asp:ListItem ResourceKey="VAT" Value="0">VAT</asp:ListItem>
             <asp:ListItem ResourceKey="Standard" Value="1">Standard</asp:ListItem>
             <asp:ListItem  Value="2" ResourceKey="Electronic">Electronic Receipt</asp:ListItem>
-            
         </asp:DropDownList>
           
         <br />
-<asp:CheckBox ID="cbTaxable" runat="server" ResourceKey="Bill" Text="I have an itemized bill and have only reimbursed the ministry calls (as I have highlighted on the bill)"  />
+<asp:CheckBox ID="cbTaxable" runat="server" ResourceKey="Bill"   />
     </td>
    
 </tr>

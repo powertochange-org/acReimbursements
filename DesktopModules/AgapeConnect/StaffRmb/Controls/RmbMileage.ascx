@@ -23,10 +23,10 @@
         </tr>
         <tr>
             <td>
-                <b><dnn:Label ID="lblDistance" runat="server" ControlName="tbDistance" ResourceKey="lblDistance"   /></b>
+                <b><dnn:Label ID="lblDistance" runat="server" ControlName="tbAmount" ResourceKey="lblDistance"   /></b>
             </td>
             <td style="width:100px">
-                <asp:TextBox ID="tbDistance" runat="server" Width="90px" class="numeric"></asp:TextBox>
+                <asp:TextBox ID="tbAmount" runat="server" Width="90px" class="numeric"></asp:TextBox>
             </td>
             <td>
                 <asp:DropDownList ID="ddlDistUnits" runat="server"></asp:DropDownList>

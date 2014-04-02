@@ -117,16 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="lblAmount.Text">
+  <data name="lblAmount.Text" xml:space="preserve">
     <value>Amount</value>
   </data>
-  <data name="Explanation.Text">
+  <data name="Explanation.Text" xml:space="preserve">
     <value>... for claiming ministry telephone costs.  If this phone is used for both ministry/personal-use, you can only reimburse the portion that is for ministry use.Taxable unless receipt is included.</value>
   </data>
-  <data name="Bill.Text">
-    <value>...for claiming expenses incurred in buying gifts for ministry guests, conference speakers, fellow staff, MPD partners, etc.</value>
-  </data>
-  <data name="lblDate.Help">
+  <data name="lblDate.Help" xml:space="preserve">
     <value>Enter the date of the phone bill</value>
   </data>
 </root>

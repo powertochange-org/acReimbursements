@@ -73,13 +73,13 @@ Partial Class controls_RmbPrint
     End Property
     Public Property theDate() As Date
         Get
-            Return CDate(dtTransDate.Text)
+            Return CDate(dtDate.Text)
         End Get
         Set(ByVal value As Date)
             If value = Nothing Then
-                dtTransDate.Text = Today.ToShortDateString
+                dtDate.Text = Today.ToShortDateString
             Else
-                dtTransDate.Text = value
+                dtDate.Text = value
             End If
         End Set
     End Property
@@ -181,7 +181,7 @@ Partial Class controls_RmbPrint
             Return False
         End If
         Try
-            Dim theDate As Date = dtTransDate.Text
+            Dim theDate As Date = dtDate.Text
             If theDate > Today Then
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("OldDate.Error", LocalResourceFile)
                 Return False

@@ -57,15 +57,19 @@ Partial Class controls_Mileage
 
     Public Property Amount() As Double
         Get
-            If tbDistance.Text <> "" Then
-                Return (CInt(tbDistance.Text) * CDbl(ddlDistUnits.SelectedValue))
+            If tbAmount.Text <> "" Then
+                Try
+                    Return (CDbl(tbAmount.Text) * CDbl(ddlDistUnits.SelectedValue))
+                Catch
+                    Return 0
+                End Try
             Else
                 Return 0
             End If
 
         End Get
         Set(ByVal value As Double)
-            'tbDistance.Text = CInt(value / ((ddlDistUnits.SelectedValue + (5 * CInt(ddlStaff.SelectedValue))) / 100))
+            'tbAmount.Text = CInt(value / ((ddlDistUnits.SelectedValue + (5 * CInt(ddlStaff.SelectedValue))) / 100))
         End Set
     End Property
     Public Property Spare1() As String
@@ -79,13 +83,13 @@ Partial Class controls_Mileage
     Public Property Spare2() As String
         Get
 
-            Return tbDistance.Text
+            Return tbAmount.Text
         End Get
         Set(ByVal value As String)
             Try
-                tbDistance.Text = CInt(value)
+                tbAmount.Text = CInt(value)
             Catch ex As Exception
-                tbDistance.Text = 0
+                tbAmount.Text = 0
             End Try
 
 
@@ -159,7 +163,7 @@ Partial Class controls_Mileage
         End Try
 
         Try
-            Dim theMiles As Double = tbDistance.Text
+            Dim theMiles As Double = tbAmount.Text
             If theMiles <= 0 Then
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Reverse.Error", LocalResourceFile)
                 Return False
@@ -191,14 +195,15 @@ Partial Class controls_Mileage
     End Property
 
     Public Sub Initialize(ByVal Settings As System.Collections.Hashtable)
-        ddlDistUnits.Items.Clear()
         Dim PS = CType(HttpContext.Current.Items("PortalSettings"), PortalSettings)
-        For I As Integer = 1 To 4
-            Dim value As String = Settings("MRate" & I)
-            If value <> "" Then
-                ddlDistUnits.Items.Add(New ListItem(Settings("MRate" & I & "Name") & " (" & StaffBrokerFunctions.GetSetting("Currency", PS.PortalId) & CDbl(value).ToString("0.00") & ")", CDbl(value)))
-            End If
-        Next I
+        If (ddlDistUnits.Items.Count() = 0) Then
+            For I As Integer = 1 To 4
+                Dim value As String = Settings("MRate" & I)
+                If value <> "" Then
+                    ddlDistUnits.Items.Add(New ListItem(Settings("MRate" & I & "Name") & " (" & StaffBrokerFunctions.GetSetting("Currency", PS.PortalId) & CDbl(value).ToString("0.00") & ")", CDbl(value)))
+                End If
+            Next I
+        End If
 
         Session("RmbSettings") = Settings
     End Sub
@@ -211,6 +216,9 @@ Partial Class controls_Mileage
     End Sub
 
 
+    Protected Sub Page_Load(sender As Object, e As EventArgs) Handles Me.Load
+
+    End Sub
 End Class
 
 
