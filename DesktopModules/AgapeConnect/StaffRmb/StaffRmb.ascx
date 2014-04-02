@@ -629,9 +629,11 @@
             source:  function(request, response) {
                 var term = request.term;
                 if (term in cache) {
+                    console.info('accounts list from cache');
                     response(cache[term]);
                     return;
                 }
+                console.info('looking up accounts list');
                 $.ajax({
                     url:"DesktopModules/AgapeConnect/StaffRmb/WebService.asmx/GetAccountNumbers",
                     dataType: "json",
@@ -640,6 +642,9 @@
                     success: function(data) {
                         cache[term] = data;
                         response(data);
+                    },
+                    error: function(a, b, c) {
+                        console.error('failure :'+b);
                     }
                 });
             },

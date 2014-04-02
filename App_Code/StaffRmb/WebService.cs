@@ -27,7 +27,7 @@ public class WebService : System.Web.Services.WebService {
             .Select(s => new { label = s.CostCentreCode + ":" + s.CostCentreName, value = s.CostCentreCode })
             .Where(w => w.label.Contains(term))
             .OrderBy(o => o.value);
-        string json=JsonConvert.SerializeObject(result).Replace('\'', ' ').Replace("\"label\"", "label").Replace("\"value\"", "value");
+        string json = JsonConvert.SerializeObject(result);
         HttpContext.Current.Response.ContentType = "application/json";
         HttpContext.Current.Response.Write(json);
     }
