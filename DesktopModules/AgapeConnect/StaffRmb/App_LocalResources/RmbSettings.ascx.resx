@@ -165,14 +165,8 @@
   <data name="lblAuthUser.Text" xml:space="preserve">
     <value>Authorasation User</value>
   </data>
-  <data name="lblBicycle.Text" xml:space="preserve">
-    <value>Bicycle Rate:</value>
-  </data>
   <data name="lblBreakfast.Text" xml:space="preserve">
     <value>Breakfast:</value>
-  </data>
-  <data name="lblCarRate.Text" xml:space="preserve">
-    <value>Car Rate:</value>
   </data>
   <data name="lblControlAccount.Help" xml:space="preserve">
     <value>The Responsibility Center of the Control Account</value>
@@ -185,9 +179,6 @@
   </data>
   <data name="lblDinner.Text" xml:space="preserve">
     <value>Dinner:</value>
-  </data>
-  <data name="lblDistanceUnit.Text" xml:space="preserve">
-    <value>Unit of Distance:</value>
   </data>
   <data name="lblDownloadFormat.Help" xml:space="preserve">
     <value>The format used for the download document</value>
@@ -270,12 +261,6 @@
   <data name="lblTaxAccRec.Text" xml:space="preserve">
     <value>Taxable Advance Account</value>
   </data>
-  <data name="lblTeamLeaderLimit.Help" xml:space="preserve">
-    <value>The maximum amount that a team leader can authorize. If a transaction is over this, an email is sent to the Auth User</value>
-  </data>
-  <data name="lblTeamLeaderLimit.Text" xml:space="preserve">
-    <value>Team Leader Auth Limit</value>
-  </data>
   <data name="lblUseDCode.Help" xml:space="preserve">
     <value>If you use different account codes for departemnts, check this box. If no DCode is supplied (below) the PCode will be used instead.</value>
   </data>
@@ -332,5 +317,11 @@
   </data>
   <data name="lblElecRec.Text" xml:space="preserve">
     <value>Allow Electronic Receipts</value>
+  </data>
+  <data name="lblBudgetTolerance.Help" xml:space="preserve">
+    <value>Allow account balances to drop below budgetted amount by this much before sending alerts. </value>
+  </data>
+  <data name="lblBudgetTolerance.Text" xml:space="preserve">
+    <value>Budget Tolerance (percentage)</value>
   </data>
 </root>

@@ -283,8 +283,8 @@
         function setUpAccordion() {
             $("#accordion").accordion({
                 header: "> div > h3",
-                active: <%= getSelectedTab() %>,
-                navigate: false
+                navigate: false,
+                active: <%= getSelectedTab() %>
             });
         }
 
@@ -1709,7 +1709,7 @@
                                 </b></td>
                                 <td>
                                   
-                                 <iframe id="ifReceipt" runat="server" src="" width="530px" height="280" >
+                                 <iframe id="ifReceipt" runat="server" src="" width="530" height="280" >
 
                                  </iframe>
                                 </td>
@@ -2028,7 +2028,7 @@
             </td>
             <td style="border-left: 1px dashed #AAA;">
                 <iframe id="ifSugPay" width="300" height="169" 
-                     frameborder="0" allowfullscreen></iframe>
+                     frameborder="0" allowfullscreen="true"></iframe>
 
             </td>
         </tr>

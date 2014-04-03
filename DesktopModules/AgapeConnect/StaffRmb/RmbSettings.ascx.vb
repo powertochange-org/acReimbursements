@@ -67,9 +67,6 @@ Namespace DotNetNuke.Modules.StaffRmb
                     If CType(TabModuleSettings("Expire"), String) <> "" Then
                         tbExpire.Text = CType(TabModuleSettings("Expire"), String)
                     End If
-                    If CType(TabModuleSettings("TeamLeaderLimit"), String) <> "" Then
-                        tbTeamLeaderLimit.Text = CType(TabModuleSettings("TeamLeaderLimit"), String)
-                    End If
 
                     If CType(TabModuleSettings("MRate1"), String) <> "" Then
                         tbMRate1.Text = CType(TabModuleSettings("MRate1"), String)
@@ -89,8 +86,10 @@ Namespace DotNetNuke.Modules.StaffRmb
                     'If CType(TabModuleSettings("Bicycle"), String) <> "" Then
                     '    tbBicycle.Text = CType(TabModuleSettings("Bicycle"), String)
                     'End If
-                    If CType(TabModuleSettings("DistanceUnit"), String) <> "" Then
-                        ddlDistance.SelectedValue = CType(TabModuleSettings("DistanceUnit"), String)
+                    If CType(TabModuleSettings("BudgetTolerance"), String) = "" Then
+                        tbBudgetTolerance.Text = 0
+                    Else
+                        tbBudgetTolerance.Text = CType(TabModuleSettings("BudgetTolerance"), String)
                     End If
 
                     Dim selectedRoles As New ArrayList
@@ -352,7 +351,7 @@ Namespace DotNetNuke.Modules.StaffRmb
             objModules.UpdateTabModuleSetting(TabModuleId, "ElectronicReceipts", cbElectronicReceipts.Checked)
             objModules.UpdateTabModuleSetting(TabModuleId, "VatAttrib", cbVAT.Checked)
             objModules.UpdateTabModuleSetting(TabModuleId, "Expire", tbExpire.Text)
-            objModules.UpdateTabModuleSetting(TabModuleId, "TeamLeaderLimit", tbTeamLeaderLimit.Text)
+            objModules.UpdateTabModuleSetting(TabModuleId, "BudgetTolerance", tbBudgetTolerance.Text)
 
             'objModules.UpdateTabModuleSetting(TabModuleId, "MRate1", tbMRate1.Text)
             'objModules.UpdateTabModuleSetting(TabModuleId, "MRate2", tbMRate2.Text)
@@ -360,7 +359,6 @@ Namespace DotNetNuke.Modules.StaffRmb
             'objModules.UpdateTabModuleSetting(TabModuleId, "AddPass", tbAddPass.Text)
             'objModules.UpdateTabModuleSetting(TabModuleId, "Motorcycle", tbMotorcycle.Text)
             'objModules.UpdateTabModuleSetting(TabModuleId, "Bicycle", tbBicycle.Text)
-            objModules.UpdateTabModuleSetting(TabModuleId, "DistanceUnit", ddlDistance.SelectedValue)
 
             Dim roles As String = ""
             For Each role As String In rsgAccountsRoles.SelectedRoleNames
@@ -554,6 +552,7 @@ Namespace DotNetNuke.Modules.StaffRmb
             lblDownloading.Visible = True
 
         End Sub
+
     End Class
 
 End Namespace

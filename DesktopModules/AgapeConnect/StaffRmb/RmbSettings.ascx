@@ -128,28 +128,6 @@
                 <tr>
                     <td>
                         <b>
-                            <dnn:Label ID="lblTeamLeaderLimit" runat="server" ControlName="tbTeamLeaderLimit"
-                                ResourceKey="lblTeamLeaderLimit" />
-                        </b>
-                    </td>
-                    <td>
-                        <asp:TextBox ID="tbTeamLeaderLimit" runat="server" Width="80px"></asp:TextBox>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <asp:Label ID="Label9" runat="server" resourcekey="lblDistanceUnit"></asp:Label>
-                    </td>
-                    <td>
-                        <asp:DropDownList ID="ddlDistance" runat="server">
-                            <asp:ListItem Text="Miles" Value="miles" />
-                            <asp:ListItem Text="Kilometers" Value="km" />
-                        </asp:DropDownList>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <b>
                             <dnn:Label ID="lblMenuSize" runat="server" ControlName="tbMenuSize" ResourceKey="lblMenuSize" />
                         </b>
                     </td>
@@ -176,6 +154,17 @@
                     </td>
                     <td>
                         <asp:CheckBox ID="cbWarnIfNegative" runat="server"   />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <b>
+                            <dnn:Label ID="lblBudgetTolerance" runat="server" ControlName="tbBudgetTolerance"
+                                ResourceKey="lblBudgetTolerance" />
+                        </b>
+                    </td>
+                    <td>
+                        <asp:TextBox ID="tbBudgetTolerance" runat="server" Width="80px"></asp:TextBox>%
                     </td>
                 </tr>
                 <tr>
@@ -366,11 +355,6 @@
         <div id='Tab2-tab'>
             <table style="font-size: 9pt;">
                 <tr valign="top">
-                    <td>
-                        <b>
-                            <dnn:Label ID="lblMileage" runat="server" ControlName="tbTeamLeaderLimit" ResourceKey="lblMileage" />
-                        </b>
-                    </td>
                     <td>
                         <table style="font-size: 9pt">
                             <tr>
