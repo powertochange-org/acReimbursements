@@ -2421,23 +2421,20 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo And c.PortalId = PortalId
                 If (rmb.Count > 0) Then
                     Dim updateAccountBalanceTask = refreshAccountBalanceAsync(hfChargeToValue.Value, StaffRmbFunctions.logonFromId(PortalId, UserId))
-                    If Dept <> StaffBrokerFunctions.IsDept(PortalId, rmb.First.CostCenter) Then
-                        Dim updateBudgetBalanceTask = refreshBudgetBalanceAsync(hfChargeToValue.Value, StaffRmbFunctions.logonFromId(PortalId, UserId))
-                        'We now need to redetermine the AccountCodes
-                        rmb.First.CostCenter = hfChargeToValue.Value
-                        rmb.First.Department = Dept
+                    Dim updateBudgetBalanceTask = refreshBudgetBalanceAsync(hfChargeToValue.Value, StaffRmbFunctions.logonFromId(PortalId, UserId))
+                    rmb.First.CostCenter = hfChargeToValue.Value
+                    rmb.First.Department = Dept
 
-                        For Each row In rmb.First.AP_Staff_RmbLines
-                            If rmb.First.CostCenter = row.CostCenter Then
-                                row.Department = Dept
-                                row.AccountCode = GetAccountCode(row.LineType, hfChargeToValue.Value)
-                                row.CostCenter = hfChargeToValue.Value
-                            End If
-                        Next
-                        Await SubmitChangesAsync()
-                        Await updateBudgetBalanceTask
-                        Await updateApproversListAsync(rmb.First)
-                    End If
+                    For Each row In rmb.First.AP_Staff_RmbLines
+                        If rmb.First.CostCenter = row.CostCenter Then
+                            row.Department = Dept
+                            row.AccountCode = GetAccountCode(row.LineType, hfChargeToValue.Value)
+                            row.CostCenter = hfChargeToValue.Value
+                        End If
+                    Next
+                    Await SubmitChangesAsync()
+                    Await updateApproversListAsync(rmb.First)
+                    Await updateBudgetBalanceTask
                     Await updateAccountBalanceTask
                     If (rmb.First.Status <> RmbStatus.Draft) Then
                         rmb.First.Status = RmbStatus.Draft
@@ -3117,7 +3114,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         'Personal Reimbursement
                         approverMessage = approverMessage.Replace("[STAFFNAME]", UserInfo.DisplayName).Replace("[RMBNO]", theRmb.RMBNo).Replace("[USERREF]", IIf(theRmb.UserRef <> "", theRmb.UserRef, "None"))
                         approverMessage = approverMessage.Replace("[APPRNAME]", toName)
-                        approverMessage = approverMessage.Replace("[TEAMLEADERLIMIT]", StaffBrokerFunctions.GetSetting("Currency", PortalId) & Settings("TeamLeaderLimit"))
+                        If (isLowBalance()) Then
+                            approverMessage = approverMessage.Replace("[LOWBALANCE]", Translate("WarningLowBalance"))
+                        End If
                         If theRmb.UserComment <> "" Then
                             approverMessage = approverMessage.Replace("[COMMENTS]", Translate("EmailComments") & "<br />" & theRmb.UserComment)
                         Else
@@ -3127,7 +3126,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Else
                         approverMessage = approverMessage.Replace("[STAFFNAME]", UserInfo.DisplayName).Replace("[RMBNO]", theRmb.RMBNo).Replace("[USERREF]", IIf(theRmb.UserRef <> "", theRmb.UserRef, "None"))
                         approverMessage = approverMessage.Replace("[APPRNAME]", Left(toName, Math.Max(toName.Length - 2, 0)))
-                        approverMessage = approverMessage.Replace("[TEAMLEADERLIMIT]", StaffBrokerFunctions.GetSetting("Currency", PortalId) & Settings("TeamLeaderLimit"))
+                        If (isLowBalance()) Then
+                            approverMessage = approverMessage.Replace("[LOWBALANCE]", Translate("WarningLowBalance"))
+                        End If
                         If theRmb.UserComment <> "" Then
                             approverMessage = approverMessage.Replace("[COMMENTS]", Translate("EmailComments") & "<br />" & theRmb.UserComment)
                         Else
@@ -4512,25 +4513,28 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Function
 
         Private Sub checkLowBalance()
-            If (lblStatus.Text = RmbStatus.StatusName(RmbStatus.Submitted)) Then
-                Try
-                    Dim rmbTotal = GetTotal(hfRmbNo.Value)
-                    Dim budgetBalance = hfBudgetBalance.Value
-                    Dim accountBalance = hfAccountBalance.Value - rmbTotal
-                    Dim budgetTolerance = Settings("BudgetTolerance") / 100
-                    Dim lowestAllowedBalance = budgetBalance - (budgetBalance * budgetTolerance)
-                    If (accountBalance < lowestAllowedBalance) Then
-                        lblWarningLabel.Text = Translate("WarningLowBalance").Replace("[ACCTBAL]", accountBalance.ToString()) _
-                        .Replace("[BUDGBAL]", budgetBalance.ToString()).Replace("[ACCT]", tbChargeTo.Text)
-                        Dim t As Type = Me.GetType()
-                        ScriptManager.RegisterClientScriptBlock(Page, t, "", "showWarningDialog();", True)
-                    End If
-                Catch ex As Exception
-                    lblError.Text = "Error comparing balances: " & ex.Message
-                    lblError.Visible = True
-                End Try
+            If (lblStatus.Text = RmbStatus.StatusName(RmbStatus.Submitted) AndAlso isLowBalance()) Then
+                Dim accountBalance = hfAccountBalance.Value - GetTotal(hfRmbNo.Value)
+                lblWarningLabel.Text = Translate("WarningLowBalance").Replace("[ACCTBAL]", accountBalance.ToString()) _
+                .Replace("[BUDGBAL]", hfBudgetBalance.Value).Replace("[ACCT]", tbChargeTo.Text)
+                Dim t As Type = Me.GetType()
+                ScriptManager.RegisterClientScriptBlock(Page, t, "", "showWarningDialog();", True)
             End If
         End Sub
+
+        Private Function isLowBalance() As Boolean
+            Try
+                Dim budgetBalance = hfBudgetBalance.Value
+                Dim accountBalance = hfAccountBalance.Value - GetTotal(hfRmbNo.Value)
+                Dim budgetTolerance = Settings("BudgetTolerance") / 100
+                Dim lowestAllowedBalance = budgetBalance - (budgetBalance * budgetTolerance)
+                If (accountBalance < lowestAllowedBalance) Then
+                    Return True
+                End If
+            Catch 
+            End Try
+            Return False
+        End Function
 
         Private Async Function LoadControlAsync(path As String) As Task(Of Object)
             Return LoadControl(path)

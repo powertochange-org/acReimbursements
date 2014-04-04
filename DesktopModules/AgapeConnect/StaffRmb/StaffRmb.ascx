@@ -664,13 +664,13 @@
                 });
             },
             select: function(event, ui) {
-                $('#<%= tbChargeTo.ClientID%>').val(ui.item.value).change();
                 $('#<%= hfChargeToValue.ClientID%>').val(ui.item.value);
+                $('#<%= tbChargeTo.ClientID%>').val(ui.item.value).change();
             },
             change: function(event, ui) {
                 if (ui != null && ui.item != null) {
-                    $('#<%= tbChargeTo.ClientID%>').val(ui.item.value).change();
                     $('#<%= hfChargeToValue.ClientID%>').val(ui.item.value);
+                    $('#<%= tbChargeTo.ClientID%>').val(ui.item.value).change();
                 } else {
                     var old_value = $('#<%= hfChargeToValue.ClientID%>').val();
                     $('#<%= tbChargeTo.ClientID%>').val(old_value);
@@ -823,7 +823,7 @@
     <asp:HiddenField ID="hfOrigCurrencyValue" runat="server" Value="" />
     <asp:HiddenField ID="staffInitials" runat="server" Value="" />
     <asp:HiddenField ID="hfCurOpen" runat="server" Value="false" />
-
+    <asp:HiddenField ID="hfChargeToValue" runat="server"  />
     <asp:HiddenField ID="hfCurOpenAdvPO" runat="server" Value="false" />
     <asp:HiddenField ID="hfExchangeRateAdvPO" runat="server" Value="1" />
     <asp:HiddenField ID="hfOrigCurrencyAdvPO" runat="server" Value="" />
@@ -1186,7 +1186,6 @@
                                     <asp:Label ID="lblRmbNo" runat="server" Style="float: left; margin-right: 5px;"></asp:Label>:
                                     <asp:TextBox ID="tbChargeTo" runat="server" AutoPostBack="true" Style="float: right; font-size: small;">
                                     </asp:TextBox>
-                                    <asp:HiddenField ID="hfChargeToValue" runat="server"  />
                                 </div>
                                 <div class="inverse" style="width:100%; margin-top:1px; padding-top:3px; padding-bottom:3px; float: left" onmouseover="showAccountBalance()" onmouseout="showBudgetBalance()">
                                     <asp:Label ID="lblStatus" runat="server" Style="float: left; font-style: italic; font-size:13px; padding-left:70px"></asp:Label>
