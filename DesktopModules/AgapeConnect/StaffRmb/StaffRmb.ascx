@@ -1904,7 +1904,7 @@
                 <br />
                 <hr />
                 <input id="btnAcknowledge" type="button" value='<%= Translate("btnOK")%>' onclick="closeWarningDialog();"
-                        class="aButton" />
+                        class="aButton" style="float:right" />
             </ContentTemplate>
         </asp:UpdatePanel>
     </div>"

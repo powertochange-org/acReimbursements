@@ -4514,12 +4514,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Private Sub checkLowBalance()
             If (lblStatus.Text = RmbStatus.StatusName(RmbStatus.Submitted)) Then
                 Try
+                    Dim rmbTotal = GetTotal(hfRmbNo.Value)
                     Dim budgetBalance = hfBudgetBalance.Value
-                    Dim accountBalance = hfAccountBalance.Value
+                    Dim accountBalance = hfAccountBalance.Value - rmbTotal
                     Dim budgetTolerance = Settings("BudgetTolerance") / 100
                     Dim lowestAllowedBalance = budgetBalance - (budgetBalance * budgetTolerance)
                     If (accountBalance < lowestAllowedBalance) Then
-                        lblWarningLabel.Text = Translate("WarningLowBalance").Replace("[ACCTBAL]", accountBalance.ToString()).Replace("[BUDGBAL]", budgetBalance.ToString())
+                        lblWarningLabel.Text = Translate("WarningLowBalance").Replace("[ACCTBAL]", accountBalance.ToString()) _
+                        .Replace("[BUDGBAL]", budgetBalance.ToString()).Replace("[ACCT]", tbChargeTo.Text)
                         Dim t As Type = Me.GetType()
                         ScriptManager.RegisterClientScriptBlock(Page, t, "", "showWarningDialog();", True)
                     End If

@@ -604,6 +604,6 @@
     <value>Warning</value>
   </data>
   <data name="WarningLowBalance.Text" xml:space="preserve">
-    <value>Warning: the actual balance of this account ($[ACCTBAL]) is significantly below the budgeted amount ($[BUDGBAL]).  You can still choose approve this reimbursement, but this budget discrepancy will be reported to your director for review.</value>
+    <value>Warning: Fulfilling this reimbursement would bring the balance of account#[ACCT] to $[ACCTBAL], which is significantly below the budgeted balance of $[BUDGBAL].  You may still choose approve this reimbursement, but this budget discrepancy will be reported to your director for review.</value>
   </data>
 </root>
