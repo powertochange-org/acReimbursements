@@ -150,6 +150,15 @@
                 }
             });
 
+            $("#divWarningDialog").dialog({
+                autoOpen: false,
+                position: ['middle', 230],
+                height: 210,
+                width: 500,
+                modal: true,
+                close: function () {}
+            })
+            $("#divWarningDialog").parent().appendTo($("form:first"));
 
             $("#divSplitPopup").dialog({
                 autoOpen: false,
@@ -321,13 +330,10 @@
     } (jQuery, window.Sys));
 
     function GetAccountBalance(jsonQuery){
- 
         $.getJSON(jsonQuery, function(json){
-      
-            var amountString = '<%=StaffBrokerFunctions.GetSetting("Currency", PortalId)  %>' + json ;
-         $("#<%= lblAccountBalance.ClientId %>").html(amountString) ;
-         $("#<%= AccBal.ClientId %>").html(amountString) ;
-            
+        var amountString = '<%=StaffBrokerFunctions.GetSetting("Currency", PortalId)  %>' + json ;
+        $("#<%= lblAccountBalance.ClientId %>").html(amountString) ;
+        $("#<%= AccBal.ClientId %>").html(amountString) ;
      });
 
  }
@@ -350,6 +356,7 @@
  function closePopup2() {$("#divSignin2").dialog("close");}
  function closePopup3() {$("#divSignin3").dialog("close");}
  function closePopupSplit() {$("#divSplitPopup").dialog("close");}
+ function closeWarningDialog() {$("#divWarningDialog").dialog("close");}
  function closePopupDownload() {$("#divDownload").dialog("close");}
  function closePopupAccountWarning() {$("#divAccountWarning").dialog("close");}
 
@@ -379,6 +386,7 @@
  function showPopup2() {$("#divSignin2").dialog("open"); return false; }
  function showPopup3() {$("#divSignin3").dialog("open"); return false; }
  function showPopupSplit() {$("#divSplitPopup").dialog("open"); return false; }
+ function showWarningDialog() {$("#divWarningDialog").dialog("open"); return false; }
  function showDownload() { $("#divDownload").dialog("open"); return false; }
  function showAccountWarning() { $("#divAccountWarning").dialog("open"); return false; }
 
@@ -1889,6 +1897,17 @@
 
 
     <asp:Label ID="lblDefatulSettings" runat="server" ForeColor="Red" resourcekey="DefaultSettings"></asp:Label>
+    <div id="divWarningDialog" class="ui-widget" >
+        <asp:UpdatePanel ID="WarningUpdatePanel" runat="server">
+            <ContentTemplate>
+                <h5><asp:Label ID="lblWarningLabel" runat="server"></asp:Label></h5>
+                <br />
+                <hr />
+                <input id="btnAcknowledge" type="button" value='<%= Translate("btnOK")%>' onclick="closeWarningDialog();"
+                        class="aButton" />
+            </ContentTemplate>
+        </asp:UpdatePanel>
+    </div>"
     <div id="divSplitPopup" class="ui-widget">
         <asp:UpdatePanel ID="UpdatePanel9" runat="server">
             <ContentTemplate>

@@ -1000,7 +1000,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     If (Rmb.MoreInfoRequested) Then
                         lblStatus.Text = lblStatus.Text & " - " & Translate("StatusMoreInfo")
                     End If
-                    'accountBalanceDiv.Style.Add(HtmlTextWriterStyle.Display, "none")
 
                     '*** FORM HEADER ***
                     '--dates
@@ -1115,6 +1114,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Await updateApproversTask
                     Await updateAccountBalanceTask
                     Await updateBudgetBalanceTask
+                    If (isApprover) Then
+                        checkLowBalance()
+                    End If
                 Else
                     pnlMain.Visible = False
                     pnlSplash.Visible = True
@@ -2418,8 +2420,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim Dept = StaffBrokerFunctions.IsDept(PortalId, hfChargeToValue.Value)
                 Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo And c.PortalId = PortalId
                 If (rmb.Count > 0) Then
-
+                    Dim updateAccountBalanceTask = refreshAccountBalanceAsync(hfChargeToValue.Value, StaffRmbFunctions.logonFromId(PortalId, UserId))
                     If Dept <> StaffBrokerFunctions.IsDept(PortalId, rmb.First.CostCenter) Then
+                        Dim updateBudgetBalanceTask = refreshBudgetBalanceAsync(hfChargeToValue.Value, StaffRmbFunctions.logonFromId(PortalId, UserId))
                         'We now need to redetermine the AccountCodes
                         rmb.First.CostCenter = hfChargeToValue.Value
                         rmb.First.Department = Dept
@@ -2432,9 +2435,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             End If
                         Next
                         Await SubmitChangesAsync()
+                        Await updateBudgetBalanceTask
                         Await updateApproversListAsync(rmb.First)
                     End If
-
+                    Await updateAccountBalanceTask
                     If (rmb.First.Status <> RmbStatus.Draft) Then
                         rmb.First.Status = RmbStatus.Draft
                         Await ResetMenuAsync()
@@ -4485,6 +4489,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 hfAccountBalance.Value = 0
             End Try
             lblAccountBalance.Text = accountBalance
+            If (hfAccountBalance.Value < 0) Then
+                lblAccountBalance.Attributes.Add("class", "NormalRed")
+            Else
+                lblAccountBalance.Attributes.Remove("class")
+            End If
         End Function
 
         Private Async Function refreshBudgetBalanceAsync(account As String, logon As String) As Task
@@ -4495,7 +4504,31 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 hfBudgetBalance.Value = 0
             End Try
             lblBudgetBalance.Text = budgetBalance
+            If (hfBudgetBalance.Value < 0) Then
+                lblBudgetBalance.Attributes.Add("class", "NormalRed")
+            Else
+                lblAccountBalance.Attributes.Remove("class")
+            End If
         End Function
+
+        Private Sub checkLowBalance()
+            If (lblStatus.Text = RmbStatus.StatusName(RmbStatus.Submitted)) Then
+                Try
+                    Dim budgetBalance = hfBudgetBalance.Value
+                    Dim accountBalance = hfAccountBalance.Value
+                    Dim budgetTolerance = Settings("BudgetTolerance") / 100
+                    Dim lowestAllowedBalance = budgetBalance - (budgetBalance * budgetTolerance)
+                    If (accountBalance < lowestAllowedBalance) Then
+                        lblWarningLabel.Text = Translate("WarningLowBalance").Replace("[ACCTBAL]", accountBalance.ToString()).Replace("[BUDGBAL]", budgetBalance.ToString())
+                        Dim t As Type = Me.GetType()
+                        ScriptManager.RegisterClientScriptBlock(Page, t, "", "showWarningDialog();", True)
+                    End If
+                Catch ex As Exception
+                    lblError.Text = "Error comparing balances: " & ex.Message
+                    lblError.Visible = True
+                End Try
+            End If
+        End Sub
 
         Private Async Function LoadControlAsync(path As String) As Task(Of Object)
             Return LoadControl(path)
