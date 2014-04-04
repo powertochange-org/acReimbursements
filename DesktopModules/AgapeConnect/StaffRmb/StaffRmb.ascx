@@ -288,26 +288,34 @@
             });
         }
 
+        function checkForMinistryAccount() {
+            var account = $("#<%= tbChargeTo.ClientID %>").val();
+            if (! account) return false;
+            isMinistryAccount = (account.charAt(0)!='8' && account.charAt(0)!='9');
+            if (isMinistryAccount) {
+                $('#budgetBalanceDiv').show(0);
+                $('#accountBalanceDiv').hide(0);        
+            } else {
+                $('#budgetBalanceDiv').hide(0);
+                $('#accountBalanceDiv').show(0);        
+            }
+        }
+
         $(document).ready(function () {
             setUpMyTabs();
             setUpAutocomplete();
             setUpAccordion();
+            checkForMinistryAccount();
                          
 
             Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
                 setUpMyTabs();
                 setUpAutocomplete();
-
+                checkForMinistryAccount();
             });
 
 
         });
-
-
-
-
-
-
 
 
     } (jQuery, window.Sys));
@@ -731,14 +739,19 @@
         $('#<%=btnSave.ClientID%>').show();
     }
 
+    var isMinistryAccount = false;
     function showAccountBalance() {
-        $('#budgetBalanceDiv').hide(0);
-        $('#accountBalanceDiv').show(0);        
+        if (isMinistryAccount) {
+            $('#budgetBalanceDiv').hide(0);
+            $('#accountBalanceDiv').show(0);        
+        }
     }
 
     function showBudgetBalance() {
-        $('#accountBalanceDiv').hide(0);
-        $('#budgetBalanceDiv').show(0);
+        if (isMinistryAccount) {
+            $('#accountBalanceDiv').hide(0);
+            $('#budgetBalanceDiv').show(0);
+        }
     }
 
 </script>

@@ -2697,8 +2697,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Protected Function CanEdit(ByVal status As Integer) As Boolean
             Return status <> RmbStatus.Processed And status <> RmbStatus.PendingDownload And status <> RmbStatus.DownloadFailed And (status <> RmbStatus.Approved Or IsAccounts())
+        End Function
 
-
+        Protected Function isStaffAccount() As Boolean
+            Dim result = StaffRmbFunctions.isStaffAccount(tbChargeTo.Text)
+            Return result
         End Function
 
         Protected Sub GetMilesForYear(ByVal RMBLineId As Integer, ByVal UID As Integer)
