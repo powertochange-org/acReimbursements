@@ -358,10 +358,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim approvable_count = ApprovableRmbs.Count + ApprovableAdvs.Count
                 Dim isApprover = (approvable_count > 0)
 
-                '-- Add a count of items to the 'Submitted' heading
-                submitted_count += approvable_count
-                If submitted_count > 0 Then
-                    lblSubmittedCount.Text = "(" & submitted_count & ")"
+                '-- Add a count of approvable items to the 'Submitted' heading
+                If approvable_count > 0 Then
+                    lblSubmittedCount.Text = "(" & approvable_count & ")"
                     pnlSubmitted.CssClass = "ui-state-highlight ui-corner-all"
                 Else
                     lblSubmittedCount.Text = ""
@@ -1076,7 +1075,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     btnSubmit.Visible = (isOwner Or isSpouse) And (DRAFT Or MORE_INFO Or CANCELLED) And FORM_HAS_ITEMS
                     btnSubmit.Text = If(DRAFT, Translate("btnSubmit"), Translate("btnResubmit"))
                     btnSubmit.Enabled = btnSubmit.Visible And Rmb.CostCenter IsNot Nothing And Rmb.ApprUserId IsNot Nothing AndAlso (Rmb.CostCenter.Length = 6) And (Rmb.ApprUserId >= 0)
-                    btnSubmit.ToolTip = If(btnSubmit.Enabled, "", "Please select an account and an approver in order to submit")
+                    btnSubmit.ToolTip = If(btnSubmit.Enabled, "", Translate("btnSubmitHelp"))
                     btnSubmit.OnClientClick = "window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & RmbNo & "&UID=" & Rmb.UserId & "&mode=1', '_blank'); "
                     btnApprove.Visible = isApprover And SUBMITTED
                     btnApprove.Enabled = btnApprove.Visible
@@ -1596,49 +1595,60 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             btnApprove.Visible = False
             btnSubmit.Visible = True
+            btnSubmit.ToolTip = If(btnSubmit.Enabled, "", Translate("btnSubmitHelp"))
 
             d.AP_Staff_Rmbs.InsertOnSubmit(insert)
             d.SubmitChanges()
+            Dim resetMenuTask = ResetMenuAsync()
+            Dim loadRmbTask = LoadRmbAsync(insert.RMBNo)
 
             Dim t As Type = tbNewChargeTo.GetType()
             Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
             sb.Append("<script language='javascript'>")
             sb.Append("closePopup2();")
             sb.Append("</script>")
-            Await LoadRmbAsync(insert.RMBNo)
+            Await resetMenuTask
+            Await loadRmbTask
             ScriptManager.RegisterClientScriptBlock(tbNewChargeTo, t, "", sb.ToString, False)
 
         End Sub
 
         Protected Async Function btnSubmit_Click(ByVal sender As Object, ByVal e As System.EventArgs) As Task Handles btnSubmit.Click
+            'note: rmb is manually updated, as Await loadRmbAsync(rmb.RmbNO) fails
             Await saveIfNecessaryAsync()
-            Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value
-            If rmb.Count > 0 Then
-                Dim NewStatus As Integer = rmb.First.Status
+            Dim rmbs = From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value
+            If rmbs.Count > 0 Then
+                Dim rmb = rmbs.First
+                Dim NewStatus As Integer = rmb.Status
                 Dim message As String = Translate("Printout")
 
-                If (rmb.First.MoreInfoRequested) Then
-                    rmb.First.MoreInfoRequested = False
-                    rmb.First.Locked = True
+                If (rmb.MoreInfoRequested) Then
+                    rmb.MoreInfoRequested = False
+                    rmb.Locked = True
+                    tbComments.Enabled = False
                 Else
                     NewStatus = RmbStatus.Submitted
-                    rmb.First.Locked = False
+                    rmb.Locked = False
                 End If
 
-                rmb.First.Status = NewStatus
-                rmb.First.RmbDate = Now
-                rmb.First.Period = Nothing
-                rmb.First.Year = Nothing
+                rmb.Status = NewStatus
+                lblStatus.Text = RmbStatus.StatusName(NewStatus)
+                rmb.RmbDate = Now
+                lblSubmittedDate.Text = Now.ToShortDateString
+                rmb.Period = Nothing
+                rmb.Year = Nothing
+                btnSubmit.Visible = False
 
-                Await SubmitChangesAsync()
+                SubmitChanges()
+                Dim refreshMenuTask = ResetMenuAsync()
                 'dlPending.DataBind()
                 'dlSubmitted.DataBind()
 
                 'Send Email to Staff Member
                 If NewStatus = RmbStatus.Submitted Then
-                    SendApprovalEmail(rmb.First)
+                    SendApprovalEmail(rmb)
                 End If
-                Log(rmb.First.RMBNo, "SUBMITTED")
+                Log(rmb.RMBNo, "SUBMITTED")
 
                 'use an alert to switch back to the main window from the printout window
                 Dim t As Type = Me.GetType()
@@ -1646,8 +1656,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 sb.Append("<script language='javascript'>")
                 sb.Append("alert(""" & message & """);")
                 sb.Append("</script>")
-                Await LoadRmbAsync(hfRmbNo.Value)
                 ScriptManager.RegisterStartupScript(Page, t, "popup", sb.ToString, False)
+                Await refreshMenuTask
 
             End If
 
@@ -1658,7 +1668,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value
             If rmb.Count > 0 Then
                 rmb.First.Status = RmbStatus.Cancelled
-                Dim submitChangesTask = SubmitChangesAsync()
                 lblStatus.Text = Translate(RmbStatus.StatusName(RmbStatus.Cancelled))
                 btnApprove.Visible = False
                 btnDelete.Visible = False
@@ -1666,7 +1675,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 If rmb.First.UserId = UserId Then
                     Log(rmb.First.RMBNo, "DELETED by owner")
 
-                    Await submitChangesTask
+                    SubmitChanges()
                     Await ResetMenuAsync()
                     ScriptManager.RegisterStartupScript(btnDelete, btnDelete.GetType(), "select4", "selectIndex(4)", True)
                 Else
@@ -1706,7 +1715,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     Log(rmb.First.RMBNo, "DELETED")
 
-                    Await submitChangesTask
+                    SubmitChanges()
                     Await ResetMenuAsync()
                     ScriptManager.RegisterStartupScript(btnDelete, btnDelete.GetType(), "select0", "selectIndex(0)", True)
 
@@ -1727,7 +1736,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 rmb.First.ApprUserId = UserId
                 rmb.First.Period = Nothing
                 rmb.First.Year = Nothing
-                Dim submitChangesTask = SubmitChangesAsync()
                 Dim resetMenuTask = ResetMenuAsync()
 
                 'SEND EMAIL TO OTHER APPROVERS
@@ -1766,11 +1774,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 ' End If
                 Emessage = Emessage.Replace("[STAFFNAME]", theUser.DisplayName).Replace("[RMBNO]", rmb.First.RID).Replace("[USERREF]", IIf(rmb.First.UserRef <> "", rmb.First.UserRef, "None"))
                 Emessage = Emessage.Replace("[APPROVER]", ObjAppr.DisplayName)
-                Await submitChangesTask
+                SubmitChanges()
                 If rmb.First.Changed = True Then
                     Emessage = Emessage.Replace("[CHANGES]", ". " & Translate("EmailApproverChanged"))
                     rmb.First.Changed = False
-                    Await SubmitChangesAsync()
+                    SubmitChanges()
                 Else
                     Emessage = Emessage.Replace("[CHANGES]", "")
                 End If
@@ -1814,10 +1822,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo And c.PortalId = PortalId
             lblAdvError.Text = ""
             If rmb.Count > 0 Then
-                '--Dim rmbLoadTask = Await LoadRmbAsync(RmbNo)
+                Dim reloadMenu = (rmb.First.UserRef <> tbYouRef.Text)
                 rmb.First.UserComment = tbComments.Text
                 rmb.First.UserRef = tbYouRef.Text
-                Dim reloadMenu = (Not rmb.First.UserRef.Equals(tbYouRef.Text))
                 rmb.First.ApprComment = tbApprComments.Text
                 rmb.First.MoreInfoRequested = cbMoreInfo.Checked Or cbApprMoreInfo.Checked
                 If (cbMoreInfo.Checked Or cbApprMoreInfo.Checked) Then
@@ -1832,10 +1839,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 '    rmb.First.Year = ddlYear.SelectedValue
                 'End If
 
+                hfChargeToValue.Value = tbChargeTo.Text
+                rmb.First.CostCenter = tbChargeTo.Text
                 For Each row In (From c In rmb.First.AP_Staff_RmbLines Where c.CostCenter = rmb.First.CostCenter)
-                    row.CostCenter = hfChargeToValue.Value
+                    row.CostCenter = tbChargeTo.Text
                 Next
-                rmb.First.CostCenter = hfChargeToValue.Value
                 If tbAdvanceAmount.Text = "" Then
                     tbAdvanceAmount.Text = 0
                 End If
@@ -1851,7 +1859,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Return
                 End Try
 
-                Await SubmitChangesAsync()
+                SubmitChanges()
                 If (reloadMenu) Then
                     Await ResetMenuAsync()
                 End If
@@ -2168,7 +2176,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If e.CommandName = "myDelete" Then
                 ' d.AP_Staff_RmbLineAddStaffs.DeleteAllOnSubmit(From c In d.AP_Staff_RmbLineAddStaffs Where c.RmbLineId = CInt(e.CommandArgument))
                 d.AP_Staff_RmbLines.DeleteAllOnSubmit(From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(e.CommandArgument))
-                Await SubmitChangesAsync()
+                SubmitChanges()
                 Await LoadRmbAsync(hfRmbNo.Value)
 
             ElseIf e.CommandName = "myEdit" Then
@@ -2355,7 +2363,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         theLine.First.AP_Staff_Rmb = q.First
                     End If
                     Dim loadRmbTask = LoadRmbAsync(hfRmbNo.Value)
-                    Await SubmitChangesAsync()
+                    SubmitChanges()
 
                     Dim theUser = UserController.GetUserById(PortalId, theLine.First.AP_Staff_Rmb.UserId)
                     Dim t As Type = GridView1.GetType()
@@ -2432,7 +2440,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             row.CostCenter = hfChargeToValue.Value
                         End If
                     Next
-                    Await SubmitChangesAsync()
+                    SubmitChanges()
                     Await updateApproversListAsync(rmb.First)
                     Await updateBudgetBalanceTask
                     Await updateAccountBalanceTask
@@ -2440,7 +2448,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         rmb.First.Status = RmbStatus.Draft
                         Await ResetMenuAsync()
                     End If
-                    Await SubmitChangesAsync()
+                    SubmitChanges()
                 End If
             Catch ex As Exception
                 lblError.Text = "Error in ChargeTo OnChange event: " & ex.Message
@@ -2457,14 +2465,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Catch
                 rmb.First.ApprUserId = Nothing
             End Try
-            Dim refresh = (rmb.First.Status <> RmbStatus.Draft)
+            Dim refreshMenu = (Not rmb.First.Status = RmbStatus.Draft)
             rmb.First.Status = RmbStatus.Draft
             lblStatus.Text = Translate(RmbStatus.StatusName(RmbStatus.Draft))
             btnSubmit.Visible = rmb.First.AP_Staff_RmbLines.Count > 0
             btnSubmit.Enabled = (rmb.First.CostCenter IsNot Nothing And rmb.First.ApprUserId IsNot Nothing _
                                  AndAlso (rmb.First.CostCenter.Length = 6) And (rmb.First.ApprUserId >= 0))
-            Await SubmitChangesAsync()
-            If refresh Then
+            btnSubmit.ToolTip = If(btnSubmit.Enabled, "", Translate("btnSubmitHelp"))
+            SubmitChanges()
+            If refreshMenu Then
                 Await ResetMenuAsync()
             End If
             ScriptManager.RegisterStartupScript(ddlApprovedBy, ddlApprovedBy.GetType(), "selectDrafts", "selectIndex(0)", True)
@@ -2913,9 +2922,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 #End Region
 
 #Region "Utilities"
-        Private Async Function SubmitChangesAsync() As Task
+        Private Sub SubmitChanges()
             d.SubmitChanges()
-        End Function
+        End Sub
 
         Private Async Function saveIfNecessaryAsync() As Task
             'TODO: logic to determine if save is required or not
@@ -3091,12 +3100,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim SpouseId As Integer = StaffBrokerFunctions.GetSpouseId(theRmb.UserId)
                 Dim ownerMessage As String = StaffBrokerFunctions.GetTemplate("RmbConfirmation", PortalId)
                 Dim approverMessage As String = StaffBrokerFunctions.GetTemplate("RmbApproverEmail", PortalId)
+                Dim owner = UserController.GetUserById(theRmb.PortalId, theRmb.UserId)
                 Dim approver = UserController.GetUserById(theRmb.PortalId, theRmb.ApprUserId)
                 Dim toEmail = approver.Email
                 Dim toName = approver.FirstName
                 Dim Approvers = approver.DisplayName
 
-                ownerMessage = ownerMessage.Replace("[APPROVER]", Approvers).Replace("[EXTRA]", "")
+                ownerMessage = ownerMessage.Replace("[APPROVER]", Approvers).Replace("[EXTRA]", "").Replace("[STAFFNAME]", owner.FirstName) _
+                    .Replace("[RMBNO]", theRmb.RMBNo).Replace("[USERREF]", theRmb.UserRef)
                 If (From c In theRmb.AP_Staff_RmbLines Where c.Receipt = True And (Not c.ReceiptImageId Is Nothing)).Count > 0 Then
                     ownerMessage = ownerMessage.Replace("[STAFFACTION]", Translate("PostReceipts"))
                 Else
@@ -3106,35 +3117,38 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     & Request.Url.Scheme & "://" & Request.Url.Authority & Request.ApplicationPath & "DesktopModules/AgapeConnect/StaffRmb/Images/PrintoutIcon.jpg' /><br />Printout</div></a><style> a div:hover{border: solid 1px blue;}</style>")
 
                 'Email to the submitter here
-                DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agapeconnect.me", UserInfo.Email, "", Translate("EmailSubmittedSubject").Replace("[RMBNO]", theRmb.RID), ownerMessage, "", "HTML", "", "", "", "")
+                DotNetNuke.Services.Mail.Mail.SendMail("reimbursements@p2c.com", UserInfo.Email, "", Translate("EmailSubmittedSubject").Replace("[RMBNO]", theRmb.RID), ownerMessage, "", "HTML", "", "", "", "")
 
                 'Send Approvers Instructions Here
                 If toEmail.Length > 0 Then
+                    Dim subject = Translate("SubmittedApprEmailSubject").Replace("[STAFFNAME]", UserInfo.DisplayName)
                     If StaffRmbFunctions.isStaffAccount(theRmb.CostCenter) Then
                         'Personal Reimbursement
                         approverMessage = approverMessage.Replace("[STAFFNAME]", UserInfo.DisplayName).Replace("[RMBNO]", theRmb.RMBNo).Replace("[USERREF]", IIf(theRmb.UserRef <> "", theRmb.UserRef, "None"))
                         approverMessage = approverMessage.Replace("[APPRNAME]", toName)
                         If (isLowBalance()) Then
-                            approverMessage = approverMessage.Replace("[LOWBALANCE]", Translate("WarningLowBalance"))
+                            approverMessage = approverMessage.Replace("[LOWBALANCE]", Translate("WarningLowBalance")).Replace("[ACCTBAL]", hfAccountBalance.Value) _
+                .Replace("[BUDGBAL]", hfBudgetBalance.Value).Replace("[ACCT]", tbChargeTo.Text)
                         End If
                         If theRmb.UserComment <> "" Then
                             approverMessage = approverMessage.Replace("[COMMENTS]", Translate("EmailComments") & "<br />" & theRmb.UserComment)
                         Else
                             approverMessage = approverMessage.Replace("[COMMENTS]", "")
                         End If
-                        DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agapeconnect.me", toEmail, "", Translate("SubmittedApprEmailSubject").Replace("[STAFFNAME]", UserInfo.FirstName & " " & UserInfo.LastName), approverMessage, "", "HTML", "", "", "", "")
+                        DotNetNuke.Services.Mail.Mail.SendMail("reimbursements@p2c.com", toEmail, "", subject, approverMessage, "", "HTML", "", "", "", "")
                     Else
                         approverMessage = approverMessage.Replace("[STAFFNAME]", UserInfo.DisplayName).Replace("[RMBNO]", theRmb.RMBNo).Replace("[USERREF]", IIf(theRmb.UserRef <> "", theRmb.UserRef, "None"))
                         approverMessage = approverMessage.Replace("[APPRNAME]", Left(toName, Math.Max(toName.Length - 2, 0)))
                         If (isLowBalance()) Then
-                            approverMessage = approverMessage.Replace("[LOWBALANCE]", Translate("WarningLowBalance"))
+                            approverMessage = approverMessage.Replace("[LOWBALANCE]", Translate("WarningLowBalance")).Replace("[ACCTBAL]", hfAccountBalance.Value) _
+                .Replace("[BUDGBAL]", hfBudgetBalance.Value).Replace("[ACCT]", tbChargeTo.Text)
                         End If
                         If theRmb.UserComment <> "" Then
                             approverMessage = approverMessage.Replace("[COMMENTS]", Translate("EmailComments") & "<br />" & theRmb.UserComment)
                         Else
                             approverMessage = approverMessage.Replace("[COMMENTS]", "")
                         End If
-                        DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agapeconnect.me", Left(toEmail, toEmail.Length - 1), "", Translate("SubmittedApprEmailSubject").Replace("[STAFFNAME]", UserInfo.FirstName & " " & UserInfo.LastName), approverMessage, "", "HTML", "", "", "", "")
+                        DotNetNuke.Services.Mail.Mail.SendMail("reimbursements@p2c.com", toEmail, "", subject, approverMessage, "", "HTML", "", "", "", "")
                     End If
                 End If
             Catch ex As Exception
@@ -4483,6 +4497,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Function
 
         Private Async Function refreshAccountBalanceAsync(account As String, logon As String) As Task
+            If account = "" Then
+                lblAccountBalance.Text = "-------"
+                lblAccountBalance.Attributes.Remove("class")
+                hfAccountBalance.Value = 0
+                Return
+            End If
             Dim accountBalance = Await StaffRmbFunctions.getAccountBalanceAsync(account, logon)
             Try
                 hfAccountBalance.Value = Double.Parse(accountBalance)
@@ -4498,6 +4518,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Function
 
         Private Async Function refreshBudgetBalanceAsync(account As String, logon As String) As Task
+            If account = "" Then
+                lblBudgetBalance.Text = "-------"
+                lblBudgetBalance.Attributes.Remove("class")
+                hfBudgetBalance.Value = 0
+                Return
+            End If
             Dim budgetBalance = Await StaffRmbFunctions.getBudgetBalanceAsync(account, logon)
             Try
                 hfBudgetBalance.Value = Double.Parse(budgetBalance)

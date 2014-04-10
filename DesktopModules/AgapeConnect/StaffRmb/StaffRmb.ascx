@@ -664,14 +664,17 @@
                 });
             },
             select: function(event, ui) {
+                console.debug("SELECT: "+ui.item.value)
                 $('#<%= hfChargeToValue.ClientID%>').val(ui.item.value);
                 $('#<%= tbChargeTo.ClientID%>').val(ui.item.value).change();
             },
             change: function(event, ui) {
                 if (ui != null && ui.item != null) {
+                    console.debug("CHANGE: "+ui.item.value)
                     $('#<%= hfChargeToValue.ClientID%>').val(ui.item.value);
                     $('#<%= tbChargeTo.ClientID%>').val(ui.item.value).change();
                 } else {
+                    console.debug("CHANGE: -null-")
                     var old_value = $('#<%= hfChargeToValue.ClientID%>').val();
                     $('#<%= tbChargeTo.ClientID%>').val(old_value);
                 }
@@ -1664,7 +1667,7 @@
     <asp:UpdateProgress ID="UpdateProgress3" runat="server" DisplayAfter="0" DynamicLayout="true"
         AssociatedUpdatePanelID="UpdatePanel1">
         <ProgressTemplate>
-            <asp:Image ID="updating3" ImageUrl="~/Images/progressbar2.gif" runat="server" />
+            <asp:Image ID="updating3" ImageUrl="~/Images/progressbar2.gif" runat="server" style="margin-left:60px"/>
         </ProgressTemplate>
     </asp:UpdateProgress>
 
@@ -1906,7 +1909,7 @@
                         class="aButton" style="float:right" />
             </ContentTemplate>
         </asp:UpdatePanel>
-    </div>"
+    </div>
     <div id="divSplitPopup" class="ui-widget">
         <asp:UpdatePanel ID="UpdatePanel9" runat="server">
             <ContentTemplate>
