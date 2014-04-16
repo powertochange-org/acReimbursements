@@ -269,11 +269,11 @@ namespace StaffRmb
             request.ContentLength = postData.Length;
             try
             {
-                using (var requestStream = await request.GetRequestStreamAsync())
+                using (var requestStream = request.GetRequestStream())
                 {
-                    await requestStream.WriteAsync(postData, 0, postData.Length);
+                    requestStream.Write(postData, 0, postData.Length);
                 }
-                var response = (HttpWebResponse)await request.GetResponseAsync();
+                var response = (HttpWebResponse) request.GetResponse();
                 if (response != null)
                 {
                     var reader = new StreamReader(response.GetResponseStream());

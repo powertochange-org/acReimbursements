@@ -63,7 +63,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Next
         End Sub
 
-        Private Async Function Page_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) As Task Handles Me.Init
+        Private Async Sub Page_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Me.Init
 
             lblAdvanceRequest.Visible = ENABLE_ADVANCE_FUNCTIONALITY
             lblError.Visible = False
@@ -204,25 +204,31 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 If hfRmbNo.Value <> "" Then
                     If CInt(hfRmbNo.Value) < 0 Then
-                        Await LoadAdvAsync(-hfRmbNo.Value)
+                        Dim loadAdvTask = LoadAdvAsync(-hfRmbNo.Value)
+                        Dim resetMenuTask = ResetMenuAsync()
+                        Await loadAdvTask
+                        Await resetMenuTask
                     Else
-                        Await LoadRmbAsync(hfRmbNo.Value)
+                        Dim loadRmbTask = LoadRmbAsync(hfRmbNo.Value)
+                        Dim resetMenuTask = ResetMenuAsync()
+                        Await loadRmbTask
+                        Await resetMenuTask
                     End If
                 Else
                     ltSplash.Text = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbSplash", PortalId))
                     Await ResetMenuAsync()
                 End If
             End If
-        End Function
+        End Sub
 
-        Protected Async Sub UpdatePanel2_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles UpdatePanel2.Load
+        Protected Sub UpdatePanel2_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles UpdatePanel2.Load
             Try
                 Dim lt = From c In d.AP_Staff_RmbLineTypes Where c.LineTypeId = ddlLineTypes.SelectedValue
 
                 If lt.Count > 0 Then
 
                     phLineDetail.Controls.Clear()
-                    theControl = Await LoadControlAsync(lt.First.ControlPath)
+                    theControl = LoadControlAsync(lt.First.ControlPath)
                     theControl.ID = "theControl"
                     phLineDetail.Controls.Add(theControl)
 
@@ -949,8 +955,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     '--hidden fields
                     hfChargeToValue.Value = If(Rmb.CostCenter Is Nothing, "", Rmb.CostCenter)
                     hfAccountBalance.Value = 0
-                    lblAccountBalance.Text = "searching..."
-                    lblBudgetBalance.Text = "searching..."
+                    lblAccountBalance.Text = "not loaded"
+                    lblBudgetBalance.Text = "not loaded"
 
                     Dim getAccountBalanceTask = getAccountBalanceAsync(Rmb.CostCenter, StaffRmbFunctions.logonFromId(PortalId, UserId))
                     Dim getBudgetBalanceTask = getBudgetBalanceAsync(Rmb.CostCenter, StaffRmbFunctions.logonFromId(PortalId, UserId))
@@ -3038,7 +3044,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ' Save the standard values
                     phLineDetail.Controls.Clear()
                     ddlOverideTax.SelectedIndex = 0
-                    theControl = Await LoadControlAsync(lt.First.ControlPath)
+                    theControl = LoadControlAsync(lt.First.ControlPath)
 
                     theControl.ID = "theControl"
                     phLineDetail.Controls.Add(theControl)
