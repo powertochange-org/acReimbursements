@@ -237,12 +237,12 @@ namespace StaffRmb
         }
 
         static public async Task<string> getAccountBalanceAsync(string account, string user_logon)
-        // Returns the balance of the account, or "-------" if the specified user does not have View Finanicals access to the account
+        // Returns the balance of the account, or "" if the specified user does not have View Finanicals access to the account
         {
             string postData = string.Format("_reportPath=/General/Account%20Balance&_renderFormat=CSV&_apiToken={0}&ProjectCodeSearch={1}&ExecuteAsUser={2}", Constants.getApiToken(), account, user_logon);
             string url = "https://1chronicles/CallRptServicesTest/CallRpt.aspx";
             string response = await getResultFromWebServiceAsync(url, postData);
-            string result = "-------";
+            string result = "";
             Match match = Regex.Match(response, @"\""([0-9,\-\.]+)\""\r?\n?$");  //Look at digits, comma, period and minus in quotes at the end of the string.
             if (match.Success) {
                 result = match.Groups[1].Value;
@@ -251,10 +251,9 @@ namespace StaffRmb
         }
 
         static public async Task<string> getBudgetBalanceAsync(string account, string user_logon)
-        // Returns the current balance of the budget for this account, or "-------" if the specified user does not have View Financials access to the account
+        // Returns the current balance of the budget for this account, or "" if the specified user does not have View Financials access to the account
         {
             return "200.00";
-            return "-------";
         }
 
         static private async Task<string> getResultFromWebServiceAsync(string url, string postString)
@@ -268,12 +267,12 @@ namespace StaffRmb
             request.Method = "POST";
             request.ContentType = "application/x-www-form-urlencoded";
             request.ContentLength = postData.Length;
-            using (var requestStream = await request.GetRequestStreamAsync())
-            {
-                await requestStream.WriteAsync(postData, 0, postData.Length);
-            }
             try
             {
+                using (var requestStream = await request.GetRequestStreamAsync())
+                {
+                    await requestStream.WriteAsync(postData, 0, postData.Length);
+                }
                 var response = (HttpWebResponse)await request.GetResponseAsync();
                 if (response != null)
                 {

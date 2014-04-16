@@ -839,6 +839,9 @@
                 <div align="center" width="100%">
                     <input id="btmNewRmb" type="button" onclick="showPopup2();" class="aButton" value='<%= Translate("btnNew") %>'
                         style="margin-bottom: 5px; font-weight: bold; min-width: 220px;" />
+                    <h5><asp:Label ID="lblAccountsTeam" runat="server" class="ui-state-highlight ui-corner-all"
+                                        Style="padding: 6px; border-radius:10px; margin-bottom:5px; background-color:black; color:orange; display: block; text-align:center;" 
+                                        resourcekey="AccountsMode" Visible="false"></asp:Label></h5>
                 </div>
                 <div id="accordion">
                     <div>
@@ -848,9 +851,7 @@
                         <div id="DraftPane" class="AcPane">
                             <asp:UpdatePanel ID="UpdatePanel5" runat="server" >
                                 <ContentTemplate>
-                                    <h5><asp:Label ID="lblAccountsTeam" runat="server" class="ui-state-highlight ui-corner-all"
-                                        Style="padding: 2px; border-radius:5px; background-color:black; color:#CCC; display: block; text-align:center;" 
-                                        resourcekey="AccountsMode" Visible="false"></asp:Label></h5>
+                                    
                                     <asp:Label ID="lblErrors" runat="server" class="ui-state-error ui-corner-all"
                                         Style="padding: 3px; margin-top: 3px; display: block;" Visible="false"></asp:Label>
                                     <asp:DataList ID="dlPending" runat="server" Width="100%">

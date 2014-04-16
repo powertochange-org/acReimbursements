@@ -24,6 +24,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Inherits Entities.Modules.PortalModuleBase
         Implements Entities.Modules.IActionable
         Dim ENABLE_ADVANCE_FUNCTIONALITY As Boolean = False
+        Dim BALANCE_INCONCLUSIVE As String = "unknown"
+        Dim BALANCE_PERMISSION_DENIED As String = "**hidden**"
 
 #Region "Properties"
         Dim d As New StaffRmbDataContext
@@ -950,9 +952,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     lblAccountBalance.Text = "searching..."
                     lblBudgetBalance.Text = "searching..."
 
-                    Dim updateApproversTask = updateApproversListAsync(Rmb)
-                    Dim updateAccountBalanceTask = refreshAccountBalanceAsync(Rmb.CostCenter, StaffRmbFunctions.logonFromId(PortalId, UserId))
-                    Dim updateBudgetBalanceTask = refreshBudgetBalanceAsync(Rmb.CostCenter, StaffRmbFunctions.logonFromId(PortalId, UserId))
+                    Dim getAccountBalanceTask = getAccountBalanceAsync(Rmb.CostCenter, StaffRmbFunctions.logonFromId(PortalId, UserId))
+                    Dim getBudgetBalanceTask = getBudgetBalanceAsync(Rmb.CostCenter, StaffRmbFunctions.logonFromId(PortalId, UserId))
 
                     Dim DRAFT = Rmb.Status = RmbStatus.Draft
                     Dim MORE_INFO = (Rmb.MoreInfoRequested IsNot Nothing AndAlso Rmb.MoreInfoRequested = True)
@@ -1008,10 +1009,18 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     lblApprovedDate.Text = If(Rmb.ApprDate Is Nothing, "", Rmb.ApprDate.Value.ToShortDateString)
                     ttlWaitingApp.Visible = Rmb.ApprDate Is Nothing
                     ttlApprovedBy.Visible = Not Rmb.ApprDate Is Nothing
-                    ttlApprovedBy.Text = If(Rmb.ApprUserId Is Nothing Or Rmb.ApprUserId = -1, "", UserController.GetUserById(PortalId, Rmb.ApprUserId).DisplayName)
                     ddlApprovedBy.Visible = DRAFT Or MORE_INFO Or CANCELLED Or ((isApprover Or isOwner Or isSpouse) And SUBMITTED)
                     ddlApprovedBy.Enabled = DRAFT Or MORE_INFO Or CANCELLED Or ((isApprover Or isOwner Or isSpouse) And SUBMITTED)
                     lblApprovedBy.Visible = Not ddlApprovedBy.Visible
+                    Dim approverName As String = If(Rmb.ApprUserId Is Nothing Or Rmb.ApprUserId = -1, "", UserController.GetUserById(PortalId, Rmb.ApprUserId).DisplayName)
+                    Dim updateApproverListTask As New Task(Sub()
+                                                               lblApprovedBy.Text = approverName
+                                                           End Sub)
+                    If (ddlApprovedBy.Visible) Then
+                        updateApproverListTask = updateApproversListAsync(Rmb)
+                    Else
+                        updateApproverListTask.Start()
+                    End If
 
                     lblProcessedDate.Text = If(Rmb.ProcDate Is Nothing, "", Rmb.ProcDate.Value.ToShortDateString)
                     lblProcessedBy.Text = If(Rmb.ProcUserId Is Nothing, "", UserController.GetUserById(PortalId, Rmb.ProcUserId).DisplayName)
@@ -1110,9 +1119,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             End If
                         End If
                     End If
-                    Await updateApproversTask
-                    Await updateAccountBalanceTask
-                    Await updateBudgetBalanceTask
+                    Await updateApproverListTask
+                    updateBalanceLabels(Await getAccountBalanceTask, Await getBudgetBalanceTask)
                     If (isApprover) Then
                         checkLowBalance()
                     End If
@@ -2389,8 +2397,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim Dept = StaffBrokerFunctions.IsDept(PortalId, hfChargeToValue.Value)
                 Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo And c.PortalId = PortalId
                 If (rmb.Count > 0) Then
-                    Dim updateAccountBalanceTask = refreshAccountBalanceAsync(hfChargeToValue.Value, StaffRmbFunctions.logonFromId(PortalId, UserId))
-                    Dim updateBudgetBalanceTask = refreshBudgetBalanceAsync(hfChargeToValue.Value, StaffRmbFunctions.logonFromId(PortalId, UserId))
+                    Dim getAccountBalanceTask = getAccountBalanceAsync(hfChargeToValue.Value, StaffRmbFunctions.logonFromId(PortalId, UserId))
+                    Dim getBudgetBalanceTask = getBudgetBalanceAsync(hfChargeToValue.Value, StaffRmbFunctions.logonFromId(PortalId, UserId))
                     rmb.First.CostCenter = hfChargeToValue.Value
                     rmb.First.Department = Dept
 
@@ -2403,8 +2411,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Next
                     SubmitChanges()
                     Await updateApproversListAsync(rmb.First)
-                    Await updateBudgetBalanceTask
-                    Await updateAccountBalanceTask
+                    updateBalanceLabels(Await getAccountBalanceTask, Await getBudgetBalanceTask)
                     If (rmb.First.Status <> RmbStatus.Draft) Then
                         rmb.First.Status = RmbStatus.Draft
                         Await ResetMenuAsync()
@@ -4462,46 +4469,36 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Return newChild
         End Function
 
-        Private Async Function refreshAccountBalanceAsync(account As String, logon As String) As Task
+        Private Async Function getAccountBalanceAsync(account As String, logon As String) As Task(Of String)
             If account = "" Then
-                lblAccountBalance.Text = "-------"
-                lblAccountBalance.Attributes.Remove("class")
-                hfAccountBalance.Value = 0
-                Return
+                Return BALANCE_INCONCLUSIVE
             End If
             Dim accountBalance = Await StaffRmbFunctions.getAccountBalanceAsync(account, logon)
-            Try
-                hfAccountBalance.Value = Double.Parse(accountBalance)
-            Catch
-                hfAccountBalance.Value = 0
-            End Try
-            lblAccountBalance.Text = accountBalance
-            If (hfAccountBalance.Value < 0) Then
-                lblAccountBalance.Attributes.Add("class", "NormalRed")
-            Else
-                lblAccountBalance.Attributes.Remove("class")
+            If accountBalance.Length = 0 Then
+                Return BALANCE_PERMISSION_DENIED
             End If
+            Try
+                Double.Parse(accountBalance)
+            Catch
+                Return BALANCE_INCONCLUSIVE
+            End Try
+            Return accountBalance
         End Function
 
-        Private Async Function refreshBudgetBalanceAsync(account As String, logon As String) As Task
+        Private Async Function getBudgetBalanceAsync(account As String, logon As String) As Task(Of String)
             If account = "" Then
-                lblBudgetBalance.Text = "-------"
-                lblBudgetBalance.Attributes.Remove("class")
-                hfBudgetBalance.Value = 0
-                Return
+                Return BALANCE_INCONCLUSIVE
             End If
             Dim budgetBalance = Await StaffRmbFunctions.getBudgetBalanceAsync(account, logon)
-            Try
-                hfBudgetBalance.Value = Double.Parse(budgetBalance)
-            Catch
-                hfBudgetBalance.Value = 0
-            End Try
-            lblBudgetBalance.Text = budgetBalance
-            If (hfBudgetBalance.Value < 0) Then
-                lblBudgetBalance.Attributes.Add("class", "NormalRed")
-            Else
-                lblAccountBalance.Attributes.Remove("class")
+            If budgetBalance.Length = 0 Then
+                Return BALANCE_PERMISSION_DENIED
             End If
+            Try
+                Double.Parse(budgetBalance)
+            Catch
+                Return BALANCE_INCONCLUSIVE
+            End Try
+            Return budgetBalance
         End Function
 
         Private Sub checkLowBalance()
@@ -4533,6 +4530,32 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Private Async Function LoadControlAsync(path As String) As Task(Of Object)
             Return LoadControl(path)
+        End Function
+
+        Private Sub updateBalanceLabels(accountBalance As String, budgetBalance As String)
+            lblAccountBalance.Text = accountBalance
+            lblBudgetBalance.Text = budgetBalance
+            hfAccountBalance.Value = numericAmount(accountBalance)
+            hfBudgetBalance.Value = numericAmount(budgetBalance)
+            lblAccountBalance.Attributes.Add("class", redIfNegative(hfAccountBalance.Value))
+            lblBudgetBalance.Attributes.Add("class", redIfNegative(hfBudgetBalance.Value))
+        End Sub
+
+        Private Function numericAmount(s As String) As Double
+            Dim result As Double
+            Try
+                result = Double.Parse(s)
+            Catch ex As Exception
+                Return 0
+            End Try
+            Return result
+        End Function
+
+        Private Function redIfNegative(amount As Double) As String
+            If (amount < 0) Then
+                Return "NormalRed"
+            End If
+            Return ""
         End Function
 
 
