@@ -1126,7 +1126,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         End If
                     End If
                     Await updateApproverListTask
-                    updateBalanceLabels(Await getAccountBalanceTask, Await getBudgetBalanceTask)
+                    Dim aBal = Await getAccountBalanceTask
+                    Dim bBal = Await getBudgetBalanceTask
+                    updateBalanceLabels(aBal, bBal)
                     If (isApprover) Then
                         checkLowBalance()
                     End If
@@ -1864,6 +1866,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Sub
 
         Protected Async Sub tbYouRef_Change(sender As Object, e As System.EventArgs) Handles tbYouRef.TextChanged
+            saveIfNecessary()
             Await ResetMenuAsync()
         End Sub
 
@@ -1946,17 +1949,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             theRmb.First.ProcDate = Today
             theRmb.First.MoreInfoRequested = False
             theRmb.First.ProcUserId = UserId
-            d.SubmitChanges()
-            Await LoadRmbAsync(hfRmbNo.Value)
+            SubmitChanges()
+            Dim loadRmbTask = LoadRmbAsync(hfRmbNo.Value)
+            Dim refreshMenuTask = ResetMenuAsync()
             Log(theRmb.First.RMBNo, "Processed - this reimbursement will be added to the next download batch")
             Dim message = Translate("NextBatch")
             Dim t As Type = Me.GetType()
-            Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
-            sb.Append("<script language='javascript'>")
-            sb.Append("alert(""" & message & """);")
-            sb.Append("</script>")
-            ScriptManager.RegisterStartupScript(Page, t, "popup", sb.ToString, False)
-
+            ScriptManager.RegisterStartupScript(Page, t, "popup", "alert(""" & message & """);", True)
+            Await loadRmbTask
+            Await refreshMenuTask
         End Sub
 
         Protected Sub btnDownload_Click(sender As Object, e As System.EventArgs) Handles btnDownload.Click
@@ -2061,7 +2062,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If theRmb.Status = RmbStatus.Processed Then
                 'If the reimbursement has already been downloaded, a warning should be displayed - but hte reimbursement can be simply unprocessed
                 theRmb.Status = RmbStatus.Approved
-                d.SubmitChanges()
+                SubmitChanges()
                 Log(theRmb.RMBNo, "UNPROCESSED, after it had been fully processed")
             Else
                 'if it has not been downloaded, it will be downloaded very soon. We need to check if a download is already in progress.
@@ -2069,11 +2070,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     'If a download is in progress, we need to display a "not at this time" message
                     Dim message = "This reimbursement cannot be unprocessed at this time, as it is currently being downloaded by the automatic datapump (transaction broker). You can try again in a few minutes, but be aware that it will already have been processed into your accounts program."
                     Dim t As Type = Me.GetType()
-                    Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
-                    sb.Append("<script language='javascript'>")
-                    sb.Append("alert(""" & message & """);")
-                    sb.Append("</script>")
-                    ScriptManager.RegisterStartupScript(Page, t, "popup", sb.ToString, False)
+                    ScriptManager.RegisterStartupScript(Page, t, "popup", "alert(""" & message & """);", True)
                     Log(theRmb.RMBNo, "Attempted unprocessed, but could not as it was in the process of being downloaded by the automatic transaction broker")
                     Return
                 Else
@@ -2084,14 +2081,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     theRmb.Period = Nothing
                     theRmb.Year = Nothing
                     theRmb.ProcDate = Nothing
-
-                    d.SubmitChanges()
+                    SubmitChanges()
                     'Then release the lock.
                     StaffBrokerFunctions.SetSetting("Datapump", "Unlocked", PortalId)
                     Log(theRmb.RMBNo, "UNPROCESSED - before it was downloaded")
                 End If
             End If
-            Await LoadRmbAsync(hfRmbNo.Value)
+            Dim loadRmbTask = LoadRmbAsync(hfRmbNo.Value)
+            Dim refreshMenuTask = ResetMenuAsync()
+            Await loadRmbTask
+            Await refreshMenuTask
         End Sub
 
         Protected Async Sub GridView1_RowCommand(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.GridViewCommandEventArgs) Handles GridView1.RowCommand
