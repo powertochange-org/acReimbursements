@@ -1627,9 +1627,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         End Sub
 
-        Protected Async Function btnSubmit_Click(ByVal sender As Object, ByVal e As System.EventArgs) As Task Handles btnSubmit.Click
+        Protected Async Sub btnSubmit_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSubmit.Click
             'note: rmb is manually updated, as Await loadRmbAsync(rmb.RmbNO) fails
-            Await saveIfNecessaryAsync()
+            saveIfNecessary()
             Dim rmbs = From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value
             If rmbs.Count > 0 Then
                 Dim rmb = rmbs.First
@@ -1675,7 +1675,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             End If
 
-        End Function
+        End Sub
 
         Protected Async Sub btnDelete_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnDelete.Click
 
@@ -1783,71 +1783,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
         End Sub
 
-        Protected Async Function btnSave_Click(ByVal sender As Object, ByVal e As System.EventArgs) As Task Handles btnSave.Click, btnSaveAdv.Click
-            Dim RmbNo As Integer
-            Dim PortalId As Integer
-
-            Try
-                RmbNo = CInt(hfRmbNo.Value)
-                PortalId = CInt(hfPortalId.Value)
-            Catch
-                Return
-            End Try
-
-            Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo And c.PortalId = PortalId
-            lblAdvError.Text = ""
-            If rmb.Count > 0 Then
-                Dim reloadMenu = (rmb.First.UserRef <> tbYouRef.Text)
-                rmb.First.UserComment = tbComments.Text
-                rmb.First.UserRef = tbYouRef.Text
-                rmb.First.ApprComment = tbApprComments.Text
-                rmb.First.MoreInfoRequested = cbMoreInfo.Checked Or cbApprMoreInfo.Checked
-                If (cbMoreInfo.Checked Or cbApprMoreInfo.Checked) Then
-                    rmb.First.Locked = False
-                End If
-                rmb.First.ApprUserId = ddlApprovedBy.SelectedValue
-                rmb.First.AcctComment = tbAccComments.Text
-                'If ddlPeriod.SelectedIndex > 0 Then
-                '    rmb.First.Period = ddlPeriod.SelectedValue
-                'End If
-                'If ddlYear.SelectedIndex > 0 Then
-                '    rmb.First.Year = ddlYear.SelectedValue
-                'End If
-
-                hfChargeToValue.Value = tbChargeTo.Text
-                rmb.First.CostCenter = tbChargeTo.Text
-                For Each row In (From c In rmb.First.AP_Staff_RmbLines Where c.CostCenter = rmb.First.CostCenter)
-                    row.CostCenter = tbChargeTo.Text
-                Next
-                If tbAdvanceAmount.Text = "" Then
-                    tbAdvanceAmount.Text = 0
-                End If
-
-                Try
-                    rmb.First.AdvanceRequest = Double.Parse(tbAdvanceAmount.Text, New CultureInfo("en-US"))
-                    If rmb.First.AdvanceRequest > rmb.First.AP_Staff_RmbLines.Sum(Function(x) x.GrossAmount) Then
-                        rmb.First.AdvanceRequest = rmb.First.AP_Staff_RmbLines.Sum(Function(x) x.GrossAmount)
-                        tbAdvanceAmount.Text = rmb.First.AdvanceRequest.ToString("0.00")
-                    End If
-                Catch
-                    lblAdvError.Text = Translate("AdvanceError")
-                    Return
-                End Try
-
-                SubmitChanges()
-                If (reloadMenu) Then
-                    Await ResetMenuAsync()
-                End If
-            End If
-
-        End Function
+        Protected Async Sub btnSave_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSave.Click, btnSaveAdv.Click
+            saveIfNecessary()
+        End Sub
 
         Protected Async Sub addLinebtn2_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles addLinebtn2.Click
 
             'ddlLineTypes_SelectedIndexChanged(Me, Nothing)
             'ddlCostcenter.SelectedValue = ddlChargeTo.SelectedValue
 
-            Dim saveTask = saveIfNecessaryAsync()
+            saveIfNecessary()
             tbCostcenter.Text = hfChargeToValue.Value
 
             ddlLineTypes.Items.Clear()
@@ -1862,8 +1807,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             ddlLineTypes.DataSource = lineTypes
             ddlLineTypes.DataBind()
 
-            Await ResetNewExpensePopupAsync(True)
-            Await saveTask
             cbRecoverVat.Checked = False
             tbVatRate.Text = ""
             tbShortComment.Text = ""
@@ -1918,6 +1861,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             insert.Cells.Add(insertAmt)
             tblSplit.Rows.Add(insert)
             '  Next
+        End Sub
+
+        Protected Async Sub tbYouRef_Change(sender As Object, e As System.EventArgs) Handles tbYouRef.TextChanged
+            Await ResetMenuAsync()
         End Sub
 
         Protected Async Sub btnOK_Click(sender As Object, e As System.EventArgs) Handles btnOK.Click
@@ -2192,7 +2139,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
 
                     ddlLineTypes.SelectedValue = theLine.First.LineType
-                    Await ddlLineTypes_SelectedIndexChanged(Me, Nothing)
+                    ddlLineTypes_SelectedIndexChanged(Me, Nothing)
 
                     Dim ucType As Type = theControl.GetType()
                     ucType.GetProperty("Comment").SetValue(theControl, theLine.First.Comment, Nothing)
@@ -2372,7 +2319,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
 #End Region
 #Region "OnChange Events"
-        Protected Async Function ddlLineTypes_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) As Task Handles ddlLineTypes.SelectedIndexChanged
+        Protected Async Sub ddlLineTypes_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles ddlLineTypes.SelectedIndexChanged
             Dim resetTask = ResetNewExpensePopupAsync(False)
             If lblIncType.Visible And ddlLineTypes.SelectedIndex <> ddlLineTypes.Items.Count - 1 Then
                 Dim oldValue = ddlLineTypes.SelectedValue
@@ -2392,7 +2339,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
 
             Await resetTask
-        End Function
+        End Sub
 
         Protected Async Sub tbChargeTo_ValueChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles tbChargeTo.TextChanged
             'The User selected a new cost centre
@@ -2901,10 +2848,81 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             d.SubmitChanges()
         End Sub
 
-        Private Async Function saveIfNecessaryAsync() As Task
-            'TODO: logic to determine if save is required or not
-            Await btnSave_Click(Me, Nothing)
-        End Function
+        Private Sub saveIfNecessary()
+            'Get Rmb
+            Dim Rmb As AP_Staff_Rmb
+            Try
+                Dim RmbNo As Integer
+                Dim PortalId As Integer
+                RmbNo = CInt(hfRmbNo.Value)
+                PortalId = CInt(hfPortalId.Value)
+                Dim rmbs = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo And c.PortalId = PortalId
+                If rmbs.Count > 0 Then
+                    Rmb = rmbs.First
+                Else
+                    Return
+                End If
+            Catch
+                Return
+            End Try
+
+            Dim save_necessary = False
+
+            hfChargeToValue.Value = tbChargeTo.Text
+            If (Rmb.CostCenter <> tbChargeTo.Text) Then
+                save_necessary = True
+                Rmb.CostCenter = tbChargeTo.Text
+                For Each row In (From c In Rmb.AP_Staff_RmbLines Where c.CostCenter = Rmb.CostCenter)
+                    row.CostCenter = tbChargeTo.Text
+                Next
+            End If
+            If (ddlApprovedBy.SelectedValue.Length > 0) AndAlso (Rmb.ApprUserId <> ddlApprovedBy.SelectedValue) Then
+                save_necessary = True
+                Rmb.ApprUserId = ddlApprovedBy.SelectedValue
+            End If
+            If (Rmb.UserRef <> tbYouRef.Text) Then
+                save_necessary = True
+                Rmb.UserRef = tbYouRef.Text
+            End If
+            If (Rmb.UserComment <> tbComments.Text) Then
+                save_necessary = True
+                Rmb.UserComment = tbComments.Text
+            End If
+            If (Rmb.ApprComment <> tbApprComments.Text) Then
+                save_necessary = True
+                Rmb.ApprComment = tbApprComments.Text
+            End If
+            If (Rmb.AcctComment <> tbAccComments.Text) Then
+                save_necessary = True
+                Rmb.AcctComment = tbAccComments.Text
+            End If
+            If (Rmb.MoreInfoRequested <> (cbMoreInfo.Checked Or cbApprMoreInfo.Checked)) Then
+                save_necessary = True
+                Rmb.Locked = False
+                Rmb.MoreInfoRequested = (cbMoreInfo.Checked Or cbApprMoreInfo.Checked)
+            End If
+            If tbAdvanceAmount.Text = "" Then
+                tbAdvanceAmount.Text = 0
+            End If
+
+            If (ENABLE_ADVANCE_FUNCTIONALITY) Then
+                lblAdvError.Text = ""
+                Try
+                    Rmb.AdvanceRequest = Double.Parse(tbAdvanceAmount.Text, New CultureInfo("en-US"))
+                    If Rmb.AdvanceRequest > Rmb.AP_Staff_RmbLines.Sum(Function(x) x.GrossAmount) Then
+                        Rmb.AdvanceRequest = Rmb.AP_Staff_RmbLines.Sum(Function(x) x.GrossAmount)
+                        tbAdvanceAmount.Text = Rmb.AdvanceRequest.ToString("0.00")
+                    End If
+                Catch
+                    lblAdvError.Text = Translate("AdvanceError")
+                    Return
+                End Try
+            End If
+
+            If (save_necessary) Then
+                SubmitChanges()
+            End If
+        End Sub
 
         Protected Sub Log(ByVal RmbNo As Integer, ByVal Message As String)
             objEventLog.AddLog("Rmb" & RmbNo, Message, PortalSettings, UserId, Services.Log.EventLog.EventLogController.EventLogType.ADMIN_ALERT)
@@ -3876,7 +3894,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     SendMessage(Translate("MoreInfoMsg"), "window.open('mailto:" & theUser.Email & "?subject=Reimbursment " & theRmb.First.RID & ": More info requested');")
                     lblStatus.Text = lblStatus.Text & " - " & Translate("StatusMoreInfo")
                 End If
-                Await btnSave_Click(Me, Nothing)
+                saveIfNecessary()
             End If
         End Sub
 
@@ -3890,7 +3908,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     SendMessage(Translate("MoreInfoMsg"), "window.open('mailto:" & theUser.Email & "?subject=Reimbursment " & theRmb.First.RID & ": More info requested');")
                     lblStatus.Text = lblStatus.Text & " - " & Translate("StatusMoreInfo")
                 End If
-                Await btnSave_Click(Me, Nothing)
+                saveIfNecessary()
             End If
 
         End Sub
