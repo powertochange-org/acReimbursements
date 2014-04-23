@@ -954,7 +954,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     '--hidden fields
                     hfChargeToValue.Value = If(Rmb.CostCenter Is Nothing, "", Rmb.CostCenter)
-                    hfAccountBalance.Value = 0
+                    hfAccountBalance.Value = ""
                     lblAccountBalance.Text = "not loaded"
                     lblBudgetBalance.Text = "not loaded"
 
@@ -1930,9 +1930,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             'Check Balance
             If CType(sender, Button).ID = "btnProcess" And Settings("WarnIfNegative") Then
-                Dim pendingBalance = GetNumericRemainingBalance(2)
+                Dim pendingBalanceTask = GetNumericRemainingBalanceAsync(2)
 
                 Dim RmbBalance = theRmb.First.AP_Staff_RmbLines.Where(Function(x) x.CostCenter = x.AP_Staff_Rmb.CostCenter).Sum(Function(x) x.GrossAmount)
+                Dim pendingBalance = Await pendingBalanceTask
                 If RmbBalance > pendingBalance Then
                     Dim message2 = Translate("NextBatch")
                     Dim t2 As Type = Me.GetType()
@@ -2768,7 +2769,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
         End Function
 
-        Public Function GetNumericRemainingBalance(ByVal mode As Integer) As Double
+        Public Async Function GetNumericRemainingBalanceAsync(ByVal mode As Integer) As Task(Of Double)
 
             Dim statusList = {RmbStatus.Approved, RmbStatus.PendingDownload, RmbStatus.DownloadFailed}
             If mode = 2 Then
@@ -2806,7 +2807,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Function
 
         Public Function GetRemainingBalance() As String
-            Return StaffBrokerFunctions.GetFormattedCurrency(PortalId, GetNumericRemainingBalance(1).ToString("0.00"))
+            If (hfAccountBalance.Value = "") Then
+                Return BALANCE_INCONCLUSIVE
+            End If
+            Dim remainingBalance = GetNumericRemainingBalanceAsync(1).ToString("0.00")
+            Return StaffBrokerFunctions.GetFormattedCurrency(PortalId, remainingBalance)
         End Function
 
         Public Function IsWrongType(ByVal CostCenter As String, ByVal LineTypeId As Integer) As Boolean
@@ -4558,26 +4563,28 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Private Sub updateBalanceLabels(accountBalance As String, budgetBalance As String)
             lblAccountBalance.Text = accountBalance
             lblBudgetBalance.Text = budgetBalance
-            hfAccountBalance.Value = numericAmount(accountBalance)
-            hfBudgetBalance.Value = numericAmount(budgetBalance)
+            valueOrNull(hfAccountBalance, accountBalance)
+            valueOrNull(hfBudgetBalance, budgetBalance)
             lblAccountBalance.Attributes.Add("class", redIfNegative(hfAccountBalance.Value))
             lblBudgetBalance.Attributes.Add("class", redIfNegative(hfBudgetBalance.Value))
         End Sub
 
-        Private Function numericAmount(s As String) As Double
-            Dim result As Double
+        Private Sub valueOrNull(hf As HiddenField, s As String)
             Try
-                result = Double.Parse(s)
+                hf.Value = Double.Parse(s)
             Catch ex As Exception
-                Return 0
+                hf.Value = ""
             End Try
-            Return result
-        End Function
+        End Sub
 
-        Private Function redIfNegative(amount As Double) As String
-            If (amount < 0) Then
-                Return "NormalRed"
-            End If
+        Private Function redIfNegative(amountString As String) As String
+            Try
+                Dim amount = Double.Parse(amountString)
+                If (amount < 0) Then
+                    Return "NormalRed"
+                End If
+            Catch
+            End Try
             Return ""
         End Function
 
