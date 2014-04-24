@@ -257,260 +257,167 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Try
                 '*** EVERYONE SEES THIS STUFF ***
                 Dim MenuSize = Settings("MenuSize")
-                '--Highlight reimbursements that need more information in a bar at the top
-                Dim MoreInfo = From c In d.AP_Staff_Rmbs
-                                    Where c.MoreInfoRequested = True And c.Status <> RmbStatus.Processed And c.UserId = UserId And c.PortalId = PortalId
-                                    Select c.UserRef, c.RID, c.RMBNo
-                For Each row In MoreInfo
-                    Dim hyp As New HyperLink()
-                    hyp.CssClass = "ui-state-highlight ui-corner-all AgapeWarning"
-                    hyp.Font.Size = FontUnit.Small
-                    hyp.Font.Bold = True
-                    hyp.Text = Translate("MoreInfo").Replace("[RMBNO]", row.RID).Replace("[USERREF]", row.UserRef)
-                    hyp.NavigateUrl = NavigateURL() & "?RmbNo=" & row.RMBNo
-                    PlaceHolder1.Controls.Add(hyp)
-                Next
 
-                '--Drafts
-                Dim Pending = (From c In d.AP_Staff_Rmbs
-                               Where c.Status = RmbStatus.Draft And c.PortalId = PortalId And (c.UserId = UserId)
-                               Order By c.RID Descending
-                               Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
-                dlPending.DataSource = Pending
-                dlPending.DataBind()
+                Dim moreInfoTask = loadBasicMoreInfoAsync()
+                Dim draftsTask = loadBasicDraftPaneAsync(MenuSize)
+                Dim submittedTask = loadBasicSubmittedPaneAsync(MenuSize)
+                Dim approvableTask = loadBasicApprovablePaneAsync(MenuSize)
+                Dim approvedTask = loadBasicApprovedPaneAsync(MenuSize)
+                Dim processedTask = loadBasicProcessedPaneAsync(MenuSize)
+                Dim cancelledTask = loadBasicCancelledTaskAsync(MenuSize)
 
-                '--Submitted
-                Dim Submitted = (From c In d.AP_Staff_Rmbs
-                                 Where c.Status = RmbStatus.Submitted And c.UserId = UserId And c.PortalId = PortalId
-                                 Order By c.RID Descending
-                                 Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
-                dlSubmitted.DataSource = Submitted
-                dlSubmitted.DataBind()
-
-                Dim AdvSubmitted = (From c In d.AP_Staff_AdvanceRequests
-                                    Where c.RequestStatus = RmbStatus.Submitted And c.UserId = UserId And c.PortalId = PortalId
-                                    Order By c.LocalAdvanceId Descending
-                                    Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId).Take(MenuSize)
-                dlAdvSubmitted.DataSource = AdvSubmitted
-                dlAdvSubmitted.DataBind()
-                dlAdvSubmitted.AlternatingItemStyle.CssClass = IIf(dlSubmitted.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
-                dlAdvSubmitted.ItemStyle.CssClass = IIf(dlSubmitted.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
-
-                Dim submitted_count = Submitted.Count + AdvSubmitted.Count
-
-                '--Approved
-                Dim Approved = (From c In d.AP_Staff_Rmbs
-                                Where (c.Status = RmbStatus.Approved Or c.Status = RmbStatus.PendingDownload Or c.Status = RmbStatus.DownloadFailed) _
-                                    And c.UserId = UserId And c.PortalId = PortalId
-                                Order By c.RID Descending
-                                Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
-                dlApproved.DataSource = Approved
-                dlApproved.DataBind()
-
-                Dim AdvApproved = (From c In d.AP_Staff_AdvanceRequests
-                                   Where (c.RequestStatus = RmbStatus.Approved Or c.RequestStatus = RmbStatus.PendingDownload Or c.RequestStatus = RmbStatus.DownloadFailed) _
-                                        And c.UserId = UserId And c.PortalId = PortalId
-                                   Order By c.LocalAdvanceId Descending
-                                   Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId).Take(MenuSize)
-                dlAdvApproved.DataSource = AdvApproved
-                dlAdvApproved.DataBind()
-                dlAdvApproved.AlternatingItemStyle.CssClass = IIf(dlApproved.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
-                dlAdvApproved.ItemStyle.CssClass = IIf(dlApproved.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
-
-                '--Processed 
-                Dim Complete = (From c In d.AP_Staff_Rmbs
-                                Where c.Status = RmbStatus.Processed And c.UserId = UserId And c.PortalId = PortalId
-                                Order By c.RID Descending
-                                Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
-                dlProcessed.DataSource = Complete
-                dlProcessed.DataBind()
-
-                Dim CompleteAdv = (From c In d.AP_Staff_AdvanceRequests
-                                   Where c.RequestStatus = RmbStatus.Processed And c.UserId = UserId And c.PortalId = PortalId
-                                   Order By c.LocalAdvanceId Descending
-                                   Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId).Take(MenuSize)
-                dlAdvProcessed.DataSource = CompleteAdv
-                dlAdvProcessed.DataBind()
-
-
-                '--Cancelled
-                Dim Cancelled = (From c In d.AP_Staff_Rmbs
-                                 Where c.Status = RmbStatus.Cancelled And c.UserId = UserId And c.PortalId = PortalId
-                                 Order By c.RID Descending
-                                 Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
-                dlCancelled.DataSource = Cancelled
-                dlCancelled.DataBind()
-
-                '***APPROVERS***
-
-                '--list any unapproved reimbursements submitted to this user for approval
-                Dim ApprovableRmbs = (From c In d.AP_Staff_Rmbs
-                            Where c.Status = RmbStatus.Submitted And c.ApprUserId = UserId And c.ApprDate Is Nothing And c.PortalId = PortalId
-                            Order By c.RMBNo Descending
-                            Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId)
-                dlToApprove.DataSource = ApprovableRmbs
-                dlToApprove.DataBind()
-
-                Dim ApprovableAdvs = (From c In d.AP_Staff_AdvanceRequests
-                             Where c.RequestStatus = RmbStatus.Submitted And c.ApproverId = UserId And c.ApprovedDate Is Nothing And c.PortalId = PortalId
-                             Order By c.LocalAdvanceId Descending
-                             Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId)
-                dlAdvToApprove.DataSource = ApprovableAdvs
-                dlAdvToApprove.DataBind()
-                dlAdvToApprove.AlternatingItemStyle.CssClass = IIf(dlToApprove.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
-                dlAdvToApprove.ItemStyle.CssClass = IIf(dlToApprove.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
-
-                Dim approvable_count = ApprovableRmbs.Count + ApprovableAdvs.Count
-                Dim isApprover = (approvable_count > 0)
-
-                '-- Add a count of approvable items to the 'Submitted' heading
-                If approvable_count > 0 Then
-                    lblSubmittedCount.Text = "(" & approvable_count & ")"
-                    pnlSubmitted.CssClass = "ui-state-highlight ui-corner-all"
-                Else
-                    lblSubmittedCount.Text = ""
-                    pnlSubmitted.CssClass = ""
-                End If
-
-                If isApprover Then
-                    lblApproveHeading.Visible = True
-                    divApproveHeading.Visible = True
-                Else
-                    lblApproveHeading.Visible = False
-                    divApproveHeading.Visible = False
-                End If
+                Await moreInfoTask
+                Await draftsTask
+                Await submittedTask
+                Await approvableTask
+                Await approvedTask
+                Await processedTask
+                Await cancelledTask
 
             Catch ex As Exception
                 Throw New Exception("Error loading basic menu: " + ex.Message)
             End Try
         End Function
 
+        Private Async Function loadBasicMoreInfoAsync() As Task
+            '--Highlight reimbursements that need more information in a bar at the top
+            Dim MoreInfo = From c In d.AP_Staff_Rmbs
+                                Where c.MoreInfoRequested = True And c.Status <> RmbStatus.Processed And c.UserId = UserId And c.PortalId = PortalId
+                                Select c.UserRef, c.RID, c.RMBNo
+            For Each row In MoreInfo
+                Dim hyp As New HyperLink()
+                hyp.CssClass = "ui-state-highlight ui-corner-all AgapeWarning"
+                hyp.Font.Size = FontUnit.Small
+                hyp.Font.Bold = True
+                hyp.Text = Translate("MoreInfo").Replace("[RMBNO]", row.RID).Replace("[USERREF]", row.UserRef)
+                hyp.NavigateUrl = NavigateURL() & "?RmbNo=" & row.RMBNo
+                PlaceHolder1.Controls.Add(hyp)
+            Next
+        End Function
+
+        Private Async Function loadBasicDraftPaneAsync(MenuSize As Integer) As Task
+            Dim Pending = (From c In d.AP_Staff_Rmbs
+                           Where c.Status = RmbStatus.Draft And c.PortalId = PortalId And (c.UserId = UserId)
+                           Order By c.RID Descending
+                           Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
+            dlPending.DataSource = Pending
+            dlPending.DataBind()
+        End Function
+
+        Private Async Function loadBasicSubmittedPaneAsync(MenuSize As Integer) As Task
+            Dim Submitted = (From c In d.AP_Staff_Rmbs
+                             Where c.Status = RmbStatus.Submitted And c.UserId = UserId And c.PortalId = PortalId
+                             Order By c.RID Descending
+                             Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
+            dlSubmitted.DataSource = Submitted
+            dlSubmitted.DataBind()
+
+            Dim AdvSubmitted = (From c In d.AP_Staff_AdvanceRequests
+                                Where c.RequestStatus = RmbStatus.Submitted And c.UserId = UserId And c.PortalId = PortalId
+                                Order By c.LocalAdvanceId Descending
+                                Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId).Take(MenuSize)
+            dlAdvSubmitted.DataSource = AdvSubmitted
+            dlAdvSubmitted.DataBind()
+            dlAdvSubmitted.AlternatingItemStyle.CssClass = IIf(dlSubmitted.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
+            dlAdvSubmitted.ItemStyle.CssClass = IIf(dlSubmitted.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
+            Dim submitted_count = Submitted.Count + AdvSubmitted.Count
+        End Function
+
+        Private Async Function loadBasicApprovablePaneAsync(MenuSize As Integer) As Task
+            '--list any unapproved reimbursements submitted to this user for approval
+            Dim ApprovableRmbs = (From c In d.AP_Staff_Rmbs
+                        Where c.Status = RmbStatus.Submitted And c.ApprUserId = UserId And c.ApprDate Is Nothing And c.PortalId = PortalId
+                        Order By c.RMBNo Descending
+                        Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId)
+            dlToApprove.DataSource = ApprovableRmbs
+            dlToApprove.DataBind()
+
+            Dim ApprovableAdvs = (From c In d.AP_Staff_AdvanceRequests
+                         Where c.RequestStatus = RmbStatus.Submitted And c.ApproverId = UserId And c.ApprovedDate Is Nothing And c.PortalId = PortalId
+                         Order By c.LocalAdvanceId Descending
+                         Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId)
+            dlAdvToApprove.DataSource = ApprovableAdvs
+            dlAdvToApprove.DataBind()
+            dlAdvToApprove.AlternatingItemStyle.CssClass = IIf(dlToApprove.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
+            dlAdvToApprove.ItemStyle.CssClass = IIf(dlToApprove.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
+
+            Dim approvable_count = ApprovableRmbs.Count + ApprovableAdvs.Count
+            Dim isApprover = (approvable_count > 0)
+
+            '-- Add a count of approvable items to the 'Submitted' heading
+            If approvable_count > 0 Then
+                lblSubmittedCount.Text = "(" & approvable_count & ")"
+                pnlSubmitted.CssClass = "ui-state-highlight ui-corner-all"
+            Else
+                lblSubmittedCount.Text = ""
+                pnlSubmitted.CssClass = ""
+            End If
+
+            If isApprover Then
+                lblApproveHeading.Visible = True
+                divApproveHeading.Visible = True
+            Else
+                lblApproveHeading.Visible = False
+                divApproveHeading.Visible = False
+            End If
+
+        End Function
+
+        Private Async Function loadBasicApprovedPaneAsync(MenuSize As Integer) As Task
+            Dim Approved = (From c In d.AP_Staff_Rmbs
+                            Where (c.Status = RmbStatus.Approved Or c.Status = RmbStatus.PendingDownload Or c.Status = RmbStatus.DownloadFailed) _
+                                And c.UserId = UserId And c.PortalId = PortalId
+                            Order By c.RID Descending
+                            Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
+            dlApproved.DataSource = Approved
+            dlApproved.DataBind()
+            Dim AdvApproved = (From c In d.AP_Staff_AdvanceRequests
+                               Where (c.RequestStatus = RmbStatus.Approved Or c.RequestStatus = RmbStatus.PendingDownload Or c.RequestStatus = RmbStatus.DownloadFailed) _
+                                    And c.UserId = UserId And c.PortalId = PortalId
+                               Order By c.LocalAdvanceId Descending
+                               Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId).Take(MenuSize)
+            dlAdvApproved.DataSource = AdvApproved
+            dlAdvApproved.DataBind()
+            dlAdvApproved.AlternatingItemStyle.CssClass = IIf(dlApproved.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
+            dlAdvApproved.ItemStyle.CssClass = IIf(dlApproved.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
+        End Function
+
+        Private Async Function loadBasicProcessedPaneAsync(MenuSize As Integer) As Task
+            Dim Complete = (From c In d.AP_Staff_Rmbs
+                            Where c.Status = RmbStatus.Processed And c.UserId = UserId And c.PortalId = PortalId
+                            Order By c.RID Descending
+                            Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
+            dlProcessed.DataSource = Complete
+            dlProcessed.DataBind()
+            Dim CompleteAdv = (From c In d.AP_Staff_AdvanceRequests
+                               Where c.RequestStatus = RmbStatus.Processed And c.UserId = UserId And c.PortalId = PortalId
+                               Order By c.LocalAdvanceId Descending
+                               Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId).Take(MenuSize)
+            dlAdvProcessed.DataSource = CompleteAdv
+            dlAdvProcessed.DataBind()
+        End Function
+
+        Private Async Function loadBasicCancelledTaskAsync(MenuSize As Integer) As Task
+            Dim Cancelled = (From c In d.AP_Staff_Rmbs
+                             Where c.Status = RmbStatus.Cancelled And c.UserId = UserId And c.PortalId = PortalId
+                             Order By c.RID Descending
+                             Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(MenuSize)
+            dlCancelled.DataSource = Cancelled
+            dlCancelled.DataBind()
+        End Function
+
         Private Async Function LoadSupervisorMenuAsync() As Task
             Try
-                '***SUPERVISORS***
-
-                Dim Team = StaffBrokerFunctions.GetTeam(UserId)
+                Dim Team As List(Of User) = StaffBrokerFunctions.GetTeam(UserId)
                 Dim isSupervisor = (Team.Count > 0)
                 If isSupervisor Then
                     lblTeamLeader.Visible = True
                     Dim TeamIds = From c In Team Select c.UserID
 
-                    '--Team Approved (build a tree)
-                    Dim TeamApprovedNode As New TreeNode("Your Team")
-                    TeamApprovedNode.SelectAction = TreeNodeSelectAction.Expand
-                    TeamApprovedNode.Expanded = False
-
-                    For Each team_member In Team
-                        Dim TeamMemberApprovedNode As New TreeNode(team_member.DisplayName)
-                        TeamMemberApprovedNode.SelectAction = TreeNodeSelectAction.Expand
-                        TeamMemberApprovedNode.Expanded = False
-
-                        Dim TeamApproved = From c In d.AP_Staff_Rmbs
-                                           Where c.UserId = team_member.UserID _
-                                                And (c.Status = RmbStatus.Approved Or c.Status = RmbStatus.PendingDownload Or c.Status = RmbStatus.DownloadFailed) _
-                                                And c.UserId <> UserId And c.PortalId = PortalId
-                                           Select c.RMBNo, c.RmbDate, c.UserRef, c.UserId, c.RID
-                        For Each rmb In TeamApproved
-                            Dim rmb_node As New TreeNode()
-                            Dim rmbUser = UserController.GetUserById(PortalId, rmb.UserId).DisplayName
-                            If (rmb.RmbDate Is Nothing) Then
-                                rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, New Date(), rmbUser)
-                            Else
-                                rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser)
-                            End If
-                            rmb_node.Value = rmb.RMBNo
-                            rmb_node.SelectAction = TreeNodeSelectAction.Select
-                            TeamMemberApprovedNode.ChildNodes.Add(rmb_node)
-                            If IsSelected(rmb.RMBNo) Then
-                                TeamMemberApprovedNode.Expanded = True
-                                TeamApprovedNode.Expanded = True
-                            End If
-                        Next
-
-                        Dim TeamAdvApproved = From c In d.AP_Staff_AdvanceRequests
-                                              Where c.UserId = team_member.UserID _
-                                                And (c.RequestStatus = RmbStatus.Approved Or c.RequestStatus = RmbStatus.PendingDownload Or c.RequestStatus = RmbStatus.DownloadFailed) _
-                                                And c.UserId <> UserId And c.PortalId = PortalId
-                                              Select c.AdvanceId, c.RequestDate, c.UserId, c.LocalAdvanceId
-                        For Each adv In TeamAdvApproved
-                            Dim adv_node As New TreeNode()
-                            Dim advUser = UserController.GetUserById(PortalId, adv.UserId).DisplayName
-                            If (adv.RequestDate Is Nothing) Then
-                                adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, New Date(), advUser)
-                            Else
-                                adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate, advUser)
-                            End If
-                            adv_node.Value = -adv.AdvanceId
-                            adv_node.SelectAction = TreeNodeSelectAction.Select
-                            TeamMemberApprovedNode.ChildNodes.Add(adv_node)
-                            If IsSelected(-adv.AdvanceId) Then
-                                TeamMemberApprovedNode.Expanded = True
-                                TeamApprovedNode.Expanded = True
-                            End If
-                        Next
-                        TeamApprovedNode.ChildNodes.Add(TeamMemberApprovedNode)
-                    Next
-                    tvTeamApproved.Nodes.Clear()
-                    tvTeamApproved.Nodes.Add(TeamApprovedNode)
-
-                    '--Team Processed (build a tree)
-                    Dim TeamProcessedNode As New TreeNode("Your Team")
-                    TeamProcessedNode.SelectAction = TreeNodeSelectAction.Expand
-                    TeamProcessedNode.Expanded = False
-
-                    For Each team_member In Team
-                        Dim TeamMemberProcessedNode As New TreeNode(team_member.DisplayName)
-                        TeamMemberProcessedNode.Expanded = False
-                        TeamMemberProcessedNode.SelectAction = TreeNodeSelectAction.Expand
-
-                        Dim TeamProcessed = From c In d.AP_Staff_Rmbs
-                                            Join b In d.AP_StaffBroker_CostCenters
-                                                On c.CostCenter Equals b.CostCentreCode _
-                                                    And c.PortalId Equals b.PortalId
-                                            Where c.UserId = team_member.UserID And c.Status = RmbStatus.Processed And b.Type = CostCentreType.Staff And c.PortalId = PortalId
-                                            Select c.RMBNo, c.RmbDate, c.UserRef, c.UserId, c.RID
-                        For Each rmb In TeamProcessed
-                            Dim rmb_node As New TreeNode()
-                            Dim rmbUser = UserController.GetUserById(PortalId, rmb.UserId).DisplayName
-                            If (rmb.RmbDate Is Nothing) Then
-                                rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, New Date(), rmbUser)
-                            Else
-                                rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser)
-                            End If
-                            rmb_node.Value = rmb.RMBNo
-                            rmb_node.SelectAction = TreeNodeSelectAction.Select
-                            TeamMemberProcessedNode.ChildNodes.Add(rmb_node)
-                            If IsSelected(rmb.RMBNo) Then
-                                TeamMemberProcessedNode.Expanded = True
-                                TeamProcessedNode.Expanded = True
-                            End If
-                        Next
-
-                        Dim TeamAdvProcessed = From c In d.AP_Staff_AdvanceRequests
-                                               Where c.RequestStatus = RmbStatus.Processed And c.UserId = team_member.UserID And c.PortalId = PortalId
-                                               Select c.AdvanceId, c.RequestDate, c.UserId, c.LocalAdvanceId
-                        For Each adv In TeamAdvProcessed
-                            Dim adv_node As New TreeNode()
-                            Dim advUser = UserController.GetUserById(PortalId, adv.UserId).DisplayName
-                            If (adv.RequestDate Is Nothing) Then
-                                adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, New Date(), advUser)
-                            Else
-                                adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate, advUser)
-                            End If
-                            adv_node.Value = -adv.AdvanceId
-                            adv_node.SelectAction = TreeNodeSelectAction.Select
-                            TeamMemberProcessedNode.ChildNodes.Add(adv_node)
-                            If IsSelected(-adv.AdvanceId) Then
-                                TeamMemberProcessedNode.Expanded = True
-                                TeamProcessedNode.Expanded = True
-                            End If
-                        Next
-                        TeamProcessedNode.ChildNodes.Add(TeamMemberProcessedNode)
-
-                    Next
-                    tvTeamProcessed.Nodes.Clear()
-                    tvTeamProcessed.Nodes.Add(TeamProcessedNode)
-
+                    Dim approvedTreeTask = buildTeamApprovedTreeAsync(Team)
+                    Dim processedTreeTask = buildTeamProcessedTreeAsync(Team)
+                    Await approvedTreeTask
+                    Await processedTreeTask
                     tvTeamApproved.Visible = True
                     tvTeamProcessed.Visible = True
 
@@ -522,6 +429,123 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Catch ex As Exception
                 Throw New Exception("Error loading supervisor menu: " + ex.Message)
             End Try
+        End Function
+
+        Private Async Function buildTeamApprovedTreeAsync(Team As List(Of User)) As Task
+            Dim TeamApprovedNode As New TreeNode("Your Team")
+            TeamApprovedNode.Expanded = False
+            TeamApprovedNode.SelectAction = TreeNodeSelectAction.Expand
+
+            For Each team_member In Team
+                Dim TeamMemberApprovedNode As New TreeNode(team_member.DisplayName)
+                TeamMemberApprovedNode.SelectAction = TreeNodeSelectAction.Expand
+                TeamMemberApprovedNode.Expanded = False
+                Dim TeamApproved = From c In d.AP_Staff_Rmbs
+                                   Where c.UserId = team_member.UserID _
+                                        And (c.Status = RmbStatus.Approved Or c.Status = RmbStatus.PendingDownload Or c.Status = RmbStatus.DownloadFailed) _
+                                        And c.UserId <> UserId And c.PortalId = PortalId
+                                   Select c.RMBNo, c.RmbDate, c.UserRef, c.UserId, c.RID
+                For Each rmb In TeamApproved
+                    Dim rmb_node As New TreeNode()
+                    Dim rmbUser = UserController.GetUserById(PortalId, rmb.UserId).DisplayName
+                    If (rmb.RmbDate Is Nothing) Then
+                        rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, New Date(), rmbUser)
+                    Else
+                        rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser)
+                    End If
+                    rmb_node.Value = rmb.RMBNo
+                    rmb_node.SelectAction = TreeNodeSelectAction.Select
+                    TeamMemberApprovedNode.ChildNodes.Add(rmb_node)
+                    If IsSelected(rmb.RMBNo) Then
+                        TeamMemberApprovedNode.Expanded = True
+                        TeamApprovedNode.Expanded = True
+                    End If
+                Next
+
+                Dim TeamAdvApproved = From c In d.AP_Staff_AdvanceRequests
+                                      Where c.UserId = team_member.UserID _
+                                        And (c.RequestStatus = RmbStatus.Approved Or c.RequestStatus = RmbStatus.PendingDownload Or c.RequestStatus = RmbStatus.DownloadFailed) _
+                                        And c.UserId <> UserId And c.PortalId = PortalId
+                                      Select c.AdvanceId, c.RequestDate, c.UserId, c.LocalAdvanceId
+                For Each adv In TeamAdvApproved
+                    Dim adv_node As New TreeNode()
+                    Dim advUser = UserController.GetUserById(PortalId, adv.UserId).DisplayName
+                    If (adv.RequestDate Is Nothing) Then
+                        adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, New Date(), advUser)
+                    Else
+                        adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate, advUser)
+                    End If
+                    adv_node.Value = -adv.AdvanceId
+                    adv_node.SelectAction = TreeNodeSelectAction.Select
+                    TeamMemberApprovedNode.ChildNodes.Add(adv_node)
+                    If IsSelected(-adv.AdvanceId) Then
+                        TeamMemberApprovedNode.Expanded = True
+                        TeamApprovedNode.Expanded = True
+                    End If
+                Next
+                TeamApprovedNode.ChildNodes.Add(TeamMemberApprovedNode)
+            Next
+            tvTeamApproved.Nodes.Clear()
+            tvTeamApproved.Nodes.Add(TeamApprovedNode)
+        End Function
+
+        Private Async Function buildTeamProcessedTreeAsync(Team As List(Of User)) As Task
+            Dim TeamProcessedNode As New TreeNode("Your Team")
+            TeamProcessedNode.SelectAction = TreeNodeSelectAction.Expand
+            TeamProcessedNode.Expanded = False
+
+            For Each team_member In Team
+                Dim TeamMemberProcessedNode As New TreeNode(team_member.DisplayName)
+                TeamMemberProcessedNode.Expanded = False
+                TeamMemberProcessedNode.SelectAction = TreeNodeSelectAction.Expand
+
+                Dim TeamProcessed = From c In d.AP_Staff_Rmbs
+                                    Join b In d.AP_StaffBroker_CostCenters
+                                        On c.CostCenter Equals b.CostCentreCode _
+                                            And c.PortalId Equals b.PortalId
+                                    Where c.UserId = team_member.UserID And c.Status = RmbStatus.Processed And b.Type = CostCentreType.Staff And c.PortalId = PortalId
+                                    Select c.RMBNo, c.RmbDate, c.UserRef, c.UserId, c.RID
+                For Each rmb In TeamProcessed
+                    Dim rmb_node As New TreeNode()
+                    Dim rmbUser = UserController.GetUserById(PortalId, rmb.UserId).DisplayName
+                    If (rmb.RmbDate Is Nothing) Then
+                        rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, New Date(), rmbUser)
+                    Else
+                        rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser)
+                    End If
+                    rmb_node.Value = rmb.RMBNo
+                    rmb_node.SelectAction = TreeNodeSelectAction.Select
+                    TeamMemberProcessedNode.ChildNodes.Add(rmb_node)
+                    If IsSelected(rmb.RMBNo) Then
+                        TeamMemberProcessedNode.Expanded = True
+                        TeamProcessedNode.Expanded = True
+                    End If
+                Next
+
+                Dim TeamAdvProcessed = From c In d.AP_Staff_AdvanceRequests
+                                       Where c.RequestStatus = RmbStatus.Processed And c.UserId = team_member.UserID And c.PortalId = PortalId
+                                       Select c.AdvanceId, c.RequestDate, c.UserId, c.LocalAdvanceId
+                For Each adv In TeamAdvProcessed
+                    Dim adv_node As New TreeNode()
+                    Dim advUser = UserController.GetUserById(PortalId, adv.UserId).DisplayName
+                    If (adv.RequestDate Is Nothing) Then
+                        adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, New Date(), advUser)
+                    Else
+                        adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate, advUser)
+                    End If
+                    adv_node.Value = -adv.AdvanceId
+                    adv_node.SelectAction = TreeNodeSelectAction.Select
+                    TeamMemberProcessedNode.ChildNodes.Add(adv_node)
+                    If IsSelected(-adv.AdvanceId) Then
+                        TeamMemberProcessedNode.Expanded = True
+                        TeamProcessedNode.Expanded = True
+                    End If
+                Next
+                TeamProcessedNode.ChildNodes.Add(TeamMemberProcessedNode)
+            Next
+            tvTeamProcessed.Nodes.Clear()
+            tvTeamProcessed.Nodes.Add(TeamProcessedNode)
+
         End Function
 
         Private Async Function LoadFinanceMenuAsync() As Task
@@ -2313,13 +2337,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Protected Async Sub menu_ItemCommand(ByVal source As Object, ByVal e As System.Web.UI.WebControls.DataListCommandEventArgs) Handles dlProcessed.ItemCommand, dlAdvProcessed.ItemCommand, dlApproved.ItemCommand, dlCancelled.ItemCommand, dlToApprove.ItemCommand, dlSubmitted.ItemCommand, dlPending.ItemCommand, dlAdvApproved.ItemCommand, dlAdvSubmitted.ItemCommand, dlAdvToApprove.ItemCommand, dlAdvApproved.ItemCommand
             hfRmbNo.Value = e.CommandArgument
             If e.CommandName = "Goto" Then
-                Dim loadRmbTask = LoadRmbAsync(e.CommandArgument)
-                Dim resetMenuTask = ResetMenuAsync()
-                Await loadRmbTask
-                Await resetMenuTask
+                Await LoadRmbAsync(e.CommandArgument)
             ElseIf e.CommandName = "GotoAdvance" Then
                 Await LoadAdvAsync(e.CommandArgument)
-                Await ResetMenuAsync()
+                'Await ResetMenuAsync()
             End If
         End Sub
 
