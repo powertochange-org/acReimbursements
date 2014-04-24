@@ -438,9 +438,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             Dim adv_node As New TreeNode()
                             Dim advUser = UserController.GetUserById(PortalId, adv.UserId).DisplayName
                             If (adv.RequestDate Is Nothing) Then
-                                adv_node.Text = "<span onClick='show_loading_spinner()'>" & GetAdvTitleTeamShort(adv.LocalAdvanceId, New Date(), advUser) & "</span>"
+                                adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, New Date(), advUser)
                             Else
-                                adv_node.Text = "<span onClick='show_loading_spinner()'>" & GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate, advUser) & "</span>"
+                                adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate, advUser)
                             End If
                             adv_node.Value = -adv.AdvanceId
                             adv_node.SelectAction = TreeNodeSelectAction.Select
@@ -475,9 +475,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             Dim rmb_node As New TreeNode()
                             Dim rmbUser = UserController.GetUserById(PortalId, rmb.UserId).DisplayName
                             If (rmb.RmbDate Is Nothing) Then
-                                rmb_node.Text = "<span onClick='show_loading_spinner()'>" & GetRmbTitleTeamShort(rmb.RID, New Date(), rmbUser) & "</span>"
+                                rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, New Date(), rmbUser)
                             Else
-                                rmb_node.Text = "<span onClick='show_loading_spinner()'>" & GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser) & "</span>"
+                                rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser)
                             End If
                             rmb_node.Value = rmb.RMBNo
                             rmb_node.SelectAction = TreeNodeSelectAction.Select
@@ -495,9 +495,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             Dim adv_node As New TreeNode()
                             Dim advUser = UserController.GetUserById(PortalId, adv.UserId).DisplayName
                             If (adv.RequestDate Is Nothing) Then
-                                adv_node.Text = "<span onClick='show_loading_spinner()'>" & GetAdvTitleTeamShort(adv.LocalAdvanceId, New Date(), advUser) & "</span>"
+                                adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, New Date(), advUser)
                             Else
-                                adv_node.Text = "<span onClick='show_loading_spinner()'>" & GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate, advUser) & "</span>"
+                                adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate, advUser)
                             End If
                             adv_node.Value = -adv.AdvanceId
                             adv_node.SelectAction = TreeNodeSelectAction.Select
@@ -605,9 +605,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         Dim rmb_node As New TreeNode()
                         Dim rmbUser = UserController.GetUserById(PortalId, rmb.UserId).DisplayName
                         If (rmb.RmbDate Is Nothing) Then
-                            rmb_node.Text = "<span onClick='show_loading_spinner()'>" & GetRmbTitleTeamShort(rmb.RID, New Date(), rmbUser) & "</span>"
+                            rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, New Date(), rmbUser)
                         Else
-                            rmb_node.Text = "<span onClick='show_loading_spinner()'>" & GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser) & "</span>"
+                            rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser)
                         End If
                         rmb_node.SelectAction = TreeNodeSelectAction.Select
                         rmb_node.Value = rmb.RMBNo
@@ -625,9 +625,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         Dim rmb_node As New TreeNode()
                         Dim rmbUser = UserController.GetUserById(PortalId, rmb.UserId).DisplayName
                         If (rmb.RmbDate Is Nothing) Then
-                            rmb_node.Text = "<span onClick='show_loading_spinner()'>" & GetRmbTitleTeamShort(rmb.RID, New Date(), rmbUser) & "</span>"
+                            rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, New Date(), rmbUser)
                         Else
-                            rmb_node.Text = "<span onClick='show_loading_spinner()'>" & GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser) & "</span>"
+                            rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser)
                         End If
                         rmb_node.SelectAction = TreeNodeSelectAction.Select
                         rmb_node.Value = rmb.RMBNo
@@ -641,9 +641,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         Dim adv_node As New TreeNode()
                         Dim advUser = UserController.GetUserById(PortalId, adv.UserId).DisplayName
                         If (adv.RequestDate Is Nothing) Then
-                            adv_node.Text = "<span onClick='show_loading_spinner()'>" & GetAdvTitleTeamShort(adv.LocalAdvanceId, New Date(), advUser) & "</span>"
+                            adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, New Date(), advUser)
                         Else
-                            adv_node.Text = "<span onClick='show_loading_spinner()'>" & GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate, advUser) & "</span>"
+                            adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate, advUser)
                         End If
                         adv_node.SelectAction = TreeNodeSelectAction.Select
                         adv_node.Value = -adv.AdvanceId
@@ -661,9 +661,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         Dim rmb_node As New TreeNode()
                         Dim rmbUser = UserController.GetUserById(PortalId, rmb.UserId).DisplayName
                         If (rmb.RmbDate Is Nothing) Then
-                            rmb_node.Text = "<span onClick='show_loading_spinner()'>" & GetRmbTitleTeamShort(rmb.RID, New Date(), rmbUser) & "</span>"
+                            rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, New Date(), rmbUser)
                         Else
-                            rmb_node.Text = "<span onClick='show_loading_spinner()'>" & GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser) & "</span>"
+                            rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser)
                         End If
                         rmb_node.SelectAction = TreeNodeSelectAction.Select
                         rmb_node.Value = rmb.RMBNo
@@ -677,9 +677,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         Dim adv_node As New TreeNode()
                         Dim advUser = UserController.GetUserById(PortalId, adv.UserId).DisplayName
                         If (adv.RequestDate Is Nothing) Then
-                            adv_node.Text = "<span onClick='show_loading_spinner()'>" & GetAdvTitleTeamShort(adv.LocalAdvanceId, New Date(), advUser) & "</span>"
+                            adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, New Date(), advUser)
                         Else
-                            adv_node.Text = "<span onClick='show_loading_spinner()'>" & GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate, advUser) & "</span>"
+                            adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate, advUser)
                         End If
                         adv_node.SelectAction = TreeNodeSelectAction.Select
                         adv_node.Value = -adv.AdvanceId
@@ -4474,11 +4474,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 newNode.SelectAction = TreeNodeSelectAction.Select
                 If (type.Equals("rmb")) Then
                     Dim rmbUser = UserController.GetUserById(PortalId, row.UserId).DisplayName
-                    newNode.Text = "<span onClick='show_loading_spinner()'>" & GetRmbTitleTeamShort(row.RID, row.RmbDate, rmbUser) & "</span>"
+                    newNode.Text = GetRmbTitleTeamShort(row.RID, row.RmbDate, rmbUser)
                     newNode.Value = row.RMBNo
                 Else
                     Dim advUser = UserController.GetUserById(PortalId, row.UserId).DisplayName
-                    newNode.Text = "<span onClick='show_loading_spinner()'>" & GetAdvTitleTeamShort(row.LocalAdvanceId, row.RequestDate, advUser) & "</span>"
+                    newNode.Text = GetAdvTitleTeamShort(row.LocalAdvanceId, row.RequestDate, advUser)
                     newNode.Value = row.AdvanceId
                 End If
                 submittedNode.ChildNodes.Add(newNode)
