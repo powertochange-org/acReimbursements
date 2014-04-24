@@ -609,4 +609,7 @@
   <data name="btnSubmitHelp.Text" xml:space="preserve">
     <value>Please select an account and an approver in order to submit</value>
   </data>
+  <data name="TeamLeader.Text" xml:space="preserve">
+    <value>Team Leader</value>
+  </data>
 </root>

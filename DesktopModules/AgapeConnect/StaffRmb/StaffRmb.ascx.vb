@@ -163,8 +163,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 GridView1.Columns(3).HeaderText = Translate("Amount")
                 GridView1.Columns(4).HeaderText = Translate("ReceiptNo")
 
-
-
                 Dim acc As Boolean = IsAccounts()
                 ' btnDownloadBatch.Visible = acc
                 btnAdvDownload.Visible = acc
@@ -174,7 +172,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 pnlAccountsOptions.Visible = acc
                 pnlVAT.Visible = Settings("VatAttrib")
 
-                lblAccountsTeam.Visible = acc '--this is the label to indicate that you are on the finance team
                 If acc Then
                     Dim errors = From c In d.AP_Staff_Rmbs Where c.PortalId = PortalId And c.Error = True And (c.Status = RmbStatus.PendingDownload Or c.Status = RmbStatus.DownloadFailed Or c.Status = RmbStatus.Approved)
 
@@ -395,6 +392,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim Team = StaffBrokerFunctions.GetTeam(UserId)
                 Dim isSupervisor = (Team.Count > 0)
                 If isSupervisor Then
+                    lblTeamLeader.Visible = True
                     Dim TeamIds = From c In Team Select c.UserID
 
                     '--Team Approved (build a tree)
@@ -532,6 +530,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim MenuSize = Settings("MenuSize")
                 Dim isFinance = IsAccounts()
                 If isFinance Then
+                    lblAccountsTeam.Visible = True
                     Dim allStaff = StaffBrokerFunctions.GetStaff()
 
                     '--Submitted / Processed (build trees)

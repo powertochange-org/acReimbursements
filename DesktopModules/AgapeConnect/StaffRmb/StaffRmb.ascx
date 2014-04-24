@@ -839,11 +839,15 @@
                 <div align="center" width="100%">
                     <input id="btmNewRmb" type="button" onclick="showPopup2();" class="aButton" value='<%= Translate("btnNew") %>'
                         style="margin-bottom: 5px; font-weight: bold; min-width: 220px;" />
-                    <h5><asp:Label ID="lblAccountsTeam" runat="server" class="ui-state-highlight ui-corner-all"
-                                        Style="padding: 6px; border-radius:10px; margin-bottom:5px; background-color:black; color:orange; display: block; text-align:center;" 
-                                        resourcekey="AccountsMode" Visible="false"></asp:Label></h5>
                 </div>
                 <div id="accordion">
+                                        <h5><asp:label ID="lblTeamLeader" runat="server" CssClass="ui-state-highlight ui-corner-all"
+                        Style="padding: 6px; border-radius:10px; margin-bottom:5px; background-color:lightgray; color:#0079c1; display: block; text-align:center;"
+                        resourcekey="TeamLeader" Visible="false"></asp:Label></h5>
+                    <h5><asp:Label ID="lblAccountsTeam" runat="server" class="ui-state-highlight ui-corner-all"
+                                        Style="padding: 6px; border-radius:10px; margin-bottom:5px; background-color:lightgray ; color:#0079c1; display: block; text-align:center;" 
+                                        resourcekey="AccountsMode" Visible="false"></asp:Label></h5>
+
                     <div>
                         <h3>
                             <a href="#" id="Tab0" class="AcHdr">
