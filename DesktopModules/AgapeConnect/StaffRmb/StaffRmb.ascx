@@ -841,12 +841,8 @@
                         style="margin-bottom: 5px; font-weight: bold; min-width: 220px;" />
                 </div>
                 <div id="accordion">
-                                        <h5><asp:label ID="lblTeamLeader" runat="server" CssClass="ui-state-highlight ui-corner-all"
-                        Style="padding: 6px; border-radius:10px; margin-bottom:5px; background-color:lightgray; color:#0079c1; display: block; text-align:center;"
-                        resourcekey="TeamLeader" Visible="false"></asp:Label></h5>
-                    <h5><asp:Label ID="lblAccountsTeam" runat="server" class="ui-state-highlight ui-corner-all"
-                                        Style="padding: 6px; border-radius:10px; margin-bottom:5px; background-color:lightgray ; color:#0079c1; display: block; text-align:center;" 
-                                        resourcekey="AccountsMode" Visible="false"></asp:Label></h5>
+                    <h5><asp:Label ID="lblTeamLeader" runat="server" CssClass="toggleButton enabled" resourcekey="TeamLeader" Visible="false" /></h5>
+                    <h5><asp:Label ID="lblAccountsTeam" runat="server" class="toggleButton enabled" resourcekey="AccountsMode" Visible="false" /></h5>
 
                     <div>
                         <h3>
