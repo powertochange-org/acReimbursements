@@ -1187,6 +1187,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 #End Region
 
 #Region "Button Events"
+
         Protected Async Sub btnAddLine_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnAddLine.Click
 
             Dim ucType As Type = theControl.GetType()
@@ -2325,6 +2326,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Protected Async Sub menu_subtree_ItemCommand(ByVal node As TreeView, ByVal e As System.EventArgs) Handles tvTeamApproved.SelectedNodeChanged, tvTeamProcessed.SelectedNodeChanged, tvAllSubmitted.SelectedNodeChanged, tvAllProcessed.SelectedNodeChanged, tvFinance.SelectedNodeChanged
             Await LoadRmbAsync(node.SelectedValue)
+            ScriptManager.RegisterStartupScript(GridView1, GridView1.GetType(), "deselect_menu", "deselectPreviousMenuItem()", True)
         End Sub
 
 
