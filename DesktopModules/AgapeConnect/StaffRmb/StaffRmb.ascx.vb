@@ -225,7 +225,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 If lt.Count > 0 Then
 
                     phLineDetail.Controls.Clear()
-                    theControl = LoadControlAsync(lt.First.ControlPath)
+                    theControl = LoadControl(lt.First.ControlPath)
                     theControl.ID = "theControl"
                     phLineDetail.Controls.Add(theControl)
 
@@ -1093,7 +1093,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     GridView1.DataBind()
 
                     '--buttons
-                    btnAddLine.Visible = (isOwner Or isSpouse) And Not (PROCESSING Or PROCESSED Or APPROVED)
+                    btnSaveLine.Visible = (isOwner Or isSpouse) And Not (PROCESSING Or PROCESSED Or APPROVED)
                     addLinebtn2.Visible = (isOwner Or isSpouse) And Not (PROCESSING Or PROCESSED Or APPROVED)
 
                     btnPrint.Visible = FORM_HAS_ITEMS
@@ -1189,11 +1189,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
 #Region "Button Events"
 
-        Protected Async Sub btnAddLine_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnAddLine.Click
+        Protected Async Sub btnSaveLine_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSaveLine.Click
 
             Dim ucType As Type = theControl.GetType()
 
-            If btnAddLine.CommandName = "Save" Then
+            If btnSaveLine.CommandName = "Save" Then
                 Dim theUserId = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.UserId).First
                 If ucType.GetMethod("ValidateForm").Invoke(theControl, New Object() {theUserId}) = True Then
 
@@ -1371,10 +1371,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ScriptManager.RegisterClientScriptBlock(Page, t, "", sb.ToString, False)
 
                 End If
-            ElseIf btnAddLine.CommandName = "Edit" Then
+            ElseIf btnSaveLine.CommandName = "Edit" Then
                 If ucType.GetMethod("ValidateForm").Invoke(theControl, New Object() {UserId}) = True Then
 
-                    Dim line = From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(btnAddLine.CommandArgument)
+                    Dim line = From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(btnSaveLine.CommandArgument)
                     If line.Count > 0 Then
 
                         Dim LineTypeName = d.AP_Staff_RmbLineTypes.Where(Function(c) c.LineTypeId = CInt(ddlLineTypes.SelectedValue)).First.TypeName.ToString()
@@ -1572,7 +1572,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                         'End If
 
-                        btnAddLine.CommandName = "Save"
+                        btnSaveLine.CommandName = "Save"
 
                     End If
                     Dim t As Type = Me.GetType()
@@ -1822,12 +1822,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             ddlLineTypes.DataSource = lineTypes
             ddlLineTypes.DataBind()
 
+            Await ResetNewExpensePopupAsync(True)
             cbRecoverVat.Checked = False
             tbVatRate.Text = ""
             tbShortComment.Text = ""
 
             'PopupTitle.Text = "Add New Reimbursement Expense"
-            btnAddLine.CommandName = "Save"
+            btnSaveLine.CommandName = "Save"
 
             hfOrigCurrency.Value = ""
             hfOrigCurrencyValue.Value = ""
@@ -2140,7 +2141,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ddlLineTypes.DataSource = lineTypes
                     ddlLineTypes.DataBind()
                     lblIncType.Visible = False
-                    btnAddLine.Enabled = True
+                    btnSaveLine.Enabled = True
 
                     If lineTypes.Where(Function(x) x.LineTypeId = theLine.First.LineType).Count = 0 Then
                         ddlLineTypes.Items.Add(New ListItem(theLine.First.AP_Staff_RmbLineType.AP_StaffRmb_PortalLineTypes.Where(Function(x) x.PortalId = PortalId).First.LocalName, theLine.First.LineType))
@@ -2148,7 +2149,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                         'Wrong Type... needs changing!
                         lblIncType.Visible = True
-                        btnAddLine.Enabled = False
+                        btnSaveLine.Enabled = False
                     End If
 
                     ddlLineTypes.SelectedValue = theLine.First.LineType
@@ -2220,8 +2221,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     '    ucType.GetMethod("LoadStaff").Invoke(theControl, New Object() {theLine.First.RmbLineNo, Settings, CanAddPass()})
                     'End If
 
-                    btnAddLine.CommandName = "Edit"
-                    btnAddLine.CommandArgument = CInt(e.CommandArgument)
+                    btnSaveLine.CommandName = "Edit"
+                    btnSaveLine.CommandArgument = CInt(e.CommandArgument)
                     tbCostcenter.Text = theLine.First.CostCenter
                     ddlAccountCode.SelectedValue = theLine.First.AccountCode
 
@@ -2349,7 +2350,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 ddlLineTypes.DataSource = lineTypes
                 ddlLineTypes.DataBind()
                 lblIncType.Visible = False
-                btnAddLine.Enabled = True
+                btnSaveLine.Enabled = True
             End If
 
             Await resetTask
@@ -3084,7 +3085,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ' Save the standard values
                     phLineDetail.Controls.Clear()
                     ddlOverideTax.SelectedIndex = 0
-                    theControl = LoadControlAsync(lt.First.ControlPath)
+                    theControl = LoadControl(lt.First.ControlPath)
 
                     theControl.ID = "theControl"
                     phLineDetail.Controls.Add(theControl)
@@ -4573,10 +4574,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Catch
             End Try
             Return False
-        End Function
-
-        Private Async Function LoadControlAsync(path As String) As Task(Of Object)
-            Return LoadControl(path)
         End Function
 
         Private Sub updateBalanceLabels(accountBalance As String, budgetBalance As String)

@@ -1761,7 +1761,7 @@
 
 
                         <br />
-                        <asp:Button ID="btnAddLine" runat="server" resourcekey="btnEnter" CommandName="Save"
+                        <asp:Button ID="btnSaveLine" runat="server" resourcekey="btnEnter" CommandName="Save"
                             class="aButton" />
                         <input type="button" value='<%= Translate("btnCancel") %>' onclick="closeNewItemPopup();"
                             class="aButton" />
@@ -1817,12 +1817,12 @@
                 </ContentTemplate>
                 <Triggers>
                     <asp:AsyncPostBackTrigger ControlID="ddlLineTypes" EventName="SelectedIndexChanged" />
-                    <asp:AsyncPostBackTrigger ControlID="btnAddLine" EventName="Click" />
+                    <asp:AsyncPostBackTrigger ControlID="btnSaveLine" EventName="Click" />
                     <%--  <asp:AsyncPostBackTrigger ControlID="btnPrint"  EventName="Click" />--%>
                     <asp:PostBackTrigger ControlID="btnPrint" />
                     <%--  <asp:PostBackTrigger ControlID="btnDownloadBatch" />
                 <asp:PostBackTrigger ControlID="btnSuggestedPayments" />--%>
-                    <%--  <asp:PostBackTrigger ControlID="btnAddLine" />--%>
+                    <%--  <asp:PostBackTrigger ControlID="btnSaveLine" />--%>
                 </Triggers>
             </asp:UpdatePanel>
             <asp:UpdateProgress ID="UpdateProgress1" runat="server" DisplayAfter="0" DynamicLayout="true"
@@ -2016,7 +2016,7 @@
 
     <asp:Label ID="lblMovedMenu" runat="server" Font-Size="XX-Small" Font-Italic="true" ForeColor="Gray" Text="If you are looking for Settings, Suggested Payments or Download Batched Transactions, these links have moved. Click the faint wrench/screwdriver icon at the top right corner of this module. "></asp:Label>
 
-    &nbsp<%--  <asp:PostBackTrigger ControlID="btnAddLine" />--%>
+    &nbsp<%--  <asp:PostBackTrigger ControlID="btnSaveLine" />--%>
     <br />
 
 </div>
