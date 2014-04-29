@@ -1143,6 +1143,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     If (isApprover) Then
                         checkLowBalance()
                     End If
+                    ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "calculate_remaining_balance", "calculate_remaining_balance()", True)
                 Else
                     pnlMain.Visible = False
                     pnlSplash.Visible = True
@@ -2783,6 +2784,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Function
 
         Public Async Function GetNumericRemainingBalanceAsync(ByVal mode As Integer) As Task(Of Double)
+            Return GetNumericRemainingBalance(mode)
+        End Function
+
+        Public Function GetNumericRemainingBalance(ByVal mode As Integer) As Double
 
             Dim statusList = {RmbStatus.Approved, RmbStatus.PendingDownload, RmbStatus.DownloadFailed}
             If mode = 2 Then
@@ -2819,13 +2824,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         End Function
 
-        Public Function GetRemainingBalance() As String
-            If (hfAccountBalance.Value = "") Then
-                Return BALANCE_INCONCLUSIVE
-            End If
-            Dim remainingBalance = GetNumericRemainingBalanceAsync(1).ToString("0.00")
-            Return StaffBrokerFunctions.GetFormattedCurrency(PortalId, remainingBalance)
-        End Function
+        'Public Function GetRemainingBalance() As String
+        '    If (hfAccountBalance.Value = "") Then
+        '        Return BALANCE_INCONCLUSIVE
+        '    End If
+        '    Dim remainingBalance = GetNumericRemainingBalance(1).ToString("0.00")
+        '    Return StaffBrokerFunctions.GetFormattedCurrency(PortalId, remainingBalance)
+        'End Function
 
         Public Function IsWrongType(ByVal CostCenter As String, ByVal LineTypeId As Integer) As Boolean
 

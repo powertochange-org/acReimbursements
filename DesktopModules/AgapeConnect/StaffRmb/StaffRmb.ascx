@@ -29,6 +29,17 @@
         $(previous_menu_item).parent().next().children().hide();
     }
 
+    function calculate_remaining_balance() {
+        var result = "";
+        var accBal = $("input[id$='StaffRmb_hfAccountBalance']:first").val();
+        var formTot = $("span[id$='GridView1_lblTotalAmount']:last").text().replace("$","");
+        if ((accBal == "") || (formTot == "")) {
+            result = "unknown";
+        } else {
+            result = accBal - formTot;
+        }
+        $("span[id$='GridView1_lblRemainingBalance']:last").text(result);
+    }
  
     (function ($, Sys) {
         function setUpMyTabs() {
@@ -1393,7 +1404,7 @@
                                                 <FooterTemplate>
                                                     <asp:Label ID="lblTotalAmount" runat="server" Text='<%# StaffBrokerFunctions.GetSetting("Currency", PortalId) & GetTotal(Eval("RmbNo")).ToString("F2") %>'></asp:Label>
                                                     <asp:Panel ID="pnlRemBal2" runat="server" Visible='<%# Settings("ShowRemBal") = "True"%>'>
-                                                        <asp:Label ID="lblRemainingBalance" runat="server" Font-Size="xx-small" Text='<%# GetRemainingBalance()%>'></asp:Label>
+                                                        <asp:Label ID="lblRemainingBalance" runat="server" Font-Size="xx-small" Text=''></asp:Label>
                                                     </asp:Panel>
                                                 </FooterTemplate>
                                                 <ItemStyle HorizontalAlign="Right" />
