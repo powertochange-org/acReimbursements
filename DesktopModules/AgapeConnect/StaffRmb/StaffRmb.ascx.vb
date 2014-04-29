@@ -1365,7 +1365,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim t As Type = Me.GetType()
                     Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
                     sb.Append("<script language='javascript'>")
-                    sb.Append("closePopup();")
+                    sb.Append("closeNewItemPopup();")
                     sb.Append("</script>")
                     Await LoadRmbAsync(hfRmbNo.Value)
                     ScriptManager.RegisterClientScriptBlock(Page, t, "", sb.ToString, False)
@@ -1578,7 +1578,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim t As Type = Me.GetType()
                     Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
                     sb.Append("<script language='javascript'>")
-                    sb.Append("closePopup();")
+                    sb.Append("closeNewItemPopup();")
                     sb.Append("</script>")
                     Await LoadRmbAsync(hfRmbNo.Value)
                     ScriptManager.RegisterClientScriptBlock(Page, t, "", sb.ToString, False)
@@ -1634,7 +1634,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim t As Type = tbNewChargeTo.GetType()
             Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
             sb.Append("<script language='javascript'>")
-            sb.Append("closePopup2();")
+            sb.Append("closeNewRmbPopup();")
             sb.Append("</script>")
             Await resetMenuTask
             Await loadRmbTask
@@ -1842,7 +1842,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
             sb.Append("<script language='javascript'>")
 
-            sb.Append(jscript & "showPopup();")
+            sb.Append(jscript & "showNewLinePopup();")
             sb.Append("</script>")
             ScriptManager.RegisterStartupScript(addLinebtn2, t, "popupAdd", sb.ToString, False)
         End Sub
@@ -2236,7 +2236,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim t As Type = GridView1.GetType()
                     Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
                     sb.Append("<script language='javascript'>")
-                    sb.Append(jscript & "showPopup();")
+                    sb.Append(jscript & "showNewLinePopup();")
                     sb.Append("</script>")
                     ScriptManager.RegisterStartupScript(GridView1, t, "popupedit", sb.ToString, False)
                 End If

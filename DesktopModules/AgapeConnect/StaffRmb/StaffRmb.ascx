@@ -213,7 +213,7 @@
             });
             $("#divAdvanceReq").parent().appendTo($("form:first"));
 
-            $("#divSignin").dialog({
+            $("#divNewItem").dialog({
                 autoOpen: false,
                 position:['middle', 150],
                 height:700,
@@ -224,9 +224,9 @@
                     //  allFields.val("").removeClass("ui-state-error");
                 }
             });
-            $("#divSignin").parent().appendTo($("form:first"));
+            $("#divNewItem").parent().appendTo($("form:first"));
 
-            $("#divSignin2").dialog({
+            $("#divNewRmb").dialog({
                 autoOpen: false,
                 position:['middle', 150],
                 height: 350,
@@ -237,9 +237,9 @@
                     //  allFields.val("").removeClass("ui-state-error");
                 }
             });
-            $("#divSignin2").parent().appendTo($("form:first"));
+            $("#divNewRmb").parent().appendTo($("form:first"));
 
-            $("#divSignin3").dialog({
+            $("#divInsufficientFunds").dialog({
                 autoOpen: false,
                 position:['middle', 150],
                 height: 400,
@@ -249,7 +249,7 @@
                     // allFields.val("").removeClass("ui-state-error");
                 }
             });
-            $("#divSignin3").parent().appendTo($("form:first"));
+            $("#divInsufficientFunds").parent().appendTo($("form:first"));
 
             $("#divDownload").dialog({
                 autoOpen: false,
@@ -383,9 +383,9 @@
     }
 
 
- function closePopup()  {$("#divSignin").dialog("close");}
- function closePopup2() {$("#divSignin2").dialog("close");}
- function closePopup3() {$("#divSignin3").dialog("close");}
+ function closeNewItemPopup()  {$("#divNewItem").dialog("close");}
+ function closeNewRmbPopup() {$("#divNewRmb").dialog("close");}
+ function closeNSFPopup() {$("#divInsufficientFunds").dialog("close");}
  function closePopupSplit() {$("#divSplitPopup").dialog("close");}
  function closeWarningDialog() {$("#divWarningDialog").dialog("close");}
  function closePopupDownload() {$("#divDownload").dialog("close");}
@@ -413,9 +413,9 @@
  
 
     
- function showPopup()  {$("#divSignin").dialog("open"); checkCur(); return false;}
- function showPopup2() {$("#divSignin2").dialog("open"); return false; }
- function showPopup3() {$("#divSignin3").dialog("open"); return false; }
+ function showNewLinePopup()  {$("#divNewItem").dialog("open"); checkCur(); return false;}
+ function showNewRmbPopup() {$("#divNewRmb").dialog("open"); return false; }
+ function showNSFPopup() {$("#divInsufficientFunds").dialog("open"); return false; }
  function showPopupSplit() {$("#divSplitPopup").dialog("open"); return false; }
  function showWarningDialog() {$("#divWarningDialog").dialog("open"); return false; }
  function showDownload() { $("#divDownload").dialog("open"); return false; }
@@ -440,7 +440,7 @@
      }
 
 
-     function checkCur(){
+    function checkCur(){
          if($('.divCur').doesExist())
          {
              var origCur =   $("#<%= hfOrigCurrency.ClientID%>").attr('value');
@@ -868,7 +868,7 @@
         <tr valign="top">
             <td>
                 <div align="center" width="100%">
-                    <input id="btmNewRmb" type="button" onclick="showPopup2();" class="aButton" value='<%= Translate("btnNew") %>'
+                    <input id="btmNewRmb" type="button" onclick="showNewRmbPopup();" class="aButton" value='<%= Translate("btnNew") %>'
                         style="margin-bottom: 5px; font-weight: bold; min-width: 220px;" />
                 </div>
                 <div id="accordion">
@@ -1688,7 +1688,7 @@
         </ProgressTemplate>
     </asp:UpdateProgress>
 
-    <div id="divSignin" class="ui-widget">
+    <div id="divNewItem" class="ui-widget">
         <div>
             <asp:UpdatePanel ID="UpdatePanel2" runat="server">
                 <ContentTemplate>
@@ -1763,7 +1763,7 @@
                         <br />
                         <asp:Button ID="btnAddLine" runat="server" resourcekey="btnEnter" CommandName="Save"
                             class="aButton" />
-                        <input type="button" value='<%= Translate("btnCancel") %>' onclick="closePopup();"
+                        <input type="button" value='<%= Translate("btnCancel") %>' onclick="closeNewItemPopup();"
                             class="aButton" />
                         <br />
                         <br />
@@ -1843,7 +1843,7 @@
         </div>
     </div>
 
-    <div id="divSignin2" class="ui-widget">
+    <div id="divNewRmb" class="ui-widget">
         <%-- New Rmb--%>
         <div>
             <asp:UpdatePanel ID="UpdatePanel3" runat="server">
@@ -1881,7 +1881,7 @@
                     </table>
                     <asp:Button ID="btnCreate" runat="server" resourcekey="btnCreate" UseSubmitBehavior="false" OnClientClick="show_loading_spinner()"
                         class="aButton" />
-                    <input id="btnCancel2" type="button" value='<%= Translate("btnCancel") %>' onclick="closePopup2();"
+                    <input id="btnCancel2" type="button" value='<%= Translate("btnCancel") %>' onclick="closeNewRmbPopup();"
                         class="aButton" />
                 </ContentTemplate>
                 <Triggers>
@@ -1892,7 +1892,7 @@
         </div>
  
     </div>
-    <div id="divSignin3" class="ui-widget">
+    <div id="divInsufficientFunds" class="ui-widget">
         <%--Not Used?--%>
         <div>
             <br />
@@ -1900,11 +1900,11 @@
             continue?</b><br />
             <br />
             <div width="100%" align="center">
-                <asp:ImageButton ID="ImageButton2" runat="server" OnClientClick="closePopup3();"
+                <asp:ImageButton ID="ImageButton2" runat="server" OnClientClick="closeNSFPopup();"
                     ImageUrl="~/images/ButtonImages/Cancel.gif" onmouseover="this.src='../images/ButtonImages/Cancel_f2.gif';"
                     onmouseout="this.src='../images/ButtonImages/Cancel.gif';" class="aButton" AlternateText="Cancel"
                     ToolTip="Cancel" />
-                <span onclick="closePopup3()">
+                <span onclick="closeNSFPopup()">
                     <asp:HyperLink ID="blockedLink" runat="server" Target="_blank" ImageUrl="~/images/ButtonImages/ContinueS.gif"></asp:HyperLink></span>
             </div>
         </div>
