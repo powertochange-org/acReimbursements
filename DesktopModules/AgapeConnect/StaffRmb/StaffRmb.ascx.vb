@@ -601,12 +601,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                        Receipts = ((c.AP_Staff_RmbLines.Where(Function(x) x.Receipt And (x.ReceiptImageId Is Nothing))).Count > 0)).Take(Settings("MenuSize"))
                 Dim total = AllApproved.Count
 
-                Dim receiptsTask = buildRmbTreeAsync("Receipts", finance_node, From c In AllApproved Where c.Status = RmbStatus.Approved And c.Receipts)
-                Dim no_receiptsTask = buildRmbTreeAsync("No Receipts", finance_node, From c In AllApproved Where c.Status = RmbStatus.Approved And Not c.Receipts)
-                Dim pendingDownloadTask = buildRmbTreeAsync("Pending Download", finance_node, From c In AllApproved Where c.Status >= RmbStatus.PendingDownload)
+                Dim receiptsTask = buildRmbTreeAsync(Translate("Receipts"), finance_node, From c In AllApproved Where c.Status = RmbStatus.Approved And c.Receipts)
+                Dim no_receiptsTask = buildRmbTreeAsync(Translate("NoReceipts"), finance_node, From c In AllApproved Where c.Status = RmbStatus.Approved And Not c.Receipts)
+                Dim pendingImportTask = buildRmbTreeAsync(Translate("PendingImport"), finance_node, From c In AllApproved Where c.Status >= RmbStatus.PendingDownload)
 
                 Dim no_receipts_node = Await no_receiptsTask
-                Dim pending_download_node = Await pendingDownloadTask
+                Dim pending_import_node = Await pendingImportTask
 
                 If (ENABLE_ADVANCE_FUNCTIONALITY) Then
                     Dim AllApprovedAdv = (From c In d.AP_Staff_AdvanceRequests
@@ -614,13 +614,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                           Order By c.LocalAdvanceId Descending).Take(Settings("MenuSize"))
                     total += AllApprovedAdv.Count
                     Dim approvedAdvanceTask = addAdvsToTreeAsync(finance_node, no_receipts_node, From c In AllApprovedAdv Where c.RequestStatus = RmbStatus.Approved)
-                    Dim pendingDownloadAdvanceTask = addAdvsToTreeAsync(finance_node, pending_download_node, From c In AllApprovedAdv Where c.RequestStatus >= RmbStatus.PendingDownload)
+                    Dim pendingDownloadAdvanceTask = addAdvsToTreeAsync(finance_node, pending_import_node, From c In AllApprovedAdv Where c.RequestStatus >= RmbStatus.PendingDownload)
                     Await Task.WhenAll(approvedAdvanceTask, pendingDownloadAdvanceTask)
                 End If
 
                 finance_node.ChildNodes.Add(Await receiptsTask)
                 finance_node.ChildNodes.Add(no_receipts_node)
-                finance_node.ChildNodes.Add(pending_download_node)
+                finance_node.ChildNodes.Add(pending_import_node)
 
                 tvFinance.Nodes.Clear()
                 tvFinance.Nodes.Add(finance_node)

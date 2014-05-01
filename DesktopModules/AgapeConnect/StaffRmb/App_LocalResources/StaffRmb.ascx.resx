@@ -636,4 +636,7 @@
   <data name="GetPostingDetails.Text" xml:space="preserve">
     <value>Posting Details</value>
   </data>
+  <data name="PendingImport.Text" xml:space="preserve">
+    <value>Pending Import:</value>
+  </data>
 </root>
