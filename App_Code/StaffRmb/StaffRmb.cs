@@ -227,6 +227,33 @@ namespace StaffRmb
             return JsonConvert.DeserializeObject<string[]>(result);
         }
 
+        static public async Task<object> getCompanies()
+        // Returns a list of companies
+        {
+            string postData = "";
+            string url = "http://gpapp/gpimport/webservice/GetCompanies";
+            string result = await getResultFromWebServiceAsync(url, postData);
+            return JsonConvert.DeserializeObject(result);
+        }
+
+        static public async Task<object> getVendors(String company)
+        // Returns a list of vendors for a given company
+        {
+            string postData = string.Format("company={0}", company);
+            string url = "http://gpapp/gpimport/webservice/GetVendors";
+            string result = await getResultFromWebServiceAsync(url, postData);
+            return JsonConvert.DeserializeObject(result);
+        }
+
+        static public async Task<object> getRemitToAddresses(String company, String vendorId)
+            // Returns a list of addresses for a given company and vendor
+        {
+            string postData = string.Format("company={0}&vendorId={1}", company, vendorId);
+            string url = "http://gpapp/gpimport/webservice/GetRemitToAddresses";
+            string result = await getResultFromWebServiceAsync(url, postData);
+            return JsonConvert.DeserializeObject(result);
+        }
+
         static public async Task<string> getAccountsAsync(string logon)
         // Returns a list of all accounts, provided the given logon is valid (using checkAuthorizations where user==logon)
         {

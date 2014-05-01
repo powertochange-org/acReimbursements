@@ -276,7 +276,16 @@
             });
             $("#divAccountWarning").parent().appendTo($("form:first"));
 
-            
+            $("#divGetPostingData").dialog({
+                autoOpen: false,
+                position:['middle', 250],
+                height: 350,
+                width: 500,
+                modal:true,
+                title: '<%= Translate("GetPostingDetails") %>',
+                close: function() {}
+            })
+            $("#divGetPostingData").parent().appendTo($("form:first"));
 
             $("#divSuggestedPayments").dialog({
                 autoOpen: false,
@@ -390,11 +399,9 @@
  function closeWarningDialog() {$("#divWarningDialog").dialog("close");}
  function closePopupDownload() {$("#divDownload").dialog("close");}
  function closePopupAccountWarning() {$("#divAccountWarning").dialog("close");}
-
-    
  function closeSuggestedPayments() {$("#divSuggestedPayments").dialog("close");}
-   
  function closeAdvanceReq()  {$("#divAdvanceReq").dialog("close");}
+ function closePostDataDialog() {$("#divGetPostingData").dialog("close");}
 
  function selectIndex(tabIndex) {
      $("#accordion").accordion("option", "active", tabIndex);        
@@ -420,6 +427,7 @@
  function showWarningDialog() {$("#divWarningDialog").dialog("open"); return false; }
  function showDownload() { $("#divDownload").dialog("open"); return false; }
  function showAccountWarning() { $("#divAccountWarning").dialog("open"); return false; }
+ function showPostDataDialog() { $("#divGetPostingData").dialog("open"); return false; }
 
      
  function showSuggestedPayments() {
@@ -1470,7 +1478,7 @@
                                     <asp:Button ID="btnPrint" runat="server" resourcekey="btnPrint" class="aButton" />
                                     <asp:Button ID="btnSubmit" runat="server" resourcekey="btnSubmit" class="aButton" visible="false"/>
                                     <asp:Button ID="btnApprove" runat="server" resourcekey="btnApprove" class="aButton" visible="false"/>
-                                    <asp:Button ID="btnProcess" runat="server" resourcekey="btnProcess" class="aButton" visible="false"/>
+                                    <asp:Button ID="btnProcess" runat="server" resourcekey="btnProcess" class="aButton" onClientClick="showPostDataDialog()" visible="false"/>
                                     <asp:Button ID="btnUnProcess" runat="server" resourcekey="btnUnProcess" class="aButton" visible="false"/>
                                 </div>
                                 <%-- <button class="Excel" title="Download" >
@@ -1927,6 +1935,34 @@
             </ContentTemplate>
         </asp:UpdatePanel>
     </div>
+
+    <div id="divGetPostingData" class="ui-widget">
+        <asp:UpdatePanel ID="PostDataDialog" runat="server">
+            <ContentTemplate>
+                <table style="width:100%; padding:20px;">
+                    <tr><td><asp:Label ID="lblCompany" runat="server" resourcekey="Company" /></td>
+                        <td style="width:100%"><asp:DropDownList ID="ddlCompany" runat="server" AutoPostBack="True" /></td></tr>
+                    <tr><td><asp:Label ID="lblPostingDate" runat="server" resourcekey="PostingDate" /></td>
+                        <td><asp:TextBox ID="dtPostingDate" runat="server" Width="90px" class="datepicker" /></td></tr>
+                    <tr><td><asp:Label ID="lblBatchId" runat="server" resourcekey="BatchId" /></td>
+                        <td><asp:TextBox ID="tbBatchId" runat="server" /></td></tr>
+                    <tr><td><asp:Label ID="lblPostingReference" runat="server" resourcekey="PostingReference" /></td>
+                        <td><asp:TextBox ID="tbPostingReference" runat="server" /></td></tr>
+                    <tr><td><asp:Label ID="lblInvoiceNumber" runat="server" resourcekey="InvoiceNumber" /></td>
+                        <td><asp:TextBox ID="tbInvoiceNumber" runat="server" /></td></tr>
+                    <tr><td><asp:Label ID="lblVendorId" runat="server" resourcekey="VendorId" /></td>
+                        <td><asp:DropDownList ID="ddlVendorId" runat="server" AutoPostBack="True"/></td></tr>
+                    <tr><td><asp:Label ID="lblRemitTo" runat="server" resourcekey="RemitTo" /></td>
+                        <td><asp:DropDownList ID="ddlRemitTo" runat="server" /></td></tr>
+                </table>
+                <table style="width:100%">
+                    <tr><td><input id="btnCancelPost" type="button" class="aButton" onclick="closePostDataDialog();" value="<%= Translate("btnCancel") %>" /></td>
+                        <td><asp:button ID="btnSubmitPostingData" runat="server" resourcekey="btnOK" cssclass="aButton right" /></td></tr>
+                </table>
+            </ContentTemplate>
+        </asp:UpdatePanel>
+    </div>
+
     <div id="divSplitPopup" class="ui-widget">
         <asp:UpdatePanel ID="UpdatePanel9" runat="server">
             <ContentTemplate>

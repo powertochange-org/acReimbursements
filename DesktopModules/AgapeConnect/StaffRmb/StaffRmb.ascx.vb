@@ -67,11 +67,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             lblAdvanceRequest.Visible = ENABLE_ADVANCE_FUNCTIONALITY
             lblError.Visible = False
+
+            Dim TaskList As New List(Of Task)
+
             If Not String.IsNullOrEmpty(Settings("NoReceipt")) Then
                 hfNoReceiptLimit.Value = Settings("NoReceipt")
             End If
 
             If Not Page.IsPostBack Then
+                TaskList.Add(LoadCompaniesAsync())
+                TaskList.Add(LoadMenuAsync())
                 If Request.QueryString("RmbNo") <> "" Then
                     hfRmbNo.Value = CInt(Request.QueryString("RmbNo"))
                 End If
@@ -201,21 +206,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 If hfRmbNo.Value <> "" Then
                     If CInt(hfRmbNo.Value) < 0 Then
-                        Dim loadAdvTask = LoadAdvAsync(-hfRmbNo.Value)
-                        Dim resetMenuTask = LoadMenuAsync()
-                        Await loadAdvTask
-                        Await resetMenuTask
+                        TaskList.Add(LoadAdvAsync(-hfRmbNo.Value))
                     Else
-                        Dim loadRmbTask = LoadRmbAsync(hfRmbNo.Value)
-                        Dim resetMenuTask = LoadMenuAsync()
-                        Await loadRmbTask
-                        Await resetMenuTask
+                        TaskList.Add(LoadRmbAsync(hfRmbNo.Value))
                     End If
                 Else
                     ltSplash.Text = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbSplash", PortalId))
-                    Await LoadMenuAsync()
                 End If
             End If
+            Await Task.WhenAll(TaskList)
         End Sub
 
         Protected Sub UpdatePanel2_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles UpdatePanel2.Load
@@ -950,6 +949,19 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
         End Sub
 
+        Private Async Function ResetPostingDataAsync() As task
+            dtPostingDate.Text = Today.ToString("MM/dd/yyyy")
+            tbBatchId.Text = Today.ToString("yyMMdd") & staffInitials.Value
+            tbPostingReference.Text = ""
+            tbInvoiceNumber.Text = "RMB" & hfRmbNo.Value
+            ddlVendorId.Enabled = ddlCompany.SelectedIndex > 0
+            If (ddlVendorId.Enabled) Then
+                Await LoadVendorsAsync()
+            End If
+            ddlRemitTo.Enabled = False
+            ddlRemitTo.Items.Clear()
+        End Function
+
         Public Async Function LoadRmbAsync(ByVal RmbNo As Integer) As Task
 
             pnlMain.Visible = True
@@ -1001,7 +1013,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         Return
                     End If
 
+                    staffInitials.Value = user.FirstName.Substring(0, 1) & user.LastName.Substring(0, 1)
                     SetYear(ddlYear, Rmb.Year)
+                    Dim resetPostingDataTask = ResetPostingDataAsync()
 
                     '*** ERRORS ***
                     lblWrongType.Visible = False
@@ -1088,7 +1102,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     pnlTaxable.Visible = (From c In Rmb.AP_Staff_RmbLines Where c.Taxable = True).Count > 0
 
                     '--grid
-                    staffInitials.Value = user.FirstName.Substring(0, 1) & user.LastName.Substring(0, 1)
                     GridView1.DataSource = Rmb.AP_Staff_RmbLines
                     GridView1.DataBind()
 
@@ -1136,7 +1149,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             End If
                         End If
                     End If
-                    Await updateApproverListTask
                     Dim aBal = Await getAccountBalanceTask
                     Dim bBal = Await getBudgetBalanceTask
                     updateBalanceLabels(aBal, bBal)
@@ -1144,6 +1156,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         checkLowBalance()
                     End If
                     ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "calculate_remaining_balance", "calculate_remaining_balance()", True)
+                    Await Task.WhenAll(updateApproverListTask, resetPostingDataTask)
                 Else
                     pnlMain.Visible = False
                     pnlSplash.Visible = True
@@ -1884,6 +1897,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Await LoadMenuAsync()
         End Sub
 
+        Protected Async Sub ddlCompany_Change(sender As Object, e As System.EventArgs) Handles ddlCompany.SelectedIndexChanged
+            Await LoadVendorsAsync()
+            ddlVendorId.Enabled = True
+        End Sub
+
+        Protected Async Sub ddlVendorId_Change(sender As Object, e As System.EventArgs) Handles ddlVendorId.SelectedIndexChanged
+            Await LoadRemitToAsync()
+            ddlRemitTo.Enabled = True
+        End Sub
+
         Protected Async Sub btnOK_Click(sender As Object, e As System.EventArgs) Handles btnOK.Click
             Dim theLine = From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(hfSplitLineId.Value)
             If theLine.Count > 0 Then
@@ -1937,25 +1960,18 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         End Sub
 
-        Protected Async Sub btnProcess_Click(sender As Object, e As System.EventArgs) Handles btnProcess.Click, btnAccountWarningYes.Click
+        Protected Async Sub btnProcess_Click(sender As Object, e As System.EventArgs) Handles btnSubmitPostingData.Click, btnAccountWarningYes.Click
 
             'Mark as Pending Download in next batch.
             Dim theRmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value)
 
             'Check Balance
-            If CType(sender, Button).ID = "btnProcess" And Settings("WarnIfNegative") Then
+            If CType(sender, Button).ID <> "btnAccountWarningYes" And Settings("WarnIfNegative") Then
                 Dim pendingBalanceTask = GetNumericRemainingBalanceAsync(2)
-
                 Dim RmbBalance = theRmb.First.AP_Staff_RmbLines.Where(Function(x) x.CostCenter = x.AP_Staff_Rmb.CostCenter).Sum(Function(x) x.GrossAmount)
                 Dim pendingBalance = Await pendingBalanceTask
                 If RmbBalance > pendingBalance Then
-                    Dim message2 = Translate("NextBatch")
-                    Dim t2 As Type = Me.GetType()
-                    Dim sb2 As System.Text.StringBuilder = New System.Text.StringBuilder()
-                    sb2.Append("<script language='javascript'>")
-                    sb2.Append("showAccountWarning();")
-                    sb2.Append("</script>")
-                    ScriptManager.RegisterStartupScript(Page, t2, "popupWarning", sb2.ToString, False)
+                    ScriptManager.RegisterStartupScript(Page, Me.GetType(), "popupWarning", "showAccountWarning(); closePostDataDialog();", True)
                     Return
                 End If
             End If
@@ -1965,14 +1981,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             theRmb.First.MoreInfoRequested = False
             theRmb.First.ProcUserId = UserId
             SubmitChanges()
+            Log(theRmb.First.RMBNo, "Processed - this reimbursement will be added to the next download batch")
+
             Dim loadRmbTask = LoadRmbAsync(hfRmbNo.Value)
             Dim refreshMenuTask = LoadMenuAsync()
-            Log(theRmb.First.RMBNo, "Processed - this reimbursement will be added to the next download batch")
+            Await Task.WhenAll(loadRmbTask, refreshMenuTask)
+
             Dim message = Translate("NextBatch")
-            Dim t As Type = Me.GetType()
-            ScriptManager.RegisterStartupScript(Page, t, "popup", "alert(""" & message & """);", True)
-            Await loadRmbTask
-            Await refreshMenuTask
+            ScriptManager.RegisterStartupScript(Page, Me.GetType(), "closePostData", "closePostDataDialog(); alert(""" & message & """);", True)
         End Sub
 
         Protected Sub btnDownload_Click(sender As Object, e As System.EventArgs) Handles btnDownload.Click
@@ -3044,6 +3060,42 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             SynchronizeModule()
 
         End Sub
+
+        Private Async Function LoadCompaniesAsync() As Task
+            ddlCompany.Items.Clear()
+            ddlCompany.Items.Add("")
+            Dim companies = Await StaffRmbFunctions.getCompanies()
+            For Each company In companies
+                Dim name = company("CompanyName").ToString
+                Dim value = company("CompanyID").ToString
+                ddlCompany.Items.Add(New ListItem(name, value))
+            Next
+            ddlCompany.SelectedIndex = 0
+        End Function
+
+        Private Async Function LoadVendorsAsync() As Task
+            ddlVendorId.Items.Clear()
+            ddlVendorId.Items.Add("")
+            Dim vendors = Await StaffRmbFunctions.getVendors(ddlCompany.SelectedValue)
+            For Each vendor In vendors
+                Dim name = vendor("VendorName").ToString
+                Dim value = vendor("VendorID").ToString
+                ddlVendorId.Items.Add(New ListItem(name, value))
+            Next
+            ddlVendorId.SelectedIndex = 0
+        End Function
+
+        Private Async Function LoadRemitToAsync() As Task
+            ddlRemitTo.Items.Clear()
+            ddlRemitTo.Items.Add("")
+            Dim addresses = Await StaffRmbFunctions.getRemitToAddresses(ddlCompany.SelectedValue, ddlVendorId.SelectedValue)
+            For Each address In addresses
+                Dim name = address("Address1").ToString
+                Dim value = address("AddressID").ToString
+                ddlRemitTo.Items.Add(New ListItem(name, value))
+            Next
+            ddlRemitTo.SelectedIndex = 0
+        End Function
 
         Protected Function ZeroFill(ByVal number As Integer, ByVal len As Integer) As String
             If number.ToString.Length > len Then

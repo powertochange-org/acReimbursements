@@ -612,4 +612,28 @@
   <data name="TeamLeader.Text" xml:space="preserve">
     <value>Team Leader</value>
   </data>
+  <data name="BatchId.Text" xml:space="preserve">
+    <value>Batch ID</value>
+  </data>
+  <data name="Company.Text" xml:space="preserve">
+    <value>Company</value>
+  </data>
+  <data name="InvoiceNumber.Text" xml:space="preserve">
+    <value>Invoice #</value>
+  </data>
+  <data name="PostingDate.Text" xml:space="preserve">
+    <value>Posting Date</value>
+  </data>
+  <data name="PostingReference.Text" xml:space="preserve">
+    <value>Reference</value>
+  </data>
+  <data name="RemitTo.Text" xml:space="preserve">
+    <value>Remit to address</value>
+  </data>
+  <data name="VendorId.Text" xml:space="preserve">
+    <value>Vendor ID</value>
+  </data>
+  <data name="GetPostingDetails.Text" xml:space="preserve">
+    <value>Posting Details</value>
+  </data>
 </root>
