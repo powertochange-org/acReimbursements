@@ -291,6 +291,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                            Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
             dlPending.DataSource = Pending
             dlPending.DataBind()
+            DraftsUpdatePanel.Update()
         End Function
 
         Private Async Function loadBasicSubmittedPaneAsync() As Task
@@ -310,6 +311,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             dlAdvSubmitted.AlternatingItemStyle.CssClass = IIf(dlSubmitted.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
             dlAdvSubmitted.ItemStyle.CssClass = IIf(dlSubmitted.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
             Dim submitted_count = Submitted.Count + AdvSubmitted.Count
+            SubmittedUpdatePanel.Update()
         End Function
 
         Private Async Function loadBasicApprovablePaneAsync() As Task
@@ -349,7 +351,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 lblApproveHeading.Visible = False
                 divApproveHeading.Visible = False
             End If
-
+            SubmittedUpdatePanel.Update()
         End Function
 
         Private Async Function loadBasicApprovedPaneAsync() As Task
@@ -369,6 +371,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             dlAdvApproved.DataBind()
             dlAdvApproved.AlternatingItemStyle.CssClass = IIf(dlApproved.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
             dlAdvApproved.ItemStyle.CssClass = IIf(dlApproved.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
+            ApprovedUpdatePanel.Update()
         End Function
 
         Private Async Function loadBasicProcessedPaneAsync() As Task
@@ -384,6 +387,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId).Take(Settings("MenuSize"))
             dlAdvProcessed.DataSource = CompleteAdv
             dlAdvProcessed.DataBind()
+            ProcessedUpdatePanel.Update()
         End Function
 
         Private Async Function loadBasicCancelledTaskAsync() As Task
@@ -393,6 +397,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                              Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
             dlCancelled.DataSource = Cancelled
             dlCancelled.DataBind()
+            CancelledUpdatePanel.Update()
         End Function
 
         Private Async Function LoadSupervisorMenuAsync() As Task
@@ -406,9 +411,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim approvedTreeTask = buildTeamApprovedTreeAsync(Team)
                     Dim processedTreeTask = buildTeamProcessedTreeAsync(Team)
                     Await Task.WhenAll(approvedTreeTask, processedTreeTask)
-
-                    tvTeamApproved.Visible = True
-                    tvTeamProcessed.Visible = True
 
                 Else '--They are not a supervisor
                     tvTeamApproved.Visible = False
@@ -476,6 +478,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Next
             tvTeamApproved.Nodes.Clear()
             tvTeamApproved.Nodes.Add(TeamApprovedNode)
+            tvTeamApproved.Visible = True
+            ApprovedUpdatePanel.Update()
         End Function
 
         Private Async Function buildTeamProcessedTreeAsync(Team As List(Of User)) As Task
@@ -534,13 +538,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Next
             tvTeamProcessed.Nodes.Clear()
             tvTeamProcessed.Nodes.Add(TeamProcessedNode)
-
+            tvTeamProcessed.Visible = True
+            ProcessedUpdatePanel.Update()
         End Function
 
         Private Async Function LoadFinanceMenuAsync() As Task
             Try
-                Dim isFinance = IsAccounts()
-                If isFinance Then
+                If IsAccounts() Then
                     Dim allStaff = StaffBrokerFunctions.GetStaff()
                     Dim submittedTask = buildAllSubmittedTreeAsync(allStaff)
                     Dim approvedTask = buildAllApprovedTreeAsync(allStaff) '--This is the key part for the FINANCE team
@@ -548,13 +552,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Await Task.WhenAll(submittedTask, approvedTask, processedTask)
                 End If
 
-                lblAccountsTeam.Visible = isFinance
-                tvFinance.Visible = isFinance
-                tvAllSubmitted.Visible = isFinance
-                tvAllProcessed.Visible = isFinance
-                lblApprovedDivider.Visible = (tvTeamApproved.Visible)
-                lblProcessedDivider.Visible = (tvFinance.Visible Or tvAllProcessed.Visible Or tvTeamProcessed.Visible)
-                lblYourProcessed.Visible = lblProcessedDivider.Visible
+                lblAccountsTeam.Visible = IsAccounts()
             Catch ex As Exception
                 Throw New Exception("Error loading finance menu: " + ex.Message)
             End Try
@@ -583,6 +581,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Next
                 tvAllSubmitted.Nodes.Clear()
                 tvAllSubmitted.Nodes.Add(AllStaffSubmittedNode)
+                tvAllSubmitted.Visible = IsAccounts()
+                SubmittedUpdatePanel.Update()
             Catch ex As Exception
                 Throw New Exception("Error building submitted tree: " + ex.Message)
             End Try
@@ -624,6 +624,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 tvFinance.Nodes.Clear()
                 tvFinance.Nodes.Add(finance_node)
+                tvFinance.Visible = IsAccounts()
+                lblApprovedDivider.Visible = (tvTeamApproved.Visible)
 
                 '-- Add a count of items to the 'Approved' heading
                 If total > 0 Then
@@ -633,6 +635,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     lblToProcess.Text = ""
                     pnlToProcess.CssClass = ""
                 End If
+                ApprovedUpdatePanel.Update()
             Catch ex As Exception
                 Throw New Exception("Error building approved tree: " + ex.Message)
             End Try
@@ -661,6 +664,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Next
                 tvAllProcessed.Nodes.Clear()
                 tvAllProcessed.Nodes.Add(AllStaffProcessedNode)
+                tvAllProcessed.Visible = IsAccounts()
+                lblProcessedDivider.Visible = (tvFinance.Visible Or tvAllProcessed.Visible Or tvTeamProcessed.Visible)
+                lblYourProcessed.Visible = lblProcessedDivider.Visible
+                ProcessedUpdatePanel.Update()
             Catch ex As Exception
                 Throw New Exception("Error building processed tree: " + ex.Message)
             End Try
@@ -950,16 +957,19 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Sub
 
         Private Async Function ResetPostingDataAsync() As task
+            Dim user = UserController.GetUserById(PortalId, UserId)
+            Dim initials = Left(user.FirstName, 1) + Left(user.LastName, 1)
             dtPostingDate.Text = Today.ToString("MM/dd/yyyy")
-            tbBatchId.Text = Today.ToString("yyMMdd") & staffInitials.Value
+            tbBatchId.Text = Today.ToString("yyMMdd") & initials
             tbPostingReference.Text = ""
-            tbInvoiceNumber.Text = "RMB" & hfRmbNo.Value
+            tbInvoiceNumber.Text = "RMB" & lblRmbNo.Text
             ddlVendorId.Enabled = ddlCompany.SelectedIndex > 0
             If (ddlVendorId.Enabled) Then
                 Await LoadVendorsAsync()
             End If
             ddlRemitTo.Enabled = False
             ddlRemitTo.Items.Clear()
+            btnSubmitPostingData.Enabled = False
         End Function
 
         Public Async Function LoadRmbAsync(ByVal RmbNo As Integer) As Task
@@ -1682,7 +1692,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 btnSubmit.Visible = False
 
                 SubmitChanges()
-                Dim refreshMenuTask = LoadMenuAsync()
+
+                Dim refreshMenuTasks = New List(Of Task)
+                refreshMenuTasks.Add(loadBasicDraftPaneAsync())
+                refreshMenuTasks.Add(loadBasicSubmittedPaneAsync())
+                refreshMenuTasks.Add(loadBasicApprovablePaneAsync())
+                If (IsAccounts()) Then
+                    Dim allStaff = StaffBrokerFunctions.GetStaff()
+                    refreshMenuTasks.Add(buildAllSubmittedTreeAsync(allStaff))
+                End If
                 'dlPending.DataBind()
                 'dlSubmitted.DataBind()
 
@@ -1693,13 +1711,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Log(rmb.RMBNo, "SUBMITTED")
 
                 'use an alert to switch back to the main window from the printout window
-                Dim t As Type = Me.GetType()
-                Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
-                sb.Append("<script language='javascript'>")
-                sb.Append("alert(""" & message & """);")
-                sb.Append("</script>")
-                ScriptManager.RegisterStartupScript(Page, t, "popup", sb.ToString, False)
-                Await refreshMenuTask
+                ScriptManager.RegisterStartupScript(Page, Me.GetType(), "popup_and_select", "alert(""" & message & """); selectIndex(1)", True)
+                Await Task.WhenAll(refreshMenuTasks)
 
             End If
 
@@ -1716,54 +1729,32 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 If rmb.First.UserId = UserId Then
                     Log(rmb.First.RMBNo, "DELETED by owner")
-
-                    SubmitChanges()
-                    Await LoadMenuAsync()
                     ScriptManager.RegisterStartupScript(btnDelete, btnDelete.GetType(), "select4", "selectIndex(4)", True)
                 Else
                     'Send an email to the end user
-                    Dim Message = ""
-                    Dim dr As New TemplatesDataContext
-                    '  Dim ConfTemplate = From c In dr.AP_StaffBroker_Templates Where c.TemplateName = "RmbCancelled" And c.PortalId = PortalId Select c.TemplateHTML
-
-                    Message = StaffBrokerFunctions.GetTemplate("RmbCancelled", PortalId)
-
-                    '  If ConfTemplate.Count > 0 Then
-                    'Message = Server.HtmlDecode(ConfTemplate.First)
-                    ' End If
-
+                    Dim Message = StaffBrokerFunctions.GetTemplate("RmbCancelled", PortalId)
                     Dim StaffMbr = UserController.GetUserById(PortalId, rmb.First.UserId)
+                    Dim comments As String = ""
+                    If tbApprComments.Text.Trim().Length > 0 Then
+                        comments = Translate("CommentLeft").Replace("[FIRSTNAME]", UserInfo.FirstName).Replace("[COMMENT]", tbApprComments.Text)
+                    End If
 
                     Message = Message.Replace("[STAFFNAME]", StaffMbr.FirstName)
                     Message = Message.Replace("[APPRNAME]", UserInfo.FirstName & " " & UserInfo.LastName)
                     Message = Message.Replace("[APPRFIRSTNAME]", UserInfo.FirstName)
-
-                    Dim comments As String = ""
-                    If tbApprComments.Text.Trim().Length > 0 Then
-                        comments = Translate("CommentLeft").Replace("[FIRSTNAME]", UserInfo.FirstName).Replace("[COMMENT]", tbApprComments.Text)
-
-                    End If
-
                     Message = Message.Replace("[COMMENTS]", comments)
 
-
-                    'DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agapeconnect.me", theUser.Email, "donotreply@agape.org.uk", "Rmb#: " & hfRmbNo.Value & "-" & rmb.First.UserRef & " has been cancelled", Message, "", "HTML", "", "", "", "")
                     DotNetNuke.Services.Mail.Mail.SendMail("reimbursements@p2c.com", StaffMbr.Email, "", Translate("EmailCancelledSubject").Replace("[RMBNO]", rmb.First.RID).Replace("[USERREF]", rmb.First.UserRef), Message, "", "HTML", "", "", "", "")
-
-                    'ltSplash.Text = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbSplash", PortalId))
 
                     pnlMain.Visible = False
                     pnlSplash.Visible = True
 
                     Log(rmb.First.RMBNo, "DELETED")
-
-                    SubmitChanges()
-                    Await LoadMenuAsync()
                     ScriptManager.RegisterStartupScript(btnDelete, btnDelete.GetType(), "select0", "selectIndex(0)", True)
-
                 End If
 
-
+                SubmitChanges()
+                Await LoadMenuAsync()
             End If
 
         End Sub
@@ -1779,7 +1770,21 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 rmb.First.Period = Nothing
                 rmb.First.Year = Nothing
                 SubmitChanges()
-                Dim resetMenuTask = LoadMenuAsync()
+
+                Dim refreshMenuTasks = New List(Of Task)
+                refreshMenuTasks.Add(loadBasicSubmittedPaneAsync())
+                refreshMenuTasks.Add(loadBasicApprovablePaneAsync())
+                refreshMenuTasks.Add(loadBasicApprovedPaneAsync())
+                Dim Team As List(Of User) = StaffBrokerFunctions.GetTeam(UserId)
+                If (Team.Count > 0) Then
+                    refreshMenuTasks.Add(buildTeamApprovedTreeAsync(Team))
+                End If
+                If (IsAccounts()) Then
+                    Dim allStaff = StaffBrokerFunctions.GetStaff()
+                    refreshMenuTasks.Add(buildAllSubmittedTreeAsync(allStaff))
+                    refreshMenuTasks.Add(buildAllApprovedTreeAsync(allStaff))
+                End If
+
                 Dim ObjAppr As UserInfo = UserController.GetUserById(PortalId, Me.UserId)
                 Dim theUser As UserInfo = UserController.GetUserById(PortalId, rmb.First.UserId)
 
@@ -1801,7 +1806,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim message As String = Translate("RmbApproved").Replace("[RMBNO]", rmb.First.RID)
                 Dim t As Type = btnApprove.GetType()
 
-                Await resetMenuTask
+                Await Task.WhenAll(refreshMenuTasks)
 
                 ScriptManager.RegisterStartupScript(btnApprove, t, "select2", "selectIndex(2); alert(""" & message & """);", True)
                 btnApprove.Visible = False
@@ -1907,6 +1912,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             ddlRemitTo.Enabled = True
         End Sub
 
+        Protected Async Sub ddlRemitTo_Change(sender As Object, e As System.EventArgs) Handles ddlRemitTo.SelectedIndexChanged
+            btnSubmitPostingData.Enabled = True
+        End Sub
+
+
         Protected Async Sub btnOK_Click(sender As Object, e As System.EventArgs) Handles btnOK.Click
             Dim theLine = From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(hfSplitLineId.Value)
             If theLine.Count > 0 Then
@@ -1963,7 +1973,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Protected Async Sub btnProcess_Click(sender As Object, e As System.EventArgs) Handles btnSubmitPostingData.Click, btnAccountWarningYes.Click
 
             'Mark as Pending Download in next batch.
+            Dim TaskList = New List(Of Task)
             Dim theRmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value)
+            Dim postingData As New AP_Staff_Rmb_Post_Extra
 
             'Check Balance
             If CType(sender, Button).ID <> "btnAccountWarningYes" And Settings("WarnIfNegative") Then
@@ -1981,11 +1993,35 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             theRmb.First.MoreInfoRequested = False
             theRmb.First.ProcUserId = UserId
             SubmitChanges()
+            TaskList.Add(loadBasicApprovedPaneAsync())
+            TaskList.Add(loadBasicProcessedPaneAsync())
+            Dim Team As List(Of User) = StaffBrokerFunctions.GetTeam(UserId)
+            If (Team.Count > 0) Then
+                TaskList.Add(buildTeamApprovedTreeAsync(Team))
+                TaskList.Add(buildTeamProcessedTreeAsync(Team))
+            End If
+            If (IsAccounts()) Then
+                Dim allStaff = StaffBrokerFunctions.GetStaff()
+                TaskList.Add(buildAllApprovedTreeAsync(allStaff))
+                TaskList.Add(buildAllProcessedTreeAsync(allStaff))
+            End If
+
+            postingData.RMBNo = CInt(hfRmbNo.Value)
+            postingData.Company = ddlCompany.SelectedValue
+            Dim fmt = New DateTimeFormatInfo()
+            fmt.ShortDatePattern = "MM/dd/yyyy"
+            postingData.PostingDate = Convert.ToDateTime(dtPostingDate.Text, fmt)
+            postingData.BatchId = tbBatchId.Text
+            postingData.Reference = tbPostingReference.Text
+            postingData.InvoiceNo = tbInvoiceNumber.Text
+            postingData.VendorId = ddlVendorId.SelectedValue
+            postingData.RemitToAddress = ddlRemitTo.SelectedValue
             Log(theRmb.First.RMBNo, "Processed - this reimbursement will be added to the next download batch")
 
-            Dim loadRmbTask = LoadRmbAsync(hfRmbNo.Value)
-            Dim refreshMenuTask = LoadMenuAsync()
-            Await Task.WhenAll(loadRmbTask, refreshMenuTask)
+            TaskList.Add(LoadRmbAsync(hfRmbNo.Value))
+            d.AP_Staff_Rmb_Post_Extras.InsertOnSubmit(postingData)
+            SubmitChanges()
+            Await Task.WhenAll(TaskList)
 
             Dim message = Translate("NextBatch")
             ScriptManager.RegisterStartupScript(Page, Me.GetType(), "closePostData", "closePostDataDialog(); alert(""" & message & """);", True)
@@ -2090,6 +2126,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Protected Async Sub btnUnProcess_Click(sender As Object, e As System.EventArgs) Handles btnUnProcess.Click
             Dim theRmb = (From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value)).First
+            Dim TaskList As List(Of Task)
             If theRmb.Status = RmbStatus.Processed Then
                 'If the reimbursement has already been downloaded, a warning should be displayed - but hte reimbursement can be simply unprocessed
                 theRmb.Status = RmbStatus.Approved
@@ -2118,10 +2155,20 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Log(theRmb.RMBNo, "UNPROCESSED - before it was downloaded")
                 End If
             End If
-            Dim loadRmbTask = LoadRmbAsync(hfRmbNo.Value)
-            Dim refreshMenuTask = LoadMenuAsync()
-            Await loadRmbTask
-            Await refreshMenuTask
+            TaskList.Add(LoadRmbAsync(hfRmbNo.Value))
+            TaskList.Add(loadBasicApprovedPaneAsync())
+            TaskList.Add(loadBasicProcessedPaneAsync())
+            Dim Team As List(Of User) = StaffBrokerFunctions.GetTeam(UserId)
+            If (Team.Count > 0) Then
+                TaskList.Add(buildTeamApprovedTreeAsync(Team))
+                TaskList.Add(buildTeamProcessedTreeAsync(Team))
+            End If
+            If (IsAccounts()) Then
+                Dim allStaff = StaffBrokerFunctions.GetStaff()
+                TaskList.Add(buildAllApprovedTreeAsync(allStaff))
+                TaskList.Add(buildAllProcessedTreeAsync(allStaff))
+            End If
+            Await Task.WhenAll(TaskList)
         End Sub
 
         Protected Async Sub GridView1_RowCommand(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.GridViewCommandEventArgs) Handles GridView1.RowCommand
@@ -3090,8 +3137,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             ddlRemitTo.Items.Add("")
             Dim addresses = Await StaffRmbFunctions.getRemitToAddresses(ddlCompany.SelectedValue, ddlVendorId.SelectedValue)
             For Each address In addresses
-                Dim name = address("Address1").ToString
+                Dim star = ""
+                If address("DefaultRemitToAddress").ToString = "Y" Then
+                    star = "*"
+                End If
                 Dim value = address("AddressID").ToString
+                Dim name = star & value & ": " & address("Address1").ToString
                 ddlRemitTo.Items.Add(New ListItem(name, value))
             Next
             ddlRemitTo.SelectedIndex = 0

@@ -92,6 +92,7 @@
       <Column Name="MoreInfoRequested" Type="System.Boolean" DbType="bit" CanBeNull="true" />
       <Column Name="ProcUserId" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Association Name="AP_Staff_Rmb_AP_Staff_RmbLine" Member="AP_Staff_RmbLines" ThisKey="RMBNo" OtherKey="RmbNo" Type="AP_Staff_RmbLine" />
+      <Association Name="AP_Staff_Rmb_AP_Staff_Rmb_Post_Extra" Member="AP_Staff_Rmb_Post_Extras" ThisKey="RMBNo" OtherKey="RMBNo" Type="AP_Staff_Rmb_Post_Extra" />
     </Type>
   </Table>
   <Table Name="dbo.AP_Staff_AdvanceRequest" Member="AP_Staff_AdvanceRequests">
@@ -162,6 +163,19 @@
       <Column Name="ReceiptText" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
       <Association Name="AP_Staff_Rmb_AP_Staff_RmbLine" Member="AP_Staff_Rmb" ThisKey="RmbNo" OtherKey="RMBNo" Type="AP_Staff_Rmb" IsForeignKey="true" />
       <Association Name="AP_Staff_RmbLineType_AP_Staff_RmbLine" Member="AP_Staff_RmbLineType" ThisKey="LineType" OtherKey="LineTypeId" Type="AP_Staff_RmbLineType" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.AP_Staff_Rmb_Post_Extra" Member="AP_Staff_Rmb_Post_Extras">
+    <Type Name="AP_Staff_Rmb_Post_Extra">
+      <Column Name="RMBNo" AutoSync="OnInsert" Type="System.Int64" DbType="BigInt NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Company" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="PostingDate" Type="System.DateTime" DbType="date" CanBeNull="true" />
+      <Column Name="BatchId" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="Reference" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="InvoiceNo" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="VendorId" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="RemitToAddress" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Association Name="AP_Staff_Rmb_AP_Staff_Rmb_Post_Extra" Member="AP_Staff_Rmb" ThisKey="RMBNo" OtherKey="RMBNo" Type="AP_Staff_Rmb" IsForeignKey="true" />
     </Type>
   </Table>
 </Database>

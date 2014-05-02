@@ -888,7 +888,7 @@
                             <a href="#" id="Tab0" class="AcHdr">
                                 <asp:Label ID="Label5" runat="server" Font-Bold="true" ResourceKey="Draft"></asp:Label></a></h3>
                         <div id="DraftPane" class="AcPane">
-                            <asp:UpdatePanel ID="UpdatePanel5" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional" >
+                            <asp:UpdatePanel ID="DraftsUpdatePanel" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional" >
                                 <ContentTemplate>
                                     <asp:Label ID="lblErrors" runat="server" class="ui-state-error ui-corner-all"
                                         Style="padding: 3px; margin-top: 3px; display: block;" Visible="false"></asp:Label>
@@ -929,7 +929,7 @@
 
                            </h3>
                             <div id="SubmittedPane">
-                                <asp:UpdatePanel ID="UpdatePanel4" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional" >
+                                <asp:UpdatePanel ID="SubmittedUpdatePanel" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional" >
                                     <ContentTemplate>
                                         <asp:TreeView ID="tvAllSubmitted" class="accounts_team" runat="server" NodeIndent="10">
                                         </asp:TreeView>
@@ -1035,7 +1035,7 @@
                             </a>
                             </h3>
                             <div id="ApprovedPane">
-                                <asp:UpdatePanel ID="UpdatePanel6" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional" >
+                                <asp:UpdatePanel ID="ApprovedUpdatePanel" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional" >
                                     <ContentTemplate>
                                         <asp:TreeView ID="tvTeamApproved" class="team_leader" runat="server" ResourceKey="TeamRmbs" NodeIndent="10">
                                         </asp:TreeView>
@@ -1102,7 +1102,7 @@
                             </a>
                         </h3>
                         <div id="ProcessedPane">
-                            <asp:UpdatePanel ID="UpdatePanel7" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional" >
+                            <asp:UpdatePanel ID="ProcessedUpdatePanel" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional" >
                                 <ContentTemplate>
                                     <asp:TreeView ID="tvAllProcessed" class="accounts_team" runat="server" NodeIndent="10">
                                     </asp:TreeView>
@@ -1161,7 +1161,7 @@
                             <a href="#" class="aLink">
                                 <asp:Label ID="Label9" runat="server" Font-Bold="true" ResourceKey="Cancelled"></asp:Label></a></h3>
                         <div id="CancelledPane">
-                            <asp:UpdatePanel ID="UpdatePanel8" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional" >
+                            <asp:UpdatePanel ID="CancelledUpdatePanel" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional" >
                                 <ContentTemplate>
                                     <asp:DataList ID="dlCancelled" runat="server" Width="100%">
                                         <ItemStyle CssClass="dnnGridItem" />
@@ -1953,11 +1953,11 @@
                     <tr><td><asp:Label ID="lblVendorId" runat="server" resourcekey="VendorId" /></td>
                         <td><asp:DropDownList ID="ddlVendorId" runat="server" AutoPostBack="True"/></td></tr>
                     <tr><td><asp:Label ID="lblRemitTo" runat="server" resourcekey="RemitTo" /></td>
-                        <td><asp:DropDownList ID="ddlRemitTo" runat="server" /></td></tr>
+                        <td><asp:DropDownList ID="ddlRemitTo" runat="server" AutoPostBack="True" /></td></tr>
                 </table>
                 <table style="width:100%">
                     <tr><td><input id="btnCancelPost" type="button" class="aButton" onclick="closePostDataDialog();" value="<%= Translate("btnCancel") %>" /></td>
-                        <td><asp:button ID="btnSubmitPostingData" runat="server" resourcekey="btnOK" cssclass="aButton right" /></td></tr>
+                        <td><asp:button ID="btnSubmitPostingData" runat="server" resourcekey="btnOK" cssclass="aButton right" OnClientClick="closePostDataDialog()"/></td></tr>
                 </table>
             </ContentTemplate>
         </asp:UpdatePanel>

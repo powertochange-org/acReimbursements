@@ -434,7 +434,7 @@ namespace StaffRmb
             if (NextRID == "")
             {
                 StaffRmbDataContext d = new StaffRmbDataContext();
-                var MaxRID = (from c in d.AP_Staff_Rmbs where c.PortalId == PortalId select c.RID);
+                var MaxRID = (from c in d.AP_Staff_Rmbs where c.PortalId == PortalId orderby c.RID descending select c.RID);
                 if (MaxRID.Count() == 0)
                 {
                     StaffBrokerFunctions.SetSetting("NextRID", "2", PortalId);
