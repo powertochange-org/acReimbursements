@@ -401,7 +401,7 @@
  function closePopupAccountWarning() {$("#divAccountWarning").dialog("close");}
  function closeSuggestedPayments() {$("#divSuggestedPayments").dialog("close");}
  function closeAdvanceReq()  {$("#divAdvanceReq").dialog("close");}
- function closePostDataDialog() {$("#divGetPostingData").dialog("close");}
+ function closePostDataDialog() {$("#divGetPostingData").dialog("close"); $("#loading").hide();}
 
  function selectIndex(tabIndex) {
      $("#accordion").accordion("option", "active", tabIndex);        
@@ -1957,7 +1957,7 @@
                 </table>
                 <table style="width:100%">
                     <tr><td><input id="btnCancelPost" type="button" class="aButton" onclick="closePostDataDialog();" value="<%= Translate("btnCancel") %>" /></td>
-                        <td><asp:button ID="btnSubmitPostingData" runat="server" resourcekey="btnOK" cssclass="aButton right" OnClientClick="closePostDataDialog()"/></td></tr>
+                        <td><asp:button ID="btnSubmitPostingData" runat="server" resourcekey="btnOK" cssclass="aButton right" OnClientClick="show_loading_spinner()" AutoPostBack="True"/></td></tr>
                 </table>
             </ContentTemplate>
         </asp:UpdatePanel>

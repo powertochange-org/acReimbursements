@@ -253,15 +253,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Private Async Function LoadBasicMenuAsync() As Task
             Try
                 '*** EVERYONE SEES THIS STUFF ***
-                Dim moreInfoTask = loadBasicMoreInfoAsync()
-                Dim draftsTask = loadBasicDraftPaneAsync()
-                Dim submittedTask = loadBasicSubmittedPaneAsync()
-                Dim approvableTask = loadBasicApprovablePaneAsync()
-                Dim approvedTask = loadBasicApprovedPaneAsync()
-                Dim processedTask = loadBasicProcessedPaneAsync()
-                Dim cancelledTask = loadBasicCancelledTaskAsync()
+                Dim ReloadMenuTasks As New List(Of Task)
+                ReloadMenuTasks.Add(loadBasicMoreInfoAsync())
+                ReloadMenuTasks.Add(loadBasicDraftPaneAsync())
+                ReloadMenuTasks.Add(loadBasicSubmittedPaneAsync())
+                ReloadMenuTasks.Add(loadBasicApprovablePaneAsync())
+                ReloadMenuTasks.Add(loadBasicApprovedPaneAsync())
+                ReloadMenuTasks.Add(loadBasicProcessedPaneAsync())
+                ReloadMenuTasks.Add(loadBasicCancelledTaskAsync())
 
-                Await Task.WhenAll(moreInfoTask, draftsTask, submittedTask, approvableTask, approvedTask, processedTask, cancelledTask)
+                Await Task.WhenAll(ReloadMenuTasks)
 
             Catch ex As Exception
                 Throw New Exception("Error loading basic menu: " + ex.Message)
@@ -270,134 +271,163 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Private Async Function loadBasicMoreInfoAsync() As Task
             '--Highlight reimbursements that need more information in a bar at the top
-            Dim MoreInfo = From c In d.AP_Staff_Rmbs
-                                Where c.MoreInfoRequested = True And c.Status <> RmbStatus.Processed And c.UserId = UserId And c.PortalId = PortalId
-                                Select c.UserRef, c.RID, c.RMBNo
-            For Each row In MoreInfo
-                Dim hyp As New HyperLink()
-                hyp.CssClass = "ui-state-highlight ui-corner-all AgapeWarning"
-                hyp.Font.Size = FontUnit.Small
-                hyp.Font.Bold = True
-                hyp.Text = Translate("MoreInfo").Replace("[RMBNO]", row.RID).Replace("[USERREF]", row.UserRef)
-                hyp.NavigateUrl = NavigateURL() & "?RmbNo=" & row.RMBNo
-                PlaceHolder1.Controls.Add(hyp)
-            Next
+            Try
+                Dim MoreInfo As System.Linq.IQueryable
+                MoreInfo = From c In d.AP_Staff_Rmbs
+                                    Where c.MoreInfoRequested = True And c.Status <> RmbStatus.Processed And c.UserId = UserId And c.PortalId = PortalId
+                                    Select c.UserRef, c.RID, c.RMBNo
+                For Each row In MoreInfo
+                    Dim hyp As New HyperLink()
+                    hyp.CssClass = "ui-state-highlight ui-corner-all AgapeWarning"
+                    hyp.Font.Size = FontUnit.Small
+                    hyp.Font.Bold = True
+                    hyp.Text = Translate("MoreInfo").Replace("[RMBNO]", row.RID).Replace("[USERREF]", row.UserRef)
+                    hyp.NavigateUrl = NavigateURL() & "?RmbNo=" & row.RMBNo
+                    PlaceHolder1.Controls.Add(hyp)
+                Next
+            Catch ex As Exception
+                Throw New Exception("Error loading MoreInfo rmbs: " + ex.Message)
+            End Try
         End Function
 
         Private Async Function loadBasicDraftPaneAsync() As Task
-            Dim Pending = (From c In d.AP_Staff_Rmbs
-                           Where c.Status = RmbStatus.Draft And c.PortalId = PortalId And (c.UserId = UserId)
-                           Order By c.RID Descending
-                           Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
-            dlPending.DataSource = Pending
-            dlPending.DataBind()
-            DraftsUpdatePanel.Update()
+            Try
+                Dim Pending = (From c In d.AP_Staff_Rmbs
+                               Where c.Status = RmbStatus.Draft And c.PortalId = PortalId And (c.UserId = UserId)
+                               Order By c.RID Descending
+                               Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
+                dlPending.DataSource = Pending
+                dlPending.DataBind()
+                DraftsUpdatePanel.Update()
+            Catch ex As Exception
+                Throw New Exception("Error loading draft rmbs: " + ex.Message)
+            End Try
         End Function
 
         Private Async Function loadBasicSubmittedPaneAsync() As Task
-            Dim Submitted = (From c In d.AP_Staff_Rmbs
-                             Where c.Status = RmbStatus.Submitted And c.UserId = UserId And c.PortalId = PortalId
-                             Order By c.RID Descending
-                             Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
-            dlSubmitted.DataSource = Submitted
-            dlSubmitted.DataBind()
+            Try
+                Dim Submitted = (From c In d.AP_Staff_Rmbs
+                                 Where c.Status = RmbStatus.Submitted And c.UserId = UserId And c.PortalId = PortalId
+                                 Order By c.RID Descending
+                                 Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
+                dlSubmitted.DataSource = Submitted
+                dlSubmitted.DataBind()
 
-            Dim AdvSubmitted = (From c In d.AP_Staff_AdvanceRequests
-                                Where c.RequestStatus = RmbStatus.Submitted And c.UserId = UserId And c.PortalId = PortalId
-                                Order By c.LocalAdvanceId Descending
-                                Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId).Take(Settings("MenuSize"))
-            dlAdvSubmitted.DataSource = AdvSubmitted
-            dlAdvSubmitted.DataBind()
-            dlAdvSubmitted.AlternatingItemStyle.CssClass = IIf(dlSubmitted.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
-            dlAdvSubmitted.ItemStyle.CssClass = IIf(dlSubmitted.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
-            Dim submitted_count = Submitted.Count + AdvSubmitted.Count
-            SubmittedUpdatePanel.Update()
+                Dim AdvSubmitted = (From c In d.AP_Staff_AdvanceRequests
+                                    Where c.RequestStatus = RmbStatus.Submitted And c.UserId = UserId And c.PortalId = PortalId
+                                    Order By c.LocalAdvanceId Descending
+                                    Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId).Take(Settings("MenuSize"))
+                dlAdvSubmitted.DataSource = AdvSubmitted
+                dlAdvSubmitted.DataBind()
+                dlAdvSubmitted.AlternatingItemStyle.CssClass = IIf(dlSubmitted.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
+                dlAdvSubmitted.ItemStyle.CssClass = IIf(dlSubmitted.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
+                Dim submitted_count = Submitted.Count + AdvSubmitted.Count
+                SubmittedUpdatePanel.Update()
+            Catch ex As Exception
+                Throw New Exception("Error loading submitted rmbs: " + ex.Message)
+            End Try
         End Function
 
         Private Async Function loadBasicApprovablePaneAsync() As Task
             '--list any unapproved reimbursements submitted to this user for approval
-            Dim ApprovableRmbs = (From c In d.AP_Staff_Rmbs
-                        Where c.Status = RmbStatus.Submitted And c.ApprUserId = UserId And c.ApprDate Is Nothing And c.PortalId = PortalId
-                        Order By c.RMBNo Descending
-                        Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId)
-            dlToApprove.DataSource = ApprovableRmbs
-            dlToApprove.DataBind()
+            Try
+                Dim ApprovableRmbs = (From c In d.AP_Staff_Rmbs
+                            Where c.Status = RmbStatus.Submitted And c.ApprUserId = UserId And c.ApprDate Is Nothing And c.PortalId = PortalId
+                            Order By c.RMBNo Descending
+                            Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId)
+                dlToApprove.DataSource = ApprovableRmbs
+                dlToApprove.DataBind()
 
-            Dim ApprovableAdvs = (From c In d.AP_Staff_AdvanceRequests
-                         Where c.RequestStatus = RmbStatus.Submitted And c.ApproverId = UserId And c.ApprovedDate Is Nothing And c.PortalId = PortalId
-                         Order By c.LocalAdvanceId Descending
-                         Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId)
-            dlAdvToApprove.DataSource = ApprovableAdvs
-            dlAdvToApprove.DataBind()
-            dlAdvToApprove.AlternatingItemStyle.CssClass = IIf(dlToApprove.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
-            dlAdvToApprove.ItemStyle.CssClass = IIf(dlToApprove.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
+                Dim ApprovableAdvs = (From c In d.AP_Staff_AdvanceRequests
+                             Where c.RequestStatus = RmbStatus.Submitted And c.ApproverId = UserId And c.ApprovedDate Is Nothing And c.PortalId = PortalId
+                             Order By c.LocalAdvanceId Descending
+                             Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId)
+                dlAdvToApprove.DataSource = ApprovableAdvs
+                dlAdvToApprove.DataBind()
+                dlAdvToApprove.AlternatingItemStyle.CssClass = IIf(dlToApprove.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
+                dlAdvToApprove.ItemStyle.CssClass = IIf(dlToApprove.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
 
-            Dim approvable_count = ApprovableRmbs.Count + ApprovableAdvs.Count
-            Dim isApprover = (approvable_count > 0)
+                Dim approvable_count = ApprovableRmbs.Count + ApprovableAdvs.Count
+                Dim isApprover = (approvable_count > 0)
 
-            '-- Add a count of approvable items to the 'Submitted' heading
-            If approvable_count > 0 Then
-                lblSubmittedCount.Text = "(" & approvable_count & ")"
-                pnlSubmitted.CssClass = "ui-state-highlight ui-corner-all"
-            Else
-                lblSubmittedCount.Text = ""
-                pnlSubmitted.CssClass = ""
-            End If
+                '-- Add a count of approvable items to the 'Submitted' heading
+                If approvable_count > 0 Then
+                    lblSubmittedCount.Text = "(" & approvable_count & ")"
+                    pnlSubmitted.CssClass = "ui-state-highlight ui-corner-all"
+                Else
+                    lblSubmittedCount.Text = ""
+                    pnlSubmitted.CssClass = ""
+                End If
 
-            If isApprover Then
-                lblApproveHeading.Visible = True
-                divApproveHeading.Visible = True
-            Else
-                lblApproveHeading.Visible = False
-                divApproveHeading.Visible = False
-            End If
-            SubmittedUpdatePanel.Update()
+                If isApprover Then
+                    lblApproveHeading.Visible = True
+                    divApproveHeading.Visible = True
+                Else
+                    lblApproveHeading.Visible = False
+                    divApproveHeading.Visible = False
+                End If
+                SubmittedUpdatePanel.Update()
+            Catch ex As Exception
+                Throw New Exception("Error loading approvable rmbs: " + ex.Message)
+            End Try
         End Function
 
         Private Async Function loadBasicApprovedPaneAsync() As Task
-            Dim Approved = (From c In d.AP_Staff_Rmbs
-                            Where (c.Status = RmbStatus.Approved Or c.Status = RmbStatus.PendingDownload Or c.Status = RmbStatus.DownloadFailed) _
-                                And c.UserId = UserId And c.PortalId = PortalId
-                            Order By c.RID Descending
-                            Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
-            dlApproved.DataSource = Approved
-            dlApproved.DataBind()
-            Dim AdvApproved = (From c In d.AP_Staff_AdvanceRequests
-                               Where (c.RequestStatus = RmbStatus.Approved Or c.RequestStatus = RmbStatus.PendingDownload Or c.RequestStatus = RmbStatus.DownloadFailed) _
+            Try
+                Dim Approved = (From c In d.AP_Staff_Rmbs
+                                Where (c.Status = RmbStatus.Approved Or c.Status = RmbStatus.PendingDownload Or c.Status = RmbStatus.DownloadFailed) _
                                     And c.UserId = UserId And c.PortalId = PortalId
-                               Order By c.LocalAdvanceId Descending
-                               Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId).Take(Settings("MenuSize"))
-            dlAdvApproved.DataSource = AdvApproved
-            dlAdvApproved.DataBind()
-            dlAdvApproved.AlternatingItemStyle.CssClass = IIf(dlApproved.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
-            dlAdvApproved.ItemStyle.CssClass = IIf(dlApproved.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
-            ApprovedUpdatePanel.Update()
+                                Order By c.RID Descending
+                                Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
+                dlApproved.DataSource = Approved
+                dlApproved.DataBind()
+                Dim AdvApproved = (From c In d.AP_Staff_AdvanceRequests
+                                   Where (c.RequestStatus = RmbStatus.Approved Or c.RequestStatus = RmbStatus.PendingDownload Or c.RequestStatus = RmbStatus.DownloadFailed) _
+                                        And c.UserId = UserId And c.PortalId = PortalId
+                                   Order By c.LocalAdvanceId Descending
+                                   Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId).Take(Settings("MenuSize"))
+                dlAdvApproved.DataSource = AdvApproved
+                dlAdvApproved.DataBind()
+                dlAdvApproved.AlternatingItemStyle.CssClass = IIf(dlApproved.Items.Count Mod 2 = 1, "dnnGridItem", "dnnGridAltItem")
+                dlAdvApproved.ItemStyle.CssClass = IIf(dlApproved.Items.Count Mod 2 = 1, "dnnGridAltItem", "dnnGridItem")
+                ApprovedUpdatePanel.Update()
+            Catch ex As Exception
+                Throw New Exception("Error loading approved rmbs: " + ex.Message)
+            End Try
         End Function
 
         Private Async Function loadBasicProcessedPaneAsync() As Task
-            Dim Complete = (From c In d.AP_Staff_Rmbs
-                            Where c.Status = RmbStatus.Processed And c.UserId = UserId And c.PortalId = PortalId
-                            Order By c.RID Descending
-                            Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
-            dlProcessed.DataSource = Complete
-            dlProcessed.DataBind()
-            Dim CompleteAdv = (From c In d.AP_Staff_AdvanceRequests
-                               Where c.RequestStatus = RmbStatus.Processed And c.UserId = UserId And c.PortalId = PortalId
-                               Order By c.LocalAdvanceId Descending
-                               Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId).Take(Settings("MenuSize"))
-            dlAdvProcessed.DataSource = CompleteAdv
-            dlAdvProcessed.DataBind()
-            ProcessedUpdatePanel.Update()
+            Try
+                Dim Complete = (From c In d.AP_Staff_Rmbs
+                                Where c.Status = RmbStatus.Processed And c.UserId = UserId And c.PortalId = PortalId
+                                Order By c.RID Descending
+                                Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
+                dlProcessed.DataSource = Complete
+                dlProcessed.DataBind()
+                Dim CompleteAdv = (From c In d.AP_Staff_AdvanceRequests
+                                   Where c.RequestStatus = RmbStatus.Processed And c.UserId = UserId And c.PortalId = PortalId
+                                   Order By c.LocalAdvanceId Descending
+                                   Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId).Take(Settings("MenuSize"))
+                dlAdvProcessed.DataSource = CompleteAdv
+                dlAdvProcessed.DataBind()
+                ProcessedUpdatePanel.Update()
+            Catch ex As Exception
+                Throw New Exception("Error loading processed rmbs: " + ex.Message)
+            End Try
         End Function
 
         Private Async Function loadBasicCancelledTaskAsync() As Task
-            Dim Cancelled = (From c In d.AP_Staff_Rmbs
-                             Where c.Status = RmbStatus.Cancelled And c.UserId = UserId And c.PortalId = PortalId
-                             Order By c.RID Descending
-                             Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
-            dlCancelled.DataSource = Cancelled
-            dlCancelled.DataBind()
-            CancelledUpdatePanel.Update()
+            Try
+                Dim Cancelled = (From c In d.AP_Staff_Rmbs
+                                 Where c.Status = RmbStatus.Cancelled And c.UserId = UserId And c.PortalId = PortalId
+                                 Order By c.RID Descending
+                                 Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
+                dlCancelled.DataSource = Cancelled
+                dlCancelled.DataBind()
+                CancelledUpdatePanel.Update()
+            Catch ex As Exception
+                Throw New Exception("Error loading cancelled rmbs: " + ex.Message)
+            End Try
         End Function
 
         Private Async Function LoadSupervisorMenuAsync() As Task
@@ -407,10 +437,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 If isSupervisor Then
                     lblTeamLeader.Visible = True
                     Dim TeamIds = From c In Team Select c.UserID
-
-                    Dim approvedTreeTask = buildTeamApprovedTreeAsync(Team)
-                    Dim processedTreeTask = buildTeamProcessedTreeAsync(Team)
-                    Await Task.WhenAll(approvedTreeTask, processedTreeTask)
+                    Dim ReloadMenuTasks As New List(Of Task)
+                    ReloadMenuTasks.Add(buildTeamApprovedTreeAsync(Team))
+                    ReloadMenuTasks.Add(buildTeamProcessedTreeAsync(Team))
+                    Await Task.WhenAll(ReloadMenuTasks)
 
                 Else '--They are not a supervisor
                     tvTeamApproved.Visible = False
@@ -546,10 +576,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Try
                 If IsAccounts() Then
                     Dim allStaff = StaffBrokerFunctions.GetStaff()
-                    Dim submittedTask = buildAllSubmittedTreeAsync(allStaff)
-                    Dim approvedTask = buildAllApprovedTreeAsync(allStaff) '--This is the key part for the FINANCE team
-                    Dim processedTask = buildAllProcessedTreeAsync(allStaff)
-                    Await Task.WhenAll(submittedTask, approvedTask, processedTask)
+                    Dim ReloadMenuTasks = New List(Of Task)
+                    ReloadMenuTasks.Add(buildAllSubmittedTreeAsync(allStaff))
+                    ReloadMenuTasks.Add(buildAllApprovedTreeAsync(allStaff)) '--This is the key part for the FINANCE team
+                    ReloadMenuTasks.Add(buildAllProcessedTreeAsync(allStaff))
+                    Await Task.WhenAll(ReloadMenuTasks)
                 End If
 
                 lblAccountsTeam.Visible = IsAccounts()
@@ -957,23 +988,51 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Sub
 
         Private Async Function ResetPostingDataAsync() As task
-            Dim user = UserController.GetUserById(PortalId, UserId)
-            Dim initials = Left(user.FirstName, 1) + Left(user.LastName, 1)
-            dtPostingDate.Text = Today.ToString("MM/dd/yyyy")
-            tbBatchId.Text = Today.ToString("yyMMdd") & initials
-            tbPostingReference.Text = ""
-            tbInvoiceNumber.Text = "RMB" & lblRmbNo.Text
-            ddlVendorId.Enabled = ddlCompany.SelectedIndex > 0
-            If (ddlVendorId.Enabled) Then
-                Await LoadVendorsAsync()
+            Dim ExistingData = From c In d.AP_Staff_Rmb_Post_Extras Where c.RMBNo = CInt(hfRmbNo.Value)
+            If (ExistingData.Count > 0) Then
+                ddlCompany.SelectedValue = ExistingData.First.Company
+                dtPostingDate.Text = ExistingData.First.PostingDate
+                tbBatchId.Text = ExistingData.First.BatchId
+                tbPostingReference.Text = ExistingData.First.Reference
+                tbInvoiceNumber.Text = ExistingData.First.InvoiceNo
+                If (ddlCompany.SelectedIndex > 0) Then
+                    Await LoadVendorsAsync()
+                    ddlVendorId.Enabled = True
+                    ddlVendorId.SelectedValue = ExistingData.First.VendorId
+                    If (ddlVendorId.SelectedIndex > 0) Then
+                        Await LoadRemitToAsync()
+                        ddlRemitTo.Enabled = True
+                        ddlRemitTo.SelectedValue = ExistingData.First.RemitToAddress
+                        btnSubmitPostingData.Enabled = (ddlRemitTo.SelectedIndex > 0)
+                    Else
+                        ddlRemitTo.Enabled = False
+                        ddlRemitTo.Items.Clear()
+                        btnSubmitPostingData.Enabled = False
+                    End If
+                Else
+                    ddlVendorId.Enabled = False
+                    ddlRemitTo.Enabled = False
+                    btnSubmitPostingData.Enabled = False
+                End If
+            Else
+                Dim user = UserController.GetUserById(PortalId, UserId)
+                Dim initials = Left(user.FirstName, 1) + Left(user.LastName, 1)
+                dtPostingDate.Text = Today.ToString("MM/dd/yyyy")
+                tbBatchId.Text = Today.ToString("yyMMdd") & initials
+                tbPostingReference.Text = ""
+                tbInvoiceNumber.Text = "RMB" & lblRmbNo.Text
+                ddlVendorId.Enabled = ddlCompany.SelectedIndex > 0
+                If (ddlVendorId.Enabled) Then
+                    Await LoadVendorsAsync()
+                End If
+                ddlRemitTo.Enabled = False
+                ddlRemitTo.Items.Clear()
+                btnSubmitPostingData.Enabled = False
+
             End If
-            ddlRemitTo.Enabled = False
-            ddlRemitTo.Items.Clear()
-            btnSubmitPostingData.Enabled = False
         End Function
 
         Public Async Function LoadRmbAsync(ByVal RmbNo As Integer) As Task
-
             pnlMain.Visible = True
             pnlMainAdvance.Visible = False
             pnlSplash.Visible = False
@@ -1023,9 +1082,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         Return
                     End If
 
-                    staffInitials.Value = user.FirstName.Substring(0, 1) & user.LastName.Substring(0, 1)
                     SetYear(ddlYear, Rmb.Year)
-                    Dim resetPostingDataTask = ResetPostingDataAsync()
 
                     '*** ERRORS ***
                     lblWrongType.Visible = False
@@ -1034,7 +1091,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     '*** TITLE ***
                     lblRmbNo.Text = ZeroFill(Rmb.RID, 5)
+                    Dim resetPostingDataTask = ResetPostingDataAsync()
                     imgAvatar.ImageUrl = GetProfileImage(Rmb.UserId)
+                    staffInitials.Value = user.FirstName.Substring(0, 1) & user.LastName.Substring(0, 1)
                     tbChargeTo.Text = If(Rmb.CostCenter Is Nothing, "", Rmb.CostCenter)
                     tbChargeTo.Enabled = DRAFT Or MORE_INFO Or CANCELLED Or (SUBMITTED And (isOwner Or isSpouse))
                     lblStatus.Text = Translate(RmbStatus.StatusName(Rmb.Status))
@@ -1975,7 +2034,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             'Mark as Pending Download in next batch.
             Dim TaskList = New List(Of Task)
             Dim theRmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value)
-            Dim postingData As New AP_Staff_Rmb_Post_Extra
+            Dim Extra = From c In d.AP_Staff_Rmb_Post_Extras Where c.RMBNo = CInt(hfRmbNo.Value)
+            Dim PostingData As AP_Staff_Rmb_Post_Extra
+            Dim insert = True
+            If (Extra.Count > 0) Then
+                PostingData = Extra.First
+                insert = False
+            Else
+                PostingData = New AP_Staff_Rmb_Post_Extra
+            End If
 
             'Check Balance
             If CType(sender, Button).ID <> "btnAccountWarningYes" And Settings("WarnIfNegative") Then
@@ -2006,20 +2073,22 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 TaskList.Add(buildAllProcessedTreeAsync(allStaff))
             End If
 
-            postingData.RMBNo = CInt(hfRmbNo.Value)
-            postingData.Company = ddlCompany.SelectedValue
+            PostingData.RMBNo = CInt(hfRmbNo.Value)
+            PostingData.Company = ddlCompany.SelectedValue
             Dim fmt = New DateTimeFormatInfo()
             fmt.ShortDatePattern = "MM/dd/yyyy"
-            postingData.PostingDate = Convert.ToDateTime(dtPostingDate.Text, fmt)
-            postingData.BatchId = tbBatchId.Text
-            postingData.Reference = tbPostingReference.Text
-            postingData.InvoiceNo = tbInvoiceNumber.Text
-            postingData.VendorId = ddlVendorId.SelectedValue
-            postingData.RemitToAddress = ddlRemitTo.SelectedValue
+            PostingData.PostingDate = Convert.ToDateTime(dtPostingDate.Text, fmt)
+            PostingData.BatchId = tbBatchId.Text
+            PostingData.Reference = tbPostingReference.Text
+            PostingData.InvoiceNo = tbInvoiceNumber.Text
+            PostingData.VendorId = ddlVendorId.SelectedValue
+            PostingData.RemitToAddress = ddlRemitTo.SelectedValue
             Log(theRmb.First.RMBNo, "Processed - this reimbursement will be added to the next download batch")
 
             TaskList.Add(LoadRmbAsync(hfRmbNo.Value))
-            d.AP_Staff_Rmb_Post_Extras.InsertOnSubmit(postingData)
+            If (insert) Then
+                d.AP_Staff_Rmb_Post_Extras.InsertOnSubmit(PostingData)
+            End If
             SubmitChanges()
             Await Task.WhenAll(TaskList)
 
@@ -2126,7 +2195,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Protected Async Sub btnUnProcess_Click(sender As Object, e As System.EventArgs) Handles btnUnProcess.Click
             Dim theRmb = (From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value)).First
-            Dim TaskList As List(Of Task)
+            Dim TaskList As New List(Of Task)
             If theRmb.Status = RmbStatus.Processed Then
                 'If the reimbursement has already been downloaded, a warning should be displayed - but hte reimbursement can be simply unprocessed
                 theRmb.Status = RmbStatus.Approved
@@ -2425,6 +2494,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 'Detect if Dept is now Personal or vica versa
                 Dim PortalId = CInt(hfPortalId.Value)
                 Dim RmbNo = CInt(hfRmbNo.Value)
+                Dim TaskList = New List(Of Task)
                 Dim Dept = StaffBrokerFunctions.IsDept(PortalId, hfChargeToValue.Value)
                 Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo And c.PortalId = PortalId
                 If (rmb.Count > 0) Then
@@ -2440,14 +2510,21 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             row.CostCenter = hfChargeToValue.Value
                         End If
                     Next
-                    SubmitChanges()
-                    Await updateApproversListAsync(rmb.First)
-                    updateBalanceLabels(Await getAccountBalanceTask, Await getBudgetBalanceTask)
                     If (rmb.First.Status <> RmbStatus.Draft) Then
+                        Undelete_Current_Rmb()
                         rmb.First.Status = RmbStatus.Draft
-                        Await LoadMenuAsync()
+                        rmb.First.ApprUserId = Nothing
+                        SubmitChanges()
+                        TaskList.Add(LoadMenuAsync())
+                        ScriptManager.RegisterStartupScript(tbChargeTo, tbChargeTo.GetType(), "select0", "selectIndex(0)", True)
+                    Else
+                        SubmitChanges()
                     End If
-                    SubmitChanges()
+                    TaskList.Add(updateApproversListAsync(rmb.First))
+                    Dim aBal = Await getAccountBalanceTask
+                    Dim bBal = Await getBudgetBalanceTask
+                    updateBalanceLabels(aBal, bBal)
+                    Await Task.WhenAll(TaskList)
                 End If
             Catch ex As Exception
                 lblError.Text = "Error in ChargeTo OnChange event: " & ex.Message
@@ -2466,16 +2543,21 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End Try
             Dim refreshMenu = (Not rmb.First.Status = RmbStatus.Draft)
             rmb.First.Status = RmbStatus.Draft
-            lblStatus.Text = Translate(RmbStatus.StatusName(RmbStatus.Draft))
-            btnSubmit.Visible = rmb.First.AP_Staff_RmbLines.Count > 0
-            btnSubmit.Enabled = (rmb.First.CostCenter IsNot Nothing And rmb.First.ApprUserId IsNot Nothing _
-                                 AndAlso (rmb.First.CostCenter.Length = 6) And (rmb.First.ApprUserId >= 0))
-            btnSubmit.ToolTip = If(btnSubmit.Enabled, "", Translate("btnSubmitHelp"))
             SubmitChanges()
+            Undelete_Current_Rmb()
             If refreshMenu Then
                 Await LoadMenuAsync()
             End If
             ScriptManager.RegisterStartupScript(ddlApprovedBy, ddlApprovedBy.GetType(), "selectDrafts", "selectIndex(0)", True)
+        End Sub
+
+        Private Sub Undelete_Current_Rmb()
+            lblStatus.Text = Translate(RmbStatus.StatusName(RmbStatus.Draft))
+            btnDelete.Visible = True
+            btnSubmit.Visible = True
+            btnSubmit.Text = Translate("btnSubmit")
+            btnSubmit.Enabled = tbChargeTo.Text.Length = 6 And ddlApprovedBy.SelectedIndex > 0 And GridView1.Rows.Count > 0
+            btnSubmit.ToolTip = Translate("btnSubmitHelp")
         End Sub
 
 
