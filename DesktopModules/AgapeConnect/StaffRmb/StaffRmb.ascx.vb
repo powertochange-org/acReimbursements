@@ -2503,6 +2503,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Protected Async Sub tbChargeTo_ValueChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles tbChargeTo.TextChanged
             'The User selected a new cost centre
             Try
+                If (hfChargeToValue.Value.Length = 0) Then
+                    tbChargeTo.Text = ""
+                    ddlApprovedBy.Items.Clear()
+                    Return
+                End If
                 'Detect if Dept is now Personal or vica versa
                 Dim PortalId = CInt(hfPortalId.Value)
                 Dim RmbNo = CInt(hfRmbNo.Value)

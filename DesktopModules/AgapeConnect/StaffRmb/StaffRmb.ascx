@@ -708,14 +708,11 @@
                 $('#<%= tbChargeTo.ClientID%>').val(ui.item.value).change();
             },
             change: function(event, ui) {
-                if (ui != null && ui.item != null) {
-                    console.debug("CHANGE: "+ui.item.value)
-                    $('#<%= hfChargeToValue.ClientID%>').val(ui.item.value);
-                    $('#<%= tbChargeTo.ClientID%>').val(ui.item.value).change();
-                } else {
+                if (!ui.item) {
                     console.debug("CHANGE: -null-")
-                    var old_value = $('#<%= hfChargeToValue.ClientID%>').val();
-                    $('#<%= tbChargeTo.ClientID%>').val(old_value);
+                    $('#<%= hfChargeToValue.ClientID%>').val('');
+                    $('#<%= tbChargeTo.ClientID%>').val('');
+                    alert("Please select an account again.  You must click on an item in the list, rather than just typing it.");
                 }
             },
             minLength: 2
