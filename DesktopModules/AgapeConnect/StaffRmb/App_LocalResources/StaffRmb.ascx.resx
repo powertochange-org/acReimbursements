@@ -639,4 +639,7 @@
   <data name="PendingImport.Text" xml:space="preserve">
     <value>Pending Import:</value>
   </data>
+  <data name="Province.Text" xml:space="preserve">
+    <value>Prov. of Expenses:</value>
+  </data>
 </root>

@@ -1237,41 +1237,41 @@
                             <div style="margin-top: 10px;" class="rmb_form">
                                 <table  class="rmbHeader" width="100%">
                                     <tr class="Agape_SubTitle">
-                                        <td class="hdrTitle">
+                                        <td class="hdrTitle" width="10%">
                                             <asp:Label ID="Label18" runat="server" resourcekey="SubmittedOn"></asp:Label>
                                         </td>
                                         <td class="hdrValue">
                                             <asp:Label ID="lblSubmittedDate" runat="server"></asp:Label>
                                         </td>
-                                        <td class="hdrTitle">
+                                        <td class="hdrTitle" width="10%">
                                             <asp:Label ID="Label19" runat="server" resourcekey="ApprovedOn"></asp:Label>
                                         </td>
-                                        <td class="hdrValue">
+                                        <td class="hdrValue" width="20%">
                                             <asp:Label ID="lblApprovedDate" runat="server"></asp:Label>
                                         </td>
-                                        <td class="hdrTitle">
+                                        <td class="hdrTitle" width="10%">
                                             <asp:Label ID="Label20" runat="server" resourcekey="ProcessedOn"></asp:Label>
                                         </td>
-                                        <td class="hdrValue">
+                                        <td class="hdrValue" width="20%">
                                             <asp:Label ID="lblProcessedDate" runat="server"></asp:Label>
                                         </td>
                                     </tr>
                                     <tr class="Agape_SubTitle">
-                                        <td class="hdrTitle">
+                                        <td class="hdrTitle" width="10%">
                                             <asp:Label ID="Label21" runat="server" resourcekey="SubmittedBy"></asp:Label>
                                         </td>
                                         <td class="hdrValue">
                                             <asp:Label ID="lblSubBy" runat="server"></asp:Label>
                                         </td>
-                                        <td rowspan="2" valign="top" style="color: Gray;">
+                                        <td style="color: Gray;" width="10%">
                                             <asp:Label ID="ttlWaitingApp" runat="server" resourcekey="AwaitingApproval"></asp:Label>
                                             <asp:Label ID="ttlApprovedBy" runat="server" resourcekey="ApprovedBy" Visible="false"></asp:Label>
                                         </td>
-                                        <td class="hdrValue" rowspan="2" valign="top">
+                                        <td class="hdrValue" valign="top">
                                             <asp:DropDownList ID="ddlApprovedBy" AutoPostBack="true" runat="server" ></asp:DropDownList>
                                             <asp:Label ID="lblApprovedBy" runat="server" Visible="false"></asp:Label>
                                         </td>
-                                        <td class="hdrTitle">
+                                        <td class="hdrTitle" width="10%">
                                             <asp:Label ID="Label22" runat="server" resourcekey="ProcessedBy"></asp:Label>
                                         </td>
                                         <td class="hdrValue">
@@ -1282,13 +1282,39 @@
 
 
                                     <tr class="Agape_SubTitle">
+                                        <td colspan="2">
+                                            <table><tr class="Agape_SubTitle">
+                                            <td class="hdrTitle" width="10%">
+                                                <asp:Label ID="Label23" runat="server" resourcekey="YourRef"></asp:Label>
+                                            </td>
+                                            <td class="hdrValue">
+                                                <asp:TextBox ID="tbYouRef" runat="server" Width="150px" onKeyPress="showSaveButton();"></asp:TextBox>
+                                            </td>
+                                            </tr>
+                                            </table>
+                                        </td>
                                         <td class="hdrTitle">
-                                            <asp:Label ID="Label23" runat="server" resourcekey="YourRef"></asp:Label>
+                                            <asp:label ID="lblProvince" runat="server" resourcekey="Province" ></asp:label>
                                         </td>
                                         <td class="hdrValue">
-                                            <asp:TextBox ID="tbYouRef" runat="server" Width="150px" onKeyPress="showSaveButton();"></asp:TextBox>
+                                            <asp:DropDownList ID="ddlProvince" runat="server" AutoPostBack="True">
+                                                <asp:ListItem Text="British Columbia" Value="BC" />
+                                                <asp:ListItem Text="Alberta" Value="AB" />
+                                                <asp:ListItem Text="Saskatchewan" Value="SK" />
+                                                <asp:ListItem Text="Manitoba" Value="MB" />
+                                                <asp:ListItem Text="Ontario" Value="ON" />
+                                                <asp:ListItem Text="Quebec" Value="PQ" />
+                                                <asp:ListItem Text="Newfoundland" Value="NL" />
+                                                <asp:ListItem Text="Nova Scotia" Value="NS" />
+                                                <asp:ListItem Text="New Brunswick" Value="NB" />
+                                                <asp:ListItem Text="Prince Edward Is." Value="PE" />
+                                                <asp:ListItem Text="Yukon" Value="YT" />
+                                                <asp:ListItem Text="Nunavut" Value="NV" />
+                                                <asp:ListItem Text="Northwest Terr." Value="NT" />
+                                                <asp:ListItem Text="Outside Canada" Value="--" />
+                                            </asp:DropDownList>
                                         </td>
-                                        <td id="pnlPeriodYear" runat="server" colspan="2" style="white-space: nowrap; color: Gray;">
+                                        <td id="pnlPeriodYear" colspan="2" runat="server" style="white-space: nowrap; color: Gray;">
                                             <asp:Label ID="Label24" runat="server" resourcekey="Period"></asp:Label>
                                             <asp:DropDownList ID="ddlPeriod" runat="server" Width="70px" Enabled="false" Font-Size="X-Small">
                                                 <asp:ListItem Text="Default" Value="" />
@@ -1312,6 +1338,8 @@
                                             </asp:DropDownList>
                                         </td>
                                     </tr>
+                                </table>
+                                <table class="rmbHeaderContinuation" width="100%">
                                     <tr valign="top">
                                         <td colspan="2" style="font-size: 8pt; width: 33%;">
                                             <fieldset>
@@ -1351,187 +1379,188 @@
                                         </td>
                                     </tr>
                                 </table>
-                                <br />
+                                <div class="rmbDataLines">
+                                    <br />
 
-                                <asp:Label ID="lblTest" runat="server" Text="Label" Visible="false"></asp:Label>
-                                <div style="padding: 0 20px 0 20px;">
-                                    <asp:GridView ID="GridView1" class="rmbDetails" runat="server" AutoGenerateColumns="False" DataKeyNames="RmbLineNo"
-                                        CellPadding="4" ForeColor="#333333" GridLines="None" Width="100%" ShowFooter="True">
-                                        <RowStyle CssClass="dnnGridItem" />
-                                        <AlternatingRowStyle CssClass="dnnGridAltItem" />
-                                        <Columns>
-                                            <asp:TemplateField HeaderText="TransDate" SortExpression="TransDate">
-                                                <EditItemTemplate>
-                                                    <asp:TextBox ID="TextBox2" runat="server" Text='<%# Bind("TransDate") %>'></asp:TextBox>
-                                                </EditItemTemplate>
-                                                <ItemTemplate>
-                                                    <asp:Label ID="Label2" runat="server" CssClass='<%# IIF(Eval("OutOfDate"), "ui-state-highlight ui-corner-all","") %>' ToolTip='<%# IIF(Eval("OutOfDate"),Translate("OutOfDate"),"") %>' Text='<%# Bind("TransDate", "{0:d}") %>'></asp:Label>
-                                                </ItemTemplate>
-                                                <ItemStyle HorizontalAlign="Left" Width="50px" />
-                                            </asp:TemplateField>
-                                            <asp:TemplateField HeaderText="Line Type" SortExpression="LineType" ItemStyle-Width="110px">
-                                                <EditItemTemplate>
-                                                    <asp:TextBox ID="TextBox1" runat="server" Text='<%# Bind("LineType") %>'></asp:TextBox>
-                                                </EditItemTemplate>
-                                                <ItemTemplate>
-                                                    <asp:Label ID="Label1" runat="server" CssClass='<%# IIF(IsWrongType(Eval("CostCenter"), Eval("LineType")), "ui-state-error ui-corner-all","") %>' ToolTip='<%# IIF(IsWrongType(Eval("CostCenter"), Eval("LineType")),Translate("lblWrongType"),"") %>' Text='<%# GetLocalTypeName(Eval("AP_Staff_RmbLineType.LineTypeId") )%>'></asp:Label>
-                                                </ItemTemplate>
-                                                <ItemStyle HorizontalAlign="Left" />
-                                            </asp:TemplateField>
+                                    <asp:Label ID="lblTest" runat="server" Text="Label" Visible="false"></asp:Label>
+                                    <div style="padding: 0 20px 0 20px;">
+                                        <asp:GridView ID="GridView1" class="rmbDetails" runat="server" AutoGenerateColumns="False" DataKeyNames="RmbLineNo"
+                                            CellPadding="4" ForeColor="#333333" GridLines="None" Width="100%" ShowFooter="True">
+                                            <RowStyle CssClass="dnnGridItem" />
+                                            <AlternatingRowStyle CssClass="dnnGridAltItem" />
+                                            <Columns>
+                                                <asp:TemplateField HeaderText="TransDate" SortExpression="TransDate">
+                                                    <EditItemTemplate>
+                                                        <asp:TextBox ID="TextBox2" runat="server" Text='<%# Bind("TransDate") %>'></asp:TextBox>
+                                                    </EditItemTemplate>
+                                                    <ItemTemplate>
+                                                        <asp:Label ID="Label2" runat="server" CssClass='<%# IIF(Eval("OutOfDate"), "ui-state-highlight ui-corner-all","") %>' ToolTip='<%# IIF(Eval("OutOfDate"),Translate("OutOfDate"),"") %>' Text='<%# Bind("TransDate", "{0:d}") %>'></asp:Label>
+                                                    </ItemTemplate>
+                                                    <ItemStyle HorizontalAlign="Left" Width="50px" />
+                                                </asp:TemplateField>
+                                                <asp:TemplateField HeaderText="Line Type" SortExpression="LineType" ItemStyle-Width="110px">
+                                                    <EditItemTemplate>
+                                                        <asp:TextBox ID="TextBox1" runat="server" Text='<%# Bind("LineType") %>'></asp:TextBox>
+                                                    </EditItemTemplate>
+                                                    <ItemTemplate>
+                                                        <asp:Label ID="Label1" runat="server" CssClass='<%# IIF(IsWrongType(Eval("CostCenter"), Eval("LineType")), "ui-state-error ui-corner-all","") %>' ToolTip='<%# IIF(IsWrongType(Eval("CostCenter"), Eval("LineType")),Translate("lblWrongType"),"") %>' Text='<%# GetLocalTypeName(Eval("AP_Staff_RmbLineType.LineTypeId") )%>'></asp:Label>
+                                                    </ItemTemplate>
+                                                    <ItemStyle HorizontalAlign="Left" />
+                                                </asp:TemplateField>
 
-                                            <asp:TemplateField HeaderText="Comment" SortExpression="Comment">
-                                                <EditItemTemplate>
-                                                </EditItemTemplate>
-                                                <ItemTemplate>
-                                                    <asp:Label ID="lblComment" runat="server" Text='<%#  Eval("Comment")  %>'></asp:Label>
-                                                    <asp:Panel ID="pnlRemBal1" runat="server" Visible='<%# CanEdit(Eval("AP_Staff_Rmb.Status")) and IsAccounts()  %>'>
-                                                        <asp:Label ID="lblTrimmedComment" runat="server" Font-Size="X-Small" ForeColor="#AAAAAA" Font-Names="Courier" Text='<%# GetLineComment(Eval("Comment"), Eval("OrigCurrency"), Eval("OrigCurrencyAmount"), Eval("ShortComment"))%>'></asp:Label>
-                                                    </asp:Panel>
+                                                <asp:TemplateField HeaderText="Comment" SortExpression="Comment">
+                                                    <EditItemTemplate>
+                                                    </EditItemTemplate>
+                                                    <ItemTemplate>
+                                                        <asp:Label ID="lblComment" runat="server" Text='<%#  Eval("Comment")  %>'></asp:Label>
+                                                        <asp:Panel ID="pnlRemBal1" runat="server" Visible='<%# CanEdit(Eval("AP_Staff_Rmb.Status")) and IsAccounts()  %>'>
+                                                            <asp:Label ID="lblTrimmedComment" runat="server" Font-Size="X-Small" ForeColor="#AAAAAA" Font-Names="Courier" Text='<%# GetLineComment(Eval("Comment"), Eval("OrigCurrency"), Eval("OrigCurrencyAmount"), Eval("ShortComment"))%>'></asp:Label>
+                                                        </asp:Panel>
 
-                                                </ItemTemplate>
-                                                <FooterTemplate>
-                                                    <asp:Label ID="lblTotalAmount" runat="server" Font-Bold="True" Text="Total:"></asp:Label>
-                                                    <asp:Panel ID="pnlRemBal1" runat="server" Visible='<%# Settings("ShowRemBal") = "True" %>'>
-                                                        <asp:Label ID="lblRemainingBalance" runat="server" Font-Size="XX-Small" ForeColor="#AAAAAA" Font-Italic="true" Text="Estimated Remaining Balance:"></asp:Label>
-                                                    </asp:Panel>
-                                                </FooterTemplate>
-                                                <ItemStyle HorizontalAlign="Left" />
-                                                <FooterStyle HorizontalAlign="Right" />
-                                            </asp:TemplateField>
+                                                    </ItemTemplate>
+                                                    <FooterTemplate>
+                                                        <asp:Label ID="lblTotalAmount" runat="server" Font-Bold="True" Text="Total:"></asp:Label>
+                                                        <asp:Panel ID="pnlRemBal1" runat="server" Visible='<%# Settings("ShowRemBal") = "True" %>'>
+                                                            <asp:Label ID="lblRemainingBalance" runat="server" Font-Size="XX-Small" ForeColor="#AAAAAA" Font-Italic="true" Text="Estimated Remaining Balance:"></asp:Label>
+                                                        </asp:Panel>
+                                                    </FooterTemplate>
+                                                    <ItemStyle HorizontalAlign="Left" />
+                                                    <FooterStyle HorizontalAlign="Right" />
+                                                </asp:TemplateField>
 
-                                            <asp:TemplateField HeaderText="Amount" SortExpression="GrossAmount" ItemStyle-Width="75px">
-                                                <EditItemTemplate>
-                                                </EditItemTemplate>
-                                                <ItemTemplate>
-                                                    <asp:Label ID="lblAmount" runat="server" CssClass='<%# IIF(Eval("LargeTransaction"), "ui-state-highlight ui-corner-all","") %>' ToolTip='<%# IIF(Eval("LargeTransaction"),Translate("LargeTransaction"),"") %>' Text='<%#  Eval("GrossAmount", "{0:F2}") & IIF(Eval("Taxable")=True, "*", "") %>'></asp:Label>
+                                                <asp:TemplateField HeaderText="Amount" SortExpression="GrossAmount" ItemStyle-Width="75px">
+                                                    <EditItemTemplate>
+                                                    </EditItemTemplate>
+                                                    <ItemTemplate>
+                                                        <asp:Label ID="lblAmount" runat="server" CssClass='<%# IIF(Eval("LargeTransaction"), "ui-state-highlight ui-corner-all","") %>' ToolTip='<%# IIF(Eval("LargeTransaction"),Translate("LargeTransaction"),"") %>' Text='<%#  Eval("GrossAmount", "{0:F2}") & IIF(Eval("Taxable")=True, "*", "") %>'></asp:Label>
 
-                                                    <asp:Panel ID="pnlCur" runat="server" Visible='<%# Not String.IsNullOrEmpty(Eval("OrigCurrency")) And Eval("OrigCurrency") <> StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)%>'>
-                                                        <asp:Label ID="lblCur" runat="server" Font-Size="XX-Small" ForeColor="#AAAAAA" Text='<%# Eval("OrigCurrency") & Eval("OrigCurrencyAmount", "{0:F2}")%>'></asp:Label>
-                                                    </asp:Panel>
-                                                </ItemTemplate>
-                                                <FooterTemplate>
-                                                    <asp:Label ID="lblTotalAmount" runat="server" Text='<%# StaffBrokerFunctions.GetSetting("Currency", PortalId) & GetTotal(Eval("RmbNo")).ToString("F2") %>'></asp:Label>
-                                                    <asp:Panel ID="pnlRemBal2" runat="server" Visible='<%# Settings("ShowRemBal") = "True"%>'>
-                                                        <asp:Label ID="lblRemainingBalance" runat="server" Font-Size="xx-small" Text=''></asp:Label>
-                                                    </asp:Panel>
-                                                </FooterTemplate>
-                                                <ItemStyle HorizontalAlign="Right" />
-                                                <FooterStyle HorizontalAlign="Right" />
-                                            </asp:TemplateField>
-                                            <asp:BoundField DataField="ReceiptNo" HeaderText="Receipt No" SortExpression="ReceiptNo"
-                                               ItemStyle-HorizontalAlign="Center" ItemStyle-Width="75px">
-                                                <ItemStyle HorizontalAlign="Center"></ItemStyle>
-                                            </asp:BoundField>
-                                            <asp:TemplateField HeaderText="" ItemStyle-Width="10px" ItemStyle-Wrap="false">
-                                                <EditItemTemplate>
-                                                </EditItemTemplate>
-                                                <ItemTemplate>
-                                                    <asp:LinkButton ID="LinkButton5" runat="server" CommandName="myEdit" Visible='<%# CanEdit(Eval("AP_Staff_Rmb.Status"))  %>'
-                                                        CommandArgument='<%# Eval("RmbLineNo") %>' resourcekey="Edit"></asp:LinkButton>
-                                                    <asp:LinkButton ID="LinkButton4" runat="server" CommandName="myDelete" Visible='<%# CanEdit(Eval("AP_Staff_Rmb.Status")) %>'
-                                                        CommandArgument='<%# Eval("RmbLineNo") %>' resourcekey="Delete"></asp:LinkButton>
-                                                    <asp:Panel ID="Accounts" runat="server" Visible='<%# (CInt(Eval("AP_Staff_Rmb.Status"))<>StaffRmb.rmbStatus.Processed and CInt(Eval("AP_Staff_Rmb.Status"))<>StaffRmb.rmbStatus.DownloadFailed and CInt(Eval("AP_Staff_Rmb.Status"))<>StaffRmb.rmbStatus.PendingDownload)  and IsAccounts()  %>'>
-                                                        <asp:LinkButton ID="LinkButton6" runat="server" CommandName="mySplit"
-                                                            CommandArgument='<%# Eval("RmbLineNo") %>' resourcekey="Split"></asp:LinkButton>
-                                                        <asp:LinkButton ID="LinkButton7" runat="server" CommandName="myDefer" ToolTip="Moves this transaction to a new 'Pending' Reimbursement."
-                                                            CommandArgument='<%# Eval("RmbLineNo") %>' resourcekey="Defer" Text="Defer"></asp:LinkButton>
+                                                        <asp:Panel ID="pnlCur" runat="server" Visible='<%# Not String.IsNullOrEmpty(Eval("OrigCurrency")) And Eval("OrigCurrency") <> StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)%>'>
+                                                            <asp:Label ID="lblCur" runat="server" Font-Size="XX-Small" ForeColor="#AAAAAA" Text='<%# Eval("OrigCurrency") & Eval("OrigCurrencyAmount", "{0:F2}")%>'></asp:Label>
+                                                        </asp:Panel>
+                                                    </ItemTemplate>
+                                                    <FooterTemplate>
+                                                        <asp:Label ID="lblTotalAmount" runat="server" Text='<%# StaffBrokerFunctions.GetSetting("Currency", PortalId) & GetTotal(Eval("RmbNo")).ToString("F2") %>'></asp:Label>
+                                                        <asp:Panel ID="pnlRemBal2" runat="server" Visible='<%# Settings("ShowRemBal") = "True"%>'>
+                                                            <asp:Label ID="lblRemainingBalance" runat="server" Font-Size="xx-small" Text=''></asp:Label>
+                                                        </asp:Panel>
+                                                    </FooterTemplate>
+                                                    <ItemStyle HorizontalAlign="Right" />
+                                                    <FooterStyle HorizontalAlign="Right" />
+                                                </asp:TemplateField>
+                                                <asp:BoundField DataField="ReceiptNo" HeaderText="Receipt No" SortExpression="ReceiptNo"
+                                                   ItemStyle-HorizontalAlign="Center" ItemStyle-Width="75px">
+                                                    <ItemStyle HorizontalAlign="Center"></ItemStyle>
+                                                </asp:BoundField>
+                                                <asp:TemplateField HeaderText="" ItemStyle-Width="10px" ItemStyle-Wrap="false">
+                                                    <EditItemTemplate>
+                                                    </EditItemTemplate>
+                                                    <ItemTemplate>
+                                                        <asp:LinkButton ID="LinkButton5" runat="server" CommandName="myEdit" Visible='<%# CanEdit(Eval("AP_Staff_Rmb.Status"))  %>'
+                                                            CommandArgument='<%# Eval("RmbLineNo") %>' resourcekey="Edit"></asp:LinkButton>
+                                                        <asp:LinkButton ID="LinkButton4" runat="server" CommandName="myDelete" Visible='<%# CanEdit(Eval("AP_Staff_Rmb.Status")) %>'
+                                                            CommandArgument='<%# Eval("RmbLineNo") %>' resourcekey="Delete"></asp:LinkButton>
+                                                        <asp:Panel ID="Accounts" runat="server" Visible='<%# (CInt(Eval("AP_Staff_Rmb.Status"))<>StaffRmb.rmbStatus.Processed and CInt(Eval("AP_Staff_Rmb.Status"))<>StaffRmb.rmbStatus.DownloadFailed and CInt(Eval("AP_Staff_Rmb.Status"))<>StaffRmb.rmbStatus.PendingDownload)  and IsAccounts()  %>'>
+                                                            <asp:LinkButton ID="LinkButton6" runat="server" CommandName="mySplit"
+                                                                CommandArgument='<%# Eval("RmbLineNo") %>' resourcekey="Split"></asp:LinkButton>
+                                                            <asp:LinkButton ID="LinkButton7" runat="server" CommandName="myDefer" ToolTip="Moves this transaction to a new 'Pending' Reimbursement."
+                                                                CommandArgument='<%# Eval("RmbLineNo") %>' resourcekey="Defer" Text="Defer"></asp:LinkButton>
 
-                                                    </asp:Panel>
+                                                        </asp:Panel>
 
 
-                                                </ItemTemplate>
-                                                <ItemStyle HorizontalAlign="Left" />
-                                            </asp:TemplateField>
-                                            <asp:TemplateField HeaderText="" ItemStyle-Width="10px" ItemStyle-Wrap="false">
-                                                <EditItemTemplate>
-                                                </EditItemTemplate>
-                                                <ItemTemplate>
-                                                </ItemTemplate>
-                                                <ItemStyle HorizontalAlign="Left" />
-                                            </asp:TemplateField>
-                                        </Columns>
-                                        <FooterStyle CssClass="ui-widget-header dnnGridFooter acGridHeader" />
-                                        <HeaderStyle CssClass="ui-widget-header dnnGridHeader acGridHeader" />
-                                        <PagerStyle CssClass="dnnGridPager" />
-                                        <SelectedRowStyle CssClass="dnnFormError" />
-                                    </asp:GridView>
+                                                    </ItemTemplate>
+                                                    <ItemStyle HorizontalAlign="Left" />
+                                                </asp:TemplateField>
+                                                <asp:TemplateField HeaderText="" ItemStyle-Width="10px" ItemStyle-Wrap="false">
+                                                    <EditItemTemplate>
+                                                    </EditItemTemplate>
+                                                    <ItemTemplate>
+                                                    </ItemTemplate>
+                                                    <ItemStyle HorizontalAlign="Left" />
+                                                </asp:TemplateField>
+                                            </Columns>
+                                            <FooterStyle CssClass="ui-widget-header dnnGridFooter acGridHeader" />
+                                            <HeaderStyle CssClass="ui-widget-header dnnGridHeader acGridHeader" />
+                                            <PagerStyle CssClass="dnnGridPager" />
+                                            <SelectedRowStyle CssClass="dnnFormError" />
+                                        </asp:GridView>
 
-                                    <asp:Panel ID="pnlTaxable" runat="server" Visible="false" >
-                                        <div style="float:left">
-                                            <asp:Label ID="Label28" runat="server" Font-Italic="true" resourcekey="Taxable"></asp:Label>
-                                        </div>
-                                    </asp:Panel>
-                                    <asp:LinkButton ID="btnDownload" runat="server">
-                                        <div style="vertical-align: middle; float: right; padding-top: 8px; padding-bottom: 2px; font-size:11px">
-                                            <img src="/DesktopModules/AgapeConnect/StaffRmb/Images/Excel_icon.gif" alt="" />
-                                            <asp:Label ID="lblDownload" runat="server" resourcekey="btnDownload"></asp:Label>
-                                        </div>
-                                        <div style="clear: both;">
-                                        </div>
-                                    </asp:LinkButton>
+                                        <asp:Panel ID="pnlTaxable" runat="server" Visible="false" >
+                                            <div style="float:left">
+                                                <asp:Label ID="Label28" runat="server" Font-Italic="true" resourcekey="Taxable"></asp:Label>
+                                            </div>
+                                        </asp:Panel>
+                                        <asp:LinkButton ID="btnDownload" runat="server">
+                                            <div style="vertical-align: middle; float: right; padding-top: 8px; padding-bottom: 2px; font-size:11px">
+                                                <img src="/DesktopModules/AgapeConnect/StaffRmb/Images/Excel_icon.gif" alt="" />
+                                                <asp:Label ID="lblDownload" runat="server" resourcekey="btnDownload"></asp:Label>
+                                            </div>
+                                            <div style="clear: both;">
+                                            </div>
+                                        </asp:LinkButton>
+                                    </div>
+
+                                    <div style="float:left; margin-left:20px">
+                                        <asp:Button ID="addLinebtn2" runat="server" resourcekey="btnAddExpenseItem" class="aButton" />
+                                    </div>
+                                    <div style="float:right; margin-right:20px">
+                                        <asp:Button ID="btnPrint" runat="server" resourcekey="btnPrint" class="aButton" />
+                                        <asp:Button ID="btnSubmit" runat="server" resourcekey="btnSubmit" class="aButton" visible="false"/>
+                                        <asp:Button ID="btnApprove" runat="server" resourcekey="btnApprove" class="aButton" visible="false"/>
+                                        <asp:Button ID="btnProcess" runat="server" resourcekey="btnProcess" class="aButton" onClientClick="showPostDataDialog()" visible="false"/>
+                                        <asp:Button ID="btnUnProcess" runat="server" resourcekey="btnUnProcess" class="aButton" visible="false"/>
+                                    </div>
+                                    <%-- <button class="Excel" title="Download" >
+                                        <asp:Label ID="Label3" runat="server" Text="Download"></asp:Label>
+                                    </button>--%>
+                                    <br />
+                                    <br />
+
+                                    <div id="advanceSection" style="margin-top: 15px;">
+                                        <fieldset id="pnlAdvance" runat="server" visible="false" style="width:100%; font-size:12px">
+                                            <legend><span class="AgapeH4">Pay Off Advance</span> </legend>
+                                            <asp:Label ID="ttlAdvanceBalance" runat="server" ForeColor="Gray" resourcekey="AdvanceBalance"></asp:Label>
+                                            &nbsp;
+                                <asp:Label ID="lblAdvanceBalance" runat="server" ForeColor="Gray" Text="searching..."></asp:Label>
+                                            <table>
+                                                <tr>
+                                                    <td>
+                                                        <%--<asp:DropDownList ID="ddlAdvanceOption" runat="server">
+                                <asp:ListItem Selected="True" Value="0.00">Do not pay off advance</asp:ListItem>
+                                <asp:ListItem Value="-1.00">Pay off as much as possible</asp:ListItem>
+                                <asp:ListItem Value="1.00">Pay upto specified amount (enter here--->):</asp:ListItem>
+                            </asp:DropDownList>--%>
+                                                        <dnn:Label ID="Label3" runat="server" ControlName="tbAdvanceAmount" ResourceKey="PayOff" />
+                                                    </td>
+                                                    <td>
+                                                        <asp:TextBox ID="tbAdvanceAmount" runat="server" class="numeric advPOAmount"></asp:TextBox>
+                                                        <dnn:Currency runat="server" ID="Currency" AdvPayOffMode="true" />
+                                                    </td>
+                                                    <td>
+                                                        <asp:Button ID="btnSaveAdv" runat="server" resourcekey="btnSave" Font-Size="8pt"
+                                                            CommandName="Save" class="aButton" />
+                                                </tr>
+                                            </table>
+                                            <asp:Label ID="lblAdvError" runat="server" ForeColor="Red"></asp:Label>
+                                        </fieldset>
+
+                                        <fieldset id="pnlError" runat="server" visible="false" style="margin-top: 15px;">
+                                            <legend>
+                                                <asp:Label ID="Label44" runat="server" CssClass="AgapeH4" ResourceKey="lblErrorMessage"></asp:Label>
+                                            </legend>
+                                            <asp:Label ID="lblWrongType" runat="server" class="ui-state-error ui-corner-all"
+                                                Style="padding: 3px; margin-top: 5px; display: block;" resourceKey="lblWrongTypes">
+
+
+                                            </asp:Label>
+                                            <asp:Label ID="lblErrorMessage" runat="server" class="ui-state-error ui-corner-all"
+                                                Style="padding: 3px; margin-top: 5px; display: block;"></asp:Label>
+
+                                        </fieldset>
+                                        <div style="clear: both;" />
+                                    </div>
+
                                 </div>
-
-                                <div style="float:left; margin-left:20px">
-                                    <asp:Button ID="addLinebtn2" runat="server" resourcekey="btnAddExpenseItem" class="aButton" />
-                                </div>
-                                <div style="float:right; margin-right:20px">
-                                    <asp:Button ID="btnPrint" runat="server" resourcekey="btnPrint" class="aButton" />
-                                    <asp:Button ID="btnSubmit" runat="server" resourcekey="btnSubmit" class="aButton" visible="false"/>
-                                    <asp:Button ID="btnApprove" runat="server" resourcekey="btnApprove" class="aButton" visible="false"/>
-                                    <asp:Button ID="btnProcess" runat="server" resourcekey="btnProcess" class="aButton" onClientClick="showPostDataDialog()" visible="false"/>
-                                    <asp:Button ID="btnUnProcess" runat="server" resourcekey="btnUnProcess" class="aButton" visible="false"/>
-                                </div>
-                                <%-- <button class="Excel" title="Download" >
-                                    <asp:Label ID="Label3" runat="server" Text="Download"></asp:Label>
-                                </button>--%>
-                                <br />
-                                <br />
-
-                                <div id="advanceSection" style="margin-top: 15px;">
-                                    <fieldset id="pnlAdvance" runat="server" visible="false" style="width:100%; font-size:12px">
-                                        <legend><span class="AgapeH4">Pay Off Advance</span> </legend>
-                                        <asp:Label ID="ttlAdvanceBalance" runat="server" ForeColor="Gray" resourcekey="AdvanceBalance"></asp:Label>
-                                        &nbsp;
-                            <asp:Label ID="lblAdvanceBalance" runat="server" ForeColor="Gray" Text="searching..."></asp:Label>
-                                        <table>
-                                            <tr>
-                                                <td>
-                                                    <%--<asp:DropDownList ID="ddlAdvanceOption" runat="server">
-                            <asp:ListItem Selected="True" Value="0.00">Do not pay off advance</asp:ListItem>
-                            <asp:ListItem Value="-1.00">Pay off as much as possible</asp:ListItem>
-                            <asp:ListItem Value="1.00">Pay upto specified amount (enter here--->):</asp:ListItem>
-                        </asp:DropDownList>--%>
-                                                    <dnn:Label ID="Label3" runat="server" ControlName="tbAdvanceAmount" ResourceKey="PayOff" />
-                                                </td>
-                                                <td>
-                                                    <asp:TextBox ID="tbAdvanceAmount" runat="server" class="numeric advPOAmount"></asp:TextBox>
-                                                    <dnn:Currency runat="server" ID="Currency" AdvPayOffMode="true" />
-                                                </td>
-                                                <td>
-                                                    <asp:Button ID="btnSaveAdv" runat="server" resourcekey="btnSave" Font-Size="8pt"
-                                                        CommandName="Save" class="aButton" />
-                                            </tr>
-                                        </table>
-                                        <asp:Label ID="lblAdvError" runat="server" ForeColor="Red"></asp:Label>
-                                    </fieldset>
-
-                                    <fieldset id="pnlError" runat="server" visible="false" style="margin-top: 15px;">
-                                        <legend>
-                                            <asp:Label ID="Label44" runat="server" CssClass="AgapeH4" ResourceKey="lblErrorMessage"></asp:Label>
-                                        </legend>
-                                        <asp:Label ID="lblWrongType" runat="server" class="ui-state-error ui-corner-all"
-                                            Style="padding: 3px; margin-top: 5px; display: block;" resourceKey="lblWrongTypes">
-
-
-                                        </asp:Label>
-                                        <asp:Label ID="lblErrorMessage" runat="server" class="ui-state-error ui-corner-all"
-                                            Style="padding: 3px; margin-top: 5px; display: block;"></asp:Label>
-
-                                    </fieldset>
-                                    <div style="clear: both;" />
-                                </div>
-
-
 
                                 <asp:LinqDataSource ID="RmbLineDS" runat="server" ContextTypeName="StaffRmb.StaffRmbDataContext"
                                     EnableDelete="True" OrderBy="RmbLineNo" TableName="AP_Staff_RmbLines" Where="RmbNo == @RmbNo"
