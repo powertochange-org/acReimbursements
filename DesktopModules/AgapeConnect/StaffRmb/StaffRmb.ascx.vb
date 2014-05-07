@@ -1130,9 +1130,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     tbYouRef.Text = If(Rmb.UserRef Is Nothing, "", Rmb.UserRef)
                     ddlProvince.Enabled = (DRAFT Or MORE_INFO Or CANCELLED) And (isOwner Or isSpouse)
                     If (Rmb.SpareField1 IsNot Nothing) Then
+                        '--Use SpareField1 to store the province of the reimbursement
                         ddlProvince.SelectedValue = Rmb.SpareField1
                     Else
-                        ddlProvince.SelectedValue = "--"
+                        Dim homeProvince = StaffBrokerFunctions.GetStaffProfileProperty(staff_member, "Country")
+                        If (homeProvince.Length = 2) Then
+                            ddlProvince.SelectedValue = homeProvince
+                        Else
+                            ddlProvince.SelectedValue = "--"
+                        End If
                     End If
                     pnlPeriodYear.Visible = isFinance And (APPROVED Or PROCESSING Or PROCESSED)
                     ddlPeriod.SelectedIndex = 0
@@ -2496,6 +2502,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Protected Async Sub ddlProvince_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles ddlProvince.SelectedIndexChanged
             Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value) And c.PortalId = PortalId
+            '--Use SpareField1 to store province of RMB
             rmb.First.SpareField1 = ddlProvince.SelectedValue
             SubmitChanges()
         End Sub

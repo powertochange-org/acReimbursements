@@ -390,7 +390,7 @@
     <value>Your Comments</value>
   </data>
   <data name="YourRef.Text" xml:space="preserve">
-    <value>Your Ref:</value>
+    <value>Description:</value>
   </data>
   <data name="YourRmbs.Text" xml:space="preserve">
     <value>Your Reimbursements:</value>
@@ -641,5 +641,14 @@
   </data>
   <data name="Province.Text" xml:space="preserve">
     <value>Prov. of Expenses:</value>
+  </data>
+  <data name="YourRef.Help" xml:space="preserve">
+    <value>This is a personal reference ID to help you identify this reimbursement.</value>
+  </data>
+  <data name="PostingData.Text" xml:space="preserve">
+    <value>Posting Data</value>
+  </data>
+  <data name="Warning" xml:space="preserve">
+    <value>Warning</value>
   </data>
 </root>

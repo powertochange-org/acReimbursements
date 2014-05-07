@@ -1891,12 +1891,12 @@
                                 <asp:Label ID="Label33" runat="server" resourcekey="YourRef"></asp:Label>
                             </td>
                             <td>
-                                <asp:TextBox ID="tbNewYourRef" runat="server" Width="150px"></asp:TextBox>
+                                <asp:TextBox ID="tbNewYourRef" runat="server" Width="150px" title="This is a personal reference ID to help you identify this Reimbursement"></asp:TextBox>
                             </td>
                             <td width="70px">Charge To:
                             </td>
                             <td>
-                                <asp:TextBox ID="tbNewChargeTo" runat="server">
+                                <asp:TextBox ID="tbNewChargeTo" runat="server" title="What account would you like to be reimbursed from?">
                                 </asp:TextBox>
                             </td>
                         </tr>
@@ -1953,6 +1953,9 @@
     <div id="divWarningDialog" class="ui-widget" >
         <asp:UpdatePanel ID="WarningUpdatePanel" runat="server">
             <ContentTemplate>
+                    <div class="AgapeH2">
+                        <asp:Label ID="Label12" runat="server" resourcekey="Warning"></asp:Label>
+                    </div>
                 <h5><asp:Label ID="lblWarningLabel" runat="server"></asp:Label></h5>
                 <br />
                 <hr />
@@ -1965,6 +1968,9 @@
     <div id="divGetPostingData" class="ui-widget">
         <asp:UpdatePanel ID="PostDataDialog" runat="server">
             <ContentTemplate>
+                    <div class="AgapeH2">
+                        <asp:Label ID="Label10" runat="server" resourcekey="PostingData"></asp:Label>
+                    </div>
                 <table style="width:100%; padding:20px;">
                     <tr><td><asp:Label ID="lblCompany" runat="server" resourcekey="Company" /></td>
                         <td style="width:100%"><asp:DropDownList ID="ddlCompany" runat="server" AutoPostBack="True" /></td></tr>
