@@ -1736,7 +1736,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         End Sub
 
-        Protected Async Sub btnSubmit_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSubmit.Click
+        Protected Async Sub btnSubmit_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnAddressOk.Click, btnTempAddressChange.Click, btnPermAddressChange.Click
             'note: rmb is manually updated, as Await loadRmbAsync(rmb.RmbNO) fails
             saveIfNecessary()
             Dim rmbs = From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value
@@ -1782,7 +1782,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Log(rmb.RMBNo, "SUBMITTED")
 
                 'use an alert to switch back to the main window from the printout window
-                ScriptManager.RegisterStartupScript(Page, Me.GetType(), "popup_and_select", "alert(""" & message & """); selectIndex(1)", True)
+                ScriptManager.RegisterStartupScript(Page, Me.GetType(), "popup_and_select", "closeAddressDialog(); alert(""" & message & """); selectIndex(1)", True)
                 Await Task.WhenAll(refreshMenuTasks)
 
             End If
@@ -2990,7 +2990,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 aTotal = a.Sum()
             End If
 
-            Return AccountBalance + Advance - (rTotal + aTotal)
+            Return Math.Round(AccountBalance + Advance - (rTotal + aTotal), 2)
 
         End Function
 
@@ -4761,8 +4761,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Private Sub checkLowBalance()
             If (lblStatus.Text = RmbStatus.StatusName(RmbStatus.Submitted) AndAlso isLowBalance()) Then
                 Dim accountBalance = hfAccountBalance.Value - GetTotal(hfRmbNo.Value)
-                lblWarningLabel.Text = Translate("WarningLowBalance").Replace("[ACCTBAL]", accountBalance.ToString()) _
-                .Replace("[BUDGBAL]", hfBudgetBalance.Value).Replace("[ACCT]", tbChargeTo.Text)
+                lblWarningLabel.Text = Translate("WarningLowBalance").Replace("[ACCTBAL]", Format(accountBalance, "Currency")) _
+                .Replace("[BUDGBAL]", Format(hfBudgetBalance.Value, "Currency")).Replace("[ACCT]", tbChargeTo.Text)
                 Dim t As Type = Me.GetType()
                 ScriptManager.RegisterClientScriptBlock(Page, t, "", "showWarningDialog();", True)
             End If

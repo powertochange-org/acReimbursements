@@ -29,6 +29,12 @@
         $(previous_menu_item).parent().next().children().hide();
     }
 
+    function address_changed() {
+        $("#<%= btnAddressOk.ClientID %>").hide();
+        $("#<%= btnTempAddressChange.ClientID %>").show();
+        $("#<%= btnPermAddressChange.ClientID %>").show();
+    }
+
     function calculate_remaining_balance() {
         var result = "";
         var accBal = $("input[id$='StaffRmb_hfAccountBalance']:first").val();
@@ -36,9 +42,19 @@
         if ((accBal == "") || (formTot == "")) {
             result = "unknown";
         } else {
-            result = accBal - formTot;
+            result = format_money(accBal - formTot);
         }
         $("span[id$='GridView1_lblRemainingBalance']:last").text(result);
+    }
+
+    function format_money(n) {
+        decPlaces = 2,
+        decSeparator = '.',
+        thouSeparator = ',',
+        sign = n < 0 ? "-" : "",
+        i = parseInt(n = Math.abs(+n || 0).toFixed(decPlaces)) + "",
+        j = (j = i.length) > 3 ? j % 3 : 0;
+        return sign + (j ? i.substr(0, j) + thouSeparator : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thouSeparator) + (decPlaces ? decSeparator + Math.abs(n - i).toFixed(decPlaces).slice(2) : "");
     }
  
     (function ($, Sys) {
@@ -182,12 +198,22 @@
             $("#divWarningDialog").dialog({
                 autoOpen: false,
                 position: ['middle', 230],
-                height: 210,
+                height: 240,
                 width: 500,
                 modal: true,
                 close: function () {}
-            })
+            });
             $("#divWarningDialog").parent().appendTo($("form:first"));
+
+            $("#divAddressConfirmation").dialog({
+                autoOpen: false,
+                position: ['middle', 230],
+                height:265,
+                width:500,
+                modal:true,
+                close: function() {}
+            });
+            $("#divAddressConfirmation").parent().appendTo($("form:first"));
 
             $("#divSplitPopup").dialog({
                 autoOpen: false,
@@ -397,6 +423,7 @@
  function closeNSFPopup() {$("#divInsufficientFunds").dialog("close");}
  function closePopupSplit() {$("#divSplitPopup").dialog("close");}
  function closeWarningDialog() {$("#divWarningDialog").dialog("close");}
+ function closeAddressDialog() {$("#divAddressConfirmation").dialog("close"); $("#loading").hide();}
  function closePopupDownload() {$("#divDownload").dialog("close");}
  function closePopupAccountWarning() {$("#divAccountWarning").dialog("close");}
  function closeSuggestedPayments() {$("#divSuggestedPayments").dialog("close");}
@@ -425,6 +452,7 @@
  function showNSFPopup() {$("#divInsufficientFunds").dialog("open"); return false; }
  function showPopupSplit() {$("#divSplitPopup").dialog("open"); return false; }
  function showWarningDialog() {$("#divWarningDialog").dialog("open"); return false; }
+ function showAddressDialog() {$("#divAddressConfirmation").dialog("open"); return false; }
  function showDownload() { $("#divDownload").dialog("open"); return false; }
  function showAccountWarning() { $("#divAccountWarning").dialog("open"); return false; }
  function showPostDataDialog() { $("#divGetPostingData").dialog("open"); return false; }
@@ -1291,7 +1319,7 @@
                                             </table>
                                         </td>
                                         <td class="hdrTitle">
-                                            <asp:label ID="lblProvince" runat="server" resourcekey="Province" ></asp:label>
+                                            <asp:label ID="lblProvince" runat="server" resourcekey="ExpProv" ></asp:label>
                                         </td>
                                         <td class="hdrValue">
                                             <asp:DropDownList ID="ddlProvince" runat="server" AutoPostBack="True">
@@ -1502,7 +1530,7 @@
                                     </div>
                                     <div style="float:right; margin-right:20px">
                                         <asp:Button ID="btnPrint" runat="server" resourcekey="btnPrint" class="aButton" />
-                                        <asp:Button ID="btnSubmit" runat="server" resourcekey="btnSubmit" class="aButton" visible="false"/>
+                                        <asp:Button ID="btnSubmit" runat="server" resourcekey="btnSubmit" class="aButton" OnClientClick="showAddressDialog()" visible="false"/>
                                         <asp:Button ID="btnApprove" runat="server" resourcekey="btnApprove" class="aButton" visible="false"/>
                                         <asp:Button ID="btnProcess" runat="server" resourcekey="btnProcess" class="aButton" onClientClick="showPostDataDialog()" visible="false"/>
                                         <asp:Button ID="btnUnProcess" runat="server" resourcekey="btnUnProcess" class="aButton" visible="false"/>
@@ -1961,6 +1989,39 @@
                 <hr />
                 <input id="btnAcknowledge" type="button" value='<%= Translate("btnOK")%>' onclick="closeWarningDialog();"
                         class="aButton" style="float:right" />
+            </ContentTemplate>
+        </asp:UpdatePanel>
+    </div>
+
+    <div id="divAddressConfirmation" class="ui-widget" >
+        <asp:UpdatePanel ID="AddressUpdatePanel" runat="server">
+            <ContentTemplate>
+                <div class="AgapeH2">
+                    <asp:Label ID="Label13" runat="server" resourcekey="AddressConfirmation"></asp:Label>
+                </div>
+                <table width="100%">
+                    <tr><td><asp:Label ID="Label14" runat="server" resourcekey="AddressLine1"></asp:Label></td>
+                        <td><asp:TextBox ID="tbAddressLine1" runat="server" onkeyup="address_changed()"></asp:TextBox></td>
+                    </tr>
+                    <tr><td><asp:Label ID="Label15" runat="server" resourcekey="AddressLine2"></asp:Label></td>
+                        <td><asp:TextBox ID="tbAddressLine2" runat="server" onkeyup="address_changed()"></asp:TextBox></td>
+                    </tr>
+                    <tr><td><asp:Label ID="Label16" runat="server" resourcekey="City"></asp:Label></td>
+                        <td><asp:TextBox ID="tbCity" runat="server" onkeyup="address_changed()"></asp:TextBox></td>
+                    </tr>
+                    <tr><td><asp:Label ID="Label39" runat="server" resourcekey="Province"></asp:Label></td>
+                        <td><asp:TextBox ID="tbProvince" runat="server" onkeyup="address_changed()"></asp:TextBox></td>
+                    </tr>
+                    <tr><td><asp:Label ID="Label48" runat="server" resourcekey="Country"></asp:Label></td>
+                        <td><asp:TextBox ID="tbCountry" runat="server" onkeyup="address_changed()"></asp:TextBox></td>
+                    </tr>
+                    <tr><td><asp:Label ID="Label49" runat="server" resourcekey="PostalCode"></asp:Label></td>
+                        <td><asp:TextBox ID="tbPostalCode" runat="server" onkeyup="address_changed()"></asp:TextBox></td>
+                    </tr>
+                    <tr><td colspan="2"><hr /><asp:button ID="btnPermAddressChange" runat="server" cssclass="hidden aButton right" resourcekey="PermAddressChange" OnClientClick="show_loading_spinner()" AutoPostBack="True"></asp:button>
+                    <asp:button ID="btnTempAddressChange" runat="server" cssclass="hidden aButton right" resourcekey="TempAddressChange" OnClientClick="show_loading_spinner()" AutoPostBack="True"></asp:button>
+                    <asp:button ID="btnAddressOk" runat="server" resourcekey="btnOK" cssclass="aButton right" OnClientClick="show_loading_spinner()" AutoPostBack="True"/></td></tr>
+                </table>
             </ContentTemplate>
         </asp:UpdatePanel>
     </div>

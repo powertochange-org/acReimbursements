@@ -604,7 +604,7 @@
     <value>Warning</value>
   </data>
   <data name="WarningLowBalance.Text" xml:space="preserve">
-    <value>Warning: Fulfilling this reimbursement would bring the balance of account#[ACCT] to $[ACCTBAL], which is significantly below the budgeted balance of $[BUDGBAL].  You may still choose approve this reimbursement, but this budget discrepancy will be reported to your director for review.</value>
+    <value>Warning: Fulfilling this reimbursement would bring the balance of account#[ACCT] to [ACCTBAL], which is significantly below the budgeted balance of [BUDGBAL].  You may still choose approve this reimbursement, but this budget discrepancy will be reported to your director for review.</value>
   </data>
   <data name="btnSubmitHelp.Text" xml:space="preserve">
     <value>Please select an account and an approver in order to submit</value>
@@ -640,7 +640,7 @@
     <value>Pending Import:</value>
   </data>
   <data name="Province.Text" xml:space="preserve">
-    <value>Prov. of Expenses:</value>
+    <value>Province:</value>
   </data>
   <data name="YourRef.Help" xml:space="preserve">
     <value>This is a personal reference ID to help you identify this reimbursement.</value>
@@ -650,5 +650,32 @@
   </data>
   <data name="Warning" xml:space="preserve">
     <value>Warning</value>
+  </data>
+  <data name="AddressConfirmation.Text" xml:space="preserve">
+    <value>Confirm your address</value>
+  </data>
+  <data name="AddressLine1.Text" xml:space="preserve">
+    <value>Street Address:</value>
+  </data>
+  <data name="AddressLine2.Text" xml:space="preserve">
+    <value>address cont'd.:</value>
+  </data>
+  <data name="City.Text" xml:space="preserve">
+    <value>City:</value>
+  </data>
+  <data name="Country.Text" xml:space="preserve">
+    <value>Country:</value>
+  </data>
+  <data name="ExpProv.Text" xml:space="preserve">
+    <value>Province of expenses:</value>
+  </data>
+  <data name="PermAddressChange.Text" xml:space="preserve">
+    <value>Permanent Change</value>
+  </data>
+  <data name="PostalCode.Text" xml:space="preserve">
+    <value>Postal Code:</value>
+  </data>
+  <data name="TempAddressChange.Text" xml:space="preserve">
+    <value>Temporary Change</value>
   </data>
 </root>
