@@ -1134,7 +1134,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         '--Use SpareField1 to store the province of the reimbursement
                         ddlProvince.SelectedValue = Rmb.SpareField1
                     Else
-                        Dim homeProvince = StaffBrokerFunctions.GetStaffProfileProperty(staff_member, "Country")
+                        Dim homeProvince = StaffBrokerFunctions.GetStaffProfileProperty(staff_member, "Province")
                         If (homeProvince.Length = 2) Then
                             ddlProvince.SelectedValue = homeProvince
                         Else
