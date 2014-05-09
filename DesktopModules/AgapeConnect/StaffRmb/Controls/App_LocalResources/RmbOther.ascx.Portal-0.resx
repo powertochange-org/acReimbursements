@@ -126,4 +126,13 @@
   <data name="Electronic.Text">
     <value>Electronic Receipt (attach an image file)</value>
   </data>
+  <data name="lblDesc.Text">
+    <value>Description and Ministry Purpose</value>
+  </data>
+  <data name="Explanation.Text">
+    <value>...Only for services not covered by other expense types.</value>
+  </data>
+  <data name="Description.Error">
+    <value>* You must enter a (better) description</value>
+  </data>
 </root>

@@ -121,12 +121,21 @@
     <value>Amount</value>
   </data>
   <data name="Explanation.Text">
-    <value>...For claiming espenses related to Licenses, Memberships or Dues.</value>
+    <value>...Ministry related professional associations &amp; memberships</value>
   </data>
   <data name="Standard.Text">
     <value>Paper receipt (must be sent by mail)</value>
   </data>
   <data name="Electronic.Text">
     <value>Electronic Receipt (attach an image file)</value>
+  </data>
+  <data name="lblDesc.Text">
+    <value>Description and Ministry Purpose</value>
+  </data>
+  <data name="lblDesc.Help">
+    <value>Please enter a brief description of this expense, and its ministry purpose</value>
+  </data>
+  <data name="Description.Error">
+    <value>* You must enter a (better) description</value>
   </data>
 </root>

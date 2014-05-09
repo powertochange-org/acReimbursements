@@ -121,12 +121,21 @@
     <value>Amount</value>
   </data>
   <data name="Explanation.Text">
-    <value>...for claiming reimbursements for short-term rentals of equipment, buildings, etc.</value>
+    <value>...e.g., conference hall and equipment rental - NOT LONG TERM LEASE</value>
   </data>
   <data name="Standard.Text">
     <value>Paper receipt (must be sent by mail)</value>
   </data>
   <data name="Electronic.Text">
     <value>Electronic Receipt (attach an image file)</value>
+  </data>
+  <data name="lblDesc.Text">
+    <value>Description and Ministry Purpose</value>
+  </data>
+  <data name="lblDesc.Help">
+    <value>Please enter a brief description of this expense and the ministry purpose</value>
+  </data>
+  <data name="Description.Error">
+    <value>* You must enter a (better) description</value>
   </data>
 </root>

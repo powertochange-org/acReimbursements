@@ -121,12 +121,19 @@
     <value>Amount</value>
   </data>
   <data name="Explanation.Text">
-    <value>...for claiming costs related to internet access.</value>
+    <value>...Web Hosting, internet access provider, domain name reg., etc.
+</value>
   </data>
   <data name="Standard.Text">
     <value>Paper receipt (must be sent by mail)</value>
   </data>
   <data name="Electronic.Text">
     <value>Electronic Receipt (attach an image file)</value>
+  </data>
+  <data name="lblDesc.Text">
+    <value>Description and Ministry Purpose</value>
+  </data>
+  <data name="Description.Error">
+    <value>* You must enter a (better) description</value>
   </data>
 </root>

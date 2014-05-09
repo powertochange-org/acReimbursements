@@ -121,12 +121,18 @@
     <value>Amount</value>
   </data>
   <data name="Explanation.Text">
-    <value>...For claiming honourariums paid for ministry-related services.</value>
+    <value>...e.g., conference and event speakers</value>
   </data>
   <data name="Standard.Text">
     <value>Paper receipt (must be sent by mail)</value>
   </data>
   <data name="Electronic.Text">
     <value>Electronic Receipt (attach an image file)</value>
+  </data>
+  <data name="lblDesc.Text">
+    <value>Description and Ministry Purpose</value>
+  </data>
+  <data name="Description.Error">
+    <value>* You must enter a (better) description</value>
   </data>
 </root>

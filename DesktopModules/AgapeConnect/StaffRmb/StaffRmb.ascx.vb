@@ -1175,8 +1175,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim MORE_INFO = (Rmb.MoreInfoRequested IsNot Nothing AndAlso Rmb.MoreInfoRequested = True)
                     Dim SUBMITTED = Rmb.Status = RmbStatus.Submitted
                     Dim APPROVED = Rmb.Status = RmbStatus.Approved
-                    Dim PROCESSING = Rmb.Status = RmbStatus.PendingDownload Or Rmb.Status = RmbStatus.DownloadFailed
-                    Dim PROCESSED = Rmb.Status = RmbStatus.Processing
+                    Dim PROCESSING = Rmb.Status = RmbStatus.PendingDownload Or Rmb.Status = RmbStatus.DownloadFailed Or Rmb.Status = RmbStatus.Processing
+                    Dim PAID = Rmb.Status = RmbStatus.Paid
                     Dim CANCELLED = Rmb.Status = RmbStatus.Cancelled
                     Dim FORM_HAS_ITEMS = Rmb.AP_Staff_RmbLines.Count > 0
 
@@ -1258,7 +1258,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             ddlProvince.SelectedValue = "--"
                         End If
                     End If
-                    pnlPeriodYear.Visible = isFinance And (APPROVED Or PROCESSING Or PROCESSED)
+                    pnlPeriodYear.Visible = isFinance And (APPROVED Or PROCESSING Or PAID)
                     ddlPeriod.SelectedIndex = 0
                     If Not Rmb.Period Is Nothing Then
                         ddlPeriod.SelectedValue = Rmb.Period
@@ -1267,7 +1267,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     '--comments
                     ttlYourComments.Visible = (isOwner Or isSpouse)
                     tbComments.Visible = (isOwner Or isSpouse)
-                    tbComments.Enabled = isOwner And Not (Rmb.Locked Or PROCESSING Or PROCESSED)
+                    tbComments.Enabled = isOwner And Not (Rmb.Locked Or PROCESSING Or PAID)
                     tbComments.Text = Rmb.UserComment
                     ttlUserComments.Visible = Not (isOwner Or isSpouse)
                     lblComments.Visible = Not (isOwner Or isSpouse)
@@ -1276,7 +1276,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     lblApprComments.Visible = Not isApprover
                     lblApprComments.Text = If(Rmb.ApprComment Is Nothing, "", Rmb.ApprComment)
                     tbApprComments.Visible = isApprover
-                    tbApprComments.Enabled = isApprover And Not (PROCESSING Or PROCESSED)
+                    tbApprComments.Enabled = isApprover And Not (PROCESSING Or PAID)
                     tbApprComments.Text = If(Rmb.ApprComment Is Nothing, "", Rmb.ApprComment)
                     cbApprMoreInfo.Visible = (isApprover And SUBMITTED)
                     cbApprMoreInfo.Checked = If(Rmb.MoreInfoRequested, Rmb.MoreInfoRequested, False)
@@ -1284,7 +1284,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     lblAccComments.Visible = Not isFinance
                     lblAccComments.Text = If(Rmb.AcctComment Is Nothing, "", Rmb.AcctComment)
                     tbAccComments.Visible = isFinance
-                    tbAccComments.Enabled = isFinance And Not (PROCESSING Or PROCESSED)
+                    tbAccComments.Enabled = isFinance And Not (PROCESSING Or PAID)
                     tbAccComments.Text = If(Rmb.AcctComment Is Nothing, "", Rmb.AcctComment)
 
                     cbMoreInfo.Visible = (isFinance And APPROVED)
@@ -1293,8 +1293,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     '--buttons
                     btnSave.Text = Translate("btnSaved")
                     btnSave.Style.Add(HtmlTextWriterStyle.Display, "none") '--hide, but still generate the button
-                    btnSaveAdv.Visible = Not (PROCESSING Or PROCESSED)
-                    btnDelete.Visible = Not (PROCESSING Or PROCESSED Or CANCELLED)
+                    btnSaveAdv.Visible = Not (PROCESSING Or PAID)
+                    btnDelete.Visible = Not (PROCESSING Or PAID Or CANCELLED)
 
 
                     '*** REIMBURSEMENT DETAILS ***
@@ -1305,8 +1305,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     GridView1.DataBind()
 
                     '--buttons
-                    btnSaveLine.Visible = (isOwner Or isSpouse) And Not (PROCESSING Or PROCESSED Or APPROVED)
-                    addLinebtn2.Visible = (isOwner Or isSpouse) And Not (PROCESSING Or PROCESSED Or APPROVED)
+                    btnSaveLine.Visible = (isOwner Or isSpouse) And Not (PROCESSING Or PAID Or APPROVED)
+                    addLinebtn2.Visible = (isOwner Or isSpouse) And Not (PROCESSING Or PAID Or APPROVED)
 
                     btnPrint.Visible = FORM_HAS_ITEMS
                     btnPrint.OnClientClick = "window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & RmbNo & "&UID=" & Rmb.UserId & "', '_blank'); "
@@ -1321,7 +1321,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     btnApprove.Enabled = btnApprove.Visible
                     btnProcess.Visible = isFinance And APPROVED
                     btnProcess.Enabled = btnProcess.Visible
-                    btnUnProcess.Visible = isFinance And (PROCESSING Or PROCESSED)
+                    btnUnProcess.Visible = isFinance And (PROCESSING Or PAID)
                     btnUnProcess.Enabled = btnUnProcess.Visible
                     btnDownload.Visible = (isFinance Or isOwner Or isSpouse) And FORM_HAS_ITEMS
 

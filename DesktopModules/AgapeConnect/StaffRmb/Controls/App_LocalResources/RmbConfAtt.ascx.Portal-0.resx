@@ -121,12 +121,22 @@
     <value>Amount</value>
   </data>
   <data name="Explanation.Text">
-    <value>... for claiming expenses for job-related training, such as courses, books, or seminars.</value>
+    <value>...Fees associated with receiving training and taking courses.
+</value>
   </data>
   <data name="Standard.Text">
     <value>Paper receipt (must be sent by mail)</value>
   </data>
   <data name="Electronic.Text">
     <value>Electronic Receipt (attach an image file)</value>
+  </data>
+  <data name="lblDesc.Text">
+    <value>Description and Ministry Purpose</value>
+  </data>
+  <data name="lblDesc.Help">
+    <value>Please enter the name of the conference/meeting and a brief description of the ministry purpose of this expense</value>
+  </data>
+  <data name="Description.Error">
+    <value>* You must enter a (better) description</value>
   </data>
 </root>

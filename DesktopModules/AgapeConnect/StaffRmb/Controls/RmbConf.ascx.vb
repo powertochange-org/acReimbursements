@@ -173,7 +173,7 @@ Partial Class controls_RmbConf
         End Set
     End Property
     Public Function ValidateForm(ByVal userId As Integer) As Boolean
-        If tbDesc.Text = "" Then
+        If (tbDesc.Text.Length < 5) Then
             ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Description.Error", LocalResourceFile)
             Return False
         End If

@@ -126,4 +126,10 @@
   <data name="Standard.Text">
     <value>Paper receipt (must be sent by mail)</value>
   </data>
+  <data name="lblDesc.Text">
+    <value>Description and Ministry Purpose</value>
+  </data>
+  <data name="Description.Error">
+    <value>* You must enter a (better) description</value>
+  </data>
 </root>

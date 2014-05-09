@@ -118,7 +118,8 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Explanation.Text">
-    <value>... for claiming printing and photocopying expenses</value>
+    <value>...e.g., flyers, MPD and publicity materials
+</value>
   </data>
   <data name="lblDate.Help">
     <value>Enter the date of this expense.</value>
@@ -128,5 +129,14 @@
   </data>
   <data name="Electronic.Text">
     <value>Electronic Receipt (attach an image file)</value>
+  </data>
+  <data name="lblDesc.Text">
+    <value>Description and Ministry Purpose</value>
+  </data>
+  <data name="lblDesc.Help">
+    <value>Please enter a brief description of this expense and its ministry purpose</value>
+  </data>
+  <data name="Description.Error">
+    <value>* You must enter a (better) description</value>
   </data>
 </root>

@@ -124,12 +124,24 @@
     <value>I have an itemized bill and have only reimbursed the ministry calls (as I have highlighted on the bill)</value>
   </data>
   <data name="Explanation.Text">
-    <value>... for claiming ministry costs related to your mobile device.  If this device is used for both ministry/personal-use, you can only reimburse the portion that is for ministry use.    enter this under rental - but note that it will be taxed.</value>
+    <value>... Only ministry related mobile devices/cell phone.</value>
   </data>
   <data name="Standard.Text">
     <value>Paper receipt (must be sent by mail)</value>
   </data>
   <data name="Electronic.Text">
     <value>Electronic Receipt (attach an image file)</value>
+  </data>
+  <data name="lblDesc.Text">
+    <value>Description and Ministry Purpose</value>
+  </data>
+  <data name="lblDate.Help">
+    <value>Enter the date of the purchase</value>
+  </data>
+  <data name="lblDesc.Help">
+    <value>Please enter a brief description of the purchase, including ministry purpose</value>
+  </data>
+  <data name="Description.Error">
+    <value>* You must enter a (better) description</value>
   </data>
 </root>

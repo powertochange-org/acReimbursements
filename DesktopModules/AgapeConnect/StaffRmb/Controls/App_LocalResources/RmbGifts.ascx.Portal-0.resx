@@ -121,7 +121,8 @@
     <value>Amount</value>
   </data>
   <data name="Explanation.Text">
-    <value>...for claiming expenses incurred in buying gifts for ministry guests, conference speakers, fellow staff, MPD partners, etc.</value>
+    <value>...e.g., MPD gifts, speaker gifts, gift cards
+</value>
   </data>
   <data name="lblDate.Help">
     <value>Enter the date of this expense.</value>
@@ -131,5 +132,14 @@
   </data>
   <data name="Electronic.Text">
     <value>Electronic Receipt (attach an image file)</value>
+  </data>
+  <data name="lblDesc.Text">
+    <value>Description and Ministry Purpose</value>
+  </data>
+  <data name="lblDesc.Help">
+    <value>Please enter a brief description of this expense, and its ministry purpose</value>
+  </data>
+  <data name="Description.Error">
+    <value>* You must enter a (better) description</value>
   </data>
 </root>

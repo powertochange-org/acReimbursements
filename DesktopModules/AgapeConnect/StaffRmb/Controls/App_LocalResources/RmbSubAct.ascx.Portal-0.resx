@@ -121,12 +121,21 @@
     <value>Amount</value>
   </data>
   <data name="Explanation.Text">
-    <value>...for claiming dining expenses incurred for ministry purposes.</value>
+    <value>...Non per diem meals, e.g., MPD meals, meetings, grocery items etc.</value>
   </data>
   <data name="Standard.Text">
     <value>Paper receipt (must be sent by mail)</value>
   </data>
   <data name="Electronic.Text">
     <value>Electronic Receipt (attach an image file)</value>
+  </data>
+  <data name="lblDesc.Text">
+    <value>Description and Ministry Purpose</value>
+  </data>
+  <data name="lblDesc.Help">
+    <value>Please enter a brief description and ministry purpose for this meal </value>
+  </data>
+  <data name="Description.Error">
+    <value>* You must enter a (better) description</value>
   </data>
 </root>

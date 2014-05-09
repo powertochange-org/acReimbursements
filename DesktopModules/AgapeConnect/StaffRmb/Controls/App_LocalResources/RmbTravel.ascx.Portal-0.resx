@@ -121,7 +121,7 @@
     <value>Amount</value>
   </data>
   <data name="Explanation.Text">
-    <value>... for claiming any costs of travelling on ministry business (including bus/train tickets, taxi fares, parking, rental car costs, flights, excess baggage, tolls etc).</value>
+    <value>...Costs related to ministry flights, car rental, tolls, parking</value>
   </data>
   <data name="lblDate.Help">
     <value>Enter your date of travel or the date of this expense. If this is a return ticket, enter the outbound date.</value>
@@ -131,5 +131,14 @@
   </data>
   <data name="Electronic.Text">
     <value>Electronic Receipt (attach an image file)</value>
+  </data>
+  <data name="lblDesc.Text">
+    <value>Description and Ministry Purpose</value>
+  </data>
+  <data name="lblDesc.Help">
+    <value>Please enter your destination and a brief description of the ministry purpose for this trip</value>
+  </data>
+  <data name="Description.Error">
+    <value>* You must enter a (better) description</value>
   </data>
 </root>

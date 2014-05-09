@@ -193,7 +193,7 @@ Partial Class controls_RmbTravel
             ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Work.Error", LocalResourceFile)
             Return False
         End If
-        If tbDesc.Text = "" Then
+        if (tbDesc.Text.Length < 5) Then
             ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Description.Error", LocalResourceFile)
             Return False
         End If

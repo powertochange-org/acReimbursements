@@ -121,15 +121,25 @@
     <value>Amount</value>
   </data>
   <data name="lblDesc.Help">
-    <value>Please enter a brief description of the furniture or equipment.</value>
+    <value>Please enter a brief description of the furniture or equipment purchased, including the ministry purpose</value>
   </data>
   <data name="Explanation.Text">
-    <value>...for claiming expenses for office furniture and equipment.</value>
+    <value>...Any ministry related furniture or office equipment purchases.
+</value>
   </data>
   <data name="Standard.Text">
     <value>Paper receipt (must be sent by mail)</value>
   </data>
   <data name="Electronic.Text">
     <value>Electronic Receipt (attach an image file)</value>
+  </data>
+  <data name="lblDesc.Text">
+    <value>Description and Ministry Purpose</value>
+  </data>
+  <data name="lblDate.Help">
+    <value>Enter the date of this expense.</value>
+  </data>
+  <data name="Description.Error">
+    <value>* You must enter a (better) description</value>
   </data>
 </root>

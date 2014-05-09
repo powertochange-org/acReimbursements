@@ -135,4 +135,19 @@
   <data name="Electronic.Text">
     <value>Electronic Receipt (attach an image file)</value>
   </data>
+  <data name="lblDesc.Text">
+    <value>Description and Ministry Purpose</value>
+  </data>
+  <data name="lblDate.Help">
+    <value>Enter the date of this expense.</value>
+  </data>
+  <data name="lblDesc.Help">
+    <value>Please enter a brief description of this purchase, including ministry purpose</value>
+  </data>
+  <data name="Peripheral.Text">
+    <value>Computer Peripheral or Printer</value>
+  </data>
+  <data name="Description.Error">
+    <value>* You must enter a (better) description</value>
+  </data>
 </root>
