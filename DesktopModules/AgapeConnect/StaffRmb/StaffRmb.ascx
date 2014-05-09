@@ -376,6 +376,10 @@
             }
         }
 
+        function tweakControl() {
+            $("#<%= UpdatePanel2.ClientID %> input[name$='tbDesc']").attr('maxlength', '27').attr('style', 'width:22em');
+        }
+
         $(document).ready(function () {
             setUpMyTabs();
             setUpAutocomplete();
@@ -387,6 +391,7 @@
                 setUpMyTabs();
                 setUpAutocomplete();
                 checkForMinistryAccount();
+                tweakControl()
             });
 
 
