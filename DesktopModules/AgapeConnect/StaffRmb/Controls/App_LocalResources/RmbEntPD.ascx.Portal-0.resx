@@ -120,4 +120,7 @@
   <data name="lblAmount.Text">
     <value>Amount</value>
   </data>
+  <data name="Electronic.Text">
+    <value>Electronic Receipt (attach an image file)</value>
+  </data>
 </root>

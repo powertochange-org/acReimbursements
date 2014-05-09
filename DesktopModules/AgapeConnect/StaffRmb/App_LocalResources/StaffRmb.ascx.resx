@@ -311,8 +311,8 @@
   <data name="PrintoutMoreInfo.Text" xml:space="preserve">
     <value>Your printout has opened in a new window/tab. If you need to send in receipts for your reimbursement and you have not yet sent them in to the office, please attach them to this printout and send it to the office.</value>
   </data>
-  <data name="Processed.Text" xml:space="preserve">
-    <value>Processed</value>
+  <data name="Processing.Text" xml:space="preserve">
+    <value>Processing</value>
   </data>
   <data name="ProcessedBy.Text" xml:space="preserve">
     <value>Processed by:</value>
@@ -390,7 +390,7 @@
     <value>Your Comments</value>
   </data>
   <data name="YourRef.Text" xml:space="preserve">
-    <value>Description:</value>
+    <value>Name this reimbursement:</value>
   </data>
   <data name="YourRmbs.Text" xml:space="preserve">
     <value>Your Reimbursements:</value>
@@ -677,5 +677,11 @@
   </data>
   <data name="TempAddressChange.Text" xml:space="preserve">
     <value>Temporary Change</value>
+  </data>
+  <data name="SubmittedPopup.Text" xml:space="preserve">
+    <value>Your reimbursement has been submitted for approval.</value>
+  </data>
+  <data name="Paid.Text" xml:space="preserve">
+    <value>Paid</value>
   </data>
 </root>

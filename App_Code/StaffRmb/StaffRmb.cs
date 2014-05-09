@@ -40,9 +40,10 @@ namespace StaffRmb
         public const int Draft = 0;
         public const int Submitted = 1;
         public const int Approved = 2;
-        public const int Processed = 3;
+        public const int Processing = 3;
         public const int Cancelled = 4;
-        public const int MoreInfo = 5; 
+        public const int MoreInfo = 5;
+        public const int Paid = 6;
         public const int PendingDownload = 10;
         public const int DownloadFailed = 20;
         static public string StatusName(int StatusNo)
@@ -52,9 +53,10 @@ namespace StaffRmb
                 case 0: return "Draft";
                 case 1: return "Submitted";
                 case 2: return "Approved";
-                case 3: return "Processed";
+                case 3: return "Processing";
                 case 4: return "Cancelled";
                 case 5: return "MoreInfo";
+                case 6: return "Paid";
                 case 10: return "PendingDownload";
                 case 20: return "DownloadFailed";
                 

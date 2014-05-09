@@ -260,7 +260,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 ReloadMenuTasks.Add(loadBasicSubmittedPaneAsync())
                 ReloadMenuTasks.Add(loadBasicApprovablePaneAsync())
                 ReloadMenuTasks.Add(loadBasicApprovedPaneAsync())
-                ReloadMenuTasks.Add(loadBasicProcessedPaneAsync())
+                ReloadMenuTasks.Add(loadBasicProcessingPaneAsync())
                 ReloadMenuTasks.Add(loadBasicCancelledTaskAsync())
 
                 Await Task.WhenAll(ReloadMenuTasks)
@@ -275,7 +275,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Try
                 Dim MoreInfo As System.Linq.IQueryable
                 MoreInfo = From c In d.AP_Staff_Rmbs
-                                    Where c.MoreInfoRequested = True And c.Status <> RmbStatus.Processed And c.UserId = UserId And c.PortalId = PortalId
+                                    Where c.MoreInfoRequested = True And c.Status <> RmbStatus.Processing And c.UserId = UserId And c.PortalId = PortalId
                                     Select c.UserRef, c.RID, c.RMBNo
                 For Each row In MoreInfo
                     Dim hyp As New HyperLink()
@@ -397,23 +397,23 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End Try
         End Function
 
-        Private Async Function loadBasicProcessedPaneAsync() As Task
+        Private Async Function loadBasicProcessingPaneAsync() As Task
             Try
                 Dim Complete = (From c In d.AP_Staff_Rmbs
-                                Where c.Status = RmbStatus.Processed And c.UserId = UserId And c.PortalId = PortalId
+                                Where c.Status = RmbStatus.Processing And c.UserId = UserId And c.PortalId = PortalId
                                 Order By c.RID Descending
                                 Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
-                dlProcessed.DataSource = Complete
-                dlProcessed.DataBind()
+                dlProcessing.DataSource = Complete
+                dlProcessing.DataBind()
                 Dim CompleteAdv = (From c In d.AP_Staff_AdvanceRequests
-                                   Where c.RequestStatus = RmbStatus.Processed And c.UserId = UserId And c.PortalId = PortalId
+                                   Where c.RequestStatus = RmbStatus.Processing And c.UserId = UserId And c.PortalId = PortalId
                                    Order By c.LocalAdvanceId Descending
                                    Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId).Take(Settings("MenuSize"))
-                dlAdvProcessed.DataSource = CompleteAdv
-                dlAdvProcessed.DataBind()
-                ProcessedUpdatePanel.Update()
+                dlAdvProcessing.DataSource = CompleteAdv
+                dlAdvProcessing.DataBind()
+                ProcessingUpdatePanel.Update()
             Catch ex As Exception
-                Throw New Exception("Error loading processed rmbs: " + ex.Message)
+                Throw New Exception("Error loading processing rmbs: " + ex.Message)
             End Try
         End Function
 
@@ -440,12 +440,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim TeamIds = From c In Team Select c.UserID
                     Dim ReloadMenuTasks As New List(Of Task)
                     ReloadMenuTasks.Add(buildTeamApprovedTreeAsync(Team))
-                    ReloadMenuTasks.Add(buildTeamProcessedTreeAsync(Team))
+                    ReloadMenuTasks.Add(buildTeamProcessingTreeAsync(Team))
                     Await Task.WhenAll(ReloadMenuTasks)
 
                 Else '--They are not a supervisor
                     tvTeamApproved.Visible = False
-                    tvTeamProcessed.Visible = False
+                    tvTeamProcessing.Visible = False
                 End If
 
             Catch ex As Exception
@@ -513,23 +513,23 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             ApprovedUpdatePanel.Update()
         End Function
 
-        Private Async Function buildTeamProcessedTreeAsync(Team As List(Of User)) As Task
-            Dim TeamProcessedNode As New TreeNode("Your Team")
-            TeamProcessedNode.SelectAction = TreeNodeSelectAction.Expand
-            TeamProcessedNode.Expanded = False
+        Private Async Function buildTeamProcessingTreeAsync(Team As List(Of User)) As Task
+            Dim TeamProcessingNode As New TreeNode("Your Team")
+            TeamProcessingNode.SelectAction = TreeNodeSelectAction.Expand
+            TeamProcessingNode.Expanded = False
 
             For Each team_member In Team
-                Dim TeamMemberProcessedNode As New TreeNode(team_member.DisplayName)
-                TeamMemberProcessedNode.Expanded = False
-                TeamMemberProcessedNode.SelectAction = TreeNodeSelectAction.Expand
+                Dim TeamMemberProcessingNode As New TreeNode(team_member.DisplayName)
+                TeamMemberProcessingNode.Expanded = False
+                TeamMemberProcessingNode.SelectAction = TreeNodeSelectAction.Expand
 
-                Dim TeamProcessed = From c In d.AP_Staff_Rmbs
+                Dim TeamProcessing = From c In d.AP_Staff_Rmbs
                                     Join b In d.AP_StaffBroker_CostCenters
                                         On c.CostCenter Equals b.CostCentreCode _
                                             And c.PortalId Equals b.PortalId
-                                    Where c.UserId = team_member.UserID And c.Status = RmbStatus.Processed And b.Type = CostCentreType.Staff And c.PortalId = PortalId
+                                    Where c.UserId = team_member.UserID And c.Status = RmbStatus.Processing And b.Type = CostCentreType.Staff And c.PortalId = PortalId
                                     Select c.RMBNo, c.RmbDate, c.UserRef, c.UserId, c.RID
-                For Each rmb In TeamProcessed
+                For Each rmb In TeamProcessing
                     Dim rmb_node As New TreeNode()
                     Dim rmbUser = UserController.GetUserById(PortalId, rmb.UserId).DisplayName
                     If (rmb.RmbDate Is Nothing) Then
@@ -539,17 +539,17 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
                     rmb_node.Value = rmb.RMBNo
                     rmb_node.SelectAction = TreeNodeSelectAction.Select
-                    TeamMemberProcessedNode.ChildNodes.Add(rmb_node)
+                    TeamMemberProcessingNode.ChildNodes.Add(rmb_node)
                     If IsSelected(rmb.RMBNo) Then
-                        TeamMemberProcessedNode.Expanded = True
-                        TeamProcessedNode.Expanded = True
+                        TeamMemberProcessingNode.Expanded = True
+                        TeamProcessingNode.Expanded = True
                     End If
                 Next
 
-                Dim TeamAdvProcessed = From c In d.AP_Staff_AdvanceRequests
-                                       Where c.RequestStatus = RmbStatus.Processed And c.UserId = team_member.UserID And c.PortalId = PortalId
+                Dim TeamAdvProcessing = From c In d.AP_Staff_AdvanceRequests
+                                       Where c.RequestStatus = RmbStatus.Processing And c.UserId = team_member.UserID And c.PortalId = PortalId
                                        Select c.AdvanceId, c.RequestDate, c.UserId, c.LocalAdvanceId
-                For Each adv In TeamAdvProcessed
+                For Each adv In TeamAdvProcessing
                     Dim adv_node As New TreeNode()
                     Dim advUser = UserController.GetUserById(PortalId, adv.UserId).DisplayName
                     If (adv.RequestDate Is Nothing) Then
@@ -559,18 +559,18 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
                     adv_node.Value = -adv.AdvanceId
                     adv_node.SelectAction = TreeNodeSelectAction.Select
-                    TeamMemberProcessedNode.ChildNodes.Add(adv_node)
+                    TeamMemberProcessingNode.ChildNodes.Add(adv_node)
                     If IsSelected(-adv.AdvanceId) Then
-                        TeamMemberProcessedNode.Expanded = True
-                        TeamProcessedNode.Expanded = True
+                        TeamMemberProcessingNode.Expanded = True
+                        TeamProcessingNode.Expanded = True
                     End If
                 Next
-                TeamProcessedNode.ChildNodes.Add(TeamMemberProcessedNode)
+                TeamProcessingNode.ChildNodes.Add(TeamMemberProcessingNode)
             Next
-            tvTeamProcessed.Nodes.Clear()
-            tvTeamProcessed.Nodes.Add(TeamProcessedNode)
-            tvTeamProcessed.Visible = True
-            ProcessedUpdatePanel.Update()
+            tvTeamProcessing.Nodes.Clear()
+            tvTeamProcessing.Nodes.Add(TeamProcessingNode)
+            tvTeamProcessing.Visible = True
+            ProcessingUpdatePanel.Update()
         End Function
 
         Private Async Function LoadFinanceMenuAsync() As Task
@@ -580,7 +580,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim ReloadMenuTasks = New List(Of Task)
                     ReloadMenuTasks.Add(buildAllSubmittedTreeAsync(allStaff))
                     ReloadMenuTasks.Add(buildAllApprovedTreeAsync(allStaff)) '--This is the key part for the FINANCE team
-                    ReloadMenuTasks.Add(buildAllProcessedTreeAsync(allStaff))
+                    ReloadMenuTasks.Add(buildAllProcessingTreeAsync(allStaff))
                     Await Task.WhenAll(ReloadMenuTasks)
                 End If
 
@@ -673,35 +673,35 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End Try
         End Function
 
-        Private Async Function buildAllProcessedTreeAsync(allStaff As IQueryable(Of StaffBroker.User)) As Task
+        Private Async Function buildAllProcessingTreeAsync(allStaff As IQueryable(Of StaffBroker.User)) As Task
             Try
-                Dim AllStaffProcessedNode As New TreeNode("All Staff")
-                AllStaffProcessedNode.SelectAction = TreeNodeSelectAction.Expand
-                AllStaffProcessedNode.Expanded = False
+                Dim AllStaffProcessingNode As New TreeNode("All Staff")
+                AllStaffProcessingNode.SelectAction = TreeNodeSelectAction.Expand
+                AllStaffProcessingNode.Expanded = False
 
                 For Each person In allStaff
                     '-- sort by first letter of last name
                     Dim letter = person.LastName.Substring(0, 1)
-                    Dim ProcessedRmb = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Processed And c.PortalId = PortalId And (c.UserId = person.UserID) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
-                    Dim processedNode As New TreeNode(person.DisplayName)
-                    If ProcessedRmb.Count() > 0 Then
-                        addItemsToTree(AllStaffProcessedNode, processedNode, letter, ProcessedRmb, "rmb")
+                    Dim ProcessingRmb = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Processing And c.PortalId = PortalId And (c.UserId = person.UserID) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
+                    Dim processingNode As New TreeNode(person.DisplayName)
+                    If ProcessingRmb.Count() > 0 Then
+                        addItemsToTree(AllStaffProcessingNode, processingNode, letter, ProcessingRmb, "rmb")
                     End If
                     If (ENABLE_ADVANCE_FUNCTIONALITY) Then
-                        Dim ProcessedAdv = (From c In d.AP_Staff_AdvanceRequests Where c.RequestStatus = RmbStatus.Processed And c.PortalId = PortalId And c.UserId = person.UserID Order By c.LocalAdvanceId Descending Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId).Take(Settings("MenuSize"))
-                        If ProcessedAdv.Count() > 0 Then
-                            addItemsToTree(AllStaffProcessedNode, processedNode, letter, ProcessedAdv, "adv")
+                        Dim ProcessingAdv = (From c In d.AP_Staff_AdvanceRequests Where c.RequestStatus = RmbStatus.Processing And c.PortalId = PortalId And c.UserId = person.UserID Order By c.LocalAdvanceId Descending Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId).Take(Settings("MenuSize"))
+                        If ProcessingAdv.Count() > 0 Then
+                            addItemsToTree(AllStaffProcessingNode, processingNode, letter, ProcessingAdv, "adv")
                         End If
                     End If
                 Next
-                tvAllProcessed.Nodes.Clear()
-                tvAllProcessed.Nodes.Add(AllStaffProcessedNode)
-                tvAllProcessed.Visible = IsAccounts()
-                lblProcessedDivider.Visible = (tvFinance.Visible Or tvAllProcessed.Visible Or tvTeamProcessed.Visible)
-                lblYourProcessed.Visible = lblProcessedDivider.Visible
-                ProcessedUpdatePanel.Update()
+                tvAllProcessing.Nodes.Clear()
+                tvAllProcessing.Nodes.Add(AllStaffProcessingNode)
+                tvAllProcessing.Visible = IsAccounts()
+                lblProcessingDivider.Visible = (tvFinance.Visible Or tvAllProcessing.Visible Or tvTeamProcessing.Visible)
+                lblYourProcessing.Visible = lblProcessingDivider.Visible
+                ProcessingUpdatePanel.Update()
             Catch ex As Exception
-                Throw New Exception("Error building processed tree: " + ex.Message)
+                Throw New Exception("Error building processing tree: " + ex.Message)
             End Try
 
         End Function
@@ -904,7 +904,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                 btnAdvUnProcess.Visible = False
                             End If
 
-                        Case RmbStatus.Processed
+                        Case RmbStatus.Processing
                             btnAdvApprove.Visible = False
                             btnAdvCancel.Visible = False
                             btnAdvProcess.Visible = False
@@ -1059,7 +1059,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim SUBMITTED = Rmb.Status = RmbStatus.Submitted
                     Dim APPROVED = Rmb.Status = RmbStatus.Approved
                     Dim PROCESSING = Rmb.Status = RmbStatus.PendingDownload Or Rmb.Status = RmbStatus.DownloadFailed
-                    Dim PROCESSED = Rmb.Status = RmbStatus.Processed
+                    Dim PROCESSED = Rmb.Status = RmbStatus.Processing
                     Dim CANCELLED = Rmb.Status = RmbStatus.Cancelled
                     Dim FORM_HAS_ITEMS = Rmb.AP_Staff_RmbLines.Count > 0
 
@@ -1197,9 +1197,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     btnSubmit.Text = If(DRAFT, Translate("btnSubmit"), Translate("btnResubmit"))
                     btnSubmit.Enabled = btnSubmit.Visible And Rmb.CostCenter IsNot Nothing And Rmb.ApprUserId IsNot Nothing AndAlso (Rmb.CostCenter.Length = 6) And (Rmb.ApprUserId >= 0)
                     btnSubmit.ToolTip = If(btnSubmit.Enabled, "", Translate("btnSubmitHelp"))
-                    btnAddressOk.OnClientClick = "window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & RmbNo & "&UID=" & Rmb.UserId & "&mode=1', '_blank'); "
-                    btnTempAddressChange.OnClientClick = "window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & RmbNo & "&UID=" & Rmb.UserId & "&mode=1', '_blank'); "
-                    btnPermAddressChange.OnClientClick = "window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & RmbNo & "&UID=" & Rmb.UserId & "&mode=1', '_blank'); "
+                    btnAddressOk.OnClientClick = ""
+                    btnTempAddressChange.OnClientClick = ""
+                    btnPermAddressChange.OnClientClick = ""
                     btnApprove.Visible = isApprover And SUBMITTED
                     btnApprove.Enabled = btnApprove.Visible
                     btnProcess.Visible = isFinance And APPROVED
@@ -1739,7 +1739,21 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         End Sub
 
-        Protected Async Sub btnSubmit_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnAddressOk.Click, btnTempAddressChange.Click, btnPermAddressChange.Click
+        Protected Sub btnSubmit_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSubmit.Click
+            Dim RmbNo = hfRmbNo.Value
+            Dim rmbs = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo
+            If (rmbs.Count > 0) Then
+                Dim rmb = rmbs.First
+                Dim receipts = From b In rmb.AP_Staff_RmbLines Where b.Receipt = True And b.ReceiptImageId Is Nothing
+                If (receipts.Count > 0) Then
+                    btnAddressOk.OnClientClick = "window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & RmbNo & "&UID=" & rmb.UserId & "&mode=1', '_blank'); "
+                    btnTempAddressChange.OnClientClick = "window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & RmbNo & "&UID=" & rmb.UserId & "&mode=1', '_blank'); "
+                    btnPermAddressChange.OnClientClick = "window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & RmbNo & "&UID=" & rmb.UserId & "&mode=1', '_blank'); "
+                End If
+            End If
+        End Sub
+
+        Protected Async Sub btnAddressOk_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnAddressOk.Click, btnTempAddressChange.Click, btnPermAddressChange.Click
             If (CType(sender, Button).ID = "btnTempAddressChange") Or (CType(sender, Button).ID <> "btnPermAddressChange") Then
                 If addAddressToComments() Then
                     If CType(sender, Button).ID <> "btnTempAddressChange" Then
@@ -1754,7 +1768,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If rmbs.Count > 0 Then
                 Dim rmb = rmbs.First
                 Dim NewStatus As Integer = rmb.Status
-                Dim message As String = Translate("Printout")
+
+                Dim requires_receipts = (btnAddressOk.OnClientClick.Length > 0) ' this will contain code to open printable form, if receipts are required
+                Dim message As String
+                If requires_receipts Then
+                    message = Translate("Printout")
+                Else
+                    message = Translate("SubmittedPopup")
+                End If
 
                 If (rmb.MoreInfoRequested) Then
                     rmb.MoreInfoRequested = False
@@ -2084,16 +2105,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             theRmb.First.ProcUserId = UserId
             SubmitChanges()
             TaskList.Add(loadBasicApprovedPaneAsync())
-            TaskList.Add(loadBasicProcessedPaneAsync())
+            TaskList.Add(loadBasicProcessingPaneAsync())
             Dim Team As List(Of User) = StaffBrokerFunctions.GetTeam(UserId)
             If (Team.Count > 0) Then
                 TaskList.Add(buildTeamApprovedTreeAsync(Team))
-                TaskList.Add(buildTeamProcessedTreeAsync(Team))
+                TaskList.Add(buildTeamProcessingTreeAsync(Team))
             End If
             If (IsAccounts()) Then
                 Dim allStaff = StaffBrokerFunctions.GetStaff()
                 TaskList.Add(buildAllApprovedTreeAsync(allStaff))
-                TaskList.Add(buildAllProcessedTreeAsync(allStaff))
+                TaskList.Add(buildAllProcessingTreeAsync(allStaff))
             End If
 
             PostingData.RMBNo = CInt(hfRmbNo.Value)
@@ -2143,7 +2164,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             '    Dim q = From c In d.AP_Staff_Rmbs Where RmbList.Contains(c.RMBNo) And c.PortalId = PortalId
 
             '    For Each row In q
-            '        row.Status = RmbStatus.Processed
+            '        row.Status = RmbStatus.Processing
             '        row.ProcDate = Now
             '        Log(row.RMBNo, "Marked as Processed - after a manual download")
             '    Next
@@ -2154,7 +2175,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             '    Dim r = From c In d.AP_Staff_AdvanceRequests Where AdvList.Contains(c.AdvanceId) And c.PortalId = PortalId
 
             '    For Each row In r
-            '        row.RequestStatus = RmbStatus.Processed
+            '        row.RequestStatus = RmbStatus.Processing
             '        row.ProcessedDate = Now
             '        Log(row.AdvanceId, "Advance Marked as Processed - after a manual download")
             '    Next
@@ -2219,7 +2240,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Protected Async Sub btnUnProcess_Click(sender As Object, e As System.EventArgs) Handles btnUnProcess.Click
             Dim theRmb = (From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value)).First
             Dim TaskList As New List(Of Task)
-            If theRmb.Status = RmbStatus.Processed Then
+            If theRmb.Status = RmbStatus.Processing Then
                 'If the reimbursement has already been downloaded, a warning should be displayed - but hte reimbursement can be simply unprocessed
                 theRmb.Status = RmbStatus.Approved
                 SubmitChanges()
@@ -2249,16 +2270,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
             TaskList.Add(LoadRmbAsync(hfRmbNo.Value))
             TaskList.Add(loadBasicApprovedPaneAsync())
-            TaskList.Add(loadBasicProcessedPaneAsync())
+            TaskList.Add(loadBasicProcessingPaneAsync())
             Dim Team As List(Of User) = StaffBrokerFunctions.GetTeam(UserId)
             If (Team.Count > 0) Then
                 TaskList.Add(buildTeamApprovedTreeAsync(Team))
-                TaskList.Add(buildTeamProcessedTreeAsync(Team))
+                TaskList.Add(buildTeamProcessingTreeAsync(Team))
             End If
             If (IsAccounts()) Then
                 Dim allStaff = StaffBrokerFunctions.GetStaff()
                 TaskList.Add(buildAllApprovedTreeAsync(allStaff))
-                TaskList.Add(buildAllProcessedTreeAsync(allStaff))
+                TaskList.Add(buildAllProcessingTreeAsync(allStaff))
             End If
             Await Task.WhenAll(TaskList)
         End Sub
@@ -2471,7 +2492,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         End Sub
 
-        Protected Async Sub menu_ItemCommand(ByVal source As Object, ByVal e As System.Web.UI.WebControls.DataListCommandEventArgs) Handles dlProcessed.ItemCommand, dlAdvProcessed.ItemCommand, dlApproved.ItemCommand, dlCancelled.ItemCommand, dlToApprove.ItemCommand, dlSubmitted.ItemCommand, dlPending.ItemCommand, dlAdvApproved.ItemCommand, dlAdvSubmitted.ItemCommand, dlAdvToApprove.ItemCommand, dlAdvApproved.ItemCommand
+        Protected Async Sub menu_ItemCommand(ByVal source As Object, ByVal e As System.Web.UI.WebControls.DataListCommandEventArgs) Handles dlProcessing.ItemCommand, dlAdvProcessing.ItemCommand, dlApproved.ItemCommand, dlCancelled.ItemCommand, dlToApprove.ItemCommand, dlSubmitted.ItemCommand, dlPending.ItemCommand, dlAdvApproved.ItemCommand, dlAdvSubmitted.ItemCommand, dlAdvToApprove.ItemCommand, dlAdvApproved.ItemCommand
             hfRmbNo.Value = e.CommandArgument
             If e.CommandName = "Goto" Then
                 Await LoadRmbAsync(e.CommandArgument)
@@ -2481,7 +2502,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
         End Sub
 
-        Protected Async Sub menu_subtree_ItemCommand(ByVal node As TreeView, ByVal e As System.EventArgs) Handles tvTeamApproved.SelectedNodeChanged, tvTeamProcessed.SelectedNodeChanged, tvAllSubmitted.SelectedNodeChanged, tvAllProcessed.SelectedNodeChanged, tvFinance.SelectedNodeChanged
+        Protected Async Sub menu_subtree_ItemCommand(ByVal node As TreeView, ByVal e As System.EventArgs) Handles tvTeamApproved.SelectedNodeChanged, tvTeamProcessing.SelectedNodeChanged, tvAllSubmitted.SelectedNodeChanged, tvAllProcessing.SelectedNodeChanged, tvFinance.SelectedNodeChanged
             Await LoadRmbAsync(node.SelectedValue)
             ScriptManager.RegisterStartupScript(GridView1, GridView1.GetType(), "deselect_menu", "deselectPreviousMenuItem()", True)
         End Sub
@@ -2822,7 +2843,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Function
 
         Protected Function CanEdit(ByVal status As Integer) As Boolean
-            Return status <> RmbStatus.Processed And status <> RmbStatus.PendingDownload And status <> RmbStatus.DownloadFailed And (status <> RmbStatus.Approved Or IsAccounts())
+            Return status <> RmbStatus.Processing And status <> RmbStatus.PendingDownload And status <> RmbStatus.DownloadFailed And (status <> RmbStatus.Approved Or IsAccounts())
         End Function
 
         Protected Function isStaffAccount() As Boolean
@@ -3363,8 +3384,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         approverMessage = approverMessage.Replace("[STAFFNAME]", UserInfo.DisplayName).Replace("[RMBNO]", theRmb.RMBNo).Replace("[USERREF]", IIf(theRmb.UserRef <> "", theRmb.UserRef, "None"))
                         approverMessage = approverMessage.Replace("[APPRNAME]", toName)
                         If (isLowBalance()) Then
-                            approverMessage = approverMessage.Replace("[LOWBALANCE]", Translate("WarningLowBalance")).Replace("[ACCTBAL]", hfAccountBalance.Value) _
-                .Replace("[BUDGBAL]", hfBudgetBalance.Value).Replace("[ACCT]", tbChargeTo.Text)
+                            Dim warning = Translate("WarningLowBalance").Replace("[ACCTBAL]", hfAccountBalance.Value).Replace("[BUDGBAL]", hfBudgetBalance.Value).Replace("[ACCT]", tbChargeTo.Text)
+                            approverMessage = approverMessage.Replace("[LOWBALANCE]", warning)
                         End If
                         If theRmb.UserComment <> "" Then
                             approverMessage = approverMessage.Replace("[COMMENTS]", Translate("EmailComments") & "<br />" & theRmb.UserComment)
@@ -3747,7 +3768,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim q = From c In d.AP_Staff_Rmbs Where RmbList.Contains(c.RMBNo) And c.PortalId = PortalId
 
                     For Each row In q
-                        row.Status = RmbStatus.Processed
+                        row.Status = RmbStatus.Processing
                         row.ProcDate = Now
                         Log(row.RMBNo, "Marked as Processed - after a manual download")
                     Next
@@ -3758,7 +3779,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim r = From c In d.AP_Staff_AdvanceRequests Where AdvList.Contains(c.AdvanceId) And c.PortalId = PortalId
 
                     For Each row In r
-                        row.RequestStatus = RmbStatus.Processed
+                        row.RequestStatus = RmbStatus.Processing
                         row.ProcessedDate = Now
                         Log(row.AdvanceId, "Advance Marked as Processed - after a manual download")
                     Next
@@ -3990,7 +4011,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim q = From c In d.AP_Staff_AdvanceRequests Where c.AdvanceId = -CInt(hfRmbNo.Value) And c.PortalId = PortalId
 
             If q.Count > 0 Then
-                Dim LockedList() = {RmbStatus.PendingDownload, RmbStatus.DownloadFailed, RmbStatus.Processed}
+                Dim LockedList() = {RmbStatus.PendingDownload, RmbStatus.DownloadFailed, RmbStatus.Processing}
                 If LockedList.Contains(q.First.RequestStatus) Then
                     SendMessage(Translate("AdvLocked") & "<br />")
                 Else
@@ -4022,7 +4043,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Protected Async Sub btnAdvSave_Click(sender As Object, e As System.EventArgs) Handles btnAdvSave.Click
             Dim q = From c In d.AP_Staff_AdvanceRequests Where c.AdvanceId = -CInt(hfRmbNo.Value) And c.PortalId = PortalId
             If q.Count > 0 Then
-                Dim LockedList() = {RmbStatus.PendingDownload, RmbStatus.DownloadFailed, RmbStatus.Processed}
+                Dim LockedList() = {RmbStatus.PendingDownload, RmbStatus.DownloadFailed, RmbStatus.Processing}
                 If LockedList.Contains(q.First.RequestStatus) Then
                     lblAdvErr.Text = "* " & Translate("AdvLocked") & "<br />"
                 Else
@@ -4177,7 +4198,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             'Maybe this would be better to do my working out the current period
             Log(0, "Step A")
-            Dim currentRmbs = From c In d.AP_Staff_RmbLines Where c.AP_Staff_Rmb.PortalId = PortalId And c.AP_Staff_Rmb.Status = RmbStatus.Processed 'And c.AP_Staff_Rmb.ProcDate > Today.AddDays(-15) And c.Department = False
+            Dim currentRmbs = From c In d.AP_Staff_RmbLines Where c.AP_Staff_Rmb.PortalId = PortalId And c.AP_Staff_Rmb.Status = RmbStatus.Processing 'And c.AP_Staff_Rmb.ProcDate > Today.AddDays(-15) And c.Department = False
 
             Dim Deductions = DotNetNuke.Entities.Profile.ProfileController.GetPropertyDefinitionsByCategory(PortalId, "Payroll-Deductions")
             Dim Earnings = DotNetNuke.Entities.Profile.ProfileController.GetPropertyDefinitionsByCategory(PortalId, "Payroll-Earnings")

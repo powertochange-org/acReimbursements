@@ -132,4 +132,10 @@
   <data name="lblDate.Help">
     <value>Enter the date of this transaction or the start date of the event.</value>
   </data>
+  <data name="Standard.Text">
+    <value>Paper receipt (must be sent by mail)</value>
+  </data>
+  <data name="Electronic.Text">
+    <value>Electronic Receipt (attach an image file)</value>
+  </data>
 </root>

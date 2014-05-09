@@ -123,4 +123,10 @@
   <data name="Explanation.Text">
     <value>...for claiming reimbursements for short-term rentals of equipment, buildings, etc.</value>
   </data>
+  <data name="Standard.Text">
+    <value>Paper receipt (must be sent by mail)</value>
+  </data>
+  <data name="Electronic.Text">
+    <value>Electronic Receipt (attach an image file)</value>
+  </data>
 </root>

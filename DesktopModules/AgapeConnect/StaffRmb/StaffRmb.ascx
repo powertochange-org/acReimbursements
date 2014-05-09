@@ -901,7 +901,7 @@
         <tr valign="top">
             <td>
                 <div align="center" width="100%">
-                    <input id="btmNewRmb" type="button" onclick="showNewRmbPopup();" class="aButton" value='<%= Translate("btnNew") %>'
+                    <input id="btnNewRmb" type="button" onclick="showNewRmbPopup();" class="aButton" value='<%= Translate("btnNew") %>'
                         style="margin-bottom: 5px; font-weight: bold; min-width: 220px;" />
                 </div>
                 <div id="accordion">
@@ -1121,25 +1121,25 @@
                             <a href="#" class="aLink">
 
 
-                                <asp:Label ID="Label8" runat="server" Font-Bold="true" ResourceKey="Processed"></asp:Label>
+                                <asp:Label ID="Label8" runat="server" Font-Bold="true" ResourceKey="Processing"></asp:Label>
 
 
                             </a>
                         </h3>
-                        <div id="ProcessedPane">
-                            <asp:UpdatePanel ID="ProcessedUpdatePanel" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional" >
-                                <ContentTemplate>
-                                    <asp:TreeView ID="tvAllProcessed" class="accounts_team" runat="server" NodeIndent="10">
+                       <div id="ProcessingPane">
+                            <asp:UpdatePanel ID="ProcessingUpdatePanel" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional" >
+                                 <ContentTemplate>
+                                    <asp:TreeView ID="tvAllProcessing" class="accounts_team" runat="server" NodeIndent="10">
                                     </asp:TreeView>
-                                    <asp:TreeView ID="tvTeamProcessed" class="team_leader" runat="server" NodeIndent="10">
+                                    <asp:TreeView ID="tvTeamProcessing" class="team_leader" runat="server" NodeIndent="10">
                                     </asp:TreeView>
-                                    <asp:Panel ID="lblProcessedDivider" runat="server" style="width: 100%; border-bottom: dashed 1px black;">
+                                    <asp:Panel ID="lblProcessingDivider" runat="server" style="width: 100%; border-bottom: dashed 1px black;">
                                         &nbsp;<br />
                                     </asp:Panel>
-                                    <asp:Label ID="lblYourProcessed" runat="server" class="Agape_SubTitle" ResourceKey="YourRmbs" Style="font-size: 8pt;">
+                                    <asp:Label ID="lblYourProcessing" runat="server" class="Agape_SubTitle" ResourceKey="YourRmbs" Style="font-size: 8pt;">
                                         <br />
                                     </asp:Label>
-                                    <asp:DataList ID="dlProcessed" runat="server" Width="100%">
+                                    <asp:DataList ID="dlProcessing" runat="server" Width="100%">
                                         <ItemStyle CssClass="dnnGridItem" />
                                         <AlternatingItemStyle CssClass="dnnGridAltItem" />
                                         <ItemTemplate>
@@ -1159,7 +1159,7 @@
                                             </table>
                                         </ItemTemplate>
                                     </asp:DataList>
-                                    <asp:DataList ID="dlAdvProcessed" runat="server" Width="100%">
+                                    <asp:DataList ID="dlAdvProcessing" runat="server" Width="100%">
                                         <ItemTemplate>
                                             <table width="100%">
                                                 <tr valign="middle">
@@ -1184,7 +1184,44 @@
                     <div>
                         <h3>
                             <a href="#" class="aLink">
-                                <asp:Label ID="Label9" runat="server" Font-Bold="true" ResourceKey="Cancelled"></asp:Label></a></h3>
+                                <asp:Label ID="Label9" runat="server" Font-Bold="true" ResourceKey="Paid"></asp:Label></a></h3>
+                        <div id="PaidPane">
+                            <asp:UpdatePanel ID="PaidUpdatePanel" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional" >
+                                <ContentTemplate>
+                                    <asp:TreeView ID="tvAllPaid" class="accounts_team" runat="server" NodeIndent="10">
+                                    </asp:TreeView>
+                                    <asp:TreeView ID="tvTeamPaid" class="team_leader" runat="server" NodeIndent="10">
+                                    </asp:TreeView>
+                                    <asp:Panel ID="lblPaidDivider" runat="server" style="width: 100%; border-bottom: dashed 1px black;">
+                                        &nbsp;<br />
+                                    </asp:Panel>
+                                    <asp:Label ID="lblYourPaid" runat="server" class="Agape_SubTitle" ResourceKey="YourRmbs" Style="font-size: 8pt;">
+                                        <br />
+                                    </asp:Label>
+                                    <asp:DataList ID="dlPaid" runat="server" Width="100%">
+                                        <ItemStyle CssClass="dnnGridItem" />
+                                        <AlternatingItemStyle CssClass="dnnGridAltItem" />
+                                        <ItemTemplate>
+                                            <table width="100%">
+                                                <tr valign="middle">
+                                                    <td width="100%">
+                                                        <asp:LinkButton ID="LinkButton" runat="server" OnClientClick='selectMenuItem(this);' Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' 
+                                                            CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" 
+                                                            Font-Size='<%# If(IsSelected(Eval("RmbNo")), "9", "10")%>' Font-Bold='<%# IsSelected(Eval("RmbNo")) %>' ></asp:LinkButton>
+                                                    </td>
+                                                    <td width="10px">
+                                                        <img ID="Img1" runat="server" alt=">" src="~/images/action_right.gif" style='<%# if(IsSelected(Eval("RmbNo")), "display:block", "display:none") %>' />
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </ItemTemplate>
+                                    </asp:DataList>
+                                </ContentTemplate>
+                            </asp:UpdatePanel>
+                        </div>
+                        <h3>
+                            <a href="#" class="aLink">
+                                <asp:Label ID="Label50" runat="server" Font-Bold="true" ResourceKey="Cancelled"></asp:Label></a></h3>
                         <div id="CancelledPane">
                             <asp:UpdatePanel ID="CancelledUpdatePanel" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional" >
                                 <ContentTemplate>
@@ -1484,7 +1521,7 @@
                                                             CommandArgument='<%# Eval("RmbLineNo") %>' resourcekey="Edit"></asp:LinkButton>
                                                         <asp:LinkButton ID="LinkButton4" runat="server" CommandName="myDelete" Visible='<%# CanEdit(Eval("AP_Staff_Rmb.Status")) %>'
                                                             CommandArgument='<%# Eval("RmbLineNo") %>' resourcekey="Delete"></asp:LinkButton>
-                                                        <asp:Panel ID="Accounts" runat="server" Visible='<%# (CInt(Eval("AP_Staff_Rmb.Status"))<>StaffRmb.rmbStatus.Processed and CInt(Eval("AP_Staff_Rmb.Status"))<>StaffRmb.rmbStatus.DownloadFailed and CInt(Eval("AP_Staff_Rmb.Status"))<>StaffRmb.rmbStatus.PendingDownload)  and IsAccounts()  %>'>
+                                                        <asp:Panel ID="Accounts" runat="server" Visible='<%# (CInt(Eval("AP_Staff_Rmb.Status"))<>StaffRmb.rmbStatus.Processing and CInt(Eval("AP_Staff_Rmb.Status"))<>StaffRmb.rmbStatus.DownloadFailed and CInt(Eval("AP_Staff_Rmb.Status"))<>StaffRmb.rmbStatus.PendingDownload)  and IsAccounts()  %>'>
                                                             <asp:LinkButton ID="LinkButton6" runat="server" CommandName="mySplit"
                                                                 CommandArgument='<%# Eval("RmbLineNo") %>' resourcekey="Split"></asp:LinkButton>
                                                             <asp:LinkButton ID="LinkButton7" runat="server" CommandName="myDefer" ToolTip="Moves this transaction to a new 'Pending' Reimbursement."

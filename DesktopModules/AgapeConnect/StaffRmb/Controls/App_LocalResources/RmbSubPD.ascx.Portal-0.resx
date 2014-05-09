@@ -123,4 +123,7 @@
   <data name="lblAmount.Help">
     <value>Please enter the number of people (you can only claim Per Diem for yourself and your spouse), the number of days and the type of Per Diem.</value>
   </data>
+  <data name="Standard.Text">
+    <value>Paper receipt (must be sent by mail)</value>
+  </data>
 </root>

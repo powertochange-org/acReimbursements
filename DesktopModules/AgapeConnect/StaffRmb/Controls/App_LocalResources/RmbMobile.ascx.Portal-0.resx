@@ -126,4 +126,10 @@
   <data name="Explanation.Text">
     <value>... for claiming ministry costs related to your mobile device.  If this device is used for both ministry/personal-use, you can only reimburse the portion that is for ministry use.    enter this under rental - but note that it will be taxed.</value>
   </data>
+  <data name="Standard.Text">
+    <value>Paper receipt (must be sent by mail)</value>
+  </data>
+  <data name="Electronic.Text">
+    <value>Electronic Receipt (attach an image file)</value>
+  </data>
 </root>

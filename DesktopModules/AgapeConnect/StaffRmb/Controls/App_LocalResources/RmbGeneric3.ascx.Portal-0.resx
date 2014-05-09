@@ -123,4 +123,10 @@
   <data name="Explanation.Text">
     <value>...for claiming expenses incurred in repair or maintenance of ministry equipment or infrastructure. Examples include costs for painting the office, repairing appliances, etc.</value>
   </data>
+  <data name="Standard.Text">
+    <value>Paper receipt (must be sent by mail)</value>
+  </data>
+  <data name="Electronic.Text">
+    <value>Electronic Receipt (attach an image file)</value>
+  </data>
 </root>

@@ -120,4 +120,7 @@
   <data name="lblAmount.Text">
     <value>Amount</value>
   </data>
+  <data name="Standard.Text">
+    <value>Paper receipt (must be sent by mail)</value>
+  </data>
 </root>
