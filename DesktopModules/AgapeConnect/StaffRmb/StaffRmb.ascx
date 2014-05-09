@@ -1216,6 +1216,24 @@
                                             </table>
                                         </ItemTemplate>
                                     </asp:DataList>
+                                    <asp:DataList ID="dlAdvPaid" runat="server" Width="100%">
+                                        <ItemStyle CssClass="dnnGridItem" />
+                                        <AlternatingItemStyle CssClass="dnnGridAltItem" />
+                                        <ItemTemplate>
+                                            <table width="100%">
+                                                <tr valign="middle">
+                                                    <td width="100%">
+                                                        <asp:LinkButton ID="LinkButton" runat="server" OnClientClick='selectMenuItem(this);' Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' 
+                                                            CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" 
+                                                            Font-Size='<%# If(IsSelected(Eval("RmbNo")), "9", "10")%>' Font-Bold='<%# IsSelected(Eval("RmbNo")) %>' ></asp:LinkButton>
+                                                    </td>
+                                                    <td width="10px">
+                                                        <img ID="Img1" runat="server" alt=">" src="~/images/action_right.gif" style='<%# if(IsSelected(Eval("RmbNo")), "display:block", "display:none") %>' />
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </ItemTemplate>
+                                    </asp:DataList>
                                 </ContentTemplate>
                             </asp:UpdatePanel>
                         </div>

@@ -261,6 +261,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 ReloadMenuTasks.Add(loadBasicApprovablePaneAsync())
                 ReloadMenuTasks.Add(loadBasicApprovedPaneAsync())
                 ReloadMenuTasks.Add(loadBasicProcessingPaneAsync())
+                ReloadMenuTasks.Add(loadBasicPaidPaneAsync())
                 ReloadMenuTasks.Add(loadBasicCancelledTaskAsync())
 
                 Await Task.WhenAll(ReloadMenuTasks)
@@ -417,6 +418,26 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End Try
         End Function
 
+        Private Async Function loadBasicPaidPaneAsync() As Task
+            Try
+                Dim Complete = (From c In d.AP_Staff_Rmbs
+                                Where c.Status = RmbStatus.Paid And c.UserId = UserId And c.PortalId = PortalId
+                                Order By c.RID Descending
+                                Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
+                dlPaid.DataSource = Complete
+                dlPaid.DataBind()
+                Dim PaidAdv = (From c In d.AP_Staff_AdvanceRequests
+                                   Where c.RequestStatus = RmbStatus.Paid And c.UserId = UserId And c.PortalId = PortalId
+                                   Order By c.LocalAdvanceId Descending
+                                   Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId).Take(Settings("MenuSize"))
+                dlAdvPaid.DataSource = PaidAdv
+                dlAdvPaid.DataBind()
+                ProcessingUpdatePanel.Update()
+            Catch ex As Exception
+                Throw New Exception("Error loading processing rmbs: " + ex.Message)
+            End Try
+        End Function
+
         Private Async Function loadBasicCancelledTaskAsync() As Task
             Try
                 Dim Cancelled = (From c In d.AP_Staff_Rmbs
@@ -441,11 +462,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim ReloadMenuTasks As New List(Of Task)
                     ReloadMenuTasks.Add(buildTeamApprovedTreeAsync(Team))
                     ReloadMenuTasks.Add(buildTeamProcessingTreeAsync(Team))
+                    ReloadMenuTasks.Add(buildTeamPaidTreeAsync(Team))
                     Await Task.WhenAll(ReloadMenuTasks)
 
                 Else '--They are not a supervisor
                     tvTeamApproved.Visible = False
                     tvTeamProcessing.Visible = False
+                    tvTeamPaid.Visible = False
                 End If
 
             Catch ex As Exception
@@ -573,6 +596,66 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             ProcessingUpdatePanel.Update()
         End Function
 
+        Private Async Function buildTeamPaidTreeAsync(Team As List(Of User)) As Task
+            Dim TeamPaidNode As New TreeNode("Your Team")
+            TeamPaidNode.SelectAction = TreeNodeSelectAction.Expand
+            TeamPaidNode.Expanded = False
+
+            For Each team_member In Team
+                Dim TeamMemberPaidNode As New TreeNode(team_member.DisplayName)
+                TeamMemberPaidNode.Expanded = False
+                TeamMemberPaidNode.SelectAction = TreeNodeSelectAction.Expand
+
+                Dim TeamPaid = From c In d.AP_Staff_Rmbs
+                                    Join b In d.AP_StaffBroker_CostCenters
+                                        On c.CostCenter Equals b.CostCentreCode _
+                                            And c.PortalId Equals b.PortalId
+                                    Where c.UserId = team_member.UserID And c.Status = RmbStatus.Paid And b.Type = CostCentreType.Staff And c.PortalId = PortalId
+                                    Select c.RMBNo, c.RmbDate, c.UserRef, c.UserId, c.RID
+                For Each rmb In TeamPaid
+                    Dim rmb_node As New TreeNode()
+                    Dim rmbUser = UserController.GetUserById(PortalId, rmb.UserId).DisplayName
+                    If (rmb.RmbDate Is Nothing) Then
+                        rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, New Date(), rmbUser)
+                    Else
+                        rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser)
+                    End If
+                    rmb_node.Value = rmb.RMBNo
+                    rmb_node.SelectAction = TreeNodeSelectAction.Select
+                    TeamMemberPaidNode.ChildNodes.Add(rmb_node)
+                    If IsSelected(rmb.RMBNo) Then
+                        TeamMemberPaidNode.Expanded = True
+                        TeamPaidNode.Expanded = True
+                    End If
+                Next
+
+                Dim TeamAdvPaid = From c In d.AP_Staff_AdvanceRequests
+                                       Where c.RequestStatus = RmbStatus.Paid And c.UserId = team_member.UserID And c.PortalId = PortalId
+                                       Select c.AdvanceId, c.RequestDate, c.UserId, c.LocalAdvanceId
+                For Each adv In TeamAdvPaid
+                    Dim adv_node As New TreeNode()
+                    Dim advUser = UserController.GetUserById(PortalId, adv.UserId).DisplayName
+                    If (adv.RequestDate Is Nothing) Then
+                        adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, New Date(), advUser)
+                    Else
+                        adv_node.Text = GetAdvTitleTeamShort(adv.LocalAdvanceId, adv.RequestDate, advUser)
+                    End If
+                    adv_node.Value = -adv.AdvanceId
+                    adv_node.SelectAction = TreeNodeSelectAction.Select
+                    TeamMemberPaidNode.ChildNodes.Add(adv_node)
+                    If IsSelected(-adv.AdvanceId) Then
+                        TeamMemberPaidNode.Expanded = True
+                        TeamPaidNode.Expanded = True
+                    End If
+                Next
+                TeamPaidNode.ChildNodes.Add(TeamMemberPaidNode)
+            Next
+            tvTeamPaid.Nodes.Clear()
+            tvTeamPaid.Nodes.Add(TeamPaidNode)
+            tvTeamPaid.Visible = True
+            PaidUpdatePanel.Update()
+        End Function
+
         Private Async Function LoadFinanceMenuAsync() As Task
             Try
                 If IsAccounts() Then
@@ -581,6 +664,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ReloadMenuTasks.Add(buildAllSubmittedTreeAsync(allStaff))
                     ReloadMenuTasks.Add(buildAllApprovedTreeAsync(allStaff)) '--This is the key part for the FINANCE team
                     ReloadMenuTasks.Add(buildAllProcessingTreeAsync(allStaff))
+                    ReloadMenuTasks.Add(buildAllPaidTreeAsync(allStaff))
                     Await Task.WhenAll(ReloadMenuTasks)
                 End If
 
@@ -702,6 +786,39 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 ProcessingUpdatePanel.Update()
             Catch ex As Exception
                 Throw New Exception("Error building processing tree: " + ex.Message)
+            End Try
+
+        End Function
+
+        Private Async Function buildAllPaidTreeAsync(allStaff As IQueryable(Of StaffBroker.User)) As Task
+            Try
+                Dim AllStaffPaidNode As New TreeNode("All Staff")
+                AllStaffPaidNode.SelectAction = TreeNodeSelectAction.Expand
+                AllStaffPaidNode.Expanded = False
+
+                For Each person In allStaff
+                    '-- sort by first letter of last name
+                    Dim letter = person.LastName.Substring(0, 1)
+                    Dim PaidRmb = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Paid And c.PortalId = PortalId And (c.UserId = person.UserID) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
+                    Dim paidNode As New TreeNode(person.DisplayName)
+                    If PaidRmb.Count() > 0 Then
+                        addItemsToTree(AllStaffPaidNode, paidNode, letter, PaidRmb, "rmb")
+                    End If
+                    If (ENABLE_ADVANCE_FUNCTIONALITY) Then
+                        Dim PaidAdv = (From c In d.AP_Staff_AdvanceRequests Where c.RequestStatus = RmbStatus.Paid And c.PortalId = PortalId And c.UserId = person.UserID Order By c.LocalAdvanceId Descending Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId).Take(Settings("MenuSize"))
+                        If PaidAdv.Count() > 0 Then
+                            addItemsToTree(AllStaffPaidNode, paidNode, letter, PaidAdv, "adv")
+                        End If
+                    End If
+                Next
+                tvAllPaid.Nodes.Clear()
+                tvAllPaid.Nodes.Add(AllStaffPaidNode)
+                tvAllPaid.Visible = IsAccounts()
+                lblPaidDivider.Visible = (tvFinance.Visible Or tvAllProcessing.Visible Or tvTeamProcessing.Visible)
+                lblYourPaid.Visible = lblProcessingDivider.Visible
+                PaidUpdatePanel.Update()
+            Catch ex As Exception
+                Throw New Exception("Error building paid tree: " + ex.Message)
             End Try
 
         End Function
