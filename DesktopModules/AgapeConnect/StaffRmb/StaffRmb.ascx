@@ -1819,7 +1819,7 @@
                                     <asp:Label ID="lblIncType" runat="server" CssClass="ui-state-error ui-corner-all" Text="Incompatible Type" Visible="false"></asp:Label>
 
                                     <div id="manualCodes" runat="server" style="float: right;">
-                                        <asp:DropDownList ID="ddlAccountCode" runat="server" Width="60px" DataSourceID="dsAccountCodes"
+                                        <asp:DropDownList ID="ddlAccountCode" runat="server" Width="70px" DataSourceID="dsAccountCodes"
                                             DataTextField="DisplayName" DataValueField="AccountCode" Enabled="false">
                                         </asp:DropDownList>
 

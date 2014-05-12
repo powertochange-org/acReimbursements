@@ -3505,26 +3505,32 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         If (isLowBalance()) Then
                             Dim warning = Translate("WarningLowBalance").Replace("[ACCTBAL]", hfAccountBalance.Value).Replace("[BUDGBAL]", hfBudgetBalance.Value).Replace("[ACCT]", tbChargeTo.Text)
                             approverMessage = approverMessage.Replace("[LOWBALANCE]", warning)
+                        Else
+                            approverMessage = approverMessage.Replace("[LOWBALANCE", "")
                         End If
                         If theRmb.UserComment <> "" Then
                             approverMessage = approverMessage.Replace("[COMMENTS]", Translate("EmailComments") & "<br />" & theRmb.UserComment)
                         Else
                             approverMessage = approverMessage.Replace("[COMMENTS]", "")
                         End If
-                        DotNetNuke.Services.Mail.Mail.SendMail("reimbursements@p2c.com", toEmail, "", subject, approverMessage, "", "HTML", "", "", "", "")
+                        '-- Send FROM owner, so that bounces or out-of-office replies come back to owner.
+                        DotNetNuke.Services.Mail.Mail.SendMail(owner.Email, toEmail, "", subject, approverMessage, "", "HTML", "", "", "", "")
                     Else
                         approverMessage = approverMessage.Replace("[STAFFNAME]", UserInfo.DisplayName).Replace("[RMBNO]", theRmb.RMBNo).Replace("[USERREF]", IIf(theRmb.UserRef <> "", theRmb.UserRef, "None"))
-                        approverMessage = approverMessage.Replace("[APPRNAME]", Left(toName, Math.Max(toName.Length - 2, 0)))
+                        approverMessage = approverMessage.Replace("[APPRNAME]", toName)
                         If (isLowBalance()) Then
-                            approverMessage = approverMessage.Replace("[LOWBALANCE]", Translate("WarningLowBalance")).Replace("[ACCTBAL]", hfAccountBalance.Value) _
-                .Replace("[BUDGBAL]", hfBudgetBalance.Value).Replace("[ACCT]", tbChargeTo.Text)
+                            Dim warning = Translate("WarningLowBalance").Replace("[ACCTBAL]", hfAccountBalance.Value).Replace("[BUDGBAL]", hfBudgetBalance.Value).Replace("[ACCT]", tbChargeTo.Text)
+                            approverMessage = approverMessage.Replace("[LOWBALANCE]", warning)
+                        Else
+                            approverMessage = approverMessage.Replace("[LOWBALANCE", "")
                         End If
                         If theRmb.UserComment <> "" Then
                             approverMessage = approverMessage.Replace("[COMMENTS]", Translate("EmailComments") & "<br />" & theRmb.UserComment)
                         Else
                             approverMessage = approverMessage.Replace("[COMMENTS]", "")
                         End If
-                        DotNetNuke.Services.Mail.Mail.SendMail("reimbursements@p2c.com", toEmail, "", subject, approverMessage, "", "HTML", "", "", "", "")
+                        '-- Send FROM owner, so that bounces or out-of-office replies come back to owner.
+                        DotNetNuke.Services.Mail.Mail.SendMail(owner.Email, toEmail, "", subject, approverMessage, "", "HTML", "", "", "", "")
                     End If
                 End If
             Catch ex As Exception
@@ -4038,6 +4044,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 message2 = StaffBrokerFunctions.GetTemplate("AdvLargeTransaction", PortalId)
             End If
             Dim approver = UserController.GetUserById(insert.PortalId, insert.ApproverId)
+            Dim owner = UserController.GetUserById(insert.PortalId, insert.UserId)
             Dim toEmail = approver.Email
             Dim toName = approver.FirstName
             Dim Approvers = approver.DisplayName
@@ -4051,7 +4058,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             If toEmail.Length > 0 Then
                 ' DotNetNuke.Services.Mail.Mail.SendMail("donotreply@agape.org.uk", Left(toEmail, toEmail.Length - 1), "donotreply@agape.org.uk", "Reimbursement for " & UserInfo.FirstName & " " & UserInfo.LastName, message2, "", "HTML", "", "", "", "")
-                DotNetNuke.Services.Mail.Mail.SendMail("reimbursements@p2c.com", toEmail, "", Translate("AdvSubmittedApprEmailSubject").Replace("[STAFFNAME]", UserInfo.FirstName & " " & UserInfo.LastName), message2, "", "HTML", "", "", "", "")
+                DotNetNuke.Services.Mail.Mail.SendMail(owner.Email, toEmail, "", Translate("AdvSubmittedApprEmailSubject").Replace("[STAFFNAME]", UserInfo.FirstName & " " & UserInfo.LastName), message2, "", "HTML", "", "", "", "")
 
             End If
 
