@@ -239,6 +239,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 #Region "Loading Functions"
         Public Async Function LoadMenuAsync() As Task
             Try
+                showDividers(False)
+                lblSubmitted.Visible = False
                 Dim basicTask = LoadBasicMenuAsync()
                 Dim supervisorTask = LoadSupervisorMenuAsync()
                 Dim financeTask = LoadFinanceMenuAsync()
@@ -250,6 +252,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 lblError.Visible = True
             End Try
         End Function
+
+        Private Sub showDividers(onoff As Boolean)
+            lblApproved.Visible = onoff
+            lblYourProcessing.Visible = onoff
+            lblYourPaid.Visible = onoff
+        End Sub
 
         Private Async Function LoadBasicMenuAsync() As Task
             Try
@@ -354,6 +362,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 '-- Add a count of approvable items to the 'Submitted' heading
                 If approvable_count > 0 Then
+                    lblSubmitted.Visible = True
                     lblSubmittedCount.Text = "(" & approvable_count & ")"
                     pnlSubmitted.CssClass = "ui-state-highlight ui-corner-all"
                 Else
@@ -361,13 +370,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     pnlSubmitted.CssClass = ""
                 End If
 
-                If isApprover Then
-                    lblApproveHeading.Visible = True
-                    divApproveHeading.Visible = True
-                Else
-                    lblApproveHeading.Visible = False
-                    divApproveHeading.Visible = False
-                End If
+                lblApproveHeading.Visible = isApprover
                 SubmittedUpdatePanel.Update()
             Catch ex As Exception
                 Throw New Exception("Error loading approvable rmbs: " + ex.Message)
@@ -458,6 +461,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim isSupervisor = (Team.Count > 0)
                 If isSupervisor Then
                     lblTeamLeader.Visible = True
+                    showDividers(True)
                     Dim TeamIds = From c In Team Select c.UserID
                     Dim ReloadMenuTasks As New List(Of Task)
                     ReloadMenuTasks.Add(buildTeamApprovedTreeAsync(Team))
@@ -659,6 +663,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Private Async Function LoadFinanceMenuAsync() As Task
             Try
                 If IsAccounts() Then
+                    showDividers(True)
                     Dim allStaff = StaffBrokerFunctions.GetStaff()
                     Dim ReloadMenuTasks = New List(Of Task)
                     ReloadMenuTasks.Add(buildAllSubmittedTreeAsync(allStaff))
@@ -741,7 +746,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 tvFinance.Nodes.Clear()
                 tvFinance.Nodes.Add(finance_node)
                 tvFinance.Visible = IsAccounts()
-                lblApprovedDivider.Visible = (tvTeamApproved.Visible)
 
                 '-- Add a count of items to the 'Approved' heading
                 If total > 0 Then
@@ -781,8 +785,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 tvAllProcessing.Nodes.Clear()
                 tvAllProcessing.Nodes.Add(AllStaffProcessingNode)
                 tvAllProcessing.Visible = IsAccounts()
-                lblProcessingDivider.Visible = (tvFinance.Visible Or tvAllProcessing.Visible Or tvTeamProcessing.Visible)
-                lblYourProcessing.Visible = lblProcessingDivider.Visible
+                lblYourProcessing.Visible = (tvFinance.Visible Or tvAllProcessing.Visible Or tvTeamProcessing.Visible)
                 ProcessingUpdatePanel.Update()
             Catch ex As Exception
                 Throw New Exception("Error building processing tree: " + ex.Message)
@@ -814,8 +817,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 tvAllPaid.Nodes.Clear()
                 tvAllPaid.Nodes.Add(AllStaffPaidNode)
                 tvAllPaid.Visible = IsAccounts()
-                lblPaidDivider.Visible = (tvFinance.Visible Or tvAllProcessing.Visible Or tvTeamProcessing.Visible)
-                lblYourPaid.Visible = lblProcessingDivider.Visible
+                lblYourPaid.Visible = (tvFinance.Visible Or tvAllProcessing.Visible Or tvTeamProcessing.Visible)
                 PaidUpdatePanel.Update()
             Catch ex As Exception
                 Throw New Exception("Error building paid tree: " + ex.Message)

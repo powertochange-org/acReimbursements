@@ -123,4 +123,10 @@
   <data name="Printout.Text">
     <value>Your reimbursement has been submitted for approval.  A printable copy of the reimbursement has opened in a new window/tab. Don't forget to attach your paper receipts to this printout and send them to the office.</value>
   </data>
+  <data name="TeamLeader.Text">
+    <value>- Team Leader -</value>
+  </data>
+  <data name="AccountsMode.Text">
+    <value>- Finance Team -</value>
+  </data>
 </root>

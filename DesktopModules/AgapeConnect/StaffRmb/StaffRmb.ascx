@@ -243,7 +243,7 @@
                 autoOpen: false,
                 position:['middle', 150],
                 height:700,
-                width: 750,
+                width: 780,
                 modal: true,
                 title: '<%= Translate("AddEditRmb") %>',
                 close: function () {
@@ -964,7 +964,7 @@
                                         <asp:TreeView ID="tvAllSubmitted" class="accounts_team" runat="server" NodeIndent="10">
                                         </asp:TreeView>
                                         <asp:Panel ID="pnlSubmittedView" runat="server">
-                                            <asp:Label ID="lblApproveHeading" runat="server" class="Agape_SubTitle" ResourceKey="RmbsToApprove" Style="font-size: 8pt;"></asp:Label>
+                                            <asp:Label ID="lblApproveHeading" runat="server" class="approver" ResourceKey="RmbsToApprove" Style="font-size: 8pt;"></asp:Label>
                                             <asp:DataList ID="dlToApprove" runat="server" Width="100%">
                                                 <ItemStyle CssClass="dnnGridItem" />
                                                 <AlternatingItemStyle CssClass="dnnGridAltItem" />
@@ -1005,10 +1005,7 @@
                                                     </table>
                                                 </ItemTemplate>
                                             </asp:DataList>
-                                            <asp:Panel ID="divApproveHeading" runat="server" style="width: 100%; border-bottom: dashed 1px black;">
-                                                &nbsp;<br />
-                                            </asp:Panel>
-                                            <asp:Label ID="Label11" runat="server" class="Agape_SubTitle" ResourceKey="YourRmbs" Style="font-size: 8pt;"></asp:Label>
+                                            <asp:Label ID="lblSubmitted" runat="server" class="my_section" ResourceKey="YourRmbs" Style="font-size: 8pt;"></asp:Label>
                                             <br />
                                             <asp:DataList ID="dlSubmitted" runat="server" Width="100%">
                                                 <ItemStyle CssClass="dnnGridItem" />
@@ -1071,10 +1068,7 @@
                                         </asp:TreeView>
                                         <asp:TreeView ID="tvFinance" class="accounts_team" runat="server" NodeIndent="10">
                                         </asp:TreeView>
-                                            <asp:Panel ID="lblApprovedDivider" runat="server" style="width: 100%; border-bottom: dashed 1px black;">
-                                                &nbsp;<br />
-                                            </asp:Panel>
-                                            <asp:Label ID="lblApproved" runat="server" class="Agape_SubTitle" ResourceKey="YourRmbs" Style="font-size: 8pt;">
+                                            <asp:Label ID="lblApproved" runat="server" class="my_section" ResourceKey="YourRmbs" Style="font-size: 8pt;">
                                                 <br />
                                             </asp:Label>
                                             <asp:DataList ID="dlApproved" runat="server" Width="100%">
@@ -1138,10 +1132,7 @@
                                     </asp:TreeView>
                                     <asp:TreeView ID="tvTeamProcessing" class="team_leader" runat="server" NodeIndent="10">
                                     </asp:TreeView>
-                                    <asp:Panel ID="lblProcessingDivider" runat="server" style="width: 100%; border-bottom: dashed 1px black;">
-                                        &nbsp;<br />
-                                    </asp:Panel>
-                                    <asp:Label ID="lblYourProcessing" runat="server" class="Agape_SubTitle" ResourceKey="YourRmbs" Style="font-size: 8pt;">
+                                    <asp:Label ID="lblYourProcessing" runat="server" class="my_section" ResourceKey="YourRmbs" Style="font-size: 8pt;">
                                         <br />
                                     </asp:Label>
                                     <asp:DataList ID="dlProcessing" runat="server" Width="100%">
@@ -1197,10 +1188,7 @@
                                     </asp:TreeView>
                                     <asp:TreeView ID="tvTeamPaid" class="team_leader" runat="server" NodeIndent="10">
                                     </asp:TreeView>
-                                    <asp:Panel ID="lblPaidDivider" runat="server" style="width: 100%; border-bottom: dashed 1px black;">
-                                        &nbsp;<br />
-                                    </asp:Panel>
-                                    <asp:Label ID="lblYourPaid" runat="server" class="Agape_SubTitle" ResourceKey="YourRmbs" Style="font-size: 8pt;">
+                                    <asp:Label ID="lblYourPaid" runat="server" class="my_section" ResourceKey="YourRmbs" Style="font-size: 8pt;">
                                         <br />
                                     </asp:Label>
                                     <asp:DataList ID="dlPaid" runat="server" Width="100%">
