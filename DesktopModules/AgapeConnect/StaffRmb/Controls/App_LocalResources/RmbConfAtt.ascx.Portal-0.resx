@@ -131,7 +131,7 @@
     <value>Electronic Receipt (attach an image file)</value>
   </data>
   <data name="lblDesc.Text">
-    <value>Description and Ministry Purpose</value>
+    <value>Description &amp; Min. Purpose</value>
   </data>
   <data name="lblDesc.Help">
     <value>Please enter the name of the conference/meeting and a brief description of the ministry purpose of this expense</value>

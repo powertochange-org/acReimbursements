@@ -130,7 +130,7 @@
     <value>Electronic Receipt (attach an image file)</value>
   </data>
   <data name="lblDesc.Text">
-    <value>Description and Ministry Purpose</value>
+    <value>Description &amp; Min. Purpose</value>
   </data>
   <data name="Description.Error">
     <value>* You must enter a (better) description</value>

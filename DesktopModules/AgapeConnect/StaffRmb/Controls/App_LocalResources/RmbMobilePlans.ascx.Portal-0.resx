@@ -124,7 +124,8 @@
     <value>I have an itemized bill and have only reimbursed the ministry calls (as I have highlighted on the bill)</value>
   </data>
   <data name="Explanation.Text">
-    <value>... Only ministry related mobile devices/cell phone.</value>
+    <value>... Mobile phone plan and related charges 
+</value>
   </data>
   <data name="Standard.Text">
     <value>Paper receipt (must be sent by mail)</value>
@@ -133,7 +134,7 @@
     <value>Electronic Receipt (attach an image file)</value>
   </data>
   <data name="lblDesc.Text">
-    <value>Description and Ministry Purpose</value>
+    <value>Description &amp; Min. Purpose</value>
   </data>
   <data name="lblDate.Help">
     <value>Enter the date of the purchase</value>
