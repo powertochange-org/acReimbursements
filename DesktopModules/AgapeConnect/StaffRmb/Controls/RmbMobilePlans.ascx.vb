@@ -1,5 +1,5 @@
 ﻿
-Partial Class controls_RmbMobile
+Partial Class controls_RmbMobilePlans
     Inherits Entities.Modules.PortalModuleBase
     Protected Sub Page_Init(sender As Object, e As System.EventArgs) Handles Me.Init
         Dim FileName As String = System.IO.Path.GetFileNameWithoutExtension(Me.AppRelativeVirtualPath)
@@ -157,10 +157,10 @@ Partial Class controls_RmbMobile
     End Property
     Public Property Taxable() As Boolean
         Get
-            Return False
+            Return Not cbTaxable.Checked
         End Get
         Set(ByVal value As Boolean)
-
+            cbTaxable.Checked = Not value
         End Set
     End Property
     Public Property ErrorText() As String

@@ -1,4 +1,4 @@
-﻿<%@ Control Language="VB" AutoEventWireup="false" CodeFile="RmbMobile.ascx.vb" Inherits="controls_RmbMobile" ClassName="controls_RmbMobile"  %>
+﻿<%@ Control Language="VB" AutoEventWireup="false" CodeFile="RmbMobilePlans.ascx.vb" Inherits="controls_RmbMobilePlans" ClassName="controls_RmbMobilePlans"  %>
 <%@ Register assembly="DotNetNuke" namespace="DotNetNuke.UI.WebControls" tagprefix="cc1" %>
 <%@ Register TagPrefix="dnn" TagName="Label" Src="~/controls/LabelControl.ascx" %>
 <%@ Register src="Currency.ascx" tagname="Currency" tagprefix="uc1" %>
@@ -43,6 +43,7 @@
         </asp:DropDownList>
         
         <br />
+<asp:CheckBox ID="cbTaxable" runat="server" ResourceKey="notTaxable" Text="I have an itemized bill and have only reimbursed the ministry calls (as I have highlighted on the bill)"  />
     </td>
    
 </tr>
