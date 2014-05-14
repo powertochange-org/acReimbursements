@@ -1394,7 +1394,7 @@
 
 
                                     <tr class="Agape_SubTitle">
-                                        <td colspan="2">
+                                        <td colspan="4">
                                             <table><tr class="Agape_SubTitle">
                                             <td class="hdrTitle" width="10%">
                                                 <asp:Label ID="Label23" runat="server" resourcekey="YourRef"></asp:Label>
@@ -1404,27 +1404,6 @@
                                             </td>
                                             </tr>
                                             </table>
-                                        </td>
-                                        <td class="hdrTitle">
-                                            <asp:label ID="lblProvince" runat="server" resourcekey="ExpProv" ></asp:label>
-                                        </td>
-                                        <td class="hdrValue">
-                                            <asp:DropDownList ID="ddlProvince" runat="server" AutoPostBack="True">
-                                                <asp:ListItem Text="British Columbia" Value="BC" />
-                                                <asp:ListItem Text="Alberta" Value="AB" />
-                                                <asp:ListItem Text="Saskatchewan" Value="SK" />
-                                                <asp:ListItem Text="Manitoba" Value="MB" />
-                                                <asp:ListItem Text="Ontario" Value="ON" />
-                                                <asp:ListItem Text="Quebec" Value="PQ" />
-                                                <asp:ListItem Text="Newfoundland" Value="NL" />
-                                                <asp:ListItem Text="Nova Scotia" Value="NS" />
-                                                <asp:ListItem Text="New Brunswick" Value="NB" />
-                                                <asp:ListItem Text="Prince Edward Is." Value="PE" />
-                                                <asp:ListItem Text="Yukon" Value="YT" />
-                                                <asp:ListItem Text="Nunavut" Value="NV" />
-                                                <asp:ListItem Text="Northwest Terr." Value="NT" />
-                                                <asp:ListItem Text="Outside Canada" Value="--" />
-                                            </asp:DropDownList>
                                         </td>
                                         <td id="pnlPeriodYear" colspan="2" runat="server" style="white-space: nowrap; color: Gray;">
                                             <asp:Label ID="Label24" runat="server" resourcekey="Period"></asp:Label>

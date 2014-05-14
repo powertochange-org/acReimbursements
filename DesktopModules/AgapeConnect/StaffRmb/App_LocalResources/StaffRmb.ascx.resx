@@ -390,7 +390,7 @@
     <value>Your Comments</value>
   </data>
   <data name="YourRef.Text" xml:space="preserve">
-    <value>ID:</value>
+    <value>Reimbursement Name:</value>
   </data>
   <data name="YourRmbs.Text" xml:space="preserve">
     <value>Your Reimbursements:</value>
