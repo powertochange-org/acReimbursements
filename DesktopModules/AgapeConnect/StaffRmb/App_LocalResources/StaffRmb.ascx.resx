@@ -390,7 +390,7 @@
     <value>Your Comments</value>
   </data>
   <data name="YourRef.Text" xml:space="preserve">
-    <value>Name this reimbursement:</value>
+    <value>ID:</value>
   </data>
   <data name="YourRmbs.Text" xml:space="preserve">
     <value>Your Reimbursements:</value>
@@ -667,7 +667,7 @@
     <value>Country:</value>
   </data>
   <data name="ExpProv.Text" xml:space="preserve">
-    <value>Province of expenses:</value>
+    <value>Prov. of expenses:</value>
   </data>
   <data name="PermAddressChange.Text" xml:space="preserve">
     <value>Permanent Change</value>
@@ -683,5 +683,8 @@
   </data>
   <data name="Paid.Text" xml:space="preserve">
     <value>Paid</value>
+  </data>
+  <data name="NameThis.Text" xml:space="preserve">
+    <value>Name this reimbursement:</value>
   </data>
 </root>

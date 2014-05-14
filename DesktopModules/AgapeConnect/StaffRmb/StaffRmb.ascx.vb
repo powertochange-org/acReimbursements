@@ -1116,10 +1116,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 tbPostingReference.Text = ExistingData.First.Reference
                 tbInvoiceNumber.Text = ExistingData.First.InvoiceNo
                 If (ddlCompany.SelectedIndex > 0) Then
-                    Await LoadVendorsAsync()
-                    ddlVendorId.Enabled = True
-                    ddlVendorId.SelectedValue = ExistingData.First.VendorId
-                    If (ddlVendorId.SelectedIndex > 0) Then
+                    'Await LoadVendorsAsync()
+                    'tbVendorId.Enabled = True
+                    ScriptManager.RegisterClientScriptBlock(ddlCompany, ddlCompany.GetType(), "loadVendors", "loadVendorIds();", True)
+                    tbVendorId.Text = ExistingData.First.VendorId
+                    If (tbVendorId.Text.Length > 0) Then
                         Await LoadRemitToAsync()
                         ddlRemitTo.Enabled = True
                         ddlRemitTo.SelectedValue = ExistingData.First.RemitToAddress
@@ -1130,7 +1131,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         btnSubmitPostingData.Enabled = False
                     End If
                 Else
-                    ddlVendorId.Enabled = False
+                    tbVendorId.Enabled = False
                     ddlRemitTo.Enabled = False
                     btnSubmitPostingData.Enabled = False
                 End If
@@ -1140,10 +1141,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 dtPostingDate.Text = Today.ToString("MM/dd/yyyy")
                 tbBatchId.Text = Today.ToString("yyMMdd") & initials
                 tbPostingReference.Text = ""
-                tbInvoiceNumber.Text = "RMB" & lblRmbNo.Text
-                ddlVendorId.Enabled = ddlCompany.SelectedIndex > 0
-                If (ddlVendorId.Enabled) Then
-                    Await LoadVendorsAsync()
+                tbInvoiceNumber.Text = "REIMB" & lblRmbNo.Text
+                tbVendorId.Enabled = ddlCompany.SelectedIndex > 0
+                If (tbVendorId.Enabled) Then
+                    'Await LoadVendorsAsync()
+                    ScriptManager.RegisterClientScriptBlock(ddlCompany, ddlCompany.GetType(), "loadVendors", "loadVendorIds();", True)
                 End If
                 ddlRemitTo.Enabled = False
                 ddlRemitTo.Items.Clear()
@@ -2125,12 +2127,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Sub
 
         Protected Async Sub ddlCompany_Change(sender As Object, e As System.EventArgs) Handles ddlCompany.SelectedIndexChanged
-            Await LoadVendorsAsync()
-            ddlVendorId.Enabled = True
+            'Await LoadVendorsAsync()
+            'tbVendorId.Enabled = True
+            ScriptManager.RegisterClientScriptBlock(ddlCompany, ddlCompany.GetType(), "loadVendors", "loadVendorIds();", True)
         End Sub
 
-        Protected Async Sub ddlVendorId_Change(sender As Object, e As System.EventArgs) Handles ddlVendorId.SelectedIndexChanged
+        Protected Async Sub tbVendorId_Change(sender As Object, e As System.EventArgs) Handles tbVendorId.TextChanged
             Await LoadRemitToAsync()
+            tbVendorId.Enabled = True
             ddlRemitTo.Enabled = True
         End Sub
 
@@ -2244,7 +2248,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             PostingData.BatchId = tbBatchId.Text
             PostingData.Reference = tbPostingReference.Text
             PostingData.InvoiceNo = tbInvoiceNumber.Text
-            PostingData.VendorId = ddlVendorId.SelectedValue
+            PostingData.VendorId = tbVendorId.Text
             PostingData.RemitToAddress = ddlRemitTo.SelectedValue
             Log(theRmb.First.RMBNo, "Processed - this reimbursement will be added to the next download batch")
 
@@ -3377,32 +3381,27 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             ddlCompany.SelectedIndex = 0
         End Function
 
-        Private Async Function LoadVendorsAsync() As Task
-            ddlVendorId.Items.Clear()
-            ddlVendorId.Items.Add("")
-            Dim vendors = Await StaffRmbFunctions.getVendors(ddlCompany.SelectedValue)
-            For Each vendor In vendors
-                Dim name = vendor("VendorName").ToString
-                Dim value = vendor("VendorID").ToString
-                ddlVendorId.Items.Add(New ListItem(name, value))
-            Next
-            ddlVendorId.SelectedIndex = 0
-        End Function
-
         Private Async Function LoadRemitToAsync() As Task
             ddlRemitTo.Items.Clear()
             ddlRemitTo.Items.Add("")
-            Dim addresses = Await StaffRmbFunctions.getRemitToAddresses(ddlCompany.SelectedValue, ddlVendorId.SelectedValue)
+            Dim addresses = Await StaffRmbFunctions.getRemitToAddresses(ddlCompany.SelectedValue, tbVendorId.Text)
+            Dim defaultValue = ""
             For Each address In addresses
                 Dim star = ""
+                Dim value = address("AddressID").ToString
                 If address("DefaultRemitToAddress").ToString = "Y" Then
                     star = "*"
+                    defaultValue = value
                 End If
-                Dim value = address("AddressID").ToString
                 Dim name = star & value & ": " & address("Address1").ToString
                 ddlRemitTo.Items.Add(New ListItem(name, value))
             Next
-            ddlRemitTo.SelectedIndex = 0
+            If (defaultValue.Length = 0) Then
+                ddlRemitTo.SelectedIndex = 0
+            Else
+                ddlRemitTo.SelectedValue = defaultValue
+                btnSubmitPostingData.Enabled = True
+            End If
         End Function
 
         Protected Function ZeroFill(ByVal number As Integer, ByVal len As Integer) As String

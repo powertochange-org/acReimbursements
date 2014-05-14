@@ -138,7 +138,6 @@ namespace StaffRmb
             {
                 result.isDept = true;
                 Decimal amount = (from line in rmb.AP_Staff_RmbLines select line.GrossAmount).Sum();
-                amount += (Decimal) 0.00; //exclude staff with "view only" signing authority ($0)
                 potential_approvers = await staffWithSigningAuthorityAsync(rmb.CostCenter, amount);
             }
 
@@ -234,15 +233,6 @@ namespace StaffRmb
         {
             string postData = "";
             string url = "http://gpapp/gpimport/webservice/GetCompanies";
-            string result = await getResultFromWebServiceAsync(url, postData);
-            return JsonConvert.DeserializeObject(result);
-        }
-
-        static public async Task<object> getVendors(String company)
-        // Returns a list of vendors for a given company
-        {
-            string postData = string.Format("company={0}", company);
-            string url = "http://gpapp/gpimport/webservice/GetVendors";
             string result = await getResultFromWebServiceAsync(url, postData);
             return JsonConvert.DeserializeObject(result);
         }

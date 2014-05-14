@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Services;
+using System.Web.Script.Services;
 using Newtonsoft.Json;
 using StaffRmb;
+using System.Threading.Tasks;
 
 /// <summary>
 /// Provides a sublist of account numbers
@@ -30,6 +33,42 @@ public class WebService : System.Web.Services.WebService {
         string json = JsonConvert.SerializeObject(result);
         HttpContext.Current.Response.ContentType = "application/json";
         HttpContext.Current.Response.Write(json);
+    }
+    
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string[] GetVendorIds(string company)
+    {
+        List<string> result = new List<string>();
+        byte[] postData = System.Text.Encoding.UTF8.GetBytes("company="+company);
+        //send request
+        HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://gpapp/gpimport/webservice/GetVendors");
+        request.KeepAlive = false; //This and the following line are required to prevent "connection closed" problems
+        request.ProtocolVersion = HttpVersion.Version10;
+        request.Method = "POST";
+        request.ContentType = "application/x-www-form-urlencoded";
+        request.ContentLength = postData.Length;
+        try
+        {
+            using (var requestStream = request.GetRequestStream())
+            {
+                requestStream.Write(postData, 0, postData.Length);
+            }
+            var response = (HttpWebResponse)request.GetResponse();
+            if (response != null)
+            {
+                var reader = new System.IO.StreamReader(response.GetResponseStream());
+                dynamic vendors = JsonConvert.DeserializeObject(reader.ReadToEnd());
+                foreach (var vendor in vendors)
+                {
+                    result.Add("[" + vendor.VendorID + "] " + vendor.VendorName);
+                }
+            }
+        }
+        catch (WebException e)
+        {
+        }
+        return result.ToArray();
     }
     
 }

@@ -29,6 +29,43 @@
         $(previous_menu_item).parent().next().children().hide();
     }
 
+    function loadVendorIds() {
+        var company = $("#<%= ddlCompany.ClientID %>").val();
+        $.ajax({
+            url:"/DesktopModules/AgapeConnect/StaffRmb/WebService.asmx/GetVendorIds",
+            data:"{ 'company':'"+company+"'}",
+            dataType: "json",
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            success: function(data) {
+                var vendors = ($.map(data.d, function (item) {
+                    return {
+                        label: item,
+                        value: item.split(']')[0].replace("[","")
+                    };
+                }));
+                $("#<%= tbVendorId.ClientID %>").prop('disabled', false).prop('class', 'autocomplete');
+                $("#<%= tbVendorId.ClientID%>").autocomplete({
+                    source:  vendors,
+                    select: function(event, ui) {
+                        $('#<%= tbVendorId.ClientID%>').val(ui.item.value);
+                        __doPostBack('<%= tbVendorId.ClientID %>', '');
+                    },
+                    minLength: 2
+                });               
+            },
+            error: function(a, b, c) {
+                console.error('failure :'+b);
+                $("#<%= tbVendorId.ClientID %>").prop('disabled', true);
+                $("#<%= tbVendorId.ClientID%>").autocomplete({
+                    source: ""
+                });
+
+            }
+        });
+
+    }
+
     function address_changed() {
         $("#<%= btnAddressOk.ClientID %>").hide();
         $("#<%= btnTempAddressChange.ClientID %>").show();
@@ -722,7 +759,7 @@
                 }
                 console.info('looking up accounts list');
                 $.ajax({
-                    url:"DesktopModules/AgapeConnect/StaffRmb/WebService.asmx/GetAccountNumbers",
+                    url:"/DesktopModules/AgapeConnect/StaffRmb/WebService.asmx/GetAccountNumbers",
                     dataType: "json",
                     data: {term: term},
                     type: "POST",
@@ -910,8 +947,10 @@
                         style="margin-bottom: 5px; font-weight: bold; min-width: 220px;" />
                 </div>
                 <div id="accordion">
-                    <h5><asp:Label ID="lblTeamLeader" runat="server" Class="buttonLabel" resourcekey="TeamLeader" Visible="false" /></h5>
-                    <h5><asp:Label ID="lblAccountsTeam" runat="server" class="buttonLabel" resourcekey="AccountsMode" Visible="false" /></h5>
+                    <div style="text-align:center">
+                        <asp:Label ID="lblTeamLeader" runat="server" Class="buttonLabel" resourcekey="TeamLeader" Visible="false" />
+                        <asp:Label ID="lblAccountsTeam" runat="server" class="buttonLabel" resourcekey="AccountsMode" Visible="false" />
+                    </div>
 
                     <div>
                         <h3>
@@ -1964,7 +2003,7 @@
                     <table width="100%">
                         <tr class="Agape_SubTitle">
                             <td width="60px">
-                                <asp:Label ID="Label33" runat="server" resourcekey="YourRef"></asp:Label>
+                                <asp:Label ID="Label33" runat="server" resourcekey="NameThis"></asp:Label>
                             </td>
                             <td>
                                 <asp:TextBox ID="tbNewYourRef" runat="server" Width="150px" title="This is a personal reference ID to help you identify this Reimbursement"></asp:TextBox>
@@ -2092,7 +2131,7 @@
                     <tr><td><asp:Label ID="lblInvoiceNumber" runat="server" resourcekey="InvoiceNumber" /></td>
                         <td><asp:TextBox ID="tbInvoiceNumber" runat="server" /></td></tr>
                     <tr><td><asp:Label ID="lblVendorId" runat="server" resourcekey="VendorId" /></td>
-                        <td><asp:DropDownList ID="ddlVendorId" runat="server" AutoPostBack="True"/></td></tr>
+                        <td><asp:TextBox ID="tbVendorId" runat="server" CssClass="autocomplete" AutoPostBack="True"/></td></tr>
                     <tr><td><asp:Label ID="lblRemitTo" runat="server" resourcekey="RemitTo" /></td>
                         <td><asp:DropDownList ID="ddlRemitTo" runat="server" AutoPostBack="True" /></td></tr>
                 </table>
@@ -2100,6 +2139,7 @@
                     <tr><td><input id="btnCancelPost" type="button" class="aButton" onclick="closePostDataDialog();" value="<%= Translate("btnCancel") %>" /></td>
                         <td><asp:button ID="btnSubmitPostingData" runat="server" resourcekey="btnOK" cssclass="aButton right" OnClientClick="show_loading_spinner()" AutoPostBack="True"/></td></tr>
                 </table>
+
             </ContentTemplate>
         </asp:UpdatePanel>
     </div>
