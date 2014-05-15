@@ -81,6 +81,18 @@ Partial Class controls_RmbSubPD
     End Property
     Public Property Spare1() As String
         Get
+            Return ddlProvince.SelectedValue
+        End Get
+        Set(ByVal value As String)
+            Try
+                ddlProvince.SelectedValue = value
+            Catch
+                ddlProvince = Nothing
+            End Try
+        End Set
+    End Property
+    Public Property Spare2() As String
+        Get
             Return DropDownList1.SelectedValue
         End Get
         Set(ByVal value As String)
@@ -91,7 +103,7 @@ Partial Class controls_RmbSubPD
             End If
         End Set
     End Property
-    Public Property Spare2() As String
+    Public Property Spare3() As String
         Get
             Return DropDownList3.SelectedValue
         End Get
@@ -103,7 +115,7 @@ Partial Class controls_RmbSubPD
             End If
         End Set
     End Property
-    Public Property Spare3() As String
+    Public Property Spare4() As String
         Get
             Return DropDownList2.SelectedValue
         End Get
@@ -113,14 +125,6 @@ Partial Class controls_RmbSubPD
             Else
                 DropDownList2.SelectedValue = value
             End If
-        End Set
-    End Property
-    Public Property Spare4() As String
-        Get
-            Return Nothing
-        End Get
-        Set(ByVal value As String)
-
         End Set
     End Property
     Public Property Spare5() As String

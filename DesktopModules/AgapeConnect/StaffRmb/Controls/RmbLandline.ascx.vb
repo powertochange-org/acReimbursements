@@ -108,10 +108,14 @@ Partial Class controls_RmbLandline
     End Property
     Public Property Spare1() As String
         Get
-            Return Nothing
+            Return ddlProvince.SelectedValue
         End Get
         Set(ByVal value As String)
-
+            Try
+                ddlProvince.SelectedValue = value
+            Catch
+                ddlProvince = Nothing
+            End Try
         End Set
     End Property
     Public Property Spare2() As String

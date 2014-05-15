@@ -33,6 +33,24 @@
                 </tr>
             </table></td>
 </tr>
+<tr><td><b><dnn:Label ID="lblProvince" runat="server" controlname="ddlProvince" ResourceKey="lblProvince" /></b></td>
+    <td ><asp:DropDownList ID="ddlProvince" runat="server">
+            <asp:ListItem Text="British Columbia" Value="BC" />
+            <asp:ListItem Text="Alberta" Value="AB" />
+            <asp:ListItem Text="Saskatchewan" Value="SK" />
+            <asp:ListItem Text="Manitoba" Value="MB" />
+            <asp:ListItem Text="Ontario" Value="ON" />
+            <asp:ListItem Text="Quebec" Value="PQ" />
+            <asp:ListItem Text="Newfoundland" Value="NL" />
+            <asp:ListItem Text="Nova Scotia" Value="NS" />
+            <asp:ListItem Text="New Brunswick" Value="NB" />
+            <asp:ListItem Text="Prince Edward Is." Value="PE" />
+            <asp:ListItem Text="Yukon" Value="YT" />
+            <asp:ListItem Text="Nunavut" Value="NV" />
+            <asp:ListItem Text="Northwest Terr." Value="NT" />
+            <asp:ListItem Text="Outside Canada" Value="--" />
+        </asp:DropDownList></td>
+</tr>
 <tr id="ReceiptLine" runat="server">
     <td><b><dnn:label id="ttlReceipt"  runat="server" controlname="ddlVATReceipt"  /></b></td>
     <td>

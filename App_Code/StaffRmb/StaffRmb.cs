@@ -112,6 +112,20 @@ namespace StaffRmb
             
         }
 
+        static public String GetDefaultProvince(int StaffId) {
+            //Get the last province used by this person,
+            //otherwise return their home province.
+            StaffRmbDataContext d = new StaffRmbDataContext();
+            var lines = from c in d.AP_Staff_RmbLines where c.AP_Staff_Rmb.UserId == StaffId orderby c.RmbLineNo descending select c.Spare1;
+            if ((lines.Count() > 0) && (lines.First() != null)) {
+                return lines.First();
+            }
+            string Province = StaffBrokerFunctions.GetStaffProfileProperty(StaffId, "Province");
+            if (Province != null) {
+                return Province;
+            }
+            return "--";
+        }
 
         static public async Task<Approvers> getApproversAsync(AP_Staff_Rmb rmb, DotNetNuke.Entities.Users.UserInfo authUser, DotNetNuke.Entities.Users.UserInfo authAuthUser)
         {

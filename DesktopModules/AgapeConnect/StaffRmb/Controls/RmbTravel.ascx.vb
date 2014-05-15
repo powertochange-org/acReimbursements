@@ -109,13 +109,25 @@ Partial Class controls_RmbTravel
     End Property
     Public Property Spare1() As String
         Get
+            Return ddlProvince.SelectedValue
+        End Get
+        Set(ByVal value As String)
+            Try
+                ddlProvince.SelectedValue = value
+            Catch
+                ddlProvince = Nothing
+            End Try
+        End Set
+    End Property
+    Public Property Spare2() As String
+        Get
             Return DropDownList1.SelectedValue
         End Get
         Set(ByVal value As String)
             DropDownList1.SelectedValue = value
         End Set
     End Property
-    Public Property Spare2() As String
+    Public Property Spare3() As String
         Get
             Return ddlWorkplace.SelectedValue = "Yes"
         End Get
@@ -128,7 +140,7 @@ Partial Class controls_RmbTravel
 
         End Set
     End Property
-    Public Property Spare3() As String
+    Public Property Spare4() As String
         Get
             Return "" ' cbOyster.Checked
         End Get
@@ -142,20 +154,12 @@ Partial Class controls_RmbTravel
 
         End Set
     End Property
-    Public Property Spare4() As String
+    Public Property Spare5() As String
         Get
             Return "" 'tbOyster.Text
         End Get
         Set(ByVal value As String)
             ' tbOyster.Text = value
-        End Set
-    End Property
-    Public Property Spare5() As String
-        Get
-            Return Nothing
-        End Get
-        Set(ByVal value As String)
-
         End Set
     End Property
     Public Property Receipt() As Boolean

@@ -3409,6 +3409,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim theDate As Date = Today
                     Dim VAT As Boolean = False
                     Dim Receipt As Boolean = True
+                    Dim Province As String = Nothing
 
                     If Not blankValues Then
                         Try
@@ -3419,11 +3420,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                 Amount = CDbl(ucTypeOld.GetProperty("Amount").GetValue(theControl, Nothing))
                                 VAT = CStr(ucTypeOld.GetProperty("VAT").GetValue(theControl, Nothing))
                                 Receipt = CStr(ucTypeOld.GetProperty("Receipt").GetValue(theControl, Nothing))
+                                Province = CStr(ucTypeOld.GetProperty("Spare1").GetValue(theControl, Nothing))
                             End If
                         Catch ex As Exception
                         End Try
                     End If
                     ' Save the standard values
+                    If (Province Is Nothing) Then
+                        Province = StaffRmbFunctions.GetDefaultProvince(UserId)
+                    End If
                     phLineDetail.Controls.Clear()
                     ddlOverideTax.SelectedIndex = 0
                     theControl = LoadControl(lt.First.ControlPath)
@@ -3437,7 +3442,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ucType.GetProperty("theDate").SetValue(theControl, theDate, Nothing)
                     ucType.GetProperty("VAT").SetValue(theControl, VAT, Nothing)
                     ucType.GetProperty("Receipt").SetValue(theControl, Receipt, Nothing)
-                    ucType.GetProperty("Spare1").SetValue(theControl, "", Nothing)
+                    ucType.GetProperty("Spare1").SetValue(theControl, Province, Nothing)
                     ucType.GetProperty("Spare2").SetValue(theControl, "", Nothing)
                     ucType.GetProperty("Spare3").SetValue(theControl, "", Nothing)
                     ucType.GetProperty("Spare4").SetValue(theControl, "", Nothing)

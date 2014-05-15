@@ -181,4 +181,10 @@
     <value>Transaction date must be in the past!</value>
     <comment>Error</comment>
   </data>
+  <data name="lblProvince.Help" xml:space="preserve">
+    <value>Please enter the province you spent the majority of the time in.  If more than 1 day was spent outside of this province, then please put it on a separate expense line.</value>
+  </data>
+  <data name="lblProvince.Text" xml:space="preserve">
+    <value>Province:</value>
+  </data>
 </root>

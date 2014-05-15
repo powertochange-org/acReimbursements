@@ -116,20 +116,24 @@ Partial Class controls_RmbEquipment
 
         End Set
     End Property
-    Public Property Spare1() As String ' type
+    Public Property Spare1() As String
+        Get
+            Return ddlProvince.SelectedValue
+        End Get
+        Set(ByVal value As String)
+            Try
+                ddlProvince.SelectedValue = value
+            Catch
+                ddlProvince = Nothing
+            End Try
+        End Set
+    End Property
+    Public Property Spare2() As String ' type
         Get
             Return ddlType.SelectedValue
         End Get
         Set(ByVal value As String)
             ddlType.SelectedValue = value
-        End Set
-    End Property
-    Public Property Spare2() As String
-        Get
-            Return Nothing
-        End Get
-        Set(ByVal value As String)
-
         End Set
     End Property
     Public Property Spare3() As String

@@ -639,9 +639,6 @@
   <data name="PendingImport.Text" xml:space="preserve">
     <value>Pending Import:</value>
   </data>
-  <data name="Province.Text" xml:space="preserve">
-    <value>Province:</value>
-  </data>
   <data name="YourRef.Help" xml:space="preserve">
     <value>This is a personal reference ID to help you identify this reimbursement.</value>
   </data>
@@ -665,9 +662,6 @@
   </data>
   <data name="Country.Text" xml:space="preserve">
     <value>Country:</value>
-  </data>
-  <data name="ExpProv.Text" xml:space="preserve">
-    <value>Prov. of expenses:</value>
   </data>
   <data name="PermAddressChange.Text" xml:space="preserve">
     <value>Permanent Change</value>

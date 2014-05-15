@@ -1868,7 +1868,6 @@
                             </tr>
                         </table>
                         <asp:PlaceHolder ID="phLineDetail" runat="server"></asp:PlaceHolder>
-
                         <asp:Panel ID="pnlElecReceipts" runat="server" style="display: none;">
                         <table style="font-size: 9pt;">
                             <tr valign="top">
@@ -1885,7 +1884,8 @@
 
 
                         </table>
-</asp:Panel>
+                        </asp:Panel>
+
 
 
                         <br />
