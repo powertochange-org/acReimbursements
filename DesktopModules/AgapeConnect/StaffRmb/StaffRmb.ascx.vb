@@ -3478,7 +3478,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 ownerMessage = ownerMessage.Replace("[PRINTOUT]", "<a href='" & Request.Url.Scheme & "://" & Request.Url.Authority & Request.ApplicationPath & "DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & theRmb.RMBNo & "&UID=" & theRmb.UserId & "' target-'_blank' style='width: 134px; display:block;)'><div style='text-align: center; width: 122px; margin: 10px;'><img src='" _
                     & Request.Url.Scheme & "://" & Request.Url.Authority & Request.ApplicationPath & "DesktopModules/AgapeConnect/StaffRmb/Images/PrintoutIcon.jpg' /><br />Printout</div></a><style> a div:hover{border: solid 1px blue;}</style>")
 
-                'Email to the submitter here
+                'Email to the submitter here 
                 DotNetNuke.Services.Mail.Mail.SendMail("reimbursements@p2c.com", UserInfo.Email, "", Translate("EmailSubmittedSubject").Replace("[RMBNO]", theRmb.RID), ownerMessage, "", "HTML", "", "", "", "")
 
                 'Send Approvers Instructions Here
@@ -3500,7 +3500,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             approverMessage = approverMessage.Replace("[COMMENTS]", "")
                         End If
                         '-- Send FROM owner, so that bounces or out-of-office replies come back to owner.
-                        DotNetNuke.Services.Mail.Mail.SendMail(owner.Email, toEmail, "", subject, approverMessage, "", "HTML", "", "", "", "")
+                        DotNetNuke.Services.Mail.Mail.SendMail("P2C Reimbursements <" & owner.Email & ">", toEmail, "", subject, approverMessage, "", "HTML", "", "", "", "")
                     Else
                         approverMessage = approverMessage.Replace("[STAFFNAME]", UserInfo.DisplayName).Replace("[RMBNO]", theRmb.RMBNo).Replace("[USERREF]", IIf(theRmb.UserRef <> "", theRmb.UserRef, "None"))
                         approverMessage = approverMessage.Replace("[APPRNAME]", toName)

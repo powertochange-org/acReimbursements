@@ -245,7 +245,7 @@
             $("#divAddressConfirmation").dialog({
                 autoOpen: false,
                 position: ['middle', 230],
-                height:265,
+                height:275,
                 width:500,
                 modal:true,
                 close: function() {}
