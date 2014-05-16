@@ -29,6 +29,20 @@
         $(previous_menu_item).parent().next().children().hide();
     }
 
+    function check_expense_date() {
+        var control = $("[name$='$theControl$dtDate']");
+        var date = control.datepicker('getDate');
+        var expiry = new Date((new Date()).getTime() - 90*24*3600000); //90 days ago
+        if (date < expiry) {
+            control.addClass("old_date");
+            $("span#olddatetext").html("<-- <%= Translate("OldDate") %>");
+        } else {
+            control.removeClass("old_date");
+            $("span#olddatetext").html("");
+        }
+
+    }
+
     function loadVendorIds() {
         var company = $("#<%= ddlCompany.ClientID %>").val();
         $.ajax({

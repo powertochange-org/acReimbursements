@@ -3467,58 +3467,34 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim toEmail = approver.Email
                 Dim toName = approver.FirstName
                 Dim Approvers = approver.DisplayName
-
-                ownerMessage = ownerMessage.Replace("[APPROVER]", Approvers).Replace("[EXTRA]", "").Replace("[STAFFNAME]", owner.FirstName) _
-                    .Replace("[RMBNO]", theRmb.RMBNo).Replace("[USERREF]", theRmb.UserRef)
-                If (From c In theRmb.AP_Staff_RmbLines Where c.Receipt = True And (Not c.ReceiptImageId Is Nothing)).Count > 0 Then
-                    ownerMessage = ownerMessage.Replace("[STAFFACTION]", Translate("PostReceipts"))
-                Else
-                    ownerMessage = ownerMessage.Replace("[STAFFACTION]", Translate("NoPostReceipts"))
-                End If
-                ownerMessage = ownerMessage.Replace("[PRINTOUT]", "<a href='" & Request.Url.Scheme & "://" & Request.Url.Authority & Request.ApplicationPath & "DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & theRmb.RMBNo & "&UID=" & theRmb.UserId & "' target-'_blank' style='width: 134px; display:block;)'><div style='text-align: center; width: 122px; margin: 10px;'><img src='" _
-                    & Request.Url.Scheme & "://" & Request.Url.Authority & Request.ApplicationPath & "DesktopModules/AgapeConnect/StaffRmb/Images/PrintoutIcon.jpg' /><br />Printout</div></a><style> a div:hover{border: solid 1px blue;}</style>")
+                Dim hasReceipts = (From c In theRmb.AP_Staff_RmbLines Where c.Receipt = True And (Not c.ReceiptImageId Is Nothing)).Count > 0
 
                 'Email to the submitter here 
-                DotNetNuke.Services.Mail.Mail.SendMail("reimbursements@p2c.com", UserInfo.Email, "", Translate("EmailSubmittedSubject").Replace("[RMBNO]", theRmb.RID), ownerMessage, "", "HTML", "", "", "", "")
+                ownerMessage = ownerMessage.Replace("[APPROVER]", Approvers).Replace("[EXTRA]", "").Replace("[STAFFNAME]", owner.FirstName) _
+                    .Replace("[RMBNO]", theRmb.RMBNo).Replace("[USERREF]", theRmb.UserRef)
+                ownerMessage = ownerMessage.Replace("[STAFFACTION]", If(hasReceipts, Translate("PostReceipts"), Translate("NoPostRecipts")))
+                ownerMessage = ownerMessage.Replace("[PRINTOUT]", "<a href='" & Request.Url.Scheme & "://" & Request.Url.Authority & Request.ApplicationPath & "DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & theRmb.RMBNo & "&UID=" & theRmb.UserId & "' target-'_blank' style='width: 134px; display:block;)'><div style='text-align: center; width: 122px; margin: 10px;'><img src='" _
+                    & Request.Url.Scheme & "://" & Request.Url.Authority & Request.ApplicationPath & "DesktopModules/AgapeConnect/StaffRmb/Images/PrintoutIcon.jpg' /><br />Printout</div></a><style> a div:hover{border: solid 1px blue;}</style>")
+                DotNetNuke.Services.Mail.Mail.SendMail("P2C Reimbursements <reimbursements@p2c.com>", UserInfo.Email, "", Translate("EmailSubmittedSubject").Replace("[RMBNO]", theRmb.RID), ownerMessage, "", "HTML", "", "", "", "")
 
                 'Send Approvers Instructions Here
                 If toEmail.Length > 0 Then
                     Dim subject = Translate("SubmittedApprEmailSubject").Replace("[STAFFNAME]", UserInfo.DisplayName)
+                    approverMessage = approverMessage.Replace("[STAFFNAME]", UserInfo.DisplayName).Replace("[RMBNO]", theRmb.RMBNo).Replace("[USERREF]", IIf(theRmb.UserRef <> "", theRmb.UserRef, "None"))
+                    approverMessage = approverMessage.Replace("[APPRNAME]", toName)
+                    approverMessage = approverMessage.Replace("[OLDEXPENSES]", If(hasOldExpenses(), Translate("WarningOldExpenses"), ""))
+                    approverMessage = approverMessage.Replace("[COMMENTS]", If(theRmb.UserComment <> "", Translate("EmailComments") & "<br />" & theRmb.UserComment, ""))
                     If StaffRmbFunctions.isStaffAccount(theRmb.CostCenter) Then
                         'Personal Reimbursement
-                        approverMessage = approverMessage.Replace("[STAFFNAME]", UserInfo.DisplayName).Replace("[RMBNO]", theRmb.RMBNo).Replace("[USERREF]", IIf(theRmb.UserRef <> "", theRmb.UserRef, "None"))
-                        approverMessage = approverMessage.Replace("[APPRNAME]", toName)
-                        If (isLowBalance()) Then
-                            Dim warning = Translate("WarningLowBalance").Replace("[ACCTBAL]", hfAccountBalance.Value).Replace("[BUDGBAL]", hfBudgetBalance.Value).Replace("[ACCT]", tbChargeTo.Text)
-                            approverMessage = approverMessage.Replace("[LOWBALANCE]", warning)
-                        Else
-                            approverMessage = approverMessage.Replace("[LOWBALANCE", "")
-                        End If
-                        If theRmb.UserComment <> "" Then
-                            approverMessage = approverMessage.Replace("[COMMENTS]", Translate("EmailComments") & "<br />" & theRmb.UserComment)
-                        Else
-                            approverMessage = approverMessage.Replace("[COMMENTS]", "")
-                        End If
-                        '-- Send FROM owner, so that bounces or out-of-office replies come back to owner.
-                        DotNetNuke.Services.Mail.Mail.SendMail("P2C Reimbursements <" & owner.Email & ">", toEmail, "", subject, approverMessage, "", "HTML", "", "", "", "")
+                        approverMessage = approverMessage.Replace("[LOWBALANCE]", If(hfAccountBalance.Value < GetTotal(hfRmbNo.Value), Translate("WarningLowBalanceStaffAccount"), ""))
                     Else
-                        approverMessage = approverMessage.Replace("[STAFFNAME]", UserInfo.DisplayName).Replace("[RMBNO]", theRmb.RMBNo).Replace("[USERREF]", IIf(theRmb.UserRef <> "", theRmb.UserRef, "None"))
-                        approverMessage = approverMessage.Replace("[APPRNAME]", toName)
-                        If (isLowBalance()) Then
-                            Dim warning = Translate("WarningLowBalance").Replace("[ACCTBAL]", hfAccountBalance.Value).Replace("[BUDGBAL]", hfBudgetBalance.Value).Replace("[ACCT]", tbChargeTo.Text)
-                            approverMessage = approverMessage.Replace("[LOWBALANCE]", warning)
-                        Else
-                            approverMessage = approverMessage.Replace("[LOWBALANCE", "")
-                        End If
-                        If theRmb.UserComment <> "" Then
-                            approverMessage = approverMessage.Replace("[COMMENTS]", Translate("EmailComments") & "<br />" & theRmb.UserComment)
-                        Else
-                            approverMessage = approverMessage.Replace("[COMMENTS]", "")
-                        End If
-                        '-- Send FROM owner, so that bounces or out-of-office replies come back to owner.
-                        DotNetNuke.Services.Mail.Mail.SendMail(owner.Email, toEmail, "", subject, approverMessage, "", "HTML", "", "", "", "")
+                        Dim low_balance = Translate("WarningLowBalance").Replace("[ACCTBAL]", hfAccountBalance.Value).Replace("[BUDGBAL]", hfBudgetBalance.Value).Replace("[ACCT]", tbChargeTo.Text)
+                        approverMessage = approverMessage.Replace("[LOWBALANCE]", If(isLowBalance(), low_balance, ""))
                     End If
+                    '-- Send FROM owner, so that bounces or out-of-office replies come back to owner.
+                    DotNetNuke.Services.Mail.Mail.SendMail("P2C Reimbursements <" & owner.Email & ">", toEmail, "", subject, approverMessage, "", "HTML", "", "", "", "")
                 End If
+
             Catch ex As Exception
                 lblError.Text = "Error Sending Approval eMail: " & ex.Message & ex.StackTrace
                 lblError.Visible = True
@@ -4990,6 +4966,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             new_address = new_address.Replace(Environment.NewLine & Environment.NewLine, Environment.NewLine)
             tbComments.Text += Environment.NewLine & "**Use the following address:" & Environment.NewLine & new_address
             Return True
+        End Function
+
+        Private Function hasOldExpenses() As Boolean
+            Dim oldest_allowable_date = expiryDate()
+            Dim old_lines = (From c In d.AP_Staff_RmbLines Where c.RmbNo = hfRmbNo.Value And c.TransDate < oldest_allowable_date).Count()
+            Return old_lines > 0
+        End Function
+
+        Private Function expiryDate() As Date
+            Return Today.AddDays(-90)
         End Function
 
 

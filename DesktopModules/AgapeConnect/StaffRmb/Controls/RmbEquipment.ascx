@@ -30,7 +30,8 @@
             </b>
         </td>
         <td colspan="2">
-            <asp:TextBox ID="dtDate" runat="server" Width="90px" class="datepicker"></asp:TextBox>
+        <asp:TextBox ID="dtDate" runat="server" Width="90px" class="datepicker" onChange="check_expense_date();"></asp:TextBox>
+        <span id="olddatetext"></span>       
         </td>
     </tr>
     <tr>

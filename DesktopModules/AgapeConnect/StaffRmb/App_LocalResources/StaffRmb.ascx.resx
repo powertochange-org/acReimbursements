@@ -681,4 +681,13 @@
   <data name="NameThis.Text" xml:space="preserve">
     <value>Name this reimbursement:</value>
   </data>
+  <data name="WarningOldExpenses.Text" xml:space="preserve">
+    <value>Notice: This reimbursement contains expenses that are more than 90 days old.</value>
+  </data>
+  <data name="WarningLowBalanceStaffAccount.Text" xml:space="preserve">
+    <value>Warning: There are insufficient funds in this staff account to fulfil this reimbursement.  You may still choose to approve it, if you are aware of sufficient incoming funds to cover it.</value>
+  </data>
+  <data name="OldDate.Text" xml:space="preserve">
+    <value>Expenses may only be reimbursed within 90 days.</value>
+  </data>
 </root>
