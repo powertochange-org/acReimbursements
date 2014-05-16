@@ -32,7 +32,7 @@
     function check_expense_date() {
         var control = $("[name$='$theControl$dtDate']");
         var date = control.datepicker('getDate');
-        var expiry = new Date((new Date()).getTime() - 90*24*3600000); //90 days ago
+        var expiry = new Date((new Date()).getTime() - <%= Settings("Expire") %>*24*3600000); //Number of days is set in Reimbursement settings
         if (date < expiry) {
             control.addClass("old_date");
             $("span#olddatetext").html("<-- <%= Translate("OldDate") %>");

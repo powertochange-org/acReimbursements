@@ -1437,7 +1437,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     insert.LineType = CInt(ddlLineTypes.SelectedValue)
                     insert.TransDate = CDate(ucType.GetProperty("theDate").GetValue(theControl, Nothing))
 
-                    Dim age = DateDiff(DateInterval.Month, insert.TransDate, Today)
+                    Dim age = DateDiff(DateInterval.Day, insert.TransDate, Today)
                     If ddlOverideTax.SelectedIndex > 0 Then
                         insert.Taxable = (ddlOverideTax.SelectedValue = 1)
                         If (age > Settings("Expire")) Then
@@ -1473,12 +1473,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             insert.OutOfDate = True
                             insert.Taxable = True
 
-                            Dim t1 As Type = Me.GetType()
-                            Dim sb1 As System.Text.StringBuilder = New System.Text.StringBuilder()
-                            sb1.Append("<script language='javascript'>")
-                            sb1.Append("alert(""" & msg & """);")
-                            sb1.Append("</script>")
-                            ScriptManager.RegisterClientScriptBlock(Page, t1, "popup", sb1.ToString, False)
+                            '-- Disabled, as we are already notifying of old transactions
+                            'Dim t1 As Type = Me.GetType()
+                            'Dim sb1 As System.Text.StringBuilder = New System.Text.StringBuilder()
+                            'sb1.Append("<script language='javascript'>")
+                            'sb1.Append("alert(""" & msg & """);")
+                            'sb1.Append("</script>")
+                            'ScriptManager.RegisterClientScriptBlock(Page, t1, "popup", sb1.ToString, False)
                         Else
                             insert.OutOfDate = False
                             If theCC.Count > 0 Then
@@ -4975,7 +4976,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Function
 
         Private Function expiryDate() As Date
-            Return Today.AddDays(-90)
+            Return Today.AddDays(-Settings("Expire"))
         End Function
 
 

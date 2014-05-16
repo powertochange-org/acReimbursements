@@ -253,7 +253,7 @@
     <value>Expenses</value>
   </data>
   <data name="Expire.Text" xml:space="preserve">
-    <value>Reimbursements must be made within [EXPIRE] months. This item you have entered is not within the [EXPIRE] months cut off period. If you reimburse this item it will be treated as extra salary and therefore incur tax.</value>
+    <value>Reimbursements must be made within [EXPIRE] days.This item you have entered is not within the [EXPIRE] months cut off period. If you reimburse this item it will be treated as extra salary and therefore incur tax.</value>
   </data>
   <data name="LineType.Text" xml:space="preserve">
     <value>Line Type</value>
@@ -517,10 +517,10 @@
     <value>Advance #: [ADVNO] has been cancelled</value>
   </data>
   <data name="ExpireDept.Text" xml:space="preserve">
-    <value>Reimbursements must be made within [EXPIRE] months. This item you have entered is not within the [EXPIRE] months cut off period. If you reimburse this item it will be treated as extra (from your STAFF ACCOUNT!) and incur tax.</value>
+    <value>Reimbursements must be made within [EXPIRE] days. This item you have entered is not within the [EXPIRE] months cut off period. If you reimburse this item it will be treated as extra (from your STAFF ACCOUNT!) and incur tax.</value>
   </data>
   <data name="ExpireImpossible.Text" xml:space="preserve">
-    <value>Reimbursements must be made within [EXPIRE] months. This item you have entered is not within the [EXPIRE] months cut off period, and cannot be reimbursed.</value>
+    <value>Reimbursements must be made within [EXPIRE] days.This item you have entered is not within the [EXPIRE] months cut off period, and cannot be reimbursed.</value>
   </data>
   <data name="lblErrorMessage.Text" xml:space="preserve">
     <value>Error Message:</value>
@@ -688,6 +688,6 @@
     <value>Warning: There are insufficient funds in this staff account to fulfil this reimbursement.  You may still choose to approve it, if you are aware of sufficient incoming funds to cover it.</value>
   </data>
   <data name="OldDate.Text" xml:space="preserve">
-    <value>Expenses may only be reimbursed within 90 days.</value>
+    <value>Expenses may only be reimbursed within 90 days.  Reimbursements older than this may be denied, and will be taxed.</value>
   </data>
 </root>

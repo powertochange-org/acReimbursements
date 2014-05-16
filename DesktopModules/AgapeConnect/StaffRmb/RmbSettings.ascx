@@ -122,7 +122,7 @@
                     </td>
                     <td>
                         <asp:TextBox ID="tbExpire" runat="server" Width="80px"></asp:TextBox>
-                        <asp:Label ID="Label21" runat="server" resourcekey="Months"></asp:Label>
+                        <asp:Label ID="Label21" runat="server" resourcekey="Days"></asp:Label>
                     </td>
                 </tr>
                 <tr>

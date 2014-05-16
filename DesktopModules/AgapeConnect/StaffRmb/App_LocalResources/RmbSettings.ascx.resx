@@ -199,7 +199,7 @@
     <value>Expense Types</value>
   </data>
   <data name="lblExpire.Help" xml:space="preserve">
-    <value>Enter the number of months back a transaction can be reimbursement. The system ignored the day-of-month. So on the 17th Jan 2011, you can reimburse anything since 1st Oct 2010</value>
+    <value>Enter the maximum age of a transaction that can still be reimbursed.</value>
   </data>
   <data name="lblExpire.Text" xml:space="preserve">
     <value>Transactions must be reimbursed within</value>
@@ -323,5 +323,8 @@
   </data>
   <data name="lblBudgetTolerance.Text" xml:space="preserve">
     <value>Budget Tolerance (percentage)</value>
+  </data>
+  <data name="Days.Text" xml:space="preserve">
+    <value>Days</value>
   </data>
 </root>
