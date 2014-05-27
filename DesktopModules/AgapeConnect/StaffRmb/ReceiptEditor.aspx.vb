@@ -108,8 +108,8 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
                 Dim fm = FolderMappingController.Instance.GetFolderMapping(PS.PortalId, "Secure")
 
 
-                If Not FolderManager.Instance.FolderExists(PS.PortalId, "_RmbReceipts/") Then
-                    Dim f1 = FolderManager.Instance.AddFolder(fm, "_RmbReceipts")
+                If Not FolderManager.Instance.FolderExists(PS.PortalId, "/_RmbReceipts/") Then
+                    Dim f1 = FolderManager.Instance.AddFolder(fm, "/_RmbReceipts")
                     Dim rc As New DotNetNuke.Security.Roles.RoleController
 
                     Dim pc As New Permissions.PermissionController
@@ -120,11 +120,12 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
 
 
                 Dim theFolder As IFolderInfo
-                If FolderManager.Instance.FolderExists(PS.PortalId, "_RmbReceipts/" & theRmb.UserId) Then
-                    theFolder = FolderManager.Instance.GetFolder(PS.PortalId, "_RmbReceipts/" & theRmb.UserId)
+                Dim path = "/_RmbReceipts/" & theRmb.UserId
+                If FolderManager.Instance.FolderExists(PS.PortalId, path) Then
+                    theFolder = FolderManager.Instance.GetFolder(PS.PortalId, path)
                 Else
 
-                    theFolder = FolderManager.Instance.AddFolder(fm, "_RmbReceipts/" & theRmb.UserId)
+                    theFolder = FolderManager.Instance.AddFolder(fm, path)
                 End If
 
 
@@ -217,7 +218,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
 
             Else
                 'Not image file
-                lblError.Text = "* File must end in .jpg, .jpeg, .gif, .png or .pdf<br />"
+                lblError.Text = "* File must end in .jpg, .jpeg, .gif, .png, .bmp or .pdf<br />"
             End If
 
 
@@ -238,7 +239,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
         Dim theRmb = (From c In d.AP_Staff_Rmbs Where c.PortalId = PS.PortalId And c.RMBNo = RmbNo).First
 
 
-        Dim theFolder As IFolderInfo = FolderManager.Instance.GetFolder(PS.PortalId, "_RmbReceipts/" & theRmb.UserId)
+        Dim theFolder As IFolderInfo = FolderManager.Instance.GetFolder(PS.PortalId, "/_RmbReceipts/" & theRmb.UserId)
 
         Dim theFile = FileManager.Instance.GetFile(theFolder, "R" & RmbNo & "L" & RmbLine & ".jpg")
 
@@ -312,7 +313,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
                 Dim theRmb = (From c In d.AP_Staff_Rmbs Where c.PortalId = PS.PortalId And c.RMBNo = RmbNo).First
 
 
-                Dim theFolder As IFolderInfo = FolderManager.Instance.GetFolder(PS.PortalId, "_RmbReceipts/" & theRmb.UserId)
+                Dim theFolder As IFolderInfo = FolderManager.Instance.GetFolder(PS.PortalId, "/_RmbReceipts/" & theRmb.UserId)
 
                 CheckFolderPermissions(PS.PortalId, theFolder, theRmb.UserId)
 

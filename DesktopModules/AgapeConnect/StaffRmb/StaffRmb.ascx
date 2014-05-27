@@ -811,7 +811,7 @@
                 }
                 console.info('looking up accounts list');
                 $.ajax({
-                    url:"DesktopModules/AgapeConnect/StaffRmb/WebService.asmx/GetAccountNumbers",
+                    url:"/DesktopModules/AgapeConnect/StaffRmb/WebService.asmx/GetAccountNumbers",
                     dataType: "json",
                     data: {term: term},
                     type: "POST",
@@ -825,7 +825,15 @@
                 });
             },
             select: function(event, ui) {
+                console.debug("SELECT: "+ui.item.value)
                 $('#<%= tbNewChargeTo.ClientID%>').val(ui.item.value);
+            },
+            change: function(event, ui) {
+                if (!ui.item) {
+                    console.debug("CHANGE: -null-")
+                    $('#<%= tbNewChargeTo.ClientID%>').val('');
+                    alert("Please select an account again.  You must click on an item in the list, rather than just typing it.");
+                }
             },
             minLength: 2
         });
@@ -839,7 +847,7 @@
                 }
                 console.info('looking up accounts list');
                 $.ajax({
-                    url:"DesktopModules/AgapeConnect/StaffRmb/WebService.asmx/GetAccountNumbers",
+                    url:"/DesktopModules/AgapeConnect/StaffRmb/WebService.asmx/GetAccountNumbers",
                     dataType: "json",
                     data: {term: term},
                     type: "POST",
@@ -853,7 +861,15 @@
                 });
             },
             select: function(event, ui) {
+                console.debug("SELECT: "+ui.item.value)
                 $('#<%= tbCostCenter.ClientID%>').val(ui.item.value);
+            },
+            change: function(event, ui) {
+                if (!ui.item) {
+                    console.debug("CHANGE: -null-")
+                    $('#<%= tbCostCenter.ClientID%>').val('');
+                    alert("Please select an account again.  You must click on an item in the list, rather than just typing it.");
+                }
             },
             minLength: 2
         });

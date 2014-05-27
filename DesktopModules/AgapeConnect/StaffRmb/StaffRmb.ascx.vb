@@ -111,35 +111,35 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim CC = ""
                 If staff Is Nothing Then
                     'Cannot Use
-                    lblError.Text = "Access Denied. You have not been setup as a staff member on this website. Please ask your accounts team or administrator to setup your staff profile."
+                    lblError.Text = "Access Denied. You have not been setup as a staff member on this website. Please ask your accounts team or administrator to set up your staff profile."
 
                     lblError.Visible = True
                     pnlEverything.Visible = False
                     Return
-                ElseIf staff.CostCenter = Nothing And PAC = "" Then
-
-                    'cannot use
-                    lblError.Text = "Access Denied. Your account has not been setup with a valid Responsibility Center. Please ask your accounts team or administrator to setup your staff profile."
-                    lblError.Visible = True
-                    pnlEverything.Visible = False
-                    Return
+                    '-- Disabled because we do not use PAC
+                    'ElseIf staff.CostCenter = Nothing And PAC = "" Then
+                    '    'cannot use
+                    '    lblError.Text = "Access Denied. Your account has not been setup with a valid Responsibility Center. Please ask your accounts team or administrator to setup your staff profile"
+                    '    lblError.Visible = True
+                    '    pnlEverything.Visible = False
+                    '    Return
 
 
                 Else
                     CC = staff.CostCenter
                     PayOnly = StaffBrokerFunctions.GetStaffProfileProperty(staff.StaffId, "PayOnly")
                     'PAC = StaffBrokerFunctions.GetStaffProfileProperty(staff.StaffId, "PersonalAccountCode")
-                    If CC = "" And PAC = "" Then
-                        'cannot use
-                        lblError.Text = "Access Denied. Your account has not been setup with a valid Responsibility Center. Please ask your accounts team or administrator to setup your staff profile."
-                        lblError.Visible = True
-                        pnlEverything.Visible = False
-                        Return
-                    End If
+                    '-- Disabled because we do not use PAC
+                    'If CC = "" And PAC = "" Then
+                    '    'cannot use
+                    '    lblError.Text = "Access Denied. Your account has not been setup with a valid Responsibility Center. Please ask your accounts team or administrator to setup your staff profile."
+                    '    lblError.Visible = True
+                    '    pnlEverything.Visible = False
+                    '    Return
+                    'End If
 
 
                 End If
-
 
 
                 Dim q = From c In ds.AP_StaffBroker_Staffs Where (c.UserId1 = UserId Or c.UserId2 = UserId) And (Not PayOnly) And c.CostCenter.Trim().Length > 0 And c.PortalId = PortalId Select DisplayName = (c.DisplayName & "(" & c.CostCenter & ")"), c.CostCenter, ViewOrder = 1
@@ -688,13 +688,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 For Each person In allStaff
                     '-- sort by first letter of last name
                     Dim letter = person.LastName.Substring(0, 1)
-                    Dim SubmittedRmb = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Submitted And c.PortalId = PortalId And (c.UserId = person.UserID) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
+                    Dim SubmittedRmb = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Submitted And c.PortalId = PortalId And (c.UserId = person.UserID) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId, Total = (From t In c.AP_Staff_RmbLines Select t.GrossAmount).Sum()).Take(Settings("MenuSize"))
                     Dim submittedNode As New TreeNode(person.DisplayName)
                     If SubmittedRmb.Count() > 0 Then
                         addItemsToTree(AllStaffSubmittedNode, submittedNode, letter, SubmittedRmb, "rmb")
                     End If
                     If (ENABLE_ADVANCE_FUNCTIONALITY) Then
-                        Dim SubmittedAdv = (From c In d.AP_Staff_AdvanceRequests Where c.RequestStatus = RmbStatus.Submitted And c.PortalId = PortalId And c.UserId = person.UserID Order By c.LocalAdvanceId Descending Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId).Take(Settings("MenuSize"))
+                        Dim SubmittedAdv = (From c In d.AP_Staff_AdvanceRequests Where c.RequestStatus = RmbStatus.Submitted And c.PortalId = PortalId And c.UserId = person.UserID Order By c.LocalAdvanceId Descending Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, Total = c.RequestAmount).Take(Settings("MenuSize"))
                         If SubmittedAdv.Count() > 0 Then
                             addItemsToTree(AllStaffSubmittedNode, submittedNode, letter, SubmittedAdv, "adv")
                         End If
@@ -770,13 +770,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 For Each person In allStaff
                     '-- sort by first letter of last name
                     Dim letter = person.LastName.Substring(0, 1)
-                    Dim ProcessingRmb = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Processing And c.PortalId = PortalId And (c.UserId = person.UserID) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
+                    Dim ProcessingRmb = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Processing And c.PortalId = PortalId And (c.UserId = person.UserID) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId, Total = (From t In c.AP_Staff_RmbLines Select t.GrossAmount).Sum()).Take(Settings("MenuSize"))
                     Dim processingNode As New TreeNode(person.DisplayName)
                     If ProcessingRmb.Count() > 0 Then
                         addItemsToTree(AllStaffProcessingNode, processingNode, letter, ProcessingRmb, "rmb")
                     End If
                     If (ENABLE_ADVANCE_FUNCTIONALITY) Then
-                        Dim ProcessingAdv = (From c In d.AP_Staff_AdvanceRequests Where c.RequestStatus = RmbStatus.Processing And c.PortalId = PortalId And c.UserId = person.UserID Order By c.LocalAdvanceId Descending Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId).Take(Settings("MenuSize"))
+                        Dim ProcessingAdv = (From c In d.AP_Staff_AdvanceRequests Where c.RequestStatus = RmbStatus.Processing And c.PortalId = PortalId And c.UserId = person.UserID Order By c.LocalAdvanceId Descending Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, Total = c.RequestAmount).Take(Settings("MenuSize"))
                         If ProcessingAdv.Count() > 0 Then
                             addItemsToTree(AllStaffProcessingNode, processingNode, letter, ProcessingAdv, "adv")
                         End If
@@ -802,13 +802,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 For Each person In allStaff
                     '-- sort by first letter of last name
                     Dim letter = person.LastName.Substring(0, 1)
-                    Dim PaidRmb = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Paid And c.PortalId = PortalId And (c.UserId = person.UserID) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
+                    Dim PaidRmb = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Paid And c.PortalId = PortalId And (c.UserId = person.UserID) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId, Total = (From t In c.AP_Staff_RmbLines Select t.GrossAmount).Sum()).Take(Settings("MenuSize"))
                     Dim paidNode As New TreeNode(person.DisplayName)
                     If PaidRmb.Count() > 0 Then
                         addItemsToTree(AllStaffPaidNode, paidNode, letter, PaidRmb, "rmb")
                     End If
                     If (ENABLE_ADVANCE_FUNCTIONALITY) Then
-                        Dim PaidAdv = (From c In d.AP_Staff_AdvanceRequests Where c.RequestStatus = RmbStatus.Paid And c.PortalId = PortalId And c.UserId = person.UserID Order By c.LocalAdvanceId Descending Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId).Take(Settings("MenuSize"))
+                        Dim PaidAdv = (From c In d.AP_Staff_AdvanceRequests Where c.RequestStatus = RmbStatus.Paid And c.PortalId = PortalId And c.UserId = person.UserID Order By c.LocalAdvanceId Descending Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, Total = c.RequestAmount).Take(Settings("MenuSize"))
                         If PaidAdv.Count() > 0 Then
                             addItemsToTree(AllStaffPaidNode, paidNode, letter, PaidAdv, "adv")
                         End If
@@ -1828,7 +1828,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 '    End If
             End If
 
-            insert.Department = StaffBrokerFunctions.IsDept(PortalId, CC.First)
+            insert.Department = If(CC.Count < 1, False, StaffBrokerFunctions.IsDept(PortalId, CC.First))
 
             btnApprove.Visible = False
             btnSubmit.Visible = True
@@ -1958,7 +1958,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Message = Message.Replace("[APPRFIRSTNAME]", UserInfo.FirstName)
                     Message = Message.Replace("[COMMENTS]", comments)
 
-                    DotNetNuke.Services.Mail.Mail.SendMail("reimbursements@p2c.com", StaffMbr.Email, "", Translate("EmailCancelledSubject").Replace("[RMBNO]", rmb.First.RID).Replace("[USERREF]", rmb.First.UserRef), Message, "", "HTML", "", "", "", "")
+                    DotNetNuke.Services.Mail.Mail.SendMail("P2C Reimbursements <reimbursements@p2c.com>", StaffMbr.Email, "", Translate("EmailCancelledSubject").Replace("[RMBNO]", rmb.First.RID).Replace("[USERREF]", rmb.First.UserRef), Message, "", "HTML", "", "", "", "")
 
                     pnlMain.Visible = False
                     pnlSplash.Visible = True
@@ -2014,7 +2014,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Else
                     Emessage = Emessage.Replace("[CHANGES]", "")
                 End If
-                DotNetNuke.Services.Mail.Mail.SendMail("reimbursements@p2c.com", theUser.Email, "", Translate("EmailApprovedSubjectP").Replace("[RMBNO]", rmb.First.RID).Replace("[USERREF]", rmb.First.UserRef), Emessage, "", "HTML", "", "", "", "")
+                DotNetNuke.Services.Mail.Mail.SendMail("P2C Reimbursements <reimbursements@p2c.com>", theUser.Email, "", Translate("EmailApprovedSubjectP").Replace("[RMBNO]", rmb.First.RID).Replace("[USERREF]", rmb.First.UserRef), Emessage, "", "HTML", "", "", "", "")
 
                 Log(rmb.First.RMBNo, "Approved")
                 Dim message As String = Translate("RmbApproved").Replace("[RMBNO]", rmb.First.RID)
@@ -2515,7 +2515,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     tbCostcenter.Text = theLine.First.CostCenter
                     ddlAccountCode.SelectedValue = theLine.First.AccountCode
 
-                    ifReceipt.Attributes("src") = Request.Url.Scheme & "://" & Request.Url.Host & "/DesktopModules/AgapeConnect/StaffRmb/ReceiptEditor.aspx?RmbNo=" & theLine.First.RmbNo & "&RmbLine=" & theLine.First.RmbLineNo
+                    ifReceipt.Attributes("src") = Request.Url.Scheme & "://" & Request.Url.Authority & "/DesktopModules/AgapeConnect/StaffRmb/ReceiptEditor.aspx?RmbNo=" & theLine.First.RmbNo & "&RmbLine=" & theLine.First.RmbLineNo
 
                     If Not theLine.First.ReceiptImageId Is Nothing Then
                         pnlElecReceipts.Attributes("style") = ""
@@ -3286,7 +3286,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 tmc.UpdateTabModuleSetting(TabModuleId, "NoReceipt", 5)
             End If
             If Settings("Expire") = "" Then
-                tmc.UpdateTabModuleSetting(TabModuleId, "Expire", 3)
+                tmc.UpdateTabModuleSetting(TabModuleId, "Expire", 90)
             End If
             If Settings("TeamLeaderLimit") = "" Then
                 tmc.UpdateTabModuleSetting(TabModuleId, "TeamLeaderLimit", 10000)
@@ -4810,8 +4810,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim newNode As New TreeNode()
                 newNode.SelectAction = TreeNodeSelectAction.Select
                 If (type.Equals("rmb")) Then
-                    Dim rmbUser = UserController.GetUserById(PortalId, row.UserId).DisplayName
-                    newNode.Text = GetRmbTitleTeamShort(row.RID, row.RmbDate, rmbUser)
+                    'Dim rmbUser = UserController.GetUserById(PortalId, row.UserId).DisplayName
+                    newNode.Text = GetRmbTitleTeamShort(row.RID, row.RmbDate, row.Total)
                     newNode.Value = row.RMBNo
                 Else
                     Dim advUser = UserController.GetUserById(PortalId, row.UserId).DisplayName
@@ -4970,15 +4970,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Function
 
         Private Function hasOldExpenses() As Boolean
-            Dim oldest_allowable_date = expiryDate()
-            Dim old_lines = (From c In d.AP_Staff_RmbLines Where c.RmbNo = hfRmbNo.Value And c.TransDate < oldest_allowable_date).Count()
+            Dim oldest_allowable_date = Today.AddDays(-Settings("Expire"))
+            Dim old_lines = (From c In d.AP_Staff_RmbLines Where c.RmbNo = hfRmbNo.Value And c.TransDate < oldest_allowable_date Select c.TransDate).Count()
             Return old_lines > 0
         End Function
-
-        Private Function expiryDate() As Date
-            Return Today.AddDays(-Settings("Expire"))
-        End Function
-
 
     End Class
 End Namespace
