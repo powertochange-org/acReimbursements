@@ -98,6 +98,17 @@
         $("span[id$='GridView1_lblRemainingBalance']:last").text(result);
     }
 
+    function disableSubmitOnEnter(e)
+    {
+        var key;      
+        if(window.event)
+            key = window.event.keyCode; //IE
+        else
+            key = e.which; //firefox      
+
+        return (key != 13);
+    }
+
     function format_money(n) {
         decPlaces = 2,
         decSeparator = '.',
@@ -499,12 +510,15 @@
      document.getElementById("addLinebtn").disabled = "disabled";
      return False;
  }
-
- 
-
+ function resetNewRmbPopup() {
+     $('#<%= hfNewChargeTo.ClientID%>').val(''); 
+     $('#<%= tbNewChargeTo.ClientID%>').val(''); 
+     $('#<%= tbNewYourRef.ClientID%>').val('');
+     $('#<%= tbNewComments.ClientID%>').val('');
+ }
     
  function showNewLinePopup()  {$("#divNewItem").dialog("open"); checkCur(); return false;}
- function showNewRmbPopup() {$("#divNewRmb").dialog("open"); return false; }
+ function showNewRmbPopup() {resetNewRmbPopup(); $("#divNewRmb").dialog("open"); return false; }
  function showNSFPopup() {$("#divInsufficientFunds").dialog("open"); return false; }
  function showPopupSplit() {$("#divSplitPopup").dialog("open"); return false; }
  function showWarningDialog() {$("#divWarningDialog").dialog("open"); return false; }
@@ -825,16 +839,10 @@
                 });
             },
             select: function(event, ui) {
-                console.debug("SELECT: "+ui.item.value)
-                $('#<%= tbNewChargeTo.ClientID%>').val(ui.item.value);
+                console.debug("SELECT: "+ui.item.value);
+                $('#<%= hfNewChargeTo.ClientID%>').val(ui.item.value);
             },
-            change: function(event, ui) {
-                if (!ui.item) {
-                    console.debug("CHANGE: -null-")
-                    $('#<%= tbNewChargeTo.ClientID%>').val('');
-                    alert("Please select an account again.  You must click on an item in the list, rather than just typing it.");
-                }
-            },
+
             minLength: 2
         });
         $("#<%= tbCostCenter.ClientID%>").autocomplete({
@@ -861,7 +869,7 @@
                 });
             },
             select: function(event, ui) {
-                console.debug("SELECT: "+ui.item.value)
+                console.debug("SELECT: "+ui.item.value);
                 $('#<%= tbCostCenter.ClientID%>').val(ui.item.value);
             },
             change: function(event, ui) {
@@ -2020,6 +2028,7 @@
                             <td width="70px">Charge To:
                             </td>
                             <td>
+                                <asp:HiddenField ID="hfNewChargeTo" runat="server" value=""></asp:HiddenField>
                                 <asp:TextBox ID="tbNewChargeTo" runat="server" title="What account would you like to be reimbursed from?">
                                 </asp:TextBox>
                             </td>
@@ -2037,7 +2046,7 @@
                             </td>
                         </tr>
                     </table>
-                    <asp:Button ID="btnCreate" runat="server" resourcekey="btnCreate" UseSubmitBehavior="false" OnClientClick="show_loading_spinner()"
+                    <asp:Button ID="btnCreate" runat="server" resourcekey="btnCreate" UseSubmitBehavior="false" OnClientClick="closeNewRmbPopup(); show_loading_spinner();"
                         class="aButton" />
                     <input id="btnCancel2" type="button" value='<%= Translate("btnCancel") %>' onclick="closeNewRmbPopup();"
                         class="aButton" />

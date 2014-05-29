@@ -214,6 +214,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Else
                     ltSplash.Text = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbSplash", PortalId))
                 End If
+                tbNewChargeTo.Attributes.Add("onkeypress", "return disableSubmitOnEnter();")
             End If
             Await Task.WhenAll(TaskList)
         End Sub
@@ -770,7 +771,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 For Each person In allStaff
                     '-- sort by first letter of last name
                     Dim letter = person.LastName.Substring(0, 1)
-                    Dim ProcessingRmb = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Processing And c.PortalId = PortalId And (c.UserId = person.UserID) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId, Total = (From t In c.AP_Staff_RmbLines Select t.GrossAmount).Sum()).Take(Settings("MenuSize"))
+                    Dim ProcessingRmb = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Processing And c.PortalId = PortalId And (c.UserId = person.UserID) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId, Total = If(c.AP_Staff_RmbLines.Count = 0, 0, (From t In c.AP_Staff_RmbLines Select t.GrossAmount).Sum())).Take(Settings("MenuSize"))
                     Dim processingNode As New TreeNode(person.DisplayName)
                     If ProcessingRmb.Count() > 0 Then
                         addItemsToTree(AllStaffProcessingNode, processingNode, letter, ProcessingRmb, "rmb")
@@ -1803,7 +1804,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 insert.UserRef = tbNewYourRef.Text
             End If
             insert.RID = StaffRmbFunctions.GetNewRID(PortalId)
-            insert.CostCenter = tbNewChargeTo.Text
+            insert.CostCenter = hfNewChargeTo.Value
             insert.UserComment = tbNewComments.Text
             insert.UserId = UserId
             ' insert.PersonalCC = ddlNewChargeTo.Items(0).Value
@@ -4811,7 +4812,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 newNode.SelectAction = TreeNodeSelectAction.Select
                 If (type.Equals("rmb")) Then
                     'Dim rmbUser = UserController.GetUserById(PortalId, row.UserId).DisplayName
-                    newNode.Text = GetRmbTitleTeamShort(row.RID, row.RmbDate, row.Total)
+                    newNode.Text = GetRmbTitleTeamShort(row.RID, row.RmbDate, "$" & Math.Round(row.Total, 2).ToString())
                     newNode.Value = row.RMBNo
                 Else
                     Dim advUser = UserController.GetUserById(PortalId, row.UserId).DisplayName
