@@ -281,6 +281,7 @@
                 autoOpen: false,
                 height: 400,
                 width: 500,
+                position: ['middle', 230],
                 modal: true,
                 title: '<%= Translate("SplitTransaction") %>',
                 close: function () {
@@ -488,7 +489,7 @@
  function closeNewItemPopup()  {$("#divNewItem").dialog("close");}
  function closeNewRmbPopup() {$("#divNewRmb").dialog("close");}
  function closeNSFPopup() {$("#divInsufficientFunds").dialog("close");}
- function closePopupSplit() {$("#divSplitPopup").dialog("close");}
+ function closePopupSplit() {$("#divSplitPopup").dialog("close"); $("#loading").hide();}
  function closeWarningDialog() {$("#divWarningDialog").dialog("close");}
  function closeAddressDialog() {$("#divAddressConfirmation").dialog("close"); $("#loading").hide();}
  function closePopupDownload() {$("#divDownload").dialog("close");}
@@ -516,11 +517,17 @@
      $('#<%= tbNewYourRef.ClientID%>').val('');
      $('#<%= tbNewComments.ClientID%>').val('');
  }
+
+    function resetSplitPopup() {
+        $('#<%= btnOK.ClientID%>').prop('disabled', true);
+        $('#<%= tblSplit.ClientID%>').find('tr:gt(0)').remove();
+        $('#<%= tblSplit.ClientID%>').find('input').val('');
+    }
     
  function showNewLinePopup()  {$("#divNewItem").dialog("open"); checkCur(); return false;}
  function showNewRmbPopup() {resetNewRmbPopup(); $("#divNewRmb").dialog("open"); return false; }
  function showNSFPopup() {$("#divInsufficientFunds").dialog("open"); return false; }
- function showPopupSplit() {$("#divSplitPopup").dialog("open"); return false; }
+ function showPopupSplit() {resetSplitPopup(); $("#divSplitPopup").dialog("open"); return false; }
  function showWarningDialog() {$("#divWarningDialog").dialog("open"); return false; }
  function showAddressDialog() {$("#divAddressConfirmation").dialog("open"); return false; }
  function showDownload() { $("#divDownload").dialog("open"); return false; }
@@ -763,16 +770,15 @@
         });
        
         var orig = $("#<%= lblOriginalAmt.ClientId %>").html();
-       
+
         if(total== parseFloat(orig.substring(0,orig.Length)))
         {
-            $("#<%= btnOK.ClientId %>").button('enable');
-       }
-       else
-       {
-           $("#<%= btnOK.ClientId %>").button('disable');
-          
-       }
+            $("#<%= btnOK.ClientId %>").prop('disabled', false).removeClass('aspNetDisabled');
+        }
+        else
+        {
+            $("#<%= btnOK.ClientId %>").prop('disabled', true).addClass('aspNetDisabled');
+        }
    }
 
     function setUpAutocomplete() {
@@ -2201,7 +2207,7 @@
                     </fieldset>
                     <br />
                     <br />
-                    <asp:Button ID="btnOK" runat="server" resourcekey="btnOK" class="aButton" Enabled="false" />
+                    <asp:Button ID="btnOK" runat="server" resourcekey="btnOK" class="aButton" OnClientClick="show_loading_spinner()" />
                     <input id="btnCancel1" type="button" value='<%= Translate("btnCancel") %>' onclick="closePopupSplit();"
                         class="aButton" />
                     <asp:Label ID="lblSplitError" runat="server" ForeColor="Red" resourcekey="SplitError"

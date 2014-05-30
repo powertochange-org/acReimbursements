@@ -169,16 +169,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 GridView1.Columns(3).HeaderText = Translate("Amount")
                 GridView1.Columns(4).HeaderText = Translate("ReceiptNo")
 
-                Dim acc As Boolean = IsAccounts()
-                ' btnDownloadBatch.Visible = acc
-                btnAdvDownload.Visible = acc
-                ' btnShowSuggestedPayments.Visible = acc
-                tbCostcenter.Enabled = acc
-                ddlAccountCode.Enabled = acc
-                pnlAccountsOptions.Visible = acc
                 pnlVAT.Visible = Settings("VatAttrib")
 
-                If acc Then
+                If IsAccounts() Then
                     Dim errors = From c In d.AP_Staff_Rmbs Where c.PortalId = PortalId And c.Error = True And (c.Status = RmbStatus.PendingDownload Or c.Status = RmbStatus.DownloadFailed Or c.Status = RmbStatus.Approved)
 
                     If errors.Count > 0 Then
@@ -1191,9 +1184,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     Dim isOwner = (UserId = Rmb.UserId)
                     Dim isSpouse = (StaffBrokerFunctions.GetSpouseId(UserId) = Rmb.UserId)
-                    Dim isApprover = (UserId = Rmb.ApprUserId) And Not isOwner
+                    Dim isApprover = (UserId = Rmb.ApprUserId) And Not (isOwner Or isSpouse)
                     Dim isSupervisor = (Not isOwner) And StaffBrokerFunctions.isLeaderOf(UserId, Rmb.UserId)
-                    Dim isFinance = IsAccounts() And Not isOwner
+                    Dim isFinance = IsAccounts() And Not (isOwner Or isSpouse) And Not DRAFT
 
                     '--Ensure the user is authorized to view this reimbursement
                     Dim RmbRel As Integer
@@ -1299,7 +1292,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     GridView1.DataBind()
 
                     '--buttons
-                    btnSaveLine.Visible = (isOwner Or isSpouse) And Not (PROCESSING Or PAID Or APPROVED)
+                    btnSaveLine.Visible = ((isOwner Or isSpouse) And Not (PROCESSING Or PAID Or APPROVED)) Or (APPROVED And isFinance)
                     addLinebtn2.Visible = (isOwner Or isSpouse) And Not (PROCESSING Or PAID Or APPROVED)
 
                     btnPrint.Visible = FORM_HAS_ITEMS
@@ -1318,6 +1311,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     btnUnProcess.Visible = isFinance And (PROCESSING Or PAID)
                     btnUnProcess.Enabled = btnUnProcess.Visible
                     btnDownload.Visible = (isFinance Or isOwner Or isSpouse) And FORM_HAS_ITEMS
+
+                    btnAdvDownload.Visible = isFinance
+                    tbCostcenter.Enabled = isFinance
+                    ddlAccountCode.Enabled = isFinance
+                    pnlAccountsOptions.Visible = isFinance
 
 
                     '*** ADVANCES ***
@@ -1655,6 +1653,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         line.First.AccountCode = ddlAccountCode.SelectedValue
                         line.First.CostCenter = tbCostcenter.Text
                         line.First.LineType = CInt(ddlLineTypes.SelectedValue)
+                        line.First.Comment = ucType.GetProperty("Comment").GetValue(theControl, Nothing)
                         line.First.TransDate = CDate(ucType.GetProperty("theDate").GetValue(theControl, Nothing))
                         Dim age = DateDiff(DateInterval.Month, line.First.TransDate, Today)
                         Dim theCC = From c In d.AP_StaffBroker_CostCenters Where c.CostCentreCode = tbCostcenter.Text And c.PortalId = PortalId And c.Type = CostCentreType.Department
@@ -2140,7 +2139,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 For Each row As TableRow In tblSplit.Rows
                     Dim RowAmount = CType(row.Cells(1).Controls(0), TextBox).Text
                     Dim RowDesc = CType(row.Cells(0).Controls(0), TextBox).Text
-                    If RowAmount = "" Or RowDesc = "" Then
+                    If RowAmount = "" Or RowDesc = "" Or RowAmount = "Amount" Or RowDesc = "Description" Then
                         lblSplitError.Visible = True
                         Return
                     ElseIf CDbl(RowAmount) = 0 Then
@@ -2504,7 +2503,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         End If
                     End If
 
-                    tbShortComment.Text = GetLineComment(theLine.First.Comment, theLine.First.OrigCurrency, theLine.First.OrigCurrencyAmount, theLine.First.ShortComment, False, Nothing, IIf(theLine.First.AP_Staff_RmbLineType.TypeName = "Mileage", theLine.First.Spare2, ""))
+                    Try
+                        tbShortComment.Text = GetLineComment(theLine.First.Comment, theLine.First.OrigCurrency, If(theLine.First.OrigCurrencyAmount Is Nothing, 0, theLine.First.OrigCurrencyAmount), theLine.First.ShortComment, False, Nothing, IIf(theLine.First.AP_Staff_RmbLineType.TypeName = "Mileage", theLine.First.Spare2, ""))
+                    Catch
+                        tbShortComment.Text = ""
+                    End Try
 
                     'If ddlLineTypes.SelectedValue = 7 Then
 
