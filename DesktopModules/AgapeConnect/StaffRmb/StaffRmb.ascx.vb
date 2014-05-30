@@ -2267,6 +2267,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             HttpContext.Current.Response.ContentType = "text/csv"
             HttpContext.Current.Response.AddHeader("Pragma", "public")
             HttpContext.Current.Response.Write(export)
+            HttpContext.Current.Response.End()
         End Sub
 
         Protected Sub btnMarkProcessed_Click(sender As Object, e As System.EventArgs) Handles btnMarkProcessed.Click
