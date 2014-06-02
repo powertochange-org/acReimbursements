@@ -441,6 +441,7 @@
 
         function tweakControl() {
             $("#<%= UpdatePanel2.ClientID %> input[name$='tbDesc']").attr('maxlength', '27').attr('style', 'width:22em');
+            $("#<%= UpdatePanel2.ClientID %> a.hlCur").hide();
         }
 
         $(document).ready(function () {
@@ -1350,7 +1351,7 @@
                     <ContentTemplate>
                         <asp:Panel ID="pnlSplash" runat="server" Visible="false">
 
-                            <asp:PlaceHolder ID="PlaceHolder1" runat="server"></asp:PlaceHolder>
+                            <asp:PlaceHolder ID="MoreInfoPlaceholder" runat="server"></asp:PlaceHolder>
 
                             <asp:Literal runat="server" ID="ltSplash"></asp:Literal>
                         </asp:Panel>

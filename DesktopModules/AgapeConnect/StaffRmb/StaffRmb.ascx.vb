@@ -287,7 +287,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     hyp.Font.Bold = True
                     hyp.Text = Translate("MoreInfo").Replace("[RMBNO]", row.RID).Replace("[USERREF]", row.UserRef)
                     hyp.NavigateUrl = NavigateURL() & "?RmbNo=" & row.RMBNo
-                    PlaceHolder1.Controls.Add(hyp)
+                    MoreInfoPlaceholder.Controls.Add(hyp)
                 Next
             Catch ex As Exception
                 Throw New Exception("Error loading MoreInfo rmbs: " + ex.Message)

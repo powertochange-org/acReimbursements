@@ -286,7 +286,7 @@ namespace StaffRmb
         static public async Task<string> getBudgetBalanceAsync(string account, string user_logon)
         // Returns the current balance of the budget for this account, or "" if the specified user does not have View Financials access to the account
         {
-            return "200.00";
+            return "Not Yet Implemented";
         }
 
         static private async Task<string> getResultFromWebServiceAsync(string url, string postString)

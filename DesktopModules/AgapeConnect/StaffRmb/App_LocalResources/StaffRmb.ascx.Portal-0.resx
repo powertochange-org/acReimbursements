@@ -129,4 +129,7 @@
   <data name="AccountsMode.Text">
     <value>- Finance Team -</value>
   </data>
+  <data name="AccountsComments.Text">
+    <value>Finance Comments</value>
+  </data>
 </root>
