@@ -10,6 +10,7 @@ using System.Web.Services;
 using System.Web.Services.Protocols;
 using DotNetNuke.Entities.Users;
 using System.Text;
+using System.Xml;
 using System.Threading.Tasks;
 
 /// <summary>
@@ -272,14 +273,24 @@ namespace StaffRmb
         static public async Task<string> getAccountBalanceAsync(string account, string user_logon)
         // Returns the balance of the account, or "" if the specified user does not have View Finanicals access to the account
         {
-            string postData = string.Format("_reportPath=/General/Account%20Balance&_renderFormat=CSV&_apiToken={0}&ProjectCodeSearch={1}&ExecuteAsUser={2}", Constants.getApiToken(), account, user_logon);
+            string postData = string.Format("_reportPath=/General/Account%20Balance&_renderFormat=XML&_apiToken={0}&ProjectCodeSearch={1}&ExecuteAsUser={2}", Constants.getApiToken(), account, user_logon);
             string url = "https://1chronicles/CallRptServicesTest/CallRpt.aspx";
             string response = await getResultFromWebServiceAsync(url, postData);
             string result = "";
-            Match match = Regex.Match(response, @"\""([0-9,\-\.]+)\""\r?\n?$");  //Look at digits, comma, period and minus in quotes at the end of the string.
-            if (match.Success) {
-                result = match.Groups[1].Value;
+            //**XML Parsing code **
+            XmlDocument xDoc = new XmlDocument();
+            xDoc.LoadXml(response);
+            try {
+                Double balance = Double.Parse(xDoc.GetElementsByTagName("Detail")[0].Attributes["Balance"].Value);
+                result = Math.Round(balance, 2).ToString();
+            } catch {
+
             }
+            //**CSV Parsing code **
+            //Match match = Regex.Match(response, @"\""([0-9,\-\.]+)\""\r?\n?$");  //Look at digits, comma, period and minus in quotes at the end of the string.
+            //if (match.Success) {
+            //    result = match.Groups[1].Value;
+            //}
             return result;
         }
 
