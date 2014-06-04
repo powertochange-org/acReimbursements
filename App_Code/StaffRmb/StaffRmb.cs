@@ -228,7 +228,7 @@ namespace StaffRmb
         static private async Task<string[]> staffWithSigningAuthorityAsync(string account, Decimal amount)
         // Returns a list of staff with signing authority for a certain amount or greater on a given account
         {
-            string postData = string.Format("account={0}&amount={1}", account, amount);
+            string postData = string.Format("account={0}&amount={1}&exclude_administrators={2}", account, amount, "true");
             string url = "https://staffapps.powertochange.org/AuthManager/webservice/get_signatories";
             string result = await getResultFromWebServiceAsync(url, postData);
             return JsonConvert.DeserializeObject<string[]>(result);
