@@ -3492,7 +3492,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     approverMessage = approverMessage.Replace("[COMMENTS]", If(theRmb.UserComment <> "", Translate("EmailComments") & "<br />" & theRmb.UserComment, ""))
                     If StaffRmbFunctions.isStaffAccount(theRmb.CostCenter) Then
                         'Personal Reimbursement
-                        approverMessage = approverMessage.Replace("[LOWBALANCE]", If(hfAccountBalance.Value < GetTotal(hfRmbNo.Value), Translate("WarningLowBalanceStaffAccount"), ""))
+                        approverMessage = approverMessage.Replace("[LOWBALANCE]", If((hfAccountBalance.Value <> String.Empty) AndAlso (hfAccountBalance.Value < GetTotal(hfRmbNo.Value)), Translate("WarningLowBalanceStaffAccount"), ""))
                     Else
                         Dim low_balance = Translate("WarningLowBalance").Replace("[ACCTBAL]", hfAccountBalance.Value).Replace("[BUDGBAL]", hfBudgetBalance.Value).Replace("[ACCT]", tbChargeTo.Text)
                         approverMessage = approverMessage.Replace("[LOWBALANCE]", If(isLowBalance(), low_balance, ""))
@@ -4856,16 +4856,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If account = "" Then
                 Return BALANCE_INCONCLUSIVE
             End If
-            Dim accountBalance = Await StaffRmbFunctions.getAccountBalanceAsync(account, logon)
-            If accountBalance.Length = 0 Then
-                Return BALANCE_PERMISSION_DENIED
-            End If
             Try
+                Dim accountBalance = Await StaffRmbFunctions.getAccountBalanceAsync(account, logon)
+                If accountBalance.Length = 0 Then
+                    Return BALANCE_PERMISSION_DENIED
+                End If
                 Double.Parse(accountBalance)
+                Return accountBalance
             Catch
                 Return BALANCE_INCONCLUSIVE
             End Try
-            Return accountBalance
         End Function
 
         Private Async Function getBudgetBalanceAsync(account As String, logon As String) As Task(Of String)
