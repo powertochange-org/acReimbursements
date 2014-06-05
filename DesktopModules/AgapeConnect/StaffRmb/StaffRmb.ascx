@@ -129,10 +129,10 @@
             $('.ddlReceipt').change(function() { 
                 
                 if( $('#' + this.id).val() == 2){
-                   
                     $("#<%= pnlElecReceipts.ClientID%>").slideDown("slow");
                 }
                 else{
+                   
                     $("#<%= pnlElecReceipts.ClientID%>").slideUp("slow");
                 }
             });
@@ -1913,13 +1913,14 @@
                             </tr>
                         </table>
                         <asp:PlaceHolder ID="phLineDetail" runat="server"></asp:PlaceHolder>
-                        <asp:Panel ID="pnlElecReceipts" runat="server" style="display: none;">
+                        <asp:Panel ID="pnlElecReceipts" runat="server"  >
                         <table style="font-size: 9pt;">
                             <tr valign="top">
                                 <td width="150px;"><b>
                                     <dnn:Label ID="lblElectronicReceipts" runat="server"  ResourceKey="lblElectronicReceipts" />
+                                    <asp:Button ID="btnAddReceipt" runat="server" resourcekey="btnAddReceipt" AutoPostBack="false" class="aButton" CommandName="addReceipt" />
                                 </b></td>
-                                <td>
+                                <td id="ifReceipts" runat="server">
                                   
                                  <iframe id="ifReceipt" runat="server" src="" width="530" height="280" >
 
