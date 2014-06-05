@@ -1394,21 +1394,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 #End Region
 
 #Region "Button Events"
-        Protected Async Sub btnAddReceipt_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnAddReceipt.Click
-
-            ' Create a new iframe to be used as a receipt
-            Dim receipt As New HtmlIframe()
-            ' TODO: Obviously. this can't just be 12
-            Dim theLine = From c In d.AP_Staff_RmbLines Where c.RmbLineNo = 12
-            'ifReceipt.Attributes("src") = "http://" & PortalSettings.PortalAlias.HTTPAlias & "/DesktopModules/AgapeConnect/StaffRmb/ReceiptEditor.aspx?RmbNo=" & hfRmbNo.Value & "&RmbLine=New"
-            'ifReceipt.Attributes("src") = Request.Url.Scheme & "://" & Request.Url.Authority & "/DesktopModules/AgapeConnect/StaffRmb/ReceiptEditor.aspx?RmbNo=" & theLine.First.RmbNo & "&RmbLine=" & theLine.First.RmbLineNo
-            receipt.Attributes("src") = Request.Url.Scheme & "://" & Request.Url.Authority & "/DesktopModules/AgapeConnect/StaffRmb/ReceiptEditor.aspx?RmbNo=" & theLine.First.RmbNo & "&RmbLine=" & theLine.First.RmbLineNo
-            receipt.Attributes("width") = "530"
-            receipt.Attributes("height") = "280"
-            ifReceipts.Controls.Add(receipt)
-            ' We have to ensure that the div is still visible
-            pnlElecReceipts.Attributes("style") = ""
-        End Sub
 
         Protected Async Sub btnSaveLine_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSaveLine.Click
 
@@ -1421,6 +1406,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim q = From c In d.AP_Staff_RmbLines Where c.RmbNo = hfRmbNo.Value And c.Receipt Select c.ReceiptNo
 
                     'Dim AccType = Right(ddlChargeTo.SelectedValue, 1)
+
 
                     Dim insert As New AP_Staff_RmbLine
                     insert.Comment = CStr(ucType.GetProperty("Comment").GetValue(theControl, Nothing))
@@ -1526,7 +1512,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                             ElectronicReceipt = True
 
-                            Dim theFolder As IFolderInfo = FolderManager.Instance.GetFolder(PortalId, "/_RmbReceipts/" & theUserId)
+                            Dim theFolder As IFolderInfo = FolderManager.Instance.GetFolder(PortalId, "_RmbReceipts/" & theUserId)
                             theFile = FileManager.Instance.GetFile(theFolder, "R" & hfRmbNo.Value & "LNew.jpg")
 
                             If Not theFile Is Nothing Then
@@ -1649,7 +1635,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         Try
                             If (CInt(ucType.GetProperty("ReceiptType").GetValue(theControl, Nothing) = 2)) Then
 
-                                Dim theFolder As IFolderInfo = FolderManager.Instance.GetFolder(PortalId, "/_RmbReceipts/" & line.First.AP_Staff_Rmb.UserId)
+                                Dim theFolder As IFolderInfo = FolderManager.Instance.GetFolder(PortalId, "_RmbReceipts/" & line.First.AP_Staff_Rmb.UserId)
                                 Dim theFile = FileManager.Instance.GetFile(theFolder, "R" & line.First.RmbNo & "L" & line.First.RmbLineNo & ".jpg")
                                 If Not theFile Is Nothing Then
                                     line.First.ReceiptImageId = theFile.FileId
@@ -2535,6 +2521,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ddlAccountCode.SelectedValue = theLine.First.AccountCode
 
                     ifReceipt.Attributes("src") = Request.Url.Scheme & "://" & Request.Url.Authority & "/DesktopModules/AgapeConnect/StaffRmb/ReceiptEditor.aspx?RmbNo=" & theLine.First.RmbNo & "&RmbLine=" & theLine.First.RmbLineNo
+
                     If Not theLine.First.ReceiptImageId Is Nothing Then
                         pnlElecReceipts.Attributes("style") = ""
                     Else

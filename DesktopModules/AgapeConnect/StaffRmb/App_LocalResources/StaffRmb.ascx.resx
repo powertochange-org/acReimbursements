@@ -690,7 +690,4 @@
   <data name="OldDate.Text" xml:space="preserve">
     <value>Expenses may only be reimbursed within 90 days.  Reimbursements older than this may be denied, and will be taxed.</value>
   </data>
-  <data name="btnAddReceipt.Text" xml:space="preserve">
-    <value>Add Receipt</value>
-  </data>
 </root>
