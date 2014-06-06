@@ -1974,6 +1974,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Sub
 
         Protected Async Sub btnApprove_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnApprove.Click
+            saveIfNecessary()
             Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value
             If rmb.Count > 0 Then
 
@@ -2187,7 +2188,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Sub
 
         Protected Async Sub btnProcess_Click(sender As Object, e As System.EventArgs) Handles btnSubmitPostingData.Click, btnAccountWarningYes.Click
-
+            saveIfNecessary()
             'Mark as Pending Download in next batch.
             Dim TaskList = New List(Of Task)
             Dim theRmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value)
