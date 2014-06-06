@@ -1512,7 +1512,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                             ElectronicReceipt = True
 
-                            Dim theFolder As IFolderInfo = FolderManager.Instance.GetFolder(PortalId, "_RmbReceipts/" & theUserId)
+                            Dim theFolder As IFolderInfo = FolderManager.Instance.GetFolder(PortalId, "/_RmbReceipts/" & theUserId)
                             theFile = FileManager.Instance.GetFile(theFolder, "R" & hfRmbNo.Value & "LNew.jpg")
 
                             If Not theFile Is Nothing Then
@@ -1635,7 +1635,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         Try
                             If (CInt(ucType.GetProperty("ReceiptType").GetValue(theControl, Nothing) = 2)) Then
 
-                                Dim theFolder As IFolderInfo = FolderManager.Instance.GetFolder(PortalId, "_RmbReceipts/" & line.First.AP_Staff_Rmb.UserId)
+                                Dim theFolder As IFolderInfo = FolderManager.Instance.GetFolder(PortalId, "/_RmbReceipts/" & line.First.AP_Staff_Rmb.UserId)
                                 Dim theFile = FileManager.Instance.GetFile(theFolder, "R" & line.First.RmbNo & "L" & line.First.RmbLineNo & ".jpg")
                                 If Not theFile Is Nothing Then
                                     line.First.ReceiptImageId = theFile.FileId
