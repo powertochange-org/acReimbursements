@@ -429,9 +429,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                    Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId).Take(Settings("MenuSize"))
                 dlAdvPaid.DataSource = PaidAdv
                 dlAdvPaid.DataBind()
-                ProcessingUpdatePanel.Update()
+                PaidUpdatePanel.Update()
             Catch ex As Exception
-                Throw New Exception("Error loading processing rmbs: " + ex.Message)
+                Throw New Exception("Error loading paid rmbs: " + ex.Message)
             End Try
         End Function
 
