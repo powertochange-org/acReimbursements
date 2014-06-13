@@ -2066,7 +2066,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             hfOrigCurrency.Value = ""
             hfOrigCurrencyValue.Value = ""
 
-            ifReceipt.Attributes("src") = "http://" & PortalSettings.PortalAlias.HTTPAlias & "/DesktopModules/AgapeConnect/StaffRmb/ReceiptEditor.aspx?RmbNo=" & hfRmbNo.Value & "&RmbLine=New"
+            ifReceipt.Attributes("src") = Request.Url.Scheme & "://" & Request.Url.Authority & "/DesktopModules/AgapeConnect/StaffRmb/ReceiptEditor.aspx?RmbNo=" & hfRmbNo.Value & "&RmbLine=New"
             pnlElecReceipts.Attributes("style") = "display: none;"
             Dim jscript As String = ""
             jscript &= " $('#" & hfOrigCurrency.ClientID & "').attr('value', '');"
