@@ -315,7 +315,12 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
 
                 Dim theFolder As IFolderInfo = FolderManager.Instance.GetFolder(PS.PortalId, "/_RmbReceipts/" & theRmb.UserId)
 
-                CheckFolderPermissions(PS.PortalId, theFolder, theRmb.UserId)
+                ' I believe this is where everything is breaking. For some reason, calling this
+                ' Replaces the "0" in the role id position with Nulls, causing the permissions to break
+                ' in mysterious ways. 
+                ' However, this should not be merged into master, until we have verified that it works as
+                ' expected to comment it out.
+                'CheckFolderPermissions(PS.PortalId, theFolder, theRmb.UserId)
 
 
                 If theRmbLine.Count > 0 Then
