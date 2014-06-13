@@ -64,6 +64,11 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
     End Function
 
     Protected Sub CheckFolderPermissions(ByVal PortalId As Integer, ByVal theFolder As IFolderInfo, ByVal theUserId As Integer)
+
+        ' Before we mess around with any folder permissions, clear the folder cache. 
+        ' This should eliminate some issues we were having with the receipt uploader
+        DataCache.ClearFolderCache(PortalId)
+
         Try
 
        
