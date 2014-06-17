@@ -283,7 +283,7 @@ namespace StaffRmb
                 XmlDocument xDoc = new XmlDocument();
                 xDoc.LoadXml(response);
                 Double balance = Double.Parse(xDoc.GetElementsByTagName("Detail")[0].Attributes["Balance"].Value);
-                result = Math.Round(balance, 2).ToString();
+                result = Math.Round(balance, 2).ToString("0.00");
             } catch {
 
             }
