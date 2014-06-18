@@ -682,7 +682,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 For Each person In allStaff
                     '-- sort by first letter of last name
                     Dim letter = person.LastName.Substring(0, 1)
-                    Dim SubmittedRmb = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Submitted And c.PortalId = PortalId And (c.UserId = person.UserID) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId, Total = (From t In c.AP_Staff_RmbLines Select t.GrossAmount).Sum()).Take(Settings("MenuSize"))
+                    Dim SubmittedRmb = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Submitted And c.PortalId = PortalId And (c.UserId = person.UserID) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId, Total = CType((From t In c.AP_Staff_RmbLines Select t.GrossAmount).Sum(), Decimal?).GetValueOrDefault(0)).Take(Settings("MenuSize"))
                     Dim submittedNode As New TreeNode(person.DisplayName)
                     If SubmittedRmb.Count() > 0 Then
                         addItemsToTree(AllStaffSubmittedNode, submittedNode, letter, SubmittedRmb, "rmb")
@@ -2850,35 +2850,37 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Function
 
         Protected Function GetRmbTitleTeamShort(ByVal RID As Integer, ByVal RmbDate As Date, ByVal name As String) As String
+            Try
+                Dim rtn As String = "<span style=""font-size: 6.5pt; color: #999999;"">#" & ZeroFill(RID.ToString, 5)
 
-            Dim rtn As String = "<span style=""font-size: 6.5pt; color: #999999;"">#" & ZeroFill(RID.ToString, 5)
-
-            If (RmbDate > (New Date(2010, 1, 1))) Then
-                rtn = rtn & ": " & RmbDate.ToShortDateString
-            End If
-            If (name IsNot Nothing) Then
-                rtn = rtn & " - " & name
-            End If
-            rtn = rtn & "</span>"
-            Return rtn
-
-            ' Return Left("RMB#" & RmbNo & " " & UserController.GetUser(PortalId, UID, False).DisplayName, 24)
+                If (RmbDate > (New Date(2010, 1, 1))) Then
+                    rtn = rtn & ": " & RmbDate.ToShortDateString
+                End If
+                If (name IsNot Nothing) Then
+                    rtn = rtn & " - " & name
+                End If
+                rtn = rtn & "</span>"
+                Return rtn
+            Catch ex As Exception
+                Throw New Exception("Error building title: " + ex.Message)
+            End Try
         End Function
 
         Protected Function GetAdvTitleTeamShort(ByVal LocalAdvanceId As Integer, ByVal RequestDate As Date, ByVal name As String) As String
+            Try
+                Dim rtn As String = "<span style=""font-size: 6.5pt; color: #999999;"">Adv#" & ZeroFill(LocalAdvanceId.ToString, 4)
 
-            Dim rtn As String = "<span style=""font-size: 6.5pt; color: #999999;"">Adv#" & ZeroFill(LocalAdvanceId.ToString, 4)
-
-            If RequestDate > (New Date(2010, 1, 1)) Then
-                rtn = rtn & ": " & RequestDate.ToShortDateString
-            End If
-            If (name IsNot Nothing) Then
-                rtn = rtn & " - " & name
-            End If
-            rtn = rtn & "</span>"
-            Return rtn
-
-            ' Return Left("RMB#" & RmbNo & " " & UserController.GetUser(PortalId, UID, False).DisplayName, 24)
+                If RequestDate > (New Date(2010, 1, 1)) Then
+                    rtn = rtn & ": " & RequestDate.ToShortDateString
+                End If
+                If (name IsNot Nothing) Then
+                    rtn = rtn & " - " & name
+                End If
+                rtn = rtn & "</span>"
+                Return rtn
+            Catch ex As Exception
+                Throw New Exception("Error building adv title: " + ex.Message)
+            End Try
         End Function
 
         Public Function GetDateFormat() As String
@@ -4808,30 +4810,39 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
 
         Private Sub addItemsToTree(AllStaffSubmittedNode As TreeNode, submittedNode As TreeNode, letter As String, queryResult As Object, type As String)
-            submittedNode.Expanded = False
-            submittedNode.SelectAction = TreeNodeSelectAction.Expand
-            getAlphabeticNode(AllStaffSubmittedNode, letter).ChildNodes.Add(submittedNode)
+            Try
+                submittedNode.Expanded = False
+                submittedNode.SelectAction = TreeNodeSelectAction.Expand
+                getAlphabeticNode(AllStaffSubmittedNode, letter).ChildNodes.Add(submittedNode)
+                Dim total As String
+                For Each row In queryResult '--get details of each reimbursement or advance
+                    Dim newNode As New TreeNode()
+                    newNode.SelectAction = TreeNodeSelectAction.Select
+                    If (type.Equals("rmb")) Then
+                        'Dim rmbUser = UserController.GetUserById(PortalId, row.UserId).DisplayName
+                        Try
+                            total = "$" + Math.Round(row.Total, 2).ToString()
+                        Catch
+                            total = "$0.00"
+                        End Try
+                        newNode.Text = GetRmbTitleTeamShort(row.RID, row.RmbDate, total)
+                        newNode.Value = row.RMBNo
+                    Else
+                        Dim advUser = UserController.GetUserById(PortalId, row.UserId).DisplayName
+                        newNode.Text = GetAdvTitleTeamShort(row.LocalAdvanceId, row.RequestDate, advUser)
+                        newNode.Value = row.AdvanceId
+                    End If
+                    submittedNode.ChildNodes.Add(newNode)
 
-            For Each row In queryResult '--get details of each reimbursement or advance
-                Dim newNode As New TreeNode()
-                newNode.SelectAction = TreeNodeSelectAction.Select
-                If (type.Equals("rmb")) Then
-                    'Dim rmbUser = UserController.GetUserById(PortalId, row.UserId).DisplayName
-                    newNode.Text = GetRmbTitleTeamShort(row.RID, row.RmbDate, "$" & Math.Round(row.Total, 2).ToString())
-                    newNode.Value = row.RMBNo
-                Else
-                    Dim advUser = UserController.GetUserById(PortalId, row.UserId).DisplayName
-                    newNode.Text = GetAdvTitleTeamShort(row.LocalAdvanceId, row.RequestDate, advUser)
-                    newNode.Value = row.AdvanceId
-                End If
-                submittedNode.ChildNodes.Add(newNode)
-
-                If IsSelected(row.RMBNo) Then
-                    submittedNode.Expanded = True
-                    submittedNode.Parent.Expanded = True
-                    submittedNode.Parent.Parent.Expanded = True
-                End If
-            Next
+                    If IsSelected(row.RMBNo) Then
+                        submittedNode.Expanded = True
+                        submittedNode.Parent.Expanded = True
+                        submittedNode.Parent.Parent.Expanded = True
+                    End If
+                Next
+            Catch ex As Exception
+                Throw New Exception("Error adding items to tree: " + ex.Message)
+            End Try
         End Sub
 
         Private Function getAlphabeticNode(mainTree As TreeNode, letter As String) As TreeNode
