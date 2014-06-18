@@ -3474,7 +3474,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim toEmail = approver.Email
                 Dim toName = approver.FirstName
                 Dim Approvers = approver.DisplayName
-                Dim hasReceipts = (From c In theRmb.AP_Staff_RmbLines Where c.Receipt = True And (Not c.ReceiptImageId Is Nothing)).Count > 0
+                Dim hasReceipts = (From c In theRmb.AP_Staff_RmbLines Where c.Receipt = True And (c.ReceiptImageId Is Nothing)).Count > 0
 
                 'Email to the submitter here 
                 ownerMessage = ownerMessage.Replace("[APPROVER]", Approvers).Replace("[EXTRA]", "").Replace("[STAFFNAME]", owner.FirstName) _
