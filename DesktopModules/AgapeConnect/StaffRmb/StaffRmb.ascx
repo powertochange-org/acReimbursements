@@ -304,8 +304,8 @@
 
             $("#divNewItem").dialog({
                 autoOpen: false,
-                position:['middle', 150],
-                height:700,
+                position:['middle', 120],
+                height: '<%= If(isAccounts(),760,700)%>',
                 width: 780,
                 modal: true,
                 title: '<%= Translate("AddEditRmb") %>',
