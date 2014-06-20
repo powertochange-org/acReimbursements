@@ -950,9 +950,6 @@
     }
 </style>
 
-<div id="loading" class="loading_overlay" style="display:none" >
-    &nbsp;
-</div>
 
 <div style="position:relative; text-align: center; width: 100%;">
     <asp:UpdatePanel ID="ErrorUpdatePanel" runat="server" >
@@ -963,7 +960,6 @@
     </asp:UpdatePanel>
 </div>
 <asp:Panel ID="pnlEverything" runat="server" >
-
 
 
     <div style="padding-bottom: 5px;">

@@ -1511,6 +1511,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         If (CInt(ucType.GetProperty("ReceiptType").GetValue(theControl, Nothing) = 2)) Then
 
                             ElectronicReceipt = True
+                            div()
 
                             Dim theFolder As IFolderInfo = FolderManager.Instance.GetFolder(PortalId, "/_RmbReceipts/" & theUserId)
                             theFile = FileManager.Instance.GetFile(theFolder, "R" & hfRmbNo.Value & "LNew.jpg")
@@ -1943,7 +1944,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 If rmb.First.UserId = UserId Then
                     Log(rmb.First.RMBNo, "DELETED by owner")
-                    ScriptManager.RegisterStartupScript(btnDelete, btnDelete.GetType(), "select4", "selectIndex(4)", True)
+                    ScriptManager.RegisterStartupScript(btnDelete, btnDelete.GetType(), "select5", "selectIndex(5)", True)
                 Else
                     'Send an email to the end user
                     Dim Message = StaffBrokerFunctions.GetTemplate("RmbCancelled", PortalId)
