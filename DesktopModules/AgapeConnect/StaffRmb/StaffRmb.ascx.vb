@@ -1511,7 +1511,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         If (CInt(ucType.GetProperty("ReceiptType").GetValue(theControl, Nothing) = 2)) Then
 
                             ElectronicReceipt = True
-                            div()
 
                             Dim theFolder As IFolderInfo = FolderManager.Instance.GetFolder(PortalId, "/_RmbReceipts/" & theUserId)
                             theFile = FileManager.Instance.GetFile(theFolder, "R" & hfRmbNo.Value & "LNew.jpg")
