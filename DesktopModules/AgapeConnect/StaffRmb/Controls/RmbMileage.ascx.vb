@@ -74,10 +74,14 @@ Partial Class controls_Mileage
     End Property
     Public Property Spare1() As String
         Get
-            Return Nothing
+            Return ddlProvince.SelectedValue
         End Get
         Set(ByVal value As String)
-
+            Try
+                ddlProvince.SelectedValue = value
+            Catch
+                ddlProvince = Nothing
+            End Try
         End Set
     End Property
     Public Property Spare2() As String
@@ -147,7 +151,7 @@ Partial Class controls_Mileage
         End Set
     End Property
     Public Function ValidateForm(ByVal userId As Integer) As Boolean
-        if (tbDesc.Text.Length < 5) Then
+        If (tbDesc.Text.Length < 5) Then
             ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Description.Error", LocalResourceFile)
             Return False
         End If

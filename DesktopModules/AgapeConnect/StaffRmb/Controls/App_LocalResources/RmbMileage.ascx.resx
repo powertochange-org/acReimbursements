@@ -205,4 +205,10 @@
   <data name="lblDistUnit.Text" xml:space="preserve">
     <value>Distance Unit:</value>
   </data>
+  <data name="lblProvince.Help" xml:space="preserve">
+    <value>Enter the province of your travel.  If your travel spans provinces, please make a separate entry for each.</value>
+  </data>
+  <data name="lblProvince.Text" xml:space="preserve">
+    <value>Province:</value>
+  </data>
 </root>
