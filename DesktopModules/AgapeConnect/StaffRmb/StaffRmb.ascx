@@ -1579,10 +1579,19 @@
                                                     <ItemStyle HorizontalAlign="Right" />
                                                     <FooterStyle HorizontalAlign="Right" />
                                                 </asp:TemplateField>
-                                                <asp:BoundField DataField="ReceiptNo" HeaderText="Receipt No" SortExpression="ReceiptNo"
-                                                   ItemStyle-HorizontalAlign="Center" ItemStyle-Width="75px">
-                                                    <ItemStyle HorizontalAlign="Center"></ItemStyle>
-                                                </asp:BoundField>
+
+                                                <asp:TemplateField HeaderText="Receipt" ItemStyle-Width="20px">
+                                                    <ItemTemplate>
+                                                        <%# If( Eval("Receipt"),
+                                                                If (Eval("ReceiptImageId"),
+                                                                    "<a target='_Blank' href="+ GetImageUrl(Eval("ReceiptImageId"))+">"+
+                                                                    "<img class='viewReceipt' src='/Icons/Sigma/ExtPng_32x32_Standard.png' width=20 alt='img' /></a>",
+                                                                    "<img src='/Icons/Sigma/BulkMail_32X32_Standard.png' width=20 alt='mail' />"),
+                                                            "<img src='/Icons/Sigma/Deny_32X32_Standard.png' width=20 alt='none' />") %>
+                                                    </ItemTemplate>
+                                                    <ItemStyle HorizontalAlign="Center" />
+                                                </asp:TemplateField>
+                                                
                                                 <asp:TemplateField HeaderText="" ItemStyle-Width="10px" ItemStyle-Wrap="false">
                                                     <EditItemTemplate>
                                                     </EditItemTemplate>
@@ -2079,11 +2088,6 @@
             </div>
         </div>
     </div>
-
-
-
-
-
 
     <asp:Label ID="lblDefatulSettings" runat="server" ForeColor="Red" resourcekey="DefaultSettings"></asp:Label>
     <div id="divWarningDialog" class="ui-widget" >

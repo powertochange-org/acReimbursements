@@ -321,7 +321,7 @@
     <value>Processed on:</value>
   </data>
   <data name="ReceiptNo.Text" xml:space="preserve">
-    <value>Receipt No</value>
+    <value>Receipt</value>
   </data>
   <data name="Receipts.Text" xml:space="preserve">
     <value>Receipts:</value>
@@ -689,5 +689,8 @@
   </data>
   <data name="OldDate.Text" xml:space="preserve">
     <value>Expenses may only be reimbursed within 90 days.  Reimbursements older than this may be denied, and will be taxed.</value>
+  </data>
+  <data name="ViewReceipt.Text" xml:space="preserve">
+    <value>View Receipt</value>
   </data>
 </root>

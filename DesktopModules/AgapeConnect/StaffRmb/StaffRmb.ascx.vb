@@ -2956,6 +2956,17 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Return False
         End Function
 
+        Protected Function GetImageUrl(id As Integer?) As String
+            If id Is Nothing Then
+                Return ""
+            End If
+            Dim file = DotNetNuke.Services.FileSystem.FileManager.Instance.GetFile(id)
+            If file Is Nothing Then
+                Return ""
+            End If
+            Return DotNetNuke.Services.FileSystem.FileManager.Instance.GetUrl(file)
+        End Function
+
         Protected Function CanEdit(ByVal status As Integer) As Boolean
             Return status <> RmbStatus.Processing And status <> RmbStatus.PendingDownload And status <> RmbStatus.DownloadFailed And (status <> RmbStatus.Approved Or IsAccounts())
         End Function
