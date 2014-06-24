@@ -2956,11 +2956,23 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Return False
         End Function
 
-        Protected Function GetImageUrl(id As Integer?) As String
+        Protected Function GetImageType(id As Integer?) As String
             If id Is Nothing Then
                 Return ""
             End If
             Dim file = DotNetNuke.Services.FileSystem.FileManager.Instance.GetFile(id)
+            If file Is Nothing Then
+                Return "missing"
+            End If
+            Return file.Extension
+        End Function
+
+        Protected Function GetImageUrl(id As Integer?) As String
+            If id Is Nothing Then
+                Return ""
+            End If
+            Dim file As DotNetNuke.Services.FileSystem.FileInfo
+            file = DotNetNuke.Services.FileSystem.FileManager.Instance.GetFile(id)
             If file Is Nothing Then
                 Return ""
             End If

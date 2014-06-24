@@ -439,6 +439,17 @@
             }
         }
 
+        function setUpReceiptPreviews() {
+            var url = ""
+            $(".viewReceipt").hover(function(e){
+                console.log(this.id);
+                $("body").append("<div id='preview' style='position:fixed; top:300px; right:25px'><img src='"+this.id+"' alt='Receipt Image' style='width:250px'/></div>");
+                $("#preview").fadeIn("fast");
+            },function(){
+                $("#preview").remove();
+            })
+        }
+
         function tweakControl() {
             $("#<%= UpdatePanel2.ClientID %> input[name$='tbDesc']").attr('maxlength', '27').attr('style', 'width:22em');
             $("#<%= UpdatePanel2.ClientID %> a.hlCur").hide();
@@ -455,6 +466,7 @@
                 setUpMyTabs();
                 setUpAutocomplete();
                 checkForMinistryAccount();
+                setUpReceiptPreviews()
                 tweakControl()
             });
 
@@ -1584,8 +1596,13 @@
                                                     <ItemTemplate>
                                                         <%# If( Eval("Receipt"),
                                                                 If (Eval("ReceiptImageId"),
-                                                                    "<a target='_Blank' href="+ GetImageUrl(Eval("ReceiptImageId"))+">"+
-                                                                    "<img class='viewReceipt' src='/Icons/Sigma/ExtPng_32x32_Standard.png' width=20 alt='img' /></a>",
+                                                                    If (GetImageType(Eval("ReceiptImageId")) = "missing",
+                                                                        "<img src='/Icons/Sigma/ErrorWarning_16X16_Standard.png' width=20 alt='missing' title='broken link'/>",
+                                                                        If (GetImageType(Eval("ReceiptImageId")) = "pdf", 
+                                                                            "<a target='_Blank' href="+GetImageUrl(Eval("ReceiptImageId"))+"title = 'click to download'>"+
+                                                                            "<img src='/Icons/Sigma/ExtPdf_32X32_Standard.png' width=20 alt='pdf' /></a>",
+                                                                            "<a target='_Blank' href="+ GetImageUrl(Eval("ReceiptImageId"))+">"+
+                                                                            "<img id='"+GetImageUrl(Eval("ReceiptImageId"))+"' class='viewReceipt' src='/Icons/Sigma/ExtPng_32x32_Standard.png' width=20 alt='img' /></a>")),
                                                                     "<img src='/Icons/Sigma/BulkMail_32X32_Standard.png' width=20 alt='mail' />"),
                                                             "<img src='/Icons/Sigma/Deny_32X32_Standard.png' width=20 alt='none' />") %>
                                                     </ItemTemplate>
