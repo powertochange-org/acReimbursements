@@ -711,7 +711,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 Dim AllApproved = (From c In d.AP_Staff_Rmbs
                                    Where (c.Status = RmbStatus.Approved Or c.Status >= RmbStatus.PendingDownload) And c.PortalId = PortalId
-                                   Order By c.RID Descending
+                                   Order By c.ApprDate Ascending
                                    Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId, c.Status, _
                                        Receipts = ((c.AP_Staff_RmbLines.Where(Function(x) x.Receipt And (x.ReceiptImageId Is Nothing))).Count > 0)).Take(Settings("MenuSize"))
                 Dim total = AllApproved.Count
@@ -828,11 +828,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim count = 0
                 For Each rmb In rmbs
                     Dim rmb_node As New TreeNode()
-                    Dim rmbUser = UserController.GetUserById(PortalId, rmb.UserId).DisplayName
+                    Dim rmbTotal = GetTotal(rmb.RMBNo).ToString("C") 'currency formatted string
                     If (rmb.RmbDate Is Nothing) Then
-                        rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, New Date(), rmbUser)
+                        rmb_node.Text = GetRmbTitleFinance(rmb.RID, New Date(1970, 1, 1), rmbTotal)
                     Else
-                        rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbUser)
+                        rmb_node.Text = GetRmbTitleFinance(rmb.RID, rmb.ApprDate, rmbTotal)
                     End If
                     rmb_node.SelectAction = TreeNodeSelectAction.Select
                     rmb_node.Value = rmb.RMBNo
@@ -2866,6 +2866,32 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End Try
         End Function
 
+        Protected Function GetRmbTitleFinance(ByVal RID As Integer, ByVal ApprDate As Date, ByVal amount As String) As String
+            Try
+                Dim rtn As String = "<span style=""font-size: 6.5pt; color: #999999;"">#" & ZeroFill(RID.ToString, 5)
+                '  colourize date based on how old it is
+                If (ApprDate > Now().AddDays(-1)) Then
+                    rtn = rtn & ": <span style='color:Green'>" & ApprDate.ToShortDateString & "</span>"
+                ElseIf (ApprDate > Now().AddDays(-3)) Then
+                    rtn = rtn & ": <span style='color:Blue'>" & ApprDate.ToShortDateString & "</span>"
+                ElseIf (ApprDate > Now().AddDays(-5)) Then
+                    rtn = rtn & ": <span style='color:Yellow'>" & ApprDate.ToShortDateString & "</span>"
+                ElseIf (ApprDate > Now().AddDays(-7)) Then
+                    rtn = rtn & ": <span style='color:Orange'>" & ApprDate.ToShortDateString & "</span>"
+                ElseIf (ApprDate > (New Date(2010, 1, 1))) Then
+                    rtn = rtn & ": <span style='color:Red'>" & ApprDate.ToShortDateString & "</span>"
+                Else
+                    rtn = rtn & ": *no-date*"
+                End If
+                If (amount IsNot Nothing) Then
+                    rtn = rtn & " - " & amount
+                End If
+                rtn = rtn & "</span>"
+                Return rtn
+            Catch ex As Exception
+                Throw New Exception("Error building title: " + ex.Message)
+            End Try
+        End Function
         Protected Function GetAdvTitleTeamShort(ByVal LocalAdvanceId As Integer, ByVal RequestDate As Date, ByVal name As String) As String
             Try
                 Dim rtn As String = "<span style=""font-size: 6.5pt; color: #999999;"">Adv#" & ZeroFill(LocalAdvanceId.ToString, 4)
@@ -3100,9 +3126,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Sub
 
         Public Function GetTotal(ByVal theRmbNo As Integer) As Double
-
-            Return (From c In d.AP_Staff_RmbLines Where c.RmbNo = hfRmbNo.Value Select c.GrossAmount).Sum
-
+            Dim result As Double
+            If theRmbNo = -1 Then
+                theRmbNo = hfRmbNo.Value
+            End If
+            Try
+                result = CType((From c In d.AP_Staff_RmbLines Where c.RmbNo = theRmbNo Select c.GrossAmount).Sum, Double?).GetValueOrDefault(0)
+            Catch
+                result = 0
+            End Try
+            Return result
 
         End Function
 

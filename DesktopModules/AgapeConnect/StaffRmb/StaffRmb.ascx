@@ -1583,7 +1583,7 @@
                                                         </asp:Panel>
                                                     </ItemTemplate>
                                                     <FooterTemplate>
-                                                        <asp:Label ID="lblTotalAmount" runat="server" Text='<%# StaffBrokerFunctions.GetSetting("Currency", PortalId) & GetTotal(Eval("RmbNo")).ToString("F2") %>'></asp:Label>
+                                                        <asp:Label ID="lblTotalAmount" runat="server" Text='<%# StaffBrokerFunctions.GetSetting("Currency", PortalId) & GetTotal(-1).ToString("F2") %>'></asp:Label>
                                                         <asp:Panel ID="pnlRemBal2" runat="server" Visible='<%# Settings("ShowRemBal") = "True"%>'>
                                                             <asp:Label ID="lblRemainingBalance" runat="server" Font-Size="xx-small" Text=''></asp:Label>
                                                         </asp:Panel>
@@ -1599,7 +1599,7 @@
                                                                     If (GetImageType(Eval("ReceiptImageId")) = "missing",
                                                                         "<img src='/Icons/Sigma/ErrorWarning_16X16_Standard.png' width=20 alt='missing' title='image not found'/>",
                                                                         If (GetImageType(Eval("ReceiptImageId")) = "pdf", 
-                                                                            "<a target='_Blank' href="+GetImageUrl(Eval("ReceiptImageId"))+"title = 'click to download'>"+
+                                                                            "<a target='_Blank' href='"+GetImageUrl(Eval("ReceiptImageId"))+"' title = 'click to download'>"+
                                                                             "<img src='/Icons/Sigma/ExtPdf_32X32_Standard.png' width=20 alt='pdf' /></a>",
                                                                             "<a target='_Blank' href="+ GetImageUrl(Eval("ReceiptImageId"))+">"+
                                                                             "<img id='"+GetImageUrl(Eval("ReceiptImageId"))+"' class='viewReceipt' src='/Icons/Sigma/ExtPng_32x32_Standard.png' width=20 alt='img' /></a>")),
