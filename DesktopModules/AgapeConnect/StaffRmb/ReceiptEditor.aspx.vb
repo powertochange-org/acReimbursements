@@ -140,7 +140,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
 
                 If ext.ToLower = "pdf" Then
                     Dim _theFile = FileManager.Instance.AddFile(theFolder, "R" & RmbNo & "L" & RmbLine & ".pdf", fuReceipt.FileContent, True)
-                    imgReceipt.ImageUrl = "\DesktopModules\AgapeConnect\Documents\images\pdf.png"
+                    imgReceipt.ImageUrl = "\DesktopModules\AgapeConnect\StaffRmb\images\pdf.png"
                     hlimg.NavigateUrl = FileManager.Instance.GetUrl(_theFile)
                     hlimg.Visible = True
                     btnRotateLeft.Visible = False
@@ -329,7 +329,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
                     Dim theFile = FileManager.Instance.GetFile(theRmbLine.First.ReceiptImageId)
 
                     If theFile.Extension.ToLower = "pdf" Then
-                        imgReceipt.ImageUrl = "\DesktopModules\AgapeConnect\Documents\images\pdf.png"
+                        imgReceipt.ImageUrl = "\DesktopModules\AgapeConnect\StaffRmb\images\pdf.png"
                         hlimg.NavigateUrl = FileManager.Instance.GetUrl(theFile)
                         hlimg.Visible = True
                         btnRotateLeft.Visible = False

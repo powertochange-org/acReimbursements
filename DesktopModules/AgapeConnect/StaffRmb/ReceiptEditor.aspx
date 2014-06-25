@@ -37,7 +37,7 @@
                 <asp:Button ID="btnRotatRight" runat="server" Visible="false" CssClass="aButton" Text="↻" Font-Size="Small" />
                 <div>
                     <asp:HyperLink ID="hlimg" runat="server"  BorderStyle="Solid" BorderColor="DarkGray" BorderWidth="1pt" Target="_blank" Visible="False" style="text-align: center;" >
-                    <asp:Image ID="imgReceipt" runat="server"  BorderStyle="Solid" BorderColor="DarkGray" BorderWidth="1pt" ToolTip="Click to open fullsize in new tab..."  />
+                    <asp:Image ID="imgReceipt" runat="server"  BorderStyle="Solid" BorderColor="DarkGray" BorderWidth="1pt" Width="118px" ToolTip="Click to open fullsize in new tab..."  />
                         <div>
                             <asp:Label ID="lblOpenNewTab" runat="server"  style="font-style: italic; font-size:small;">Click to view in new tab...</asp:Label>
                         </div>
