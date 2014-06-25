@@ -682,7 +682,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 For Each person In allStaff
                     '-- sort by first letter of last name
                     Dim letter = person.LastName.Substring(0, 1)
-                    Dim SubmittedRmb = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Submitted And c.PortalId = PortalId And (c.UserId = person.UserID) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId, Total = CType((From t In c.AP_Staff_RmbLines Select t.GrossAmount).Sum(), Decimal?).GetValueOrDefault(0)).Take(Settings("MenuSize"))
+                    Dim SubmittedRmb = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Submitted And c.PortalId = PortalId And (c.UserId = person.UserID)
+                                        Order By c.RID Descending
+                                        Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId, Total = If(c.SpareField1 Is Nothing, 0, Double.Parse(c.SpareField1))).Take(Settings("MenuSize"))
                     Dim submittedNode As New TreeNode(person.DisplayName)
                     If SubmittedRmb.Count() > 0 Then
                         addItemsToTree(AllStaffSubmittedNode, submittedNode, letter, SubmittedRmb, "rmb")
@@ -712,7 +714,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim AllApproved = (From c In d.AP_Staff_Rmbs
                                    Where (c.Status = RmbStatus.Approved Or c.Status >= RmbStatus.PendingDownload) And c.PortalId = PortalId
                                    Order By c.ApprDate Ascending
-                                   Select c.RMBNo, c.RmbDate, c.ApprDate, c.UserRef, c.RID, c.UserId, c.Status, _
+                                   Select c.RMBNo, c.RmbDate, c.ApprDate, c.UserRef, c.RID, c.UserId, c.Status, c.SpareField1, _
                                        Receipts = ((c.AP_Staff_RmbLines.Where(Function(x) x.Receipt And (x.ReceiptImageId Is Nothing))).Count > 0)).Take(Settings("MenuSize"))
                 Dim total = AllApproved.Count
 
@@ -764,7 +766,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 For Each person In allStaff
                     '-- sort by first letter of last name
                     Dim letter = person.LastName.Substring(0, 1)
-                    Dim ProcessingRmb = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Processing And c.PortalId = PortalId And (c.UserId = person.UserID) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId, Total = If(c.AP_Staff_RmbLines.Count = 0, 0, (From t In c.AP_Staff_RmbLines Select t.GrossAmount).Sum())).Take(Settings("MenuSize"))
+                    Dim ProcessingRmb = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Processing And c.PortalId = PortalId And (c.UserId = person.UserID)
+                                         Order By c.RID Descending
+                                         Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId, Total = If(c.SpareField1 Is Nothing, 0, Double.Parse(c.SpareField1))).Take(Settings("MenuSize"))
                     Dim processingNode As New TreeNode(person.DisplayName)
                     If ProcessingRmb.Count() > 0 Then
                         addItemsToTree(AllStaffProcessingNode, processingNode, letter, ProcessingRmb, "rmb")
@@ -796,7 +800,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 For Each person In allStaff
                     '-- sort by first letter of last name
                     Dim letter = person.LastName.Substring(0, 1)
-                    Dim PaidRmb = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Paid And c.PortalId = PortalId And (c.UserId = person.UserID) Order By c.RID Descending Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId, Total = (From t In c.AP_Staff_RmbLines Select t.GrossAmount).Sum()).Take(Settings("MenuSize"))
+                    Dim PaidRmb = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Paid And c.PortalId = PortalId And (c.UserId = person.UserID)
+                                    Order By c.RID Descending
+                                    Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId, Total = If(c.SpareField1 Is Nothing, 0, Double.Parse(c.SpareField1))).Take(Settings("MenuSize"))
                     Dim paidNode As New TreeNode(person.DisplayName)
                     If PaidRmb.Count() > 0 Then
                         addItemsToTree(AllStaffPaidNode, paidNode, letter, PaidRmb, "rmb")
@@ -828,7 +834,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim count = 0
                 For Each rmb In rmbs
                     Dim rmb_node As New TreeNode()
-                    Dim rmbTotal = GetTotal(rmb.RMBNo).ToString("C") 'currency formatted string
+                    Dim rmbTotal = If(rmb.SpareField1 Is Nothing, "unknown", rmb.SpareField1)
                     If (rmb.RmbDate Is Nothing) Then
                         rmb_node.Text = GetRmbTitleFinance(rmb.RID, New Date(1970, 1, 1), rmbTotal)
                     Else
@@ -1879,7 +1885,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If rmbs.Count > 0 Then
                 Dim rmb = rmbs.First
                 Dim NewStatus As Integer = rmb.Status
-
+                Dim rmbTotal = CType((From t In d.AP_Staff_RmbLines Where t.RmbNo = rmb.RMBNo Select t.GrossAmount).Sum(), Decimal?).GetValueOrDefault(0)
                 Dim requires_receipts = (btnAddressOk.OnClientClick.Length > 0) ' this will contain code to open printable form, if receipts are required
                 Dim message As String
                 If requires_receipts Then
@@ -1898,6 +1904,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 End If
 
                 rmb.Status = NewStatus
+                rmb.SpareField1 = rmbTotal.toString("C") ' currency formatted string
                 lblStatus.Text = RmbStatus.StatusName(NewStatus)
                 rmb.RmbDate = Now
                 lblSubmittedDate.Text = Now.ToShortDateString
@@ -1977,7 +1984,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             saveIfNecessary()
             Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value
             If rmb.Count > 0 Then
-
+                Dim rmbTotal = CType((From a In d.AP_Staff_RmbLines Where a.RmbNo = rmb.First.RMBNo Select a.GrossAmount).Sum(), Decimal?).GetValueOrDefault(0)
+                rmb.First.SpareField1 = rmbTotal.ToString("C") ' currency formatted string
                 rmb.First.Status = RmbStatus.Approved
                 rmb.First.Locked = True
                 rmb.First.ApprDate = Now
