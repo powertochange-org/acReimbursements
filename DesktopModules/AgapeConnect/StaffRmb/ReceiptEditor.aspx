@@ -30,19 +30,11 @@
     <form id="form1" runat="server">
         <div>
             <div style="width: 100%; text-align: left;">
-                <input type="button" class="aButton" onclick="fuReceipt.click()" value="Select receipt..." style="font-size:small" />
+                <input type="button" class="aButton" onclick="fuReceipt.click()" value="Add receipt..." style="font-size:small" />
                 <asp:FileUpload ID="fuReceipt" runat="server" style="display:none" OnChange="$('#btnUploadReceipt').click();" />
                 <asp:Button ID="btnUploadReceipt" runat="server" Text="Upload Selected File" CssClass="aButton" Style="display:none" Font-Size="small" />
-                <asp:Button ID="btnRotateLeft" runat="server" Visible="false" CssClass="aButton" Text="↺" Font-Size="Small" Style="margin-left: 20px;" />
-                <asp:Button ID="btnRotatRight" runat="server" Visible="false" CssClass="aButton" Text="↻" Font-Size="Small" />
-                <div>
-                    <asp:HyperLink ID="hlimg" runat="server"  BorderStyle="Solid" BorderColor="DarkGray" BorderWidth="1pt" Target="_blank" Visible="False" style="text-align: center;" >
-                    <asp:Image ID="imgReceipt" runat="server"  BorderStyle="Solid" BorderColor="DarkGray" BorderWidth="1pt" Width="118px" ToolTip="Click to open fullsize in new tab..."  />
-                        <div>
-                            <asp:Label ID="lblOpenNewTab" runat="server"  style="font-style: italic; font-size:small;">Click to view in new tab...</asp:Label>
-                        </div>
-                    </asp:HyperLink>
-                </div>
+                <div id="currentReceipts" runat="server">
+		</div>
                 <asp:Label ID="lblError" runat="server" ForeColor="Red"></asp:Label>
             </div>
         </div>

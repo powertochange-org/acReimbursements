@@ -178,4 +178,12 @@
       <Association Name="AP_Staff_Rmb_AP_Staff_Rmb_Post_Extra" Member="AP_Staff_Rmb" ThisKey="RMBNo" OtherKey="RMBNo" Type="AP_Staff_Rmb" IsForeignKey="true" />
     </Type>
   </Table>
+  <Table Name="dbo.AP_Staff_RmbLine_Files" Member="AP_Staff_RmbLine_Files">
+    <Type Name="AP_Staff_RmbLine_File">
+      <Column Name="FileId" Type="System.Int32" DbType="Int NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="RmbLineNo" Type="System.Int64" DbType="BigInt" CanBeNull="true" />
+      <Column Name="RMBNo" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
+      <Column Name="RecNum" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
 </Database>

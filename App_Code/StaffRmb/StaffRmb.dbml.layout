@@ -83,12 +83,18 @@
         <elementListCompartment Id="a5f9a7c5-2adc-4da6-8661-1f3c97188320" absoluteBounds="0.89, 9.71, 1.9700000000000002, 1.7878011067708333" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <associationConnector edgePoints="[(2.0625 : 8.0303369140625); (2.0625 : 9.25)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(2.0625 : 8.0303369140625); (2.0625 : 9.25)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/StaffRmbDataContext/AP_Staff_Rmb/AP_Staff_Rmb_AP_Staff_Rmb_Post_Extra" />
       <nodes>
         <classShapeMoniker Id="04cf3e34-0cde-4d87-b8b3-dcae1502bbc1" />
         <classShapeMoniker Id="b37eafed-f6c4-4602-a6c9-3eb52f937fa0" />
       </nodes>
     </associationConnector>
+    <classShape Id="82f3901f-62be-47c7-b8c0-66d34b29dc5c" absoluteBounds="6.625, 5.75, 2, 1.5785953776041666">
+      <DataClassMoniker Name="/StaffRmbDataContext/AP_Staff_RmbLine_File" />
+      <nestedChildShapes>
+        <elementListCompartment Id="775a364e-45ea-4cdb-81e8-1e88a2f75f81" absoluteBounds="6.64, 6.21, 1.9700000000000002, 1.0185953776041665" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
   </nestedChildShapes>
 </ordesignerObjectsDiagram>

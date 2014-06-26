@@ -1521,24 +1521,17 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     Dim theFile As IFileInfo
                     Dim ElectronicReceipt As Boolean = False
+                    ' Get each of the files from the line - file table
+                    Dim theFiles = (From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo Is Nothing And lf.RMBNo = insert.RmbNo)
                     Try
-                        If (CInt(ucType.GetProperty("ReceiptType").GetValue(theControl, Nothing) = 2)) Then
+                        If (CInt(ucType.GetProperty("ReceiptType").GetValue(theControl, Nothing) = 2) And theFiles.Count > 0) Then
 
                             ElectronicReceipt = True
 
-                            Dim theFolder As IFolderInfo = FolderManager.Instance.GetFolder(PortalId, "/_RmbReceipts/" & theUserId)
-                            theFile = FileManager.Instance.GetFile(theFolder, "R" & hfRmbNo.Value & "LNew.jpg")
+                            ' Set the receiptImageId to the first fileid that we get; this way, we know that it's at least got 
+                            ' something, even if it doesn't have all of the receipts assocaited with this line
+                            insert.ReceiptImageId = theFiles.First.FileId
 
-                            If Not theFile Is Nothing Then
-                                'FileManager.Instance.RenameFile(theFile, "R" & hfRmbNo.Value & "L" & line.First.RmbLineNo & ".jpg")
-
-                                insert.ReceiptImageId = theFile.FileId
-                            Else
-                                theFile = FileManager.Instance.GetFile(theFolder, "R" & hfRmbNo.Value & "LNew.pdf")
-                                If Not theFile Is Nothing Then
-                                    insert.ReceiptImageId = theFile.FileId
-                                End If
-                            End If
                         End If
                     Catch ex As Exception
                         StaffBrokerFunctions.EventLog("Rmb" & hfRmbNo.Value, "Failed to Add Electronic Receipt: " & ex.ToString, UserId)
@@ -1579,8 +1572,17 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         theRmb.Changed = True
                     End If
                     d.SubmitChanges()
-                    If ElectronicReceipt And Not theFile Is Nothing Then
-                        FileManager.Instance.RenameFile(theFile, "R" & hfRmbNo.Value & "L" & insert.RmbLineNo & "." & theFile.Extension)
+                    If ElectronicReceipt Then
+                        For Each file In theFiles
+                            ' Get the actual file item
+                            Dim thisFile = FileManager.Instance.GetFile(file.FileId)
+                            ' Rename it
+                            FileManager.Instance.RenameFile(thisFile, "R" & hfRmbNo.Value & "L" & insert.RmbLineNo & "Rec" & file.RecNum & "." & thisFile.Extension)
+                            ' Update the line number to match
+                            file.RmbLineNo = insert.RmbLineNo.ToString
+                        Next
+                        ' Submit all the changes to the files we made
+                        d.SubmitChanges()
                     End If
 
                     Dim t As Type = Me.GetType()
@@ -1643,27 +1645,28 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         End If
 
 
+			' Get all of the electronic receipts for this rmb line
+                        Dim line_files = From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo = line.First.RmbLineNo And lf.RMBNo = line.First.RmbNo
                         'look for electronic receipt
-
-
-                        Try
-                            If (CInt(ucType.GetProperty("ReceiptType").GetValue(theControl, Nothing) = 2)) Then
-
-                                Dim theFolder As IFolderInfo = FolderManager.Instance.GetFolder(PortalId, "/_RmbReceipts/" & line.First.AP_Staff_Rmb.UserId)
-                                Dim theFile = FileManager.Instance.GetFile(theFolder, "R" & line.First.RmbNo & "L" & line.First.RmbLineNo & ".jpg")
-                                If Not theFile Is Nothing Then
-                                    line.First.ReceiptImageId = theFile.FileId
-                                Else
-                                    theFile = FileManager.Instance.GetFile(theFolder, "R" & line.First.RmbNo & "L" & line.First.RmbLineNo & ".pdf")
-                                    If Not theFile Is Nothing Then
-                                        line.First.ReceiptImageId = theFile.FileId
-                                    End If
-                                End If
-                            End If
-                        Catch ex As Exception
-
-                        End Try
-
+                        If (CInt(ucType.GetProperty("ReceiptType").GetValue(theControl, Nothing) = 2) And line_files.Count > 0) Then
+                            ' Set the ImageReceiptId to the first file
+                            line.First.ReceiptImageId = line_files.First.FileId
+                        Else
+                            ' Unset the receipt
+                            line.First.ReceiptImageId = Nothing
+                            ' Since we aren't supposed to have any receipts with
+                            ' this, we should forcefully remove any receipts that
+                            ' are already associated with this line
+                            Dim files As New List(Of IFileInfo)
+                            ' Iterate through all of the line_files we got
+                            For Each line_file As AP_Staff_RmbLine_File In line_files
+                                ' Add the file to the list
+                                files.add(FileManager.Instance.GetFile(line_file.FileId))
+                            Next
+                            ' Delete all the files. This should cascade delete to the line_file table as well
+                            FileManager.Instance.DeleteFiles(files)
+                        End If
+                        
                         line.First.AccountCode = ddlAccountCode.SelectedValue
                         line.First.CostCenter = tbCostcenter.Text
                         line.First.LineType = CInt(ddlLineTypes.SelectedValue)
@@ -2488,16 +2491,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ucType.GetProperty("Spare4").SetValue(theControl, theLine.First.Spare4, Nothing)
                     ucType.GetProperty("Spare5").SetValue(theControl, theLine.First.Spare5, Nothing)
 
-                    Dim receiptMode = 2
+                    Dim receiptMode = 1
                     If theLine.First.VATReceipt Then
                         receiptMode = 0
+                    ' If we have any files matching this line, or our receiptImageId is valid
+                    ElseIf (From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo = theLine.First.RmbLineNo And lf.RMBNo = theLine.First.RmbNo).Count > 0 Or
+                        (Not theLine.First.ReceiptImageId Is Nothing And theLine.First.ReceiptImageId > 0) Then
+                        receiptMode = 2
+                    ' If we don't have a receipt
                     ElseIf Not theLine.First.Receipt Then
                         receiptMode = -1
-                    ElseIf theLine.First.ReceiptImageId Is Nothing Then
-                        receiptMode = 1
-                    ElseIf theLine.First.ReceiptImageId < 0 Then
-                        receiptMode = 1
-
                     End If
                     Try
                         ucType.GetProperty("ReceiptType").SetValue(theControl, receiptMode, Nothing)
@@ -2538,8 +2541,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ddlAccountCode.SelectedValue = theLine.First.AccountCode
 
                     ifReceipt.Attributes("src") = Request.Url.Scheme & "://" & Request.Url.Authority & "/DesktopModules/AgapeConnect/StaffRmb/ReceiptEditor.aspx?RmbNo=" & theLine.First.RmbNo & "&RmbLine=" & theLine.First.RmbLineNo
-
-                    If Not theLine.First.ReceiptImageId Is Nothing Then
+                    ' Check to see if we have any images
+                    If receiptMode = 2 Then
                         pnlElecReceipts.Attributes("style") = ""
                     Else
                         pnlElecReceipts.Attributes("style") = "display: none;"
@@ -3492,11 +3495,17 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim VAT As Boolean = False
                     Dim Receipt As Boolean = True
                     Dim Province As String = Nothing
+                    Dim receiptMode As Integer = 1
 
                     If Not blankValues Then
                         Try
                             If Not (theControl Is Nothing) Then
                                 Dim ucTypeOld As Type = theControl.GetType()
+                                ' Attempt to get the receiptMode
+                                Try
+                                    receiptMode = CInt(ucTypeOld.GetProperty("ReceiptType").GetValue(theControl, Nothing))
+                                Catch ex As Exception ' We couldn't get one; no big deal, but keep going with this block of code
+                                End Try
                                 Comment = CStr(ucTypeOld.GetProperty("Comment").GetValue(theControl, Nothing))
                                 theDate = CDate(ucTypeOld.GetProperty("theDate").GetValue(theControl, Nothing))
                                 Amount = CDbl(ucTypeOld.GetProperty("Amount").GetValue(theControl, Nothing))
@@ -3529,6 +3538,19 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ucType.GetProperty("Spare3").SetValue(theControl, "", Nothing)
                     ucType.GetProperty("Spare4").SetValue(theControl, "", Nothing)
                     ucType.GetProperty("Spare5").SetValue(theControl, "", Nothing)
+                    ' Attempt to set the receipttype
+                    Try 
+                        ucType.GetProperty("ReceiptType").SetValue(theControl, receiptMode, Nothing)
+                        If (receiptMode = 2) Then ' We have electronic receipts
+                            pnlElecReceipts.Attributes("style") = ""
+                        Else ' Make sure it's hidden
+                            pnlElecReceipts.Attributes("style") = "display: none"
+                        End If
+                    Catch ex As Exception
+                        ' We apparently can't set the receipt type
+                        ' Need to ensure the electronic receipts are hidden
+                        pnlElecReceipts.Attributes("style") = "display: none;"
+                    End Try
                     ucType.GetMethod("Initialize").Invoke(theControl, New Object() {Settings})
 
                     ddlAccountCode.SelectedValue = GetAccountCode(lt.First.LineTypeId, tbCostcenter.Text)

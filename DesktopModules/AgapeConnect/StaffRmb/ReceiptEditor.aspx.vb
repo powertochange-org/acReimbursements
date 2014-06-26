@@ -4,12 +4,20 @@ Imports DotNetNuke.Services.FileSystem
 Imports System.Drawing.Imaging
 Imports System.Drawing
 Imports System.IO
+Imports StaffRmb
 
 
 Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
     Inherits System.Web.UI.Page
     Private imgExt() As String = {"jpg", "jpeg", "gif", "png", "bmp", "pdf"}
     Private LocalResourceFile As String
+    ' Variables for file saving
+    Private RmbNo As String
+    Private RmbLine As String
+    Private RecNum As String
+    Private theFolder As IFolderInfo
+    ' The data context
+    Dim d As New StaffRmb.StaffRmbDataContext
     Protected Sub Page_Init(sender As Object, e As System.EventArgs) Handles Me.Init
         Dim PS = CType(HttpContext.Current.Items("PortalSettings"), PortalSettings)
 
@@ -96,18 +104,105 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
         End Try
 
     End Sub
+    Private Sub AddImage(ByVal NavigateUrl As String, Optional ByVal ext As String = "jpg")
+        ' Create the div to contain this new image
+        Dim div = New HtmlGenericControl("DIV")
+        div.Attributes.Add("style", "display: inline-block; margin: 5px; vertical-align: top;")
+
+        ' Set up the link 
+        Dim link = New HyperLink
+        'link.BorderStyle = "Solid"
+        link.BorderColor = Color.DarkGray
+        'link.BorderWidth = "1pt"
+        link.Target = "_blank"
+        link.Visible = "True"
+        link.NavigateUrl = NavigateUrl
+        link.Attributes.Add("style", "display: block")
+
+        ' Set up image 
+        Dim img = New HtmlImage
+        ' If it's a pdf, need to use the generic pdf button
+        if ext.tolower = "pdf"
+            img.Src = "\images\ButtonImages\pdf.png"
+        Else ' Otherwise, we just use the same as the navigation url
+            img.Src = NavigateUrl
+            ' Also add in the rotation buttons, since these
+            ' won't be used when we have a pdf
+            div.Controls.Add(createButton("↻", "R" & RmbNo & "L" & RmbLine & "Rec" & RecNum & "." & ext))
+            div.Controls.Add(createButton("↺", "R" & RmbNo & "L" & RmbLine & "Rec" & RecNum & "." & ext))
+        End if
+        ' TODO At some point, this should be changed to: Translate("OpenNewTab")
+        img.Alt = "Click to open fullsize in new tab..."
+        ' Provide mouse-over
+        img.Attributes("title") = "Click to open fullsize in new tab..."
+        img.Width = 200
+
+        ' Add the elements appropriately
+        link.Controls.Add(img)
+        div.Controls.Add(createButton("✖", "R" & RmbNo & "L" & RmbLine & "Rec" & RecNum & "." & ext))
+        div.Controls.Add(link)
+        currentReceipts.Controls.Add(div)
+    End Sub
+
+    Private Function createButton(ByVal Text As String, ByVal FileName As String) As Button
+        Dim btn = New Button
+        btn.CssClass = "aButton"
+        ' btnL.Font-Size = "Small"
+        btn.Text = Text
+        ' Set the filename attribute of this button to the current value
+        btn.Attributes.Add("FileName", FileName)
+        ' Set up the proper event handler
+        Select Case Text
+            Case "↻", "↺" ' Rotation buttons
+                AddHandler btn.Click, AddressOf Rotate
+            Case "✖"      ' Delete button
+                AddHandler btn.Click, AddressOf Delete
+        End Select
+
+        Return btn
+    End Function
+
+    ' A sub to insert a file - line relationship 
+    Private Sub AddFileLine(ByVal FileId As Integer, ByVal RmbLine As String, ByVal RmbNo As String, ByVal RecNum As String)
+        ' First, check to see if we already have a file with this fileid
+        Dim existingFiles = (From lf In d.AP_Staff_RmbLine_Files Where lf.FileId = FileId)
+        If existingFiles.Count > 0 Then ' If we got something back
+            Dim ef = existingFiles.First
+            ' Update the fields
+            If (RmbLine <> "New") Then
+                ' Set the line number
+                ef.RmbLineNo = RmbLine
+            Else
+                ' Explicitly set it back to nothing; it'll get set once we've inserted the rmb line
+                ef.RmbLineNo = Nothing
+            End If
+            ef.RMBNo = RmbNo
+            ef.RecNum = RecNum
+        Else
+            ' Didn't have anything; insert new row
+            Dim insert As New AP_Staff_RmbLine_File
+            insert.FileId = FileId
+            ' If this isn't a new line
+            If (RmbLine <> "New") Then
+                ' Set the line number
+                insert.RmbLineNo = RmbLine
+            End If ' If this IS a new line, the rmbline will get set later
+            insert.RMBNo = RmbNo
+            insert.RecNum = RecNum
+            d.AP_Staff_RmbLine_Files.InsertOnSubmit(insert)
+        End If
+        d.SubmitChanges()
+
+    End Sub
 
     Protected Sub btnUploadReceipt_Click(sender As Object, e As System.EventArgs) Handles btnUploadReceipt.Click
         If fuReceipt.HasFile Then
             Dim Filename As String = fuReceipt.FileName
             Dim ext As String = Filename.Substring(Filename.LastIndexOf(".") + 1)
             If imgExt.Contains(ext.ToLower) Then
-                Dim d As New StaffRmb.StaffRmbDataContext
 
                 Dim PS = CType(HttpContext.Current.Items("PortalSettings"), PortalSettings)
 
-                Dim RmbNo As String = Request.QueryString("RmbNo")
-                Dim RmbLine As String = Request.QueryString("RmbLine")
                 Dim theRmb = (From c In d.AP_Staff_Rmbs Where c.PortalId = PS.PortalId And c.RMBNo = RmbNo).First
 
 
@@ -136,22 +231,10 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
 
 
                 CheckFolderPermissions(PS.PortalId, theFolder, theRmb.UserId)
-
+                Dim _theFile As IFileInfo
 
                 If ext.ToLower = "pdf" Then
-                    Dim _theFile = FileManager.Instance.AddFile(theFolder, "R" & RmbNo & "L" & RmbLine & ".pdf", fuReceipt.FileContent, True)
-                    imgReceipt.ImageUrl = "images/pdf.png"
-                    hlimg.NavigateUrl = FileManager.Instance.GetUrl(_theFile)
-                    hlimg.Visible = True
-                    btnRotateLeft.Visible = False
-                    btnRotatRight.Visible = False
-
-                    'Look for new image and remove it!
-                    Dim theOtherFile = FileManager.Instance.GetFile(theFolder, "R" & RmbNo & "L" & RmbLine & ".jpg")
-                    If Not theOtherFile Is Nothing Then
-                        FileManager.Instance.DeleteFile(theOtherFile)
-                    End If
-
+                     _theFile = FileManager.Instance.AddFile(theFolder, "R" & RmbNo & "L" & RmbLine & "Rec" & RecNum + 1 & ".pdf", fuReceipt.FileContent, True)
                 Else
 
 
@@ -190,37 +273,24 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
 
 
 
-                    Dim _theFile = FileManager.Instance.AddFile(theFolder, "R" & RmbNo & "L" & RmbLine & ".jpg", myMemoryStream, True)
-
-
-                    Dim _FileId = _theFile.FileId
-                    'Look for new pdf and remove it!
-                    Dim theOtherFile = FileManager.Instance.GetFile(theFolder, "R" & RmbNo & "L" & RmbLine & ".pdf")
-                    If Not theOtherFile Is Nothing Then
-                        FileManager.Instance.DeleteFile(theOtherFile)
-                    End If
-
-
-
-
+                    _theFile = FileManager.Instance.AddFile(theFolder, "R" & RmbNo & "L" & RmbLine & "Rec" & RecNum + 1 & ".jpg", myMemoryStream, True)
                     myMemoryStream.Dispose()
-                    imgReceipt.ImageUrl = FileManager.Instance.GetUrl(_theFile)
-                    '   lblError.Text = imgReceipt.ImageUrl
-                    hlimg.NavigateUrl = imgReceipt.ImageUrl
-                    hlimg.Visible = True
-                    btnRotateLeft.Visible = True
-                    btnRotatRight.Visible = True
-                    If newWidth / newHeight < 500 / 200 Then
-                        imgReceipt.Height = New Unit(200)
-                        imgReceipt.Width = New Unit(200 * newWidth / newHeight)
-                    Else
-                        imgReceipt.Width = New Unit(500)
-                        imgReceipt.Height = New Unit(500 / (newWidth / newHeight))
-                    End If
-                    imgReceipt.Visible = True
+                End if
+
+                ' Add the image to the page
+                AddImage(FileManager.Instance.GetUrl(_theFile), _theFile.Extension)
+                ' Increment the RecNum
+                RecNum += 1
+
+                ' Add this file-rmb line relationship to the database
+                AddFileLine(_theFile.FileId, RmbLine, RmbNo, RecNum)
 
 
-                End If
+
+
+
+
+
 
             Else
                 'Not image file
@@ -233,132 +303,97 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
 
 
     End Sub
-   
-    Protected Sub btnRotateLeft_Click(sender As Object, e As System.EventArgs) Handles btnRotateLeft.Click
-        Rotate(False)
-    End Sub
-    Private Sub Rotate(ByVal Right As Boolean)
-        Dim RmbNo As String = Request.QueryString("RmbNo")
-        Dim RmbLine As String = Request.QueryString("RmbLine")
-        Dim PS = CType(HttpContext.Current.Items("PortalSettings"), PortalSettings)
-        Dim d As New StaffRmb.StaffRmbDataContext
-        Dim theRmb = (From c In d.AP_Staff_Rmbs Where c.PortalId = PS.PortalId And c.RMBNo = RmbNo).First
+    Private Sub Delete(sender As Object, e As System.EventArgs)
+        ' Get the button that caused the event
+        Dim b As Button = CType(sender, Button)
 
+        ' Get the file for this receipt
+        Dim theFile = FileManager.Instance.GetFile(theFolder, b.Attributes("FileName"))
 
-        Dim theFolder As IFolderInfo = FolderManager.Instance.GetFolder(PS.PortalId, "/_RmbReceipts/" & theRmb.UserId)
+        ' Get the parent of the parent of this button; this represents the div
+        ' containing all of the receipts for this line
+        Dim receipts = b.Parent.Parent
+        ' Remove the div for this receipt
+        receipts.Controls.Remove(b.Parent)
 
-        Dim theFile = FileManager.Instance.GetFile(theFolder, "R" & RmbNo & "L" & RmbLine & ".jpg")
-
-       
-        Dim img = New Bitmap(theFile.PhysicalPath & ".resources")
-        'Dim img = New Bitmap(FileManager.Instance.GetFileContent(theFile))
-
-
-        If (Right) Then
-            img.RotateFlip(RotateFlipType.Rotate90FlipNone)
-        Else
-            img.RotateFlip(RotateFlipType.Rotate270FlipNone)
-        End If
-        Dim newWidth = img.Width
-        Dim newHeight = img.Height
-
-        Dim myMemoryStream As New IO.MemoryStream
-        img.Save(myMemoryStream, ImageFormat.Jpeg)
-
-        img.Dispose()
-
-        'If Not theFile Is Nothing Then
-        '    Try
-        '        FileManager.Instance.DeleteFile(theFile)
-        '    Catch ex As Exception
-        '        lblError.Text = ex.ToString
-        '    End Try
-
-        'End If
-
-
-        Dim _theFile = FileManager.Instance.AddFile(theFolder, theFile.FileName, myMemoryStream, True)
-        'Dim _theFile = FileManager.Instance.UpdateFile(theFile, myMemoryStream)
-        Dim Version = 1
-        If imgReceipt.ImageUrl.Contains("&v=") Then
-            Version = imgReceipt.ImageUrl.Substring(imgReceipt.ImageUrl.IndexOf("&v=") + 3)
-        End If
-
-        imgReceipt.ImageUrl = FileManager.Instance.GetUrl(_theFile) & "&v=" & Version
-
-        hlimg.NavigateUrl = imgReceipt.ImageUrl
-        hlimg.Visible = True
-        btnRotateLeft.Visible = True
-        btnRotatRight.Visible = True
-        If newWidth / newHeight < 500 / 200 Then
-            imgReceipt.Height = New Unit(200)
-            imgReceipt.Width = New Unit(200 * newWidth / newHeight)
-        Else
-            imgReceipt.Width = New Unit(500)
-            imgReceipt.Height = New Unit(500 / (newWidth / newHeight))
-        End If
-        myMemoryStream.Dispose()
+        ' Delete the file; deletes it from the filesystem as well as the db, and
+        ' cascades down to the line-file table
+        FileManager.Instance.DeleteFile(theFile)
     End Sub
 
-    Protected Sub btnRotatRight_Click(sender As Object, e As System.EventArgs) Handles btnRotatRight.Click
-        Rotate(True)
+    Private Sub Rotate(sender As Object, e As System.EventArgs)
+        Try
+            ' Get access to the button that caused this event
+            Dim b As Button = CType(sender, Button)
+            ' Get current file
+            Dim theFile = FileManager.Instance.GetFile(theFolder, b.Attributes("FileName"))
+
+            Dim img = New Bitmap(theFile.PhysicalPath & ".resources")
+
+            ' If this is the left rotation
+            If (b.Text = "↻") Then
+                img.RotateFlip(RotateFlipType.Rotate90FlipNone)
+            ElseIf (b.Text = "↺") Then ' Right rotation
+                img.RotateFlip(RotateFlipType.Rotate270FlipNone)
+            Else ' This shouldn't ever happen
+                Throw New Exception
+            End If
+            Dim newWidth = img.Width
+            Dim newHeight = img.Height
+
+            Dim myMemoryStream As New IO.MemoryStream
+            img.Save(myMemoryStream, ImageFormat.Jpeg)
+
+            img.Dispose()
+
+            ' Replace the image with the rotated version
+            FileManager.Instance.AddFile(theFolder, theFile.FileName, myMemoryStream, True)
+            myMemoryStream.Dispose()
+        Catch Exception As Exception
+            lblError.Text = "Error while attempting to rotate image"
+        End Try
     End Sub
 
-    
     Protected Sub Page_Load(sender As Object, e As System.EventArgs) Handles Me.Load
-        lblOpenNewTab.Text = Translate("OpenNewTab")
+        ' Get the reimbursement and line number
+        RmbNo = Request.QueryString("RmbNo")
+        RmbLine = Request.QueryString("RmbLine")
+        ' Set the receipt number to 0 (We don't have any yet)
+        RecNum = 0
+        Try
+            Dim PS = CType(HttpContext.Current.Items("PortalSettings"), PortalSettings)
 
-        Dim RmbNo As String = Request.QueryString("RmbNo")
-        Dim RmbLine As String = Request.QueryString("RmbLine")
-        If (RmbLine <> "New") Then
-            Try
-                Dim PS = CType(HttpContext.Current.Items("PortalSettings"), PortalSettings)
-                Dim d As New StaffRmb.StaffRmbDataContext
-                Dim theRmbLine = (From c In d.AP_Staff_RmbLines Where c.AP_Staff_Rmb.PortalId = PS.PortalId And c.RmbLineNo = RmbLine)
-
-                Dim theRmb = (From c In d.AP_Staff_Rmbs Where c.PortalId = PS.PortalId And c.RMBNo = RmbNo).First
+            Dim theRmb = (From c In d.AP_Staff_Rmbs Where c.PortalId = PS.PortalId And c.RMBNo = RmbNo).First
 
 
-                Dim theFolder As IFolderInfo = FolderManager.Instance.GetFolder(PS.PortalId, "/_RmbReceipts/" & theRmb.UserId)
+            theFolder = FolderManager.Instance.GetFolder(PS.PortalId, "/_RmbReceipts/" & theRmb.UserId)
 
-                CheckFolderPermissions(PS.PortalId, theFolder, theRmb.UserId)
-
-
-                If theRmbLine.Count > 0 Then
-
-                    Dim theFile = FileManager.Instance.GetFile(theRmbLine.First.ReceiptImageId)
-
-                    If theFile.Extension.ToLower = "pdf" Then
-                        imgReceipt.ImageUrl = "images/pdf.png"
-                        hlimg.NavigateUrl = FileManager.Instance.GetUrl(theFile)
-                        hlimg.Visible = True
-                        btnRotateLeft.Visible = False
-                        btnRotatRight.Visible = False
+            CheckFolderPermissions(PS.PortalId, theFolder, theRmb.UserId)
 
 
-                    Else
-                        imgReceipt.ImageUrl = FileManager.Instance.GetUrl(theFile)
-                        hlimg.NavigateUrl = imgReceipt.ImageUrl
-                        hlimg.Visible = True
-                        btnRotateLeft.Visible = True
-                        btnRotatRight.Visible = True
-                        Dim newWidth = theFile.Width
-                        Dim newHeight = theFile.Height
-                        If newWidth / newHeight < 500 / 200 Then
-                            imgReceipt.Height = New Unit(200)
-                            imgReceipt.Width = New Unit(200 * newWidth / newHeight)
-                        Else
-                            imgReceipt.Width = New Unit(500)
-                            imgReceipt.Height = New Unit(500 / (newWidth / newHeight))
-                        End If
 
-                        'lblError.Text = imgReceipt.Width.Value & " - " & imgReceipt.Height.Value
-                    End If
-                End If
-            Catch ex As Exception
+            Dim theFiles As Object
+            ' If this isn't a new line we're creating
+            If (RmbLine <> "New") Then
+                ' Get all of the files associated with this existing rmb line
+                theFiles = (From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo = RmbLine And lf.RMBNo = RmbNo Order By RecNum)
+            Else
+                ' Get all of the ones for this reimbursement that don't have a line yet
+                theFiles = (From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo Is Nothing And lf.RMBNo = RmbNo Order By RecNum)
+            End If
 
-            End Try
-        End If
+            For Each line_file As AP_Staff_RmbLine_File In theFiles
+                ' Keep re-setting the receipt number to the latest one
+                RecNum = line_file.RecNum
+                ' Get the actual file
+                Dim file = FileManager.Instance.GetFile(line_file.FileId)
+                ' Add each of the files to the page
+                AddImage(FileManager.Instance.GetUrl(file), file.Extension)
+            Next
+
+        Catch ex As Exception
+
+        End Try
 
 
 

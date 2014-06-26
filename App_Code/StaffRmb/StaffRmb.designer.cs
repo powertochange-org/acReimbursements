@@ -60,6 +60,9 @@ namespace StaffRmb
     partial void InsertAP_Staff_Rmb_Post_Extra(AP_Staff_Rmb_Post_Extra instance);
     partial void UpdateAP_Staff_Rmb_Post_Extra(AP_Staff_Rmb_Post_Extra instance);
     partial void DeleteAP_Staff_Rmb_Post_Extra(AP_Staff_Rmb_Post_Extra instance);
+    partial void InsertAP_Staff_RmbLine_File(AP_Staff_RmbLine_File instance);
+    partial void UpdateAP_Staff_RmbLine_File(AP_Staff_RmbLine_File instance);
+    partial void DeleteAP_Staff_RmbLine_File(AP_Staff_RmbLine_File instance);
     #endregion
 		
 		public StaffRmbDataContext() : 
@@ -169,6 +172,14 @@ namespace StaffRmb
 			get
 			{
 				return this.GetTable<AP_Staff_Rmb_Post_Extra>();
+			}
+		}
+		
+		public System.Data.Linq.Table<AP_Staff_RmbLine_File> AP_Staff_RmbLine_Files
+		{
+			get
+			{
+				return this.GetTable<AP_Staff_RmbLine_File>();
 			}
 		}
 	}
@@ -3924,6 +3935,140 @@ namespace StaffRmb
 						this._RMBNo = default(long);
 					}
 					this.SendPropertyChanged("AP_Staff_Rmb");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.AP_Staff_RmbLine_Files")]
+	public partial class AP_Staff_RmbLine_File : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _FileId;
+		
+		private System.Nullable<long> _RmbLineNo;
+		
+		private long _RMBNo;
+		
+		private int _RecNum;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnFileIdChanging(int value);
+    partial void OnFileIdChanged();
+    partial void OnRmbLineNoChanging(System.Nullable<long> value);
+    partial void OnRmbLineNoChanged();
+    partial void OnRMBNoChanging(long value);
+    partial void OnRMBNoChanged();
+    partial void OnRecNumChanging(int value);
+    partial void OnRecNumChanged();
+    #endregion
+		
+		public AP_Staff_RmbLine_File()
+		{
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FileId", DbType="Int NOT NULL", IsPrimaryKey=true)]
+		public int FileId
+		{
+			get
+			{
+				return this._FileId;
+			}
+			set
+			{
+				if ((this._FileId != value))
+				{
+					this.OnFileIdChanging(value);
+					this.SendPropertyChanging();
+					this._FileId = value;
+					this.SendPropertyChanged("FileId");
+					this.OnFileIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_RmbLineNo", DbType="BigInt")]
+		public System.Nullable<long> RmbLineNo
+		{
+			get
+			{
+				return this._RmbLineNo;
+			}
+			set
+			{
+				if ((this._RmbLineNo != value))
+				{
+					this.OnRmbLineNoChanging(value);
+					this.SendPropertyChanging();
+					this._RmbLineNo = value;
+					this.SendPropertyChanged("RmbLineNo");
+					this.OnRmbLineNoChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_RMBNo", DbType="BigInt NOT NULL")]
+		public long RMBNo
+		{
+			get
+			{
+				return this._RMBNo;
+			}
+			set
+			{
+				if ((this._RMBNo != value))
+				{
+					this.OnRMBNoChanging(value);
+					this.SendPropertyChanging();
+					this._RMBNo = value;
+					this.SendPropertyChanged("RMBNo");
+					this.OnRMBNoChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_RecNum", DbType="Int NOT NULL")]
+		public int RecNum
+		{
+			get
+			{
+				return this._RecNum;
+			}
+			set
+			{
+				if ((this._RecNum != value))
+				{
+					this.OnRecNumChanging(value);
+					this.SendPropertyChanging();
+					this._RecNum = value;
+					this.SendPropertyChanged("RecNum");
+					this.OnRecNumChanged();
 				}
 			}
 		}
