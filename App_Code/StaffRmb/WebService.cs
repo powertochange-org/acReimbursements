@@ -8,6 +8,7 @@ using System.Web.Script.Services;
 using Newtonsoft.Json;
 using StaffRmb;
 using System.Threading.Tasks;
+using DotNetNuke.Web.Api;
 
 /// <summary>
 /// Provides a sublist of account numbers
@@ -69,6 +70,47 @@ public class WebService : System.Web.Services.WebService {
         {
         }
         return result.ToArray();
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+    public string AllRmbs(int status)
+    {
+        if (isFinance())
+        {
+            switch (status)
+            {
+                case RmbStatus.Submitted:
+                    return "submitted";
+                    break;
+                case RmbStatus.Processing:
+                    return "processing";
+                    break;
+                case RmbStatus.Paid:
+                    return "paid";
+                    break;
+                default:
+                    return "unknown status";
+            }
+        }
+        return "";
+    }
+
+    private Boolean isFinance()
+    {
+        Boolean result = false;
+        string username = Context.User.Identity.Name;
+        DotNetNuke.Entities.Users.UserInfo user = DotNetNuke.Entities.Users.UserController.GetUserByName(username);
+        if (user == null || user.Roles == null) return false;
+        if (user.Roles.Contains("Accounts Team")) result = true;
+        return result;
+        //StaffRmb.StaffRmbFunctions.
+        //DotNetNuke.Security.Roles
+        //For Each role In CStr(Settings("AccountsRoles")).Split(";")
+        //    If (UserInfo.Roles().Contains(role)) Then
+        //        Return True
+        //    End If
+        //Next
     }
     
 }
