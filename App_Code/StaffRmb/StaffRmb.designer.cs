@@ -1339,6 +1339,8 @@ namespace StaffRmb
 		
 		private EntitySet<AP_Staff_Rmb_Post_Extra> _AP_Staff_Rmb_Post_Extras;
 		
+		private EntitySet<AP_Staff_RmbLine_File> _AP_Staff_RmbLine_Files;
+		
     #region Extensibility Method Definitions
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -1415,6 +1417,7 @@ namespace StaffRmb
 		{
 			this._AP_Staff_RmbLines = new EntitySet<AP_Staff_RmbLine>(new Action<AP_Staff_RmbLine>(this.attach_AP_Staff_RmbLines), new Action<AP_Staff_RmbLine>(this.detach_AP_Staff_RmbLines));
 			this._AP_Staff_Rmb_Post_Extras = new EntitySet<AP_Staff_Rmb_Post_Extra>(new Action<AP_Staff_Rmb_Post_Extra>(this.attach_AP_Staff_Rmb_Post_Extras), new Action<AP_Staff_Rmb_Post_Extra>(this.detach_AP_Staff_Rmb_Post_Extras));
+			this._AP_Staff_RmbLine_Files = new EntitySet<AP_Staff_RmbLine_File>(new Action<AP_Staff_RmbLine_File>(this.attach_AP_Staff_RmbLine_Files), new Action<AP_Staff_RmbLine_File>(this.detach_AP_Staff_RmbLine_Files));
 			OnCreated();
 		}
 		
@@ -2104,6 +2107,19 @@ namespace StaffRmb
 			}
 		}
 		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="AP_Staff_Rmb_AP_Staff_RmbLine_File", Storage="_AP_Staff_RmbLine_Files", ThisKey="RMBNo", OtherKey="RMBNo")]
+		public EntitySet<AP_Staff_RmbLine_File> AP_Staff_RmbLine_Files
+		{
+			get
+			{
+				return this._AP_Staff_RmbLine_Files;
+			}
+			set
+			{
+				this._AP_Staff_RmbLine_Files.Assign(value);
+			}
+		}
+		
 		public event PropertyChangingEventHandler PropertyChanging;
 		
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -2143,6 +2159,18 @@ namespace StaffRmb
 		}
 		
 		private void detach_AP_Staff_Rmb_Post_Extras(AP_Staff_Rmb_Post_Extra entity)
+		{
+			this.SendPropertyChanging();
+			entity.AP_Staff_Rmb = null;
+		}
+		
+		private void attach_AP_Staff_RmbLine_Files(AP_Staff_RmbLine_File entity)
+		{
+			this.SendPropertyChanging();
+			entity.AP_Staff_Rmb = this;
+		}
+		
+		private void detach_AP_Staff_RmbLine_Files(AP_Staff_RmbLine_File entity)
 		{
 			this.SendPropertyChanging();
 			entity.AP_Staff_Rmb = null;
@@ -3974,6 +4002,8 @@ namespace StaffRmb
 		
 		private int _RecNum;
 		
+		private EntityRef<AP_Staff_Rmb> _AP_Staff_Rmb;
+		
     #region Extensibility Method Definitions
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -3990,6 +4020,7 @@ namespace StaffRmb
 		
 		public AP_Staff_RmbLine_File()
 		{
+			this._AP_Staff_Rmb = default(EntityRef<AP_Staff_Rmb>);
 			OnCreated();
 		}
 		
@@ -4044,6 +4075,10 @@ namespace StaffRmb
 			{
 				if ((this._RMBNo != value))
 				{
+					if (this._AP_Staff_Rmb.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
 					this.OnRMBNoChanging(value);
 					this.SendPropertyChanging();
 					this._RMBNo = value;
@@ -4069,6 +4104,40 @@ namespace StaffRmb
 					this._RecNum = value;
 					this.SendPropertyChanged("RecNum");
 					this.OnRecNumChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="AP_Staff_Rmb_AP_Staff_RmbLine_File", Storage="_AP_Staff_Rmb", ThisKey="RMBNo", OtherKey="RMBNo", IsForeignKey=true, DeleteOnNull=true, DeleteRule="CASCADE")]
+		public AP_Staff_Rmb AP_Staff_Rmb
+		{
+			get
+			{
+				return this._AP_Staff_Rmb.Entity;
+			}
+			set
+			{
+				AP_Staff_Rmb previousValue = this._AP_Staff_Rmb.Entity;
+				if (((previousValue != value) 
+							|| (this._AP_Staff_Rmb.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._AP_Staff_Rmb.Entity = null;
+						previousValue.AP_Staff_RmbLine_Files.Remove(this);
+					}
+					this._AP_Staff_Rmb.Entity = value;
+					if ((value != null))
+					{
+						value.AP_Staff_RmbLine_Files.Add(this);
+						this._RMBNo = value.RMBNo;
+					}
+					else
+					{
+						this._RMBNo = default(long);
+					}
+					this.SendPropertyChanged("AP_Staff_Rmb");
 				}
 			}
 		}

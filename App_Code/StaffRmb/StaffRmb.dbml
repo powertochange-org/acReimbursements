@@ -93,6 +93,7 @@
       <Column Name="ProcUserId" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Association Name="AP_Staff_Rmb_AP_Staff_RmbLine" Member="AP_Staff_RmbLines" ThisKey="RMBNo" OtherKey="RmbNo" Type="AP_Staff_RmbLine" />
       <Association Name="AP_Staff_Rmb_AP_Staff_Rmb_Post_Extra" Member="AP_Staff_Rmb_Post_Extras" ThisKey="RMBNo" OtherKey="RMBNo" Type="AP_Staff_Rmb_Post_Extra" />
+      <Association Name="AP_Staff_Rmb_AP_Staff_RmbLine_File" Member="AP_Staff_RmbLine_Files" ThisKey="RMBNo" OtherKey="RMBNo" Type="AP_Staff_RmbLine_File" />
     </Type>
   </Table>
   <Table Name="dbo.AP_Staff_AdvanceRequest" Member="AP_Staff_AdvanceRequests">
@@ -184,6 +185,7 @@
       <Column Name="RmbLineNo" Type="System.Int64" DbType="BigInt" CanBeNull="true" />
       <Column Name="RMBNo" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
       <Column Name="RecNum" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Association Name="AP_Staff_Rmb_AP_Staff_RmbLine_File" Member="AP_Staff_Rmb" ThisKey="RMBNo" OtherKey="RMBNo" Type="AP_Staff_Rmb" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
     </Type>
   </Table>
 </Database>
