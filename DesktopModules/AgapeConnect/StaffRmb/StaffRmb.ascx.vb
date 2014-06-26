@@ -1522,7 +1522,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim theFile As IFileInfo
                     Dim ElectronicReceipt As Boolean = False
                     ' Get each of the files from the line - file table
-                    Dim theFiles = (From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo Is Nothing And lf.RMBNo = insert.RmbNo)
+                    Dim theFiles = (From lf In d.AP_Staff_RmbLine_File Where lf.RmbLineNo Is Nothing And lf.RMBNo = insert.RmbNo)
                     Try
                         If (CInt(ucType.GetProperty("ReceiptType").GetValue(theControl, Nothing) = 2) And theFiles.Count > 0) Then
 
