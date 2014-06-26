@@ -123,7 +123,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
         Dim img = New HtmlImage
         ' If it's a pdf, need to use the generic pdf button
         if ext.tolower = "pdf"
-            img.Src = "\images\ButtonImages\pdf.png"
+            img.Src = "images/pdf.png"
         Else ' Otherwise, we just use the same as the navigation url
             img.Src = NavigateUrl
             ' Also add in the rotation buttons, since these
