@@ -388,6 +388,8 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
             DataCache.ClearFolderCache(PS.PortalId)
             ' Try to get the folder; if this fails, we'll throw an exception and break out of this block
             theFolder = FolderManager.Instance.GetFolder(PS.PortalId, "/_RmbReceipts/" & theRmb.UserId)
+            ' Set the proper folder permissions
+            CheckFolderPermissions(PS.PortalId, theFolder, theRmb.UserId)
             Dim theFiles As Object
             ' If this isn't a new line we're creating
             If (RmbLine <> "New") Then
