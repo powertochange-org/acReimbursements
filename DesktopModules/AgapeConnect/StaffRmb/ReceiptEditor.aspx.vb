@@ -72,37 +72,56 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
     End Function
 
     Protected Sub CheckFolderPermissions(ByVal PortalId As Integer, ByVal theFolder As IFolderInfo, ByVal theUserId As Integer)
-
-        ' Before we mess around with any folder permissions, clear the caches. 
-        ' This should eliminate some issues we were having with the receipt uploader
-        DataCache.ClearFolderCache(PortalId)
-        DataCache.ClearFolderPermissionsCache(PortalId)
-
-        Try
-
-       
-        Dim rc As New DotNetNuke.Security.Roles.RoleController
-
+        ' Get the write permission
         Dim pc As New Permissions.PermissionController
         Dim w As Permissions.PermissionInfo = pc.GetPermissionByCodeAndKey("SYSTEM_FOLDER", "WRITE")(0)
-        Dim r As Permissions.PermissionInfo = pc.GetPermissionByCodeAndKey("SYSTEM_FOLDER", "READ")(0)
-        FolderManager.Instance.SetFolderPermission(theFolder, w.PermissionID, Nothing, theUserId)
-        FolderManager.Instance.SetFolderPermission(theFolder, w.PermissionID, rc.GetRoleByName(PortalId, "Accounts Team").RoleID)
 
-        ' If Not (Permissions.FolderPermissionController.HasFolderPermission(PortalId, theFolder.FolderPath, "READ")) Then
-        FolderManager.Instance.SetFolderPermission(theFolder, w.PermissionID, Nothing, UserController.GetCurrentUserInfo.UserID)
+        ' Get a list of all the folderPermissions we currently have
+        Dim folderPermissions = theFolder.FolderPermissions
+
+        ' Set up the first permission
+        Dim permission As New Permissions.FolderPermissionInfo()
+        ' Set up some default values for the permission
+        initFolderPermission(permission, theFolder.FolderID, PortalId, w.PermissionID)
+
+        ' Set the user id to be this user
+        permission.UserID = theUserId
+        ' Add folder permissions, with a check for duplicates. 
+        ' This duplicate check (the 'True' parameter) will classify this as a "duplicate" if this permission
+        ' has the same PermissionID, UserID, and RoleID as a pre-existing one, and not add it if it is a duplicate
+        folderPermissions.Add(permission, True)
+
         For Each row In StaffBrokerFunctions.GetLeaders(UserController.GetCurrentUserInfo.UserID, True).Distinct()
-
-
-            FolderManager.Instance.SetFolderPermission(theFolder, w.PermissionID, Nothing, row)
+            ' Create a new permission for this leader
+            permission = New Permissions.FolderPermissionInfo()
+            ' Initialize all the variables
+            initFolderPermission(permission, theFolder.FolderID, PortalId, w.PermissionID)
+            ' Set the userid to the leader's id
+            permission.UserID = row
+            ' Add permission for leader
+            folderPermissions.Add(permission, True)
         Next
-        'End If
 
+        ' Finally, add permissions for the accounts team:
+        permission = New Permissions.FolderPermissionInfo()
+        ' Initialize new folder permission
+        initFolderPermission(permission, theFolder.FolderID, PortalId, w.PermissionID)
 
-        Catch ex As Exception
+        ' Set the role ID
+        Dim rc As New DotNetNuke.Security.Roles.RoleController
+        permission.RoleID = rc.GetRoleByName(PortalId, "Accounts Team").RoleID
+        folderPermissions.Add(permission, True)
 
-        End Try
+        ' Once we're finished adding these folder permissions, save it all
+        Permissions.FolderPermissionController.SaveFolderPermissions(theFolder)
+    End Sub
 
+    ' Simple helper function to initialize a folder permission
+    Private Sub initFolderPermission(folderPermission As Permissions.FolderPermissionInfo, ByVal FolderID As Integer, ByVal PortalID As Integer, ByVal PermissionID As Integer)
+        folderPermission.FolderID = FolderID
+        folderPermission.PortalID = PortalID
+        folderPermission.PermissionID = PermissionID
+        folderPermission.AllowAccess = 1
     End Sub
     Private Sub AddImage(ByVal NavigateUrl As String, Optional ByVal ext As String = "jpg")
         ' Create the div to contain this new image
@@ -222,14 +241,15 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
 
                 Dim theFolder As IFolderInfo
                 Dim path = "/_RmbReceipts/" & theRmb.UserId
+                ' Clear the folder cache, to ensure we're getting the most up-to-date folder info
+                DataCache.ClearFolderCache(PS.PortalId)
                 If FolderManager.Instance.FolderExists(PS.PortalId, path) Then
                     theFolder = FolderManager.Instance.GetFolder(PS.PortalId, path)
                 Else
-
                     theFolder = FolderManager.Instance.AddFolder(fm, path)
                 End If
 
-
+                ' Set the proper folder permissions
                 CheckFolderPermissions(PS.PortalId, theFolder, theRmb.UserId)
                 Dim _theFile As IFileInfo
 
@@ -364,14 +384,10 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
             Dim PS = CType(HttpContext.Current.Items("PortalSettings"), PortalSettings)
 
             Dim theRmb = (From c In d.AP_Staff_Rmbs Where c.PortalId = PS.PortalId And c.RMBNo = RmbNo).First
-
-
+            ' Clear folder cache, to make sure we're getting the up-to-date folder info
+            DataCache.ClearFolderCache(PS.PortalId)
+            ' Try to get the folder; if this fails, we'll throw an exception and break out of this block
             theFolder = FolderManager.Instance.GetFolder(PS.PortalId, "/_RmbReceipts/" & theRmb.UserId)
-
-            CheckFolderPermissions(PS.PortalId, theFolder, theRmb.UserId)
-
-
-
             Dim theFiles As Object
             ' If this isn't a new line we're creating
             If (RmbLine <> "New") Then
