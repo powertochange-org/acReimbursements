@@ -16,6 +16,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
     Private RmbLine As String
     Private RecNum As String
     Private theFolder As IFolderInfo
+    Private theRmb As AP_Staff_Rmb 
     ' The data context
     Dim d As New StaffRmb.StaffRmbDataContext
     Protected Sub Page_Init(sender As Object, e As System.EventArgs) Handles Me.Init
@@ -71,7 +72,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
 
     End Function
 
-    Protected Sub CheckFolderPermissions(ByVal PortalId As Integer, ByVal theFolder As IFolderInfo, ByVal theUserId As Integer)
+    Protected Async Function CheckFolderPermissions(ByVal PortalId As Integer, ByVal theFolder As IFolderInfo, ByVal theUserId As Integer) As Threading.Tasks.Task
         ' Get the write permission
         Dim pc As New Permissions.PermissionController
         Dim w As Permissions.PermissionInfo = pc.GetPermissionByCodeAndKey("SYSTEM_FOLDER", "WRITE")(0)
@@ -91,14 +92,15 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
         ' has the same PermissionID, UserID, and RoleID as a pre-existing one, and not add it if it is a duplicate
         folderPermissions.Add(permission, True)
 
-        For Each row In StaffBrokerFunctions.GetLeaders(UserController.GetCurrentUserInfo.UserID, True).Distinct()
-            ' Create a new permission for this leader
+        ' Get all the possible approvers for this reimbursement
+        For Each approver In (Await StaffRmbFunctions.getApproversAsync(theRmb, Nothing, Nothing)).UserIds
+            ' Create a new permission for this approver
             permission = New Permissions.FolderPermissionInfo()
             ' Initialize all the variables
             initFolderPermission(permission, theFolder.FolderID, PortalId, w.PermissionID)
-            ' Set the userid to the leader's id
-            permission.UserID = row
-            ' Add permission for leader
+            ' Set the userid to the approver's id
+            permission.UserID = approver.UserID
+            ' Add permission for approver
             folderPermissions.Add(permission, True)
         Next
 
@@ -114,7 +116,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
 
         ' Once we're finished adding these folder permissions, save it all
         Permissions.FolderPermissionController.SaveFolderPermissions(theFolder)
-    End Sub
+    End Function
 
     ' Simple helper function to initialize a folder permission
     Private Sub initFolderPermission(folderPermission As Permissions.FolderPermissionInfo, ByVal FolderID As Integer, ByVal PortalID As Integer, ByVal PermissionID As Integer)
@@ -123,7 +125,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
         folderPermission.PermissionID = PermissionID
         folderPermission.AllowAccess = 1
     End Sub
-    Private Sub AddImage(ByVal NavigateUrl As String, Optional ByVal ext As String = "jpg")
+    Private Sub AddImage(ByVal file As IFileInfo)
         ' Create the div to contain this new image
         Dim div = New HtmlGenericControl("DIV")
         div.Attributes.Add("style", "display: inline-block; margin: 5px; vertical-align: top;")
@@ -135,21 +137,21 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
         'link.BorderWidth = "1pt"
         link.Target = "_blank"
         link.Visible = "True"
-        link.NavigateUrl = NavigateUrl
+        link.NavigateUrl = FileManager.Instance.GetUrl(file)
         link.Attributes.Add("style", "display: block")
 
         ' Set up image 
         Dim img = New HtmlImage
         ' If it's a pdf, need to use the generic pdf button
-        if ext.tolower = "pdf"
+        If file.Extension.ToLower = "pdf" Then
             img.Src = "images/pdf.png"
         Else ' Otherwise, we just use the same as the navigation url
-            img.Src = NavigateUrl
+            img.Src = link.NavigateUrl
             ' Also add in the rotation buttons, since these
             ' won't be used when we have a pdf
-            div.Controls.Add(createButton("↻", "R" & RmbNo & "L" & RmbLine & "Rec" & RecNum & "." & ext))
-            div.Controls.Add(createButton("↺", "R" & RmbNo & "L" & RmbLine & "Rec" & RecNum & "." & ext))
-        End if
+            div.Controls.Add(createButton("↻", file.FileName))
+            div.Controls.Add(createButton("↺", file.FileName))
+        End If
         ' TODO At some point, this should be changed to: Translate("OpenNewTab")
         img.Alt = "Click to open fullsize in new tab..."
         ' Provide mouse-over
@@ -158,7 +160,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
 
         ' Add the elements appropriately
         link.Controls.Add(img)
-        div.Controls.Add(createButton("✖", "R" & RmbNo & "L" & RmbLine & "Rec" & RecNum & "." & ext))
+        div.Controls.Add(createButton("✖", file.FileName))
         div.Controls.Add(link)
         currentReceipts.Controls.Add(div)
     End Sub
@@ -221,9 +223,6 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
             If imgExt.Contains(ext.ToLower) Then
 
                 Dim PS = CType(HttpContext.Current.Items("PortalSettings"), PortalSettings)
-
-                Dim theRmb = (From c In d.AP_Staff_Rmbs Where c.PortalId = PS.PortalId And c.RMBNo = RmbNo).First
-
 
                 Dim fm = FolderMappingController.Instance.GetFolderMapping(PS.PortalId, "Secure")
 
@@ -295,10 +294,10 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
 
                     _theFile = FileManager.Instance.AddFile(theFolder, "R" & RmbNo & "L" & RmbLine & "Rec" & RecNum + 1 & ".jpg", myMemoryStream, True)
                     myMemoryStream.Dispose()
-                End if
+                End If
 
                 ' Add the image to the page
-                AddImage(FileManager.Instance.GetUrl(_theFile), _theFile.Extension)
+                AddImage(_theFile)
                 ' Increment the RecNum
                 RecNum += 1
 
@@ -383,7 +382,8 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
         Try
             Dim PS = CType(HttpContext.Current.Items("PortalSettings"), PortalSettings)
 
-            Dim theRmb = (From c In d.AP_Staff_Rmbs Where c.PortalId = PS.PortalId And c.RMBNo = RmbNo).First
+            ' Set the rmb for this receipt
+            theRmb = (From c In d.AP_Staff_Rmbs Where c.PortalId = PS.PortalId And c.RMBNo = RmbNo).First
             ' Clear folder cache, to make sure we're getting the up-to-date folder info
             DataCache.ClearFolderCache(PS.PortalId)
             ' Try to get the folder; if this fails, we'll throw an exception and break out of this block
@@ -404,7 +404,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
                 ' Get the actual file
                 Dim file = FileManager.Instance.GetFile(line_file.FileId)
                 ' Add each of the files to the page
-                AddImage(FileManager.Instance.GetUrl(file), file.Extension)
+                AddImage(file)
             Next
 
         Catch ex As Exception
