@@ -243,6 +243,9 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
                 ' Clear the folder cache, to ensure we're getting the most up-to-date folder info
                 DataCache.ClearFolderCache(PS.PortalId)
                 If FolderManager.Instance.FolderExists(PS.PortalId, path) Then
+                    If Not Directory.Exists(Server.MapPath("~/portals/" & PS.PortalId & path)) Then
+                        Directory.CreateDirectory(Server.MapPath("~/portals/" & PS.PortalId & path))
+                    End If
                     theFolder = FolderManager.Instance.GetFolder(PS.PortalId, path)
                 Else
                     theFolder = FolderManager.Instance.AddFolder(fm, path)
