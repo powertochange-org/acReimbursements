@@ -39,6 +39,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 #Region "Page Events"
         Protected Sub Page_Load(sender As Object, e As System.EventArgs) Handles Me.Load
             hfPortalId.Value = PortalId
+            hfTabModuleId.Value = TabModuleId
             lblMovedMenu.Visible = IsEditable
 
             For i As Integer = 2 To hfRows.Value
@@ -74,7 +75,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 hfNoReceiptLimit.Value = Settings("NoReceipt")
             End If
 
-            If Not Page.IsPostBack Then
+            If Page.IsPostBack Then
+
+            Else
                 TaskList.Add(LoadCompaniesAsync())
                 TaskList.Add(LoadMenuAsync())
                 TaskList.Add(LoadAddressAsync())
@@ -672,10 +675,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     showDividers(True)
                     Dim allStaff = StaffBrokerFunctions.GetStaff()
                     Dim ReloadMenuTasks = New List(Of Task)
-                    ReloadMenuTasks.Add(buildAllSubmittedTreeAsync(allStaff))
+                    SubmittedUpdatePanel.ContentTemplateContainer.Controls.AddAt(0, GenerateTreeControl("treeSubmitted"))
+                    ProcessingUpdatePanel.ContentTemplateContainer.Controls.AddAt(0, GenerateTreeControl("treeProcessing"))
+                    PaidUpdatePanel.ContentTemplateContainer.Controls.AddAt(0, GenerateTreeControl("treePaid"))
                     ReloadMenuTasks.Add(buildAllApprovedTreeAsync(allStaff)) '--This is the key part for the FINANCE team
-                    ReloadMenuTasks.Add(buildAllProcessingTreeAsync(allStaff))
-                    ReloadMenuTasks.Add(buildAllPaidTreeAsync(allStaff))
                     Await Task.WhenAll(ReloadMenuTasks)
                 End If
 
@@ -685,36 +688,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End Try
         End Function
 
-        Private Async Function buildAllSubmittedTreeAsync(allStaff As IQueryable(Of StaffBroker.User)) As Task
-            Try
-                Dim AllStaffSubmittedNode As New TreeNode("All Staff")
-                AllStaffSubmittedNode.SelectAction = TreeNodeSelectAction.Expand
-                AllStaffSubmittedNode.Expanded = False
-
-                For Each person In allStaff
-                    '-- sort by first letter of last name
-                    Dim letter = person.LastName.Substring(0, 1)
-                    Dim SubmittedRmb = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Submitted And c.PortalId = PortalId And (c.UserId = person.UserID)
-                                        Order By c.RID Descending
-                                        Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId, Total = If(c.SpareField1 Is Nothing, "", c.SpareField1)).Take(Settings("MenuSize"))
-                    Dim submittedNode As New TreeNode(person.DisplayName)
-                    If SubmittedRmb.Count() > 0 Then
-                        addItemsToTree(AllStaffSubmittedNode, submittedNode, letter, SubmittedRmb, "rmb")
-                    End If
-                    If (ENABLE_ADVANCE_FUNCTIONALITY) Then
-                        Dim SubmittedAdv = (From c In d.AP_Staff_AdvanceRequests Where c.RequestStatus = RmbStatus.Submitted And c.PortalId = PortalId And c.UserId = person.UserID Order By c.LocalAdvanceId Descending Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, Total = c.RequestAmount).Take(Settings("MenuSize"))
-                        If SubmittedAdv.Count() > 0 Then
-                            addItemsToTree(AllStaffSubmittedNode, submittedNode, letter, SubmittedAdv, "adv")
-                        End If
-                    End If
-                Next
-                tvAllSubmitted.Nodes.Clear()
-                tvAllSubmitted.Nodes.Add(AllStaffSubmittedNode)
-                tvAllSubmitted.Visible = IsAccounts()
-                SubmittedUpdatePanel.Update()
-            Catch ex As Exception
-                Throw New Exception("Error building submitted tree: " + ex.Message)
-            End Try
+        Private Function GenerateTreeControl(ByVal id As String) As Control
+            Dim control = New HtmlGenericControl("div")
+            control.Attributes.Add("class", "accounts_team")
+            control.Attributes.Add("id", ID)
+            Return control
         End Function
 
         Private Async Function buildAllApprovedTreeAsync(allStaff As IQueryable(Of StaffBroker.User)) As Task
@@ -767,74 +745,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Catch ex As Exception
                 Throw New Exception("Error building approved tree: " + ex.Message)
             End Try
-        End Function
-
-        Private Async Function buildAllProcessingTreeAsync(allStaff As IQueryable(Of StaffBroker.User)) As Task
-            Try
-                Dim AllStaffProcessingNode As New TreeNode("All Staff")
-                AllStaffProcessingNode.SelectAction = TreeNodeSelectAction.Expand
-                AllStaffProcessingNode.Expanded = False
-
-                For Each person In allStaff
-                    '-- sort by first letter of last name
-                    Dim letter = person.LastName.Substring(0, 1)
-                    Dim ProcessingRmb = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Processing And c.PortalId = PortalId And (c.UserId = person.UserID)
-                                         Order By c.RID Descending
-                                         Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId, Total = If(c.SpareField1 Is Nothing, 0, Double.Parse(c.SpareField1))).Take(Settings("MenuSize"))
-                    Dim processingNode As New TreeNode(person.DisplayName)
-                    If ProcessingRmb.Count() > 0 Then
-                        addItemsToTree(AllStaffProcessingNode, processingNode, letter, ProcessingRmb, "rmb")
-                    End If
-                    If (ENABLE_ADVANCE_FUNCTIONALITY) Then
-                        Dim ProcessingAdv = (From c In d.AP_Staff_AdvanceRequests Where c.RequestStatus = RmbStatus.Processing And c.PortalId = PortalId And c.UserId = person.UserID Order By c.LocalAdvanceId Descending Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, Total = c.RequestAmount).Take(Settings("MenuSize"))
-                        If ProcessingAdv.Count() > 0 Then
-                            addItemsToTree(AllStaffProcessingNode, processingNode, letter, ProcessingAdv, "adv")
-                        End If
-                    End If
-                Next
-                tvAllProcessing.Nodes.Clear()
-                tvAllProcessing.Nodes.Add(AllStaffProcessingNode)
-                tvAllProcessing.Visible = IsAccounts()
-                lblYourProcessing.Visible = (tvFinance.Visible Or tvAllProcessing.Visible Or tvTeamProcessing.Visible)
-                ProcessingUpdatePanel.Update()
-            Catch ex As Exception
-                Throw New Exception("Error building processing tree: " + ex.Message)
-            End Try
-
-        End Function
-
-        Private Async Function buildAllPaidTreeAsync(allStaff As IQueryable(Of StaffBroker.User)) As Task
-            Try
-                Dim AllStaffPaidNode As New TreeNode("All Staff")
-                AllStaffPaidNode.SelectAction = TreeNodeSelectAction.Expand
-                AllStaffPaidNode.Expanded = False
-
-                For Each person In allStaff
-                    '-- sort by first letter of last name
-                    Dim letter = person.LastName.Substring(0, 1)
-                    Dim PaidRmb = (From c In d.AP_Staff_Rmbs Where c.Status = RmbStatus.Paid And c.PortalId = PortalId And (c.UserId = person.UserID)
-                                    Order By c.RID Descending
-                                    Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId, Total = If(c.SpareField1 Is Nothing, 0, Double.Parse(c.SpareField1))).Take(Settings("MenuSize"))
-                    Dim paidNode As New TreeNode(person.DisplayName)
-                    If PaidRmb.Count() > 0 Then
-                        addItemsToTree(AllStaffPaidNode, paidNode, letter, PaidRmb, "rmb")
-                    End If
-                    If (ENABLE_ADVANCE_FUNCTIONALITY) Then
-                        Dim PaidAdv = (From c In d.AP_Staff_AdvanceRequests Where c.RequestStatus = RmbStatus.Paid And c.PortalId = PortalId And c.UserId = person.UserID Order By c.LocalAdvanceId Descending Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, Total = c.RequestAmount).Take(Settings("MenuSize"))
-                        If PaidAdv.Count() > 0 Then
-                            addItemsToTree(AllStaffPaidNode, paidNode, letter, PaidAdv, "adv")
-                        End If
-                    End If
-                Next
-                tvAllPaid.Nodes.Clear()
-                tvAllPaid.Nodes.Add(AllStaffPaidNode)
-                tvAllPaid.Visible = IsAccounts()
-                lblYourPaid.Visible = (tvFinance.Visible Or tvAllProcessing.Visible Or tvTeamProcessing.Visible)
-                PaidUpdatePanel.Update()
-            Catch ex As Exception
-                Throw New Exception("Error building paid tree: " + ex.Message)
-            End Try
-
         End Function
 
         Private Async Function buildRmbTreeAsync(title As String, finance_node As TreeNode, rmbs As Object) As Task(Of TreeNode)
@@ -1645,7 +1555,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         End If
 
 
-			' Get all of the electronic receipts for this rmb line
+                        ' Get all of the electronic receipts for this rmb line
                         Dim line_files = From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo = line.First.RmbLineNo And lf.RMBNo = line.First.RmbNo
                         'look for electronic receipt
                         If (CInt(ucType.GetProperty("ReceiptType").GetValue(theControl, Nothing) = 2) And line_files.Count > 0) Then
@@ -1661,12 +1571,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             ' Iterate through all of the line_files we got
                             For Each line_file As AP_Staff_RmbLine_File In line_files
                                 ' Add the file to the list
-                                files.add(FileManager.Instance.GetFile(line_file.FileId))
+                                files.Add(FileManager.Instance.GetFile(line_file.FileId))
                             Next
                             ' Delete all the files. This should cascade delete to the line_file table as well
                             FileManager.Instance.DeleteFiles(files)
                         End If
-                        
+
                         line.First.AccountCode = ddlAccountCode.SelectedValue
                         line.First.CostCenter = tbCostcenter.Text
                         line.First.LineType = CInt(ddlLineTypes.SelectedValue)
@@ -1915,7 +1825,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 End If
 
                 rmb.Status = NewStatus
-                rmb.SpareField1 = rmbTotal.toString("C") ' currency formatted string
+                rmb.SpareField1 = rmbTotal.ToString("C") ' currency formatted string
                 lblStatus.Text = RmbStatus.StatusName(NewStatus)
                 rmb.RmbDate = Now
                 lblSubmittedDate.Text = Now.ToShortDateString
@@ -1929,10 +1839,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 refreshMenuTasks.Add(loadBasicDraftPaneAsync())
                 refreshMenuTasks.Add(loadBasicSubmittedPaneAsync())
                 refreshMenuTasks.Add(loadBasicApprovablePaneAsync())
-                If (IsAccounts()) Then
-                    Dim allStaff = StaffBrokerFunctions.GetStaff()
-                    refreshMenuTasks.Add(buildAllSubmittedTreeAsync(allStaff))
-                End If
+
                 'dlPending.DataBind()
                 'dlSubmitted.DataBind()
 
@@ -2015,7 +1922,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 End If
                 If (IsAccounts()) Then
                     Dim allStaff = StaffBrokerFunctions.GetStaff()
-                    refreshMenuTasks.Add(buildAllSubmittedTreeAsync(allStaff))
                     refreshMenuTasks.Add(buildAllApprovedTreeAsync(allStaff))
                 End If
 
@@ -2247,7 +2153,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If (IsAccounts()) Then
                 Dim allStaff = StaffBrokerFunctions.GetStaff()
                 TaskList.Add(buildAllApprovedTreeAsync(allStaff))
-                TaskList.Add(buildAllProcessingTreeAsync(allStaff))
             End If
 
             PostingData.RMBNo = CInt(hfRmbNo.Value)
@@ -2413,7 +2318,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If (IsAccounts()) Then
                 Dim allStaff = StaffBrokerFunctions.GetStaff()
                 TaskList.Add(buildAllApprovedTreeAsync(allStaff))
-                TaskList.Add(buildAllProcessingTreeAsync(allStaff))
             End If
             Await Task.WhenAll(TaskList)
         End Sub
@@ -2494,11 +2398,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim receiptMode = 1
                     If theLine.First.VATReceipt Then
                         receiptMode = 0
-                    ' If we have any files matching this line, or our receiptImageId is valid
+                        ' If we have any files matching this line, or our receiptImageId is valid
                     ElseIf (From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo = theLine.First.RmbLineNo And lf.RMBNo = theLine.First.RmbNo).Count > 0 Or
                         (Not theLine.First.ReceiptImageId Is Nothing And theLine.First.ReceiptImageId > 0) Then
                         receiptMode = 2
-                    ' If we don't have a receipt
+                        ' If we don't have a receipt
                     ElseIf Not theLine.First.Receipt Then
                         receiptMode = -1
                     End If
@@ -2640,7 +2544,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
         End Sub
 
-        Protected Async Sub menu_subtree_ItemCommand(ByVal node As TreeView, ByVal e As System.EventArgs) Handles tvTeamApproved.SelectedNodeChanged, tvTeamProcessing.SelectedNodeChanged, tvAllSubmitted.SelectedNodeChanged, tvAllProcessing.SelectedNodeChanged, tvFinance.SelectedNodeChanged
+        Protected Async Sub menu_subtree_ItemCommand(ByVal node As TreeView, ByVal e As System.EventArgs) Handles tvTeamApproved.SelectedNodeChanged, tvTeamProcessing.SelectedNodeChanged, tvFinance.SelectedNodeChanged
             Await LoadRmbAsync(node.SelectedValue)
             ScriptManager.RegisterStartupScript(GridView1, GridView1.GetType(), "deselect_menu", "deselectPreviousMenuItem()", True)
         End Sub
@@ -3539,7 +3443,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ucType.GetProperty("Spare4").SetValue(theControl, "", Nothing)
                     ucType.GetProperty("Spare5").SetValue(theControl, "", Nothing)
                     ' Attempt to set the receipttype
-                    Try 
+                    Try
                         ucType.GetProperty("ReceiptType").SetValue(theControl, receiptMode, Nothing)
                         If (receiptMode = 2) Then ' We have electronic receipts
                             pnlElecReceipts.Attributes("style") = ""

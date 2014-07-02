@@ -9,6 +9,11 @@
 
 <script src="/js/jquery.numeric.js" type="text/javascript"></script>
 <script src="/js/jquery.watermarkinput.js" type="text/javascript"></script>
+
+<script src="/js/tree.jquery.js"></script>
+<link rel="stylesheet" href="/js/jqtree.css" />
+
+
 <script type="text/javascript">
     optimizeYouTubeEmbeds();
 
@@ -27,6 +32,26 @@
         previous_menu_item.style.fontWeight = 'normal';
         previous_menu_item.style.fontSize = '10pt';
         $(previous_menu_item).parent().next().children().hide();
+    }
+
+    
+    function loadRmb(rmbno) {
+        var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+        if (is_chrome) {
+            openInBackgroundTab("?rmbno="+rmbno);
+        } else {
+            window.open("?rmbno="+rmbno, "_blank");
+        }
+    }
+
+    function openInBackgroundTab(url){
+        var a = document.createElement("a");
+        a.href = url;
+        var evt = document.createEvent("MouseEvents");
+        //the tenth parameter of initMouseEvent sets ctrl key
+        evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0,
+                                    true, false, false, false, 0, null);
+        a.dispatchEvent(evt);
     }
 
     function check_expense_date() {
@@ -417,7 +442,6 @@
         }
 
 
-
         function setUpAccordion() {
             $("#accordion").accordion({
                 header: "> div > h3",
@@ -450,6 +474,75 @@
             })
         }
 
+        function loadFinanceTrees() {
+            $.getJSON(
+                "/DesktopModules/AgapeConnect/StaffRmb/WebService.asmx/AllRmbs?portalid="+$('#<%= hfPortalId.ClientID %>').val()+
+                            "&tabmoduleid="+$('#<%= hfTabModuleId.ClientID %>').val()+"&status=<%= StaffRmb.RmbStatus.Submitted%>",
+                function(data) {
+                    $("#treeSubmitted").tree({
+                        data: data,
+                        onCreateLi: function(node, $li) {
+                            $li.find('.jqtree-title').not('.jqtree-title-folder').addClass('menu_link');
+                        }
+                    });
+                    $("#treeSubmitted").bind(
+                        'tree.click',
+                        function(event) {
+                            var node = event.node;
+                            if (node.rmbno) {
+                                loadRmb(node.rmbno);
+                            } else {
+                                $("#treeSubmitted").tree('toggle', node);
+                            }
+                        })
+                }
+            );
+            $.getJSON(
+                "/DesktopModules/AgapeConnect/StaffRmb/WebService.asmx/AllRmbs?portalid="+$('#<%= hfPortalId.ClientID %>').val()+
+                            "&tabmoduleid="+$('#<%= hfTabModuleId.ClientID %>').val()+"&status=<%= StaffRmb.RmbStatus.Processing%>",
+                function(data) {
+                    $("#treeProcessing").tree({
+                        data: data,
+                        onCreateLi: function(node, $li) {
+                            $li.find('.jqtree-title').not('.jqtree-title-folder').addClass('menu_link');
+                        }
+                    });
+                    $("#treeProcessing").bind(
+                        'tree.click',
+                        function(event) {
+                            var node = event.node;
+                            if (node.rmbno) {
+                                loadRmb(node.rmbno);
+                            } else {
+                                $("#treeProcessing").tree('toggle', node);
+                            }
+                        })
+                }
+            );
+            $.getJSON(
+                "/DesktopModules/AgapeConnect/StaffRmb/WebService.asmx/AllRmbs?portalid="+$('#<%= hfPortalId.ClientID %>').val()+
+                            "&tabmoduleid="+$('#<%= hfTabModuleId.ClientID %>').val()+"&status=<%= StaffRmb.RmbStatus.Paid%>",
+                function(data) {
+                    $("#treePaid").tree({
+                        data: data,
+                        onCreateLi: function(node, $li) {
+                            $li.find('.jqtree-title').not('.jqtree-title-folder').addClass('menu_link');
+                        }
+                    });
+                    $("#treePaid").bind(
+                        'tree.click',
+                        function(event) {
+                            var node = event.node;
+                            if (node.rmbno) {
+                                loadRmb(node.rmbno);
+                            } else {
+                                $("#treePaid").tree('toggle', node);
+                            }
+                        })
+                }
+            );
+        }
+
         function tweakControl() {
             $("#<%= UpdatePanel2.ClientID %> input[name$='tbDesc']").attr('maxlength', '27').attr('style', 'width:22em');
             $("#<%= UpdatePanel2.ClientID %> a.hlCur").hide();
@@ -460,6 +553,7 @@
             setUpAutocomplete();
             setUpAccordion();
             checkForMinistryAccount();
+            loadFinanceTrees();
                          
 
             Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
@@ -962,6 +1056,9 @@
     }
 </style>
 
+<div id="loading" class="loading_overlay" style="display:none" >
+    &nbsp;
+</div>
 
 <div style="position:relative; text-align: center; width: 100%;">
     <asp:UpdatePanel ID="ErrorUpdatePanel" runat="server" >
@@ -990,6 +1087,7 @@
     <asp:HiddenField ID="hfExchangeRateAdvPO" runat="server" Value="1" />
     <asp:HiddenField ID="hfOrigCurrencyAdvPO" runat="server" Value="" />
     <asp:HiddenField ID="hfOrigCurrencyValueAdvPO" runat="server" Value="" />
+    <asp:HiddenField ID="hfTabModuleId" runat="server" Value="-1" />
 
 
     <table width="100%">
@@ -1053,8 +1151,6 @@
                             <div id="SubmittedPane">
                                 <asp:UpdatePanel ID="SubmittedUpdatePanel" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional" >
                                     <ContentTemplate>
-                                        <asp:TreeView ID="tvAllSubmitted" class="accounts_team" runat="server" NodeIndent="10">
-                                        </asp:TreeView>
                                         <asp:Panel ID="pnlSubmittedView" runat="server">
                                             <asp:Label ID="lblApproveHeading" runat="server" class="approver" ResourceKey="RmbsToApprove" Style="font-size: 8pt;"></asp:Label>
                                             <asp:DataList ID="dlToApprove" runat="server" Width="100%">
@@ -1098,7 +1194,6 @@
                                                 </ItemTemplate>
                                             </asp:DataList>
                                             <asp:Label ID="lblSubmitted" runat="server" class="my_section" ResourceKey="YourRmbs" Style="font-size: 8pt;"></asp:Label>
-                                            <br />
                                             <asp:DataList ID="dlSubmitted" runat="server" Width="100%">
                                                 <ItemStyle CssClass="dnnGridItem" />
                                                 <AlternatingItemStyle CssClass="dnnGridAltItem" />
@@ -1220,8 +1315,6 @@
                        <div id="ProcessingPane">
                             <asp:UpdatePanel ID="ProcessingUpdatePanel" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional" >
                                  <ContentTemplate>
-                                    <asp:TreeView ID="tvAllProcessing" class="accounts_team" runat="server" NodeIndent="10">
-                                    </asp:TreeView>
                                     <asp:TreeView ID="tvTeamProcessing" class="team_leader" runat="server" NodeIndent="10">
                                     </asp:TreeView>
                                     <asp:Label ID="lblYourProcessing" runat="server" class="my_section" ResourceKey="YourRmbs" Style="font-size: 8pt;">
@@ -1276,8 +1369,6 @@
                         <div id="PaidPane">
                             <asp:UpdatePanel ID="PaidUpdatePanel" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional" >
                                 <ContentTemplate>
-                                    <asp:TreeView ID="tvAllPaid" class="accounts_team" runat="server" NodeIndent="10">
-                                    </asp:TreeView>
                                     <asp:TreeView ID="tvTeamPaid" class="team_leader" runat="server" NodeIndent="10">
                                     </asp:TreeView>
                                     <asp:Label ID="lblYourPaid" runat="server" class="my_section" ResourceKey="YourRmbs" Style="font-size: 8pt;">
