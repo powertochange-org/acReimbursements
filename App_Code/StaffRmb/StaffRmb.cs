@@ -215,7 +215,7 @@ namespace StaffRmb
             return false;
         }
 
-        static private async Task<string[]> managersInDepartmentAsync(string logon)
+        static public async Task<string[]> managersInDepartmentAsync(string logon)
         // Returns a list of staff who supervise other staff in the same department.
         {
             if (logon.Equals("")) return new string[0];
