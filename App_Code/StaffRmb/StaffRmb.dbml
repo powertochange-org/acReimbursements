@@ -185,6 +185,7 @@
       <Column Name="RmbLineNo" Type="System.Int64" DbType="BigInt" CanBeNull="true" />
       <Column Name="RMBNo" Type="System.Int64" DbType="BigInt NOT NULL" CanBeNull="false" />
       <Column Name="RecNum" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="URL" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
       <Association Name="AP_Staff_Rmb_AP_Staff_RmbLine_File" Member="AP_Staff_Rmb" ThisKey="RMBNo" OtherKey="RMBNo" Type="AP_Staff_Rmb" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
     </Type>
   </Table>

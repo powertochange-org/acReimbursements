@@ -184,9 +184,9 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
     End Function
 
     ' A sub to insert a file - line relationship 
-    Private Sub AddFileLine(ByVal FileId As Integer, ByVal RmbLine As String, ByVal RmbNo As String, ByVal RecNum As String)
+    Private Sub AddFileLine(ByVal File As IFileInfo, ByVal RmbLine As String, ByVal RmbNo As String, ByVal RecNum As String)
         ' First, check to see if we already have a file with this fileid
-        Dim existingFiles = (From lf In d.AP_Staff_RmbLine_Files Where lf.FileId = FileId)
+        Dim existingFiles = (From lf In d.AP_Staff_RmbLine_Files Where lf.FileId = File.FileId)
         If existingFiles.Count > 0 Then ' If we got something back
             Dim ef = existingFiles.First
             ' Update the fields
@@ -199,10 +199,12 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
             End If
             ef.RMBNo = RmbNo
             ef.RecNum = RecNum
+            ' Set the url, using the fully-qualified url for this domain
+            ef.URL = Request.Url.Scheme & "://" & Request.Url.Authority & FileManager.Instance.GetUrl(File)
         Else
             ' Didn't have anything; insert new row
             Dim insert As New AP_Staff_RmbLine_File
-            insert.FileId = FileId
+            insert.FileId = File.FileId
             ' If this isn't a new line
             If (RmbLine <> "New") Then
                 ' Set the line number
@@ -210,6 +212,8 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
             End If ' If this IS a new line, the rmbline will get set later
             insert.RMBNo = RmbNo
             insert.RecNum = RecNum
+            ' Set the url, using the fully-qualified url
+            insert.URL = Request.Url.Scheme & "://" & Request.Url.Authority & FileManager.Instance.GetUrl(File)
             d.AP_Staff_RmbLine_Files.InsertOnSubmit(insert)
         End If
         d.SubmitChanges()
@@ -305,7 +309,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
                 RecNum += 1
 
                 ' Add this file-rmb line relationship to the database
-                AddFileLine(_theFile.FileId, RmbLine, RmbNo, RecNum)
+                AddFileLine(_theFile, RmbLine, RmbNo, RecNum)
 
 
 

@@ -4002,6 +4002,8 @@ namespace StaffRmb
 		
 		private int _RecNum;
 		
+		private string _URL;
+		
 		private EntityRef<AP_Staff_Rmb> _AP_Staff_Rmb;
 		
     #region Extensibility Method Definitions
@@ -4016,6 +4018,8 @@ namespace StaffRmb
     partial void OnRMBNoChanged();
     partial void OnRecNumChanging(int value);
     partial void OnRecNumChanged();
+    partial void OnURLChanging(string value);
+    partial void OnURLChanged();
     #endregion
 		
 		public AP_Staff_RmbLine_File()
@@ -4104,6 +4108,26 @@ namespace StaffRmb
 					this._RecNum = value;
 					this.SendPropertyChanged("RecNum");
 					this.OnRecNumChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_URL", DbType="NVarChar(255)")]
+		public string URL
+		{
+			get
+			{
+				return this._URL;
+			}
+			set
+			{
+				if ((this._URL != value))
+				{
+					this.OnURLChanging(value);
+					this.SendPropertyChanging();
+					this._URL = value;
+					this.SendPropertyChanged("URL");
+					this.OnURLChanged();
 				}
 			}
 		}
