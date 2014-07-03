@@ -2906,27 +2906,34 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Return False
         End Function
 
-        Protected Function GetImageType(id As Integer?) As String
-            If id Is Nothing Then
-                Return ""
+        Protected Function GetImageType(lineId As Integer) As String
+            'Returns the image type of the first image associated with the lineId
+            Dim receiptIds = From e In d.AP_Staff_RmbLine_Files Where e.RmbLineNo = lineId Order By e.RecNum Select e.FileId
+            If receiptIds.Count() < 1 Then
+                Return "no receipts found"
             End If
-            Dim file = DotNetNuke.Services.FileSystem.FileManager.Instance.GetFile(id)
+            Dim file = DotNetNuke.Services.FileSystem.FileManager.Instance.GetFile(receiptIds.first)
             If file Is Nothing Then
-                Return "missing"
+                Return "missing file"
             End If
-            Return file.Extension
+            Return file.Extension.ToLower()
         End Function
 
-        Protected Function GetImageUrl(id As Integer?) As String
-            If id Is Nothing Then
-                Return ""
+        Protected Function GetImageUrl(lineId As Integer) As String
+            Dim urls = From e In d.AP_Staff_RmbLine_Files Where e.RmbLineNo = lineId Order By e.RecNum Select e.URL
+            If urls.Count() < 1 Then
+                Return "no receipts found"
             End If
-            Dim file As DotNetNuke.Services.FileSystem.FileInfo
-            file = DotNetNuke.Services.FileSystem.FileManager.Instance.GetFile(id)
-            If file Is Nothing Then
+            If (urls.First) Is Nothing Then
                 Return ""
+            Else
+                Return urls.First
             End If
-            Return DotNetNuke.Services.FileSystem.FileManager.Instance.GetUrl(file)
+        End Function
+
+        Protected Function HasMultipleReceipts(lineId As Integer) As Boolean
+            Dim receipts = From e In d.AP_Staff_RmbLine_Files Where e.RmbLineNo = lineId Select e
+            Return (receipts.Count() > 1)
         End Function
 
         Protected Function CanEdit(ByVal status As Integer) As Boolean

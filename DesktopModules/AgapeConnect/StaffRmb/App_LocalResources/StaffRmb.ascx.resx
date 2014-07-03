@@ -693,4 +693,10 @@
   <data name="ViewReceipt.Text" xml:space="preserve">
     <value>View Receipt</value>
   </data>
+  <data name="EditToView.Text" xml:space="preserve">
+    <value>Edit the line to view them all</value>
+  </data>
+  <data name="MultipleReceipts.Text" xml:space="preserve">
+    <value>There are multiple receipts for this item</value>
+  </data>
 </root>
