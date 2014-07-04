@@ -555,20 +555,28 @@
             $("#<%= UpdatePanel2.ClientID %> a.hlCur").hide();
         }
 
+        function setUpConfirms() {
+            $('.confirm').click(function() {
+                return window.confirm("Are you sure?");
+            })
+        }
+
         $(document).ready(function () {
             setUpMyTabs();
             setUpAutocomplete();
             setUpAccordion();
             checkForMinistryAccount();
             loadFinanceTrees();
+            setUpConfirms();
                          
 
             Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
                 setUpMyTabs();
                 setUpAutocomplete();
                 checkForMinistryAccount();
-                setUpReceiptPreviews()
-                tweakControl()
+                setUpReceiptPreviews();
+                tweakControl();
+                setUpConfirms();
             });
 
 
@@ -1713,7 +1721,7 @@
                                                     <ItemTemplate>
                                                         <asp:LinkButton ID="LinkButton5" runat="server" CommandName="myEdit" Visible='<%# CanEdit(Eval("AP_Staff_Rmb.Status"))  %>'
                                                             CommandArgument='<%# Eval("RmbLineNo") %>' resourcekey="Edit"></asp:LinkButton>
-                                                        <asp:LinkButton ID="LinkButton4" runat="server" CommandName="myDelete" Visible='<%# CanEdit(Eval("AP_Staff_Rmb.Status")) %>'
+                                                        <asp:LinkButton ID="LinkButton4" runat="server" CommandName="myDelete" Visible='<%# CanEdit(Eval("AP_Staff_Rmb.Status")) %>' CssClass="confirm"
                                                             CommandArgument='<%# Eval("RmbLineNo") %>' resourcekey="Delete"></asp:LinkButton>
                                                         <asp:Panel ID="Accounts" runat="server" Visible='<%# (CInt(Eval("AP_Staff_Rmb.Status"))<>StaffRmb.rmbStatus.Processing and CInt(Eval("AP_Staff_Rmb.Status"))<>StaffRmb.rmbStatus.DownloadFailed and CInt(Eval("AP_Staff_Rmb.Status"))<>StaffRmb.rmbStatus.PendingDownload)  and IsAccounts()  %>'>
                                                             <asp:LinkButton ID="LinkButton6" runat="server" CommandName="mySplit"
