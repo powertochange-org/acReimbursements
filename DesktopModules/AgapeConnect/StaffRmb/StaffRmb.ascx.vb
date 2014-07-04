@@ -2793,17 +2793,17 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim rtn As String = "<span style=""font-size: 6.5pt; color: #999999;"">#" & ZeroFill(RID.ToString, 5)
                 '  colourize date based on how old it is
                 If (ApprDate Is Nothing) Then
-                    rtn = rtn & ": <span style='color:black'>" & DateString & "</span>"
+                    rtn = rtn & ": <span class='dateproblem'>" & DateString & "</span>"
                 ElseIf (ApprDate > Now().AddDays(-1)) Then
-                    rtn = rtn & ": <span style='color:Green'>" & DateString & "</span>"
+                    rtn = rtn & ": <span class='rightaway'>" & DateString & "</span>"
                 ElseIf (ApprDate > Now().AddDays(-3)) Then
-                    rtn = rtn & ": <span style='color:Blue'>" & DateString & "</span>"
+                    rtn = rtn & ": <span class='aheadofschedule'>" & DateString & "</span>"
                 ElseIf (ApprDate > Now().AddDays(-5)) Then
-                    rtn = rtn & ": <span style='color:Yellow'>" & DateString & "</span>"
+                    rtn = rtn & ": <span class='ontime'>" & DateString & "</span>"
                 ElseIf (ApprDate > Now().AddDays(-7)) Then
-                    rtn = rtn & ": <span style='color:Orange'>" & DateString & "</span>"
+                    rtn = rtn & ": <span class='late'>" & DateString & "</span>"
                 ElseIf (ApprDate > (New Date(2010, 1, 1))) Then
-                    rtn = rtn & ": <span style='color:Red'>" & DateString & "</span>"
+                    rtn = rtn & ": <span class='overdue'>" & DateString & "</span>"
                 Else
                     rtn = rtn & ": *date error*"
                 End If
