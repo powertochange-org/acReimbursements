@@ -313,11 +313,39 @@ Namespace DotNetNuke.Modules.StaffRmb
                         ddlBankAccount.SelectedValue = CType(TabModuleSettings("BankAccount"), String)
                         lblOopsBank.Text = ""
                     End If
+
+
+                    'Taxes tab
+                    If CType(TabModuleSettings("ProjectCodeGSTHSTPTC"), String) <> "" Then
+                        tbProjectCodeGSTHSTPTC.Text = CType(TabModuleSettings("ProjectCodeGSTHSTPTC"), String)
+                    End If
+                    If CType(TabModuleSettings("ProjectCodeGSTHSTGAIN"), String) <> "" Then
+                        tbProjectCodeGSTHSTGAIN.Text = CType(TabModuleSettings("ProjectCodeGSTHSTGAIN"), String)
+                    End If
+                    If CType(TabModuleSettings("GLAccountGSTHSTRebateOnExpenses"), String) <> "" Then
+                        tbGLAccountGSTHSTRebateOnExpenses.Text = CType(TabModuleSettings("GLAccountGSTHSTRebateOnExpenses"), String)
+                    End If
+                    If CType(TabModuleSettings("GLAccountFederalGSTReceivable"), String) <> "" Then
+                        tbGLAccountFederalGSTReceivable.Text = CType(TabModuleSettings("GLAccountFederalGSTReceivable"), String)
+                    End If
+                    If CType(TabModuleSettings("GSTPercent"), String) <> "" Then
+                        tbGSTPercent.Text = CType(TabModuleSettings("GSTPercent"), String)
+                    End If
+                    If CType(TabModuleSettings("NormalGSTOnlyNumerator"), String) <> "" Then
+                        tbNormalGSTOnlyNumerator.Text = CType(TabModuleSettings("NormalGSTOnlyNumerator"), String)
+                    End If
+                    If CType(TabModuleSettings("NormalGSTOnlyDenominator"), String) <> "" Then
+                        tbNormalGSTOnlyDenominator.Text = CType(TabModuleSettings("NormalGSTOnlyDenominator"), String)
+                    End If
+                    If CType(TabModuleSettings("PerDiemGSTOnlyNumerator"), String) <> "" Then
+                        tbPerDiemGSTOnlyNumerator.Text = CType(TabModuleSettings("PerDiemGSTOnlyNumerator"), String)
+                    End If
+                    If CType(TabModuleSettings("PerDiemGSTOnlyDenominator"), String) <> "" Then
+                        tbPerDiemGSTOnlyDenominator.Text = CType(TabModuleSettings("PerDiemGSTOnlyDenominator"), String)
+                    End If
                 End If
 
                 '  GridView1.Columns(4).Visible = cbUseDCode.Checked
-
-
 
 
             Catch exc As Exception           'Module failed to load
@@ -421,6 +449,16 @@ Namespace DotNetNuke.Modules.StaffRmb
 
             StaffBrokerFunctions.SetSetting("RmbDownload", cbDatapump.Checked, PortalId)
 
+            'Taxes
+            objModules.UpdateTabModuleSetting(TabModuleId, "ProjectCodeGSTHSTPTC", tbProjectCodeGSTHSTPTC.Text)
+            objModules.UpdateTabModuleSetting(TabModuleId, "ProjectCodeGSTHSTGAIN", tbProjectCodeGSTHSTGAIN.Text)
+            objModules.UpdateTabModuleSetting(TabModuleId, "GLAccountGSTHSTRebateOnExpenses", tbGLAccountGSTHSTRebateOnExpenses.Text)
+            objModules.UpdateTabModuleSetting(TabModuleId, "GLAccountFederalGSTReceivable", tbGLAccountFederalGSTReceivable.Text)
+            objModules.UpdateTabModuleSetting(TabModuleId, "GSTPercent", tbGSTPercent.Text)
+            objModules.UpdateTabModuleSetting(TabModuleId, "NormalGSTOnlyNumerator", tbNormalGSTOnlyNumerator.Text)
+            objModules.UpdateTabModuleSetting(TabModuleId, "NormalGSTOnlyDenominator", tbNormalGSTOnlyDenominator.Text)
+            objModules.UpdateTabModuleSetting(TabModuleId, "PerDiemGSTOnlyNumerator", tbPerDiemGSTOnlyNumerator.Text)
+            objModules.UpdateTabModuleSetting(TabModuleId, "PerDiemGSTOnlyDenominator", tbPerDiemGSTOnlyDenominator.Text)
 
 
             objModules.UpdateTabModuleSetting(TabModuleId, "isLoaded", "Yes")

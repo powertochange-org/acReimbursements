@@ -327,4 +327,46 @@
   <data name="Days.Text" xml:space="preserve">
     <value>Days</value>
   </data>
+  <data name="lblGLAccountFederalGSTReceivable.Help" xml:space="preserve">
+    <value>Main account in the GL to post the GST receivable to</value>
+  </data>
+  <data name="lblGLAccountFederalGSTReceivable.Text" xml:space="preserve">
+    <value>GL Account Federal GST Receivable</value>
+  </data>
+  <data name="lblGLAccountGSTHSTRebateOnExpenses.Help" xml:space="preserve">
+    <value>Main account in the GL to post the GST/HST rebate on expenses to</value>
+  </data>
+  <data name="lblGLAccountGSTHSTRebateOnExpenses.Text" xml:space="preserve">
+    <value>GL Account GST/HST Rebate on expenses</value>
+  </data>
+  <data name="lblGSTPercent.Help" xml:space="preserve">
+    <value>Current rate of GST</value>
+  </data>
+  <data name="lblGSTPercent.Text" xml:space="preserve">
+    <value>GST Percent</value>
+  </data>
+  <data name="lblNormalGSTOnly.Help" xml:space="preserve">
+    <value>Enter the numerator and denominator to be used in tax calculations for normal expenses in provinces that have GST only</value>
+  </data>
+  <data name="lblNormalGSTOnly.Text" xml:space="preserve">
+    <value>Normal GST Only</value>
+  </data>
+  <data name="lblPerDiemGSTOnly.Help" xml:space="preserve">
+    <value>Enter the numerator and denominator to be used in tax calculations for per diem expenses in provinces that have GST only</value>
+  </data>
+  <data name="lblPerDiemGSTOnly.Text" xml:space="preserve">
+    <value>Per Diem GST Only</value>
+  </data>
+  <data name="lblProjectCodeGSTHSTGAIN.Help" xml:space="preserve">
+    <value>Project code to post the GST/HST to for a GAIN reimbursement</value>
+  </data>
+  <data name="lblProjectCodeGSTHSTGAIN.Text" xml:space="preserve">
+    <value>Project Code GST/HST GAIN</value>
+  </data>
+  <data name="lblProjectCodeGSTHSTPTC.Help" xml:space="preserve">
+    <value>Project code to post the GST/HST to for a PTC reimbursement</value>
+  </data>
+  <data name="lblProjectCodeGSTHSTPTC.Text" xml:space="preserve">
+    <value>Project Code GST/HST PTC</value>
+  </data>
 </root>

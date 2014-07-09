@@ -74,7 +74,8 @@
         <li><a href='#Tab2-tab'>Rates</a></li>
         <li><a href='#Tab3-tab'>Roles</a></li>
         <li><a href='#Tab4-tab'>Expense Types</a></li>
-        <li><a href='#Tab5-tab'>Help</a></li>
+        <li><a href='#Tab5-tab'>Taxes</a></li>
+        <li><a href='#Tab99-tab'>Help</a></li>
     </ul>
     <div style="width: 100%; min-height: 350px; background-color: #FFFFFF;">
         <div id='Tab1-tab'>
@@ -1216,7 +1217,92 @@
                 </tr>
             </table>
         </div>
-          <div id='Tab5-tab'>
+        <div id='Tab5-tab'>
+           <table style="font-size: 9pt;">
+                <tr>
+                    <td>
+                        <b>
+                            <dnn:Label ID="lblProjectCodeGSTHSTPTC" runat="server" ControlName="tbProjectCodeGSTHSTPTC" ResourceKey="lblProjectCodeGSTHSTPTC" />
+                        </b>
+                    </td>
+                    <td colspan="2">
+                        <asp:TextBox ID="tbProjectCodeGSTHSTPTC" runat="server" Width="200px"></asp:TextBox>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <b>
+                            <dnn:Label ID="lblProjectCodeGSTHSTGAIN" runat="server" ControlName="tbProjectCodeGSTHSTGAIN" ResourceKey="lblProjectCodeGSTHSTGAIN" />
+                        </b>
+                    </td>
+                    <td colspan="2">
+                        <asp:TextBox ID="tbProjectCodeGSTHSTGAIN" runat="server" Width="200px"></asp:TextBox>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <b>
+                            <dnn:Label ID="lblGLAccountGSTHSTRebateOnExpenses" runat="server" ControlName="tbGLAccountGSTHSTRebateOnExpenses" ResourceKey="lblGLAccountGSTHSTRebateOnExpenses" />
+                        </b>
+                    </td>
+                    <td colspan="2">
+                        <asp:TextBox ID="tbGLAccountGSTHSTRebateOnExpenses" runat="server" Width="200px"></asp:TextBox>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <b>
+                            <dnn:Label ID="lblGLAccountFederalGSTReceivable" runat="server" ControlName="tbGLAccountFederalGSTReceivable" ResourceKey="lblGLAccountFederalGSTReceivable" />
+                        </b>
+                    </td>
+                    <td colspan="2">
+                        <asp:TextBox ID="tbGLAccountFederalGSTReceivable" runat="server" Width="200px"></asp:TextBox>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <b>
+                            <dnn:Label ID="lblGSTPercent" runat="server" ControlName="tbGSTPercent" ResourceKey="lblGSTPercent" />
+                        </b>
+                    </td>
+                    <td colspan="2">
+                        <asp:TextBox ID="tbGSTPercent" runat="server" Width="200px"></asp:TextBox>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Numerator</td>
+                    <td>Denominator</td>
+                </tr>
+                <tr>
+                    <td>
+                        <b>
+                            <dnn:Label ID="lblNormalGSTOnly" runat="server" ControlName="tbNormalGSTOnlyNumerator" ResourceKey="lblNormalGSTOnly" />
+                        </b>
+                    </td>
+                    <td>
+                        <asp:TextBox ID="tbNormalGSTOnlyNumerator" runat="server" Width="100px"></asp:TextBox>
+                    </td>
+                    <td>
+                        <asp:TextBox ID="tbNormalGSTOnlyDenominator" runat="server" Width="100px"></asp:TextBox>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <b>
+                            <dnn:Label ID="lblPerDiemGSTOnly" runat="server" ControlName="tbPerDiemGSTOnlyNumerator" ResourceKey="lblPerDiemGSTOnly" />
+                        </b>
+                    </td>
+                    <td>
+                        <asp:TextBox ID="tbPerDiemGSTOnlyNumerator" runat="server" Width="100px"></asp:TextBox>
+                    </td>
+                    <td>
+                        <asp:TextBox ID="tbPerDiemGSTOnlyDenominator" runat="server" Width="100px"></asp:TextBox>
+                    </td>
+                </tr>
+           </table>
+        </div>
+        <div id='Tab99-tab'>
            <iframe width="853" height="480" src="https://www.youtube.com/embed/7h1HFWFuCLk?rel=0&wmode=transparent" frameborder="0" allowfullscreen></iframe>
         </div>
     </div>
