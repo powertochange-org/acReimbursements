@@ -1166,6 +1166,7 @@
                             <div id="SubmittedPane">
                                 <asp:UpdatePanel ID="SubmittedUpdatePanel" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional" >
                                     <ContentTemplate>
+                                        <asp:Placeholder id="submittedPlaceholder" runat="server"></asp:Placeholder>
                                         <asp:Panel ID="pnlSubmittedView" runat="server">
                                             <asp:Label ID="lblApproveHeading" runat="server" class="approver" ResourceKey="RmbsToApprove" Style="font-size: 8pt;"></asp:Label>
                                             <asp:DataList ID="dlToApprove" runat="server" Width="100%">
@@ -1330,6 +1331,7 @@
                        <div id="ProcessingPane">
                             <asp:UpdatePanel ID="ProcessingUpdatePanel" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional" >
                                  <ContentTemplate>
+                                    <asp:Placeholder id="processingPlaceholder" runat="server"></asp:Placeholder>
                                     <asp:TreeView ID="tvTeamProcessing" class="team_leader" runat="server" NodeIndent="10">
                                     </asp:TreeView>
                                     <asp:Label ID="lblYourProcessing" runat="server" class="my_section" ResourceKey="YourRmbs" Style="font-size: 8pt;">
@@ -1384,6 +1386,7 @@
                         <div id="PaidPane">
                             <asp:UpdatePanel ID="PaidUpdatePanel" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional" >
                                 <ContentTemplate>
+                                    <asp:Placeholder id="paidPlaceholder" runat="server"></asp:Placeholder>
                                     <asp:TreeView ID="tvTeamPaid" class="team_leader" runat="server" NodeIndent="10">
                                     </asp:TreeView>
                                     <asp:Label ID="lblYourPaid" runat="server" class="my_section" ResourceKey="YourRmbs" Style="font-size: 8pt;">

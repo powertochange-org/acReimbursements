@@ -675,9 +675,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     showDividers(True)
                     Dim allStaff = StaffBrokerFunctions.GetStaff()
                     Dim ReloadMenuTasks = New List(Of Task)
-                    SubmittedUpdatePanel.ContentTemplateContainer.Controls.AddAt(0, GenerateTreeControl("treeSubmitted"))
-                    ProcessingUpdatePanel.ContentTemplateContainer.Controls.AddAt(0, GenerateTreeControl("treeProcessing"))
-                    PaidUpdatePanel.ContentTemplateContainer.Controls.AddAt(0, GenerateTreeControl("treePaid"))
+                    submittedPlaceholder.Controls.AddAt(0, GenerateTreeControl("treeSubmitted"))
+                    processingPlaceholder.Controls.AddAt(0, GenerateTreeControl("treeProcessing"))
+                    paidPlaceholder.Controls.AddAt(0, GenerateTreeControl("treePaid"))
                     ReloadMenuTasks.Add(buildAllApprovedTreeAsync(allStaff)) '--This is the key part for the FINANCE team
                     Await Task.WhenAll(ReloadMenuTasks)
                 End If
