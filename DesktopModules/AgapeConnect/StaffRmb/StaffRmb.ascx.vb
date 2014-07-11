@@ -1557,8 +1557,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                         ' Get all of the electronic receipts for this rmb line
                         Dim line_files = From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo = line.First.RmbLineNo And lf.RMBNo = line.First.RmbNo
+                        ' Get the receipt type property
+                        Dim receiptType = ucType.GetProperty("ReceiptType")
                         'look for electronic receipt
-                        If (CInt(ucType.GetProperty("ReceiptType").GetValue(theControl, Nothing) = 2) And line_files.Count > 0) Then
+                        If (Not receiptType Is Nothing AndAlso (CInt(receiptType.GetValue(theControl, Nothing) = 2) AndAlso line_files.Count > 0)) Then
                             ' Set the ImageReceiptId to the first file
                             line.First.ReceiptImageId = line_files.First.FileId
                         Else
