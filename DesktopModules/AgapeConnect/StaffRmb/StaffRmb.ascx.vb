@@ -705,7 +705,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                    Where (c.Status = RmbStatus.Approved Or c.Status >= RmbStatus.PendingDownload) And c.PortalId = PortalId
                                    Order By c.ApprDate Ascending
                                    Select c.RMBNo, c.RmbDate, c.ApprDate, c.UserRef, c.RID, c.UserId, c.Status, c.SpareField1, _
-                                       Receipts = ((c.AP_Staff_RmbLines.Where(Function(x) x.Receipt And (x.ReceiptImageId Is Nothing))).Count > 0)).Take(Settings("MenuSize"))
+                                       Receipts = ((c.AP_Staff_RmbLines.Where(Function(x) x.Receipt And (x.ReceiptImageId Is Nothing))).Count > 0))
                 Dim total = AllApproved.Count
 
                 Dim receiptsTask = buildRmbTreeAsync(Translate("Receipts"), finance_node, From c In AllApproved Where c.Status = RmbStatus.Approved And c.Receipts)
