@@ -40,11 +40,13 @@ namespace StaffRmb
     {
         public const int Draft = 0;
         public const int Submitted = 1;
-        public const int Approved = 2;
-        public const int Processing = 3;
-        public const int Cancelled = 4;
-        public const int MoreInfo = 5;
-        public const int Paid = 6;
+        public const int PendingDirectorApproval = 2;
+        public const int PendingEDMSApproval = 3;
+        public const int Approved = 4;
+        public const int Processing = 5;
+        public const int Cancelled = 6;
+        public const int MoreInfo = 7;
+        public const int Paid = 8;
         public const int PendingDownload = 10;
         public const int DownloadFailed = 20;
         static public string StatusName(int StatusNo)
@@ -53,11 +55,13 @@ namespace StaffRmb
             {
                 case 0: return "Draft";
                 case 1: return "Submitted";
-                case 2: return "Approved";
-                case 3: return "Processing";
-                case 4: return "Cancelled";
-                case 5: return "MoreInfo";
-                case 6: return "Paid";
+                case 2: return "PendingDirectorApproval";
+                case 3: return "PendingEDMSApproval";
+                case 4: return "Approved";
+                case 5: return "Processing";
+                case 6: return "Cancelled";
+                case 7: return "MoreInfo";
+                case 8: return "Paid";
                 case 10: return "PendingDownload";
                 case 20: return "DownloadFailed";
                 
@@ -126,6 +130,17 @@ namespace StaffRmb
                 return Province;
             }
             return "--";
+        }
+
+        static public Boolean RequiresExtraApproval(int CostCenter) {
+            //TODO: stub
+            return false;
+        }
+
+        static public int getDirectorFor(int CostCenter)
+        {
+            //TODO: stub
+            return 0;
         }
 
         static public async Task<Approvers> getApproversAsync(AP_Staff_Rmb rmb, DotNetNuke.Entities.Users.UserInfo authUser, DotNetNuke.Entities.Users.UserInfo authAuthUser)

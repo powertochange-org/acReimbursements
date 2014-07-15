@@ -312,16 +312,17 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Function
 
         Private Async Function loadBasicSubmittedPaneAsync() As Task
+            'This panel lists reimbursements in the Submitted, PendingDirectorApproval, or PendingEDMSApproval statuses
             Try
                 Dim Submitted = (From c In d.AP_Staff_Rmbs
-                                 Where c.Status = RmbStatus.Submitted And c.UserId = UserId And c.PortalId = PortalId
+                                 Where (c.Status = RmbStatus.Submitted Or c.Status = RmbStatus.PendingDirectorApproval Or c.Status = RmbStatus.PendingEDMSApproval) And c.UserId = UserId And c.PortalId = PortalId
                                  Order By c.RID Descending
                                  Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
                 dlSubmitted.DataSource = Submitted
                 dlSubmitted.DataBind()
 
                 Dim AdvSubmitted = (From c In d.AP_Staff_AdvanceRequests
-                                    Where c.RequestStatus = RmbStatus.Submitted And c.UserId = UserId And c.PortalId = PortalId
+                                    Where (c.RequestStatus = RmbStatus.Submitted Or c.RequestStatus = RmbStatus.PendingDirectorApproval Or c.RequestStatus = RmbStatus.PendingEDMSApproval) And c.UserId = UserId And c.PortalId = PortalId
                                     Order By c.LocalAdvanceId Descending
                                     Select c.AdvanceId, c.RequestDate, c.LocalAdvanceId, c.UserId).Take(Settings("MenuSize"))
                 dlAdvSubmitted.DataSource = AdvSubmitted
@@ -337,11 +338,22 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Private Async Function loadBasicApprovablePaneAsync() As Task
             '--list any unapproved reimbursements submitted to this user for approval
+            '--Status=Submitted, and ApprUserId = UserId
+            '--OR Status=PendingDirectorApproval, SpareField2 = UserId
+            '--OR Status=PendingEDMSApproval, and user is EDMS
+            '--**NOTE: Director's UserId is stored in rmb.SpareField2 during form submission if director's approval is necessary
+            Dim userIsEDMS = (Settings("EDMSId") = UserId)
             Try
                 Dim ApprovableRmbs = (From c In d.AP_Staff_Rmbs
-                            Where c.Status = RmbStatus.Submitted And c.ApprUserId = UserId And c.ApprDate Is Nothing And c.PortalId = PortalId
+                            Where ((c.Status = RmbStatus.Submitted And c.ApprUserId = UserId) Or (c.Status = RmbStatus.PendingDirectorApproval And c.SpareField2 IsNot Nothing AndAlso c.SpareField2 = UserId)) And c.ApprDate Is Nothing And c.PortalId = PortalId
                             Order By c.RMBNo Descending
                             Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId)
+                If userIsEDMS Then
+                    ApprovableRmbs.Concat(From c In d.AP_Staff_Rmbs
+                                          Where c.Status = RmbStatus.PendingEDMSApproval And c.ApprDate Is Nothing And c.PortalId = PortalId
+                                          Order By c.RMBNo Descending
+                                          Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId)
+                End If
                 dlToApprove.DataSource = ApprovableRmbs
                 dlToApprove.DataBind()
 
@@ -902,7 +914,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     Select Case q.First.RequestStatus
 
-                        Case RmbStatus.Submitted
+                        Case RmbStatus.Submitted, RmbStatus.PendingDirectorApproval, RmbStatus.PendingEDMSApproval
                             btnAdvApprove.Visible = (q.First.UserId <> UserId)
                             btnAdvReject.Visible = (q.First.UserId <> UserId)
                             btnAdvSave.Visible = (q.First.UserId = UserId)
@@ -1101,7 +1113,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     Dim DRAFT = Rmb.Status = RmbStatus.Draft
                     Dim MORE_INFO = (Rmb.MoreInfoRequested IsNot Nothing AndAlso Rmb.MoreInfoRequested = True)
-                    Dim SUBMITTED = Rmb.Status = RmbStatus.Submitted
+                    Dim SUBMITTED = Rmb.Status = RmbStatus.Submitted Or Rmb.Status = RmbStatus.PendingDirectorApproval Or Rmb.Status = RmbStatus.PendingEDMSApproval
                     Dim APPROVED = Rmb.Status = RmbStatus.Approved
                     Dim PROCESSING = Rmb.Status = RmbStatus.PendingDownload Or Rmb.Status = RmbStatus.DownloadFailed Or Rmb.Status = RmbStatus.Processing
                     Dim PAID = Rmb.Status = RmbStatus.Paid
@@ -1828,6 +1840,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     rmb.Locked = True
                     tbComments.Enabled = False
                 Else
+                    If StaffRmbFunctions.RequiresExtraApproval(rmb.CostCenter) Then
+                        rmb.SpareField2 = StaffRmbFunctions.getDirectorFor(rmb.CostCenter)
+                    End If
                     NewStatus = RmbStatus.Submitted
                     rmb.Locked = False
                 End If
@@ -1912,14 +1927,33 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If rmb.Count > 0 Then
                 Dim rmbTotal = CType((From a In d.AP_Staff_RmbLines Where a.RmbNo = rmb.First.RMBNo Select a.GrossAmount).Sum(), Decimal?).GetValueOrDefault(0)
                 rmb.First.SpareField1 = rmbTotal.ToString("C") ' currency formatted string
-                rmb.First.Status = RmbStatus.Approved
-                rmb.First.Locked = True
-                rmb.First.ApprDate = Now
-                rmb.First.ApprUserId = UserId
+                If StaffRmbFunctions.RequiresExtraApproval(rmb.First.CostCenter) Then
+                    Select Case rmb.First.Status
+                        Case RmbStatus.PendingEDMSApproval
+                            If UserId = Settings("EDMSId") Then
+                                rmb.First.Status = RmbStatus.Approved
+                                rmb.First.ApprDate = Now
+                                rmb.First.Locked = True
+                            End If
+                        Case RmbStatus.PendingDirectorApproval
+                            If UserId = StaffRmbFunctions.getDirectorFor(rmb.First.CostCenter) Then
+                                rmb.First.Status = RmbStatus.PendingEDMSApproval
+                            End If
+                        Case RmbStatus.Submitted
+                            If UserId = rmb.First.ApprUserId Then
+                                rmb.First.Status = RmbStatus.PendingDirectorApproval
+                            End If
+                    End Select
+                Else
+                    If UserId = rmb.First.ApprUserId Then
+                        rmb.First.Status = RmbStatus.Approved
+                        rmb.First.ApprDate = Now
+                        rmb.First.Locked = True
+                    End If
+                End If
                 rmb.First.Period = Nothing
                 rmb.First.Year = Nothing
                 SubmitChanges()
-
                 Dim refreshMenuTasks = New List(Of Task)
                 refreshMenuTasks.Add(loadBasicSubmittedPaneAsync())
                 refreshMenuTasks.Add(loadBasicApprovablePaneAsync())
@@ -1936,7 +1970,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim ObjAppr As UserInfo = UserController.GetUserById(PortalId, Me.UserId)
                 Dim theUser As UserInfo = UserController.GetUserById(PortalId, rmb.First.UserId)
 
-                'SEND APRROVE EMAIL
+                'SEND APRROVAL EMAIL
                 Dim Emessage = ""
                 Emessage = StaffBrokerFunctions.GetTemplate("RmbApprovedEmail", PortalId)
                 Emessage = Emessage.Replace("[STAFFNAME]", theUser.DisplayName).Replace("[RMBNO]", rmb.First.RID).Replace("[USERREF]", IIf(rmb.First.UserRef <> "", rmb.First.UserRef, "None"))
@@ -2864,10 +2898,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Try
                     Dim rmb_status = (From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo Select c.Status).First
                     Select Case rmb_status
-                        Case 0 To 4
-                            Return rmb_status
-                        Case 10 To 20
+                        Case RmbStatus.Draft
+                            Return 0
+                        Case RmbStatus.Submitted, RmbStatus.PendingDirectorApproval, RmbStatus.PendingEDMSApproval
+                            Return 1
+                        Case RmbStatus.Approved, RmbStatus.PendingDownload, RmbStatus.DownloadFailed
                             Return 2
+                        Case RmbStatus.Processing
+                            Return 3
+                        Case RmbStatus.Paid
+                            Return 4
                         Case Else
                             Return 0
                     End Select
@@ -2882,12 +2922,18 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 If adv.Count > 0 Then
                     Select Case adv.First.RequestStatus
-                        'Case RmbStatus.MoreInfo
-                        '    Return 0
-                        Case Is >= RmbStatus.PendingDownload
+                        Case RmbStatus.Draft
+                            Return 0
+                        Case RmbStatus.Submitted, RmbStatus.PendingDirectorApproval, RmbStatus.PendingEDMSApproval
+                            Return 1
+                        Case RmbStatus.Approved, RmbStatus.PendingDownload, RmbStatus.DownloadFailed
                             Return 2
+                        Case RmbStatus.Processing
+                            Return 3
+                        Case RmbStatus.Paid
+                            Return 4
                         Case Else
-                            Return adv.First.RequestStatus
+                            Return 0
                     End Select
                 End If
 
@@ -4058,6 +4104,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Sub
 
         Protected Async Sub btnAdvApprove_Click(sender As Object, e As System.EventArgs) Handles btnAdvApprove.Click
+            '--Does not respect "requiresExtraApproval()"
             btnAdvSave_Click(Me, Nothing)
             Dim q = From c In d.AP_Staff_AdvanceRequests Where c.AdvanceId = -CInt(hfRmbNo.Value) And c.PortalId = PortalId
             If q.Count > 0 Then
@@ -4905,7 +4952,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Function
 
         Private Sub checkLowBalance()
-            If (lblStatus.Text = RmbStatus.StatusName(RmbStatus.Submitted) AndAlso isLowBalance()) Then
+            If (lblStatus.Text = RmbStatus.StatusName(RmbStatus.Submitted) Or lblStatus.Text = RmbStatus.StatusName(RmbStatus.PendingDirectorApproval) Or lblStatus.Text = RmbStatus.StatusName(RmbStatus.PendingEDMSApproval) AndAlso isLowBalance()) Then
                 Dim accountBalance = hfAccountBalance.Value - GetTotal(hfRmbNo.Value)
                 lblWarningLabel.Text = Translate("WarningLowBalance").Replace("[ACCTBAL]", Format(accountBalance, "Currency")) _
                 .Replace("[BUDGBAL]", Format(hfBudgetBalance.Value, "Currency")).Replace("[ACCT]", tbChargeTo.Text)
