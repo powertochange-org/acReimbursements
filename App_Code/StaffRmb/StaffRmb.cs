@@ -293,7 +293,7 @@ namespace StaffRmb
             string response = await getResultFromWebServiceAsync(url, postData);
             if (response.Length == 0)
             {
-                return "ERROR geting account balance: Web Service did not return any data";
+                return "ERROR getting account balance: Web Service did not return any data";
             }
             string result = "";
             //**XML Parsing code **
@@ -304,7 +304,7 @@ namespace StaffRmb
                 Double balance = Double.Parse(xDoc.GetElementsByTagName("Detail")[0].Attributes["Balance"].Value);
                 result = Math.Round(balance, 2).ToString("0.00");
             } catch (Exception e) {
-                return "ERROR getting account balance: " + e.Message +"  \n"+ response;
+                return "ERROR getting account balance: " + response;
             }
             //**CSV Parsing code **
             //Match match = Regex.Match(response, @"\""([0-9,\-\.]+)\""\r?\n?$");  //Look at digits, comma, period and minus in quotes at the end of the string.
