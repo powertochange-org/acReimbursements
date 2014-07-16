@@ -299,8 +299,8 @@ namespace StaffRmb
                 xDoc.LoadXml(response);
                 Double balance = Double.Parse(xDoc.GetElementsByTagName("Detail")[0].Attributes["Balance"].Value);
                 result = Math.Round(balance, 2).ToString("0.00");
-            } catch {
-
+            } catch (Exception e) {
+                return "ERROR getting account balance: " + e.Message +"  \n"+ e.InnerException;
             }
             //**CSV Parsing code **
             //Match match = Regex.Match(response, @"\""([0-9,\-\.]+)\""\r?\n?$");  //Look at digits, comma, period and minus in quotes at the end of the string.
