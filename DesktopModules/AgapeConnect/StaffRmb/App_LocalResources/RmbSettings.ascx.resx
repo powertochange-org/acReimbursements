@@ -165,6 +165,12 @@
   <data name="lblAuthUser.Text" xml:space="preserve">
     <value>Authorasation User</value>
   </data>
+  <data name="lblEDMS.Help" xml:space="preserve">
+    <value>Select the current Executive Director Ministry Services. This is used when additional approval is needed for reimbursements</value>
+  </data>
+  <data name="lblEDMS.Text" xml:space="preserve">
+    <value>EDMS</value>
+  </data>
   <data name="lblBreakfast.Text" xml:space="preserve">
     <value>Breakfast:</value>
   </data>
