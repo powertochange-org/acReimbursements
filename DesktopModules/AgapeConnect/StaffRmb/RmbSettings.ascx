@@ -1145,6 +1145,18 @@
                         </asp:DropDownList>
                     </td>
                 </tr>
+                <tr>
+                    <td>
+                        <b>
+                            <dnn:Label ID="lblEDMS" runat="server" ControlName="ddlEDMS"
+                                ResourceKey="lblEDMS" />
+                        </b>
+                    </td>
+                    <td>
+                        <asp:DropDownList ID="ddlEDMS" runat="server">
+                        </asp:DropDownList>
+                    </td>
+                </tr>
             </table>
         </div>
         <div id='Tab4-tab'>

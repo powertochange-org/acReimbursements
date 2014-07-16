@@ -38,17 +38,22 @@ Namespace DotNetNuke.Modules.StaffRmb
 
                     ddlAuthUser.Items.Clear()
                     ddlAuthAuthUser.Items.Clear()
+                    ddlEDMS.Items.Clear()
                     For Each row In (From c In stafflist Order By c.DisplayName)
                         Dim user = UserController.GetUserById(PortalId, row.UID).LastName & ", " & UserController.GetUserById(PortalId, row.UID).FirstName
                         ddlAuthUser.Items.Add(New ListItem(user, row.UID))
-                        If CType(TabModuleSettings("AuthUser"), String) <> "" Then
-                            ddlAuthUser.SelectedValue = CType(TabModuleSettings("AuthUser"), Integer)
-                        End If
                         ddlAuthAuthUser.Items.Add(New ListItem(user, row.UID))
-                        If CType(TabModuleSettings("AuthAuthUser"), String) <> "" Then
-                            ddlAuthAuthUser.SelectedValue = CType(TabModuleSettings("AuthAuthUser"), Integer)
-                        End If
+                        ddlEDMS.Items.Add(New ListItem(user, row.UID))
                     Next
+                    If CType(TabModuleSettings("AuthUser"), String) <> "" Then
+                        ddlAuthUser.SelectedValue = CType(TabModuleSettings("AuthUser"), Integer)
+                    End If
+                    If CType(TabModuleSettings("AuthAuthUser"), String) <> "" Then
+                        ddlAuthAuthUser.SelectedValue = CType(TabModuleSettings("AuthAuthUser"), Integer)
+                    End If
+                    If CType(TabModuleSettings("EDMSId"), String) <> "" Then
+                        ddlEDMS.SelectedValue = CType(TabModuleSettings("EDMSId"), Integer)
+                    End If
 
 
 
@@ -400,6 +405,7 @@ Namespace DotNetNuke.Modules.StaffRmb
             objModules.UpdateTabModuleSetting(TabModuleId, "DownloadFormat", ddlDownloadFormat.SelectedValue)
             objModules.UpdateTabModuleSetting(TabModuleId, "AuthUser", ddlAuthUser.SelectedValue)
             objModules.UpdateTabModuleSetting(TabModuleId, "AuthAuthUser", ddlAuthAuthUser.SelectedValue)
+            objModules.UpdateTabModuleSetting(TabModuleId, "EDMSId", ddlEDMS.SelectedValue)
 
             objModules.UpdateTabModuleSetting(TabModuleId, "Sub1Name", tbPD1Name.Text)
             objModules.UpdateTabModuleSetting(TabModuleId, "Sub2Name", tbPD2Name.Text)

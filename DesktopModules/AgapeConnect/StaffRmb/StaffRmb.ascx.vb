@@ -4877,7 +4877,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 Dim Actions As New Entities.Modules.Actions.ModuleActionCollection
 
-                Actions.Add(GetNextActionID, "Expense Settings", "RmbSettings", "", "action_settings.gif", EditUrl("RmbSettings"), False, SecurityAccessLevel.Edit, True, False)
+                Actions.Add(GetNextActionID, "Reimbursement Settings", "RmbSettings", "", "action_settings.gif", EditUrl("RmbSettings"), False, SecurityAccessLevel.Edit, True, False)
 
                 AddClientAction("Download Batched Transactions", "showDownload()", Actions)
                 AddClientAction("Suggested Payments", "showSuggestedPayments()", Actions)
