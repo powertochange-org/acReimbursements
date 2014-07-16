@@ -132,17 +132,6 @@ namespace StaffRmb
             return "--";
         }
 
-        static public Boolean RequiresExtraApproval(int CostCenter) {
-            //TODO: stub
-            return false;
-        }
-        
-        static public int getDirectorFor(int CostCenter)
-        {
-            //TODO: stub
-            return 0;
-        }
-
         static public async Task<Approvers> getApproversAsync(AP_Staff_Rmb rmb, DotNetNuke.Entities.Users.UserInfo authUser, DotNetNuke.Entities.Users.UserInfo authAuthUser)
         {
             String staff_logon = logonFromId(rmb.PortalId, rmb.UserId);

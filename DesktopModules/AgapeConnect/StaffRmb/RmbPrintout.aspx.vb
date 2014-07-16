@@ -174,18 +174,18 @@ Partial Class DesktopModules_StaffRmb_RmbPrintout
                     lines = lines & "<td><span style=""color: #AAA;"">" & row.AccountCode & "-</span>" & GetLocalTypeName(row.LineType, PS.PortalId) & "</td>"
                     lines = lines & "<td>" & row.Comment
 
-                    If row.AP_Staff_RmbLineType.TypeName = "Mileage" Then
-                        If row.Spare1 > 0 Then
+                    'If row.AP_Staff_RmbLineType.TypeName = "Mileage" Then
+                    'If row.Spare1 > 0 Then
 
 
-                            'lines += "<br/ ><span class=""Agape_SubTitle"">Passengers: "
-                            'For Each person In row.Agape_Staff_RmbLine.AddStaffs
-                            '    lines += person.Name & " + "
-                            'Next
-                            'lines = Left(lines, lines.Length - 3)
-                            'lines += "</span>"
-                        End If
-                    End If
+                    'lines += "<br/ ><span class=""Agape_SubTitle"">Passengers: "
+                    'For Each person In row.Agape_Staff_RmbLine.AddStaffs
+                    '    lines += person.Name & " + "
+                    'Next
+                    'lines = Left(lines, lines.Length - 3)
+                    'lines += "</span>"
+                    'End If
+                    'End If
 
                     lines = lines & "</td>"
                     lines = lines & "<td>" & "</td>" ' IIf(row.Taxable, "Yes", "No") & "</td>"
