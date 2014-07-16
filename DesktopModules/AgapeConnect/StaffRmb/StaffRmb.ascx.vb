@@ -1106,7 +1106,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     hfChargeToValue.Value = If(Rmb.CostCenter Is Nothing, "", Rmb.CostCenter)
                     hfAccountBalance.Value = ""
                     lblAccountBalance.Text = "not loaded"
-                    lblBudgetBalance.Text = "not loaded"
 
                     Dim getAccountBalanceTask = getAccountBalanceAsync(Rmb.CostCenter, StaffRmbFunctions.logonFromId(PortalId, UserId))
                     Dim getBudgetBalanceTask = getBudgetBalanceAsync(Rmb.CostCenter, StaffRmbFunctions.logonFromId(PortalId, UserId))
@@ -1284,9 +1283,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             End If
                         End If
                     End If
-                    Dim aBal = Await getAccountBalanceTask
-                    Dim bBal = Await getBudgetBalanceTask
-                    updateBalanceLabels(aBal, bBal)
+                    updateBalanceLabel(Await getAccountBalanceTask)
                     If (isApprover) Then
                         checkLowBalance()
                     End If
@@ -2654,9 +2651,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         SubmitChanges()
                     End If
                     TaskList.Add(updateApproversListAsync(rmb.First))
-                    Dim aBal = Await getAccountBalanceTask
-                    Dim bBal = Await getBudgetBalanceTask
-                    updateBalanceLabels(aBal, bBal)
+                    updateBalanceLabel(Await getAccountBalanceTask)
                     Await Task.WhenAll(TaskList)
                 End If
             Catch ex As Exception
@@ -3557,7 +3552,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         'Personal Reimbursement
                         approverMessage = approverMessage.Replace("[LOWBALANCE]", If((hfAccountBalance.Value <> String.Empty) AndAlso (hfAccountBalance.Value < GetTotal(hfRmbNo.Value)), Translate("WarningLowBalanceStaffAccount"), ""))
                     Else
-                        Dim low_balance = Translate("WarningLowBalance").Replace("[ACCTBAL]", hfAccountBalance.Value).Replace("[BUDGBAL]", hfBudgetBalance.Value).Replace("[ACCT]", tbChargeTo.Text)
+                        Dim low_balance = Translate("WarningLowBalance").Replace("[ACCTBAL]", hfAccountBalance.Value).Replace("[ACCT]", tbChargeTo.Text)
                         approverMessage = approverMessage.Replace("[LOWBALANCE]", If(isLowBalance(), low_balance, ""))
                     End If
                     '-- Send FROM owner, so that bounces or out-of-office replies come back to owner.
@@ -4954,37 +4949,23 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Private Sub checkLowBalance()
             If (lblStatus.Text = RmbStatus.StatusName(RmbStatus.Submitted) Or lblStatus.Text = RmbStatus.StatusName(RmbStatus.PendingDirectorApproval) Or lblStatus.Text = RmbStatus.StatusName(RmbStatus.PendingEDMSApproval) AndAlso isLowBalance()) Then
                 Dim accountBalance = hfAccountBalance.Value - GetTotal(hfRmbNo.Value)
-                lblWarningLabel.Text = Translate("WarningLowBalance").Replace("[ACCTBAL]", Format(accountBalance, "Currency")) _
-                .Replace("[BUDGBAL]", Format(hfBudgetBalance.Value, "Currency")).Replace("[ACCT]", tbChargeTo.Text)
+                lblWarningLabel.Text = Translate("WarningLowBalance").Replace("[ACCTBAL]", Format(accountBalance, "Currency")).Replace("[ACCT]", tbChargeTo.Text)
                 Dim t As Type = Me.GetType()
                 ScriptManager.RegisterClientScriptBlock(Page, t, "", "showWarningDialog();", True)
             End If
         End Sub
 
         Private Function isLowBalance() As Boolean
-            If isStaffAccount() Or (lblBudgetBalance.Text = "-------") Or (lblAccBal.Text = "-------") Then
+            If isStaffAccount() Or (lblAccBal.Text = BALANCE_PERMISSION_DENIED) Or (lblAccBal.Text = BALANCE_INCONCLUSIVE) Then
                 Return False
             End If
-            Try
-                Dim budgetBalance = hfBudgetBalance.Value
-                Dim accountBalance = hfAccountBalance.Value - GetTotal(hfRmbNo.Value)
-                Dim budgetTolerance = Settings("BudgetTolerance") / 100
-                Dim lowestAllowedBalance = budgetBalance - (budgetBalance * budgetTolerance)
-                If (accountBalance < lowestAllowedBalance) Then
-                    Return True
-                End If
-            Catch
-            End Try
-            Return False
+            Return (GetTotal(hfRmbNo.Value) > hfAccountBalance.Value)
         End Function
 
-        Private Sub updateBalanceLabels(accountBalance As String, budgetBalance As String)
+        Private Sub updateBalanceLabel(accountBalance As String)
             lblAccountBalance.Text = accountBalance
-            lblBudgetBalance.Text = budgetBalance
             valueOrNull(hfAccountBalance, accountBalance)
-            valueOrNull(hfBudgetBalance, budgetBalance)
             lblAccountBalance.Attributes.Add("class", redIfNegative(hfAccountBalance.Value))
-            lblBudgetBalance.Attributes.Add("class", redIfNegative(hfBudgetBalance.Value))
         End Sub
 
         Private Sub valueOrNull(hf As HiddenField, s As String)

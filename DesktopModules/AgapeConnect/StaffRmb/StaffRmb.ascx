@@ -454,13 +454,6 @@
             var account = $("#<%= tbChargeTo.ClientID %>").val();
             if (! account) return false;
             isMinistryAccount = (account.charAt(0)!='8' && account.charAt(0)!='9');
-            if (isMinistryAccount) {
-                $('#budgetBalanceDiv').show(0);
-                $('#accountBalanceDiv').hide(0);        
-            } else {
-                $('#budgetBalanceDiv').hide(0);
-                $('#accountBalanceDiv').show(0);        
-            }
         }
 
         function setUpReceiptPreviews() {
@@ -1023,19 +1016,6 @@
     }
 
     var isMinistryAccount = false;
-    function showAccountBalance() {
-        if (isMinistryAccount) {
-            $('#budgetBalanceDiv').hide(0);
-            $('#accountBalanceDiv').show(0);        
-        }
-    }
-
-    function showBudgetBalance() {
-        if (isMinistryAccount) {
-            $('#accountBalanceDiv').hide(0);
-            $('#budgetBalanceDiv').show(0);
-        }
-    }
 
 </script>
 <style type="text/css">
@@ -1489,18 +1469,13 @@
                                     <asp:TextBox ID="tbChargeTo" runat="server" AutoPostBack="true" Style="float: right; font-size: small;">
                                     </asp:TextBox>
                                 </div>
-                                <div class="inverse" style="width:100%; margin-top:1px; padding-top:3px; padding-bottom:3px; float: left" onmouseover="showAccountBalance()" onmouseout="showBudgetBalance()">
+                                <div class="inverse" style="width:100%; margin-top:1px; padding-top:3px; padding-bottom:3px; float: left" >
                                     <asp:Label ID="lblStatus" runat="server" Style="float: left; font-style: italic; font-size:13px; padding-left:70px"></asp:Label>
                                     <div style="float: right; padding-right:10px; margin-right: 3px;">
-                                        <div id="accountBalanceDiv" style="display:none">
+                                        <div id="accountBalanceDiv">
                                             <asp:Label ID="ttlAccountBalance" runat="server" Style="margin-right: 3px; font-style: italic;  font-size:13px;" resourceKey="AccountBalance"></asp:Label>
                                             <asp:Label ID="lblAccountBalance" runat="server" Style="font-style: italic; font-size:13px;"></asp:Label>
                                             <asp:HiddenField ID="hfAccountBalance" runat="server" />
-                                        </div>
-                                        <div id="budgetBalanceDiv">
-                                            <asp:Label ID="ttlBudgetBalance" runat="server" Style="margin-right: 3px; font-size:13px;" resourceKey="BudgetBalance"></asp:Label>
-                                            <asp:Label ID="lblBudgetBalance" runat="server" Style="font-size:13px;"></asp:Label>
-                                            <asp:HiddenField ID="hfBudgetBalance" runat="server" />
                                         </div>
                                     </div>
                                 </div>
