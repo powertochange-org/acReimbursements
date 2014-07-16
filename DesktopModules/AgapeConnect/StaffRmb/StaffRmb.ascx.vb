@@ -4928,7 +4928,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Double.Parse(accountBalance)
                 Return accountBalance
             Catch e As Exception
-                Return "<span title=Error:'" + e.Message + " \naccountBalance result:" + accountBalance + "'>" + BALANCE_INCONCLUSIVE + "</span>"
+                Return "<span title='Error:" + e.Message + " accountBalance result:" + accountBalance + "'>" + BALANCE_INCONCLUSIVE + "</span>"
             End Try
         End Function
 
