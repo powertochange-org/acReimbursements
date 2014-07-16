@@ -4914,7 +4914,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Private Async Function getAccountBalanceAsync(account As String, logon As String) As Task(Of String)
             If account = "" Then
-                Return BALANCE_INCONCLUSIVE
+                Return "<span title='Error: no account number'>" + BALANCE_INCONCLUSIVE + "</span>"
             End If
             Dim accountBalance = ""
             Try
@@ -4927,8 +4927,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 End If
                 Double.Parse(accountBalance)
                 Return accountBalance
-            Catch
-                Return "<span title='" + accountBalance + "'>" + BALANCE_INCONCLUSIVE + "</span>"
+            Catch e As Exception
+                Return "<span title=Error:'" + e.Message + " \naccountBalance result:" + accountBalance + "'>" + BALANCE_INCONCLUSIVE + "</span>"
             End Try
         End Function
 
