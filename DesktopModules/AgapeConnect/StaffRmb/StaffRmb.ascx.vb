@@ -1794,6 +1794,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Sub
 
         Protected Sub btnSubmit_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSubmit.Click
+            'This function simply kicks off the address confirmation dialogue.
+            'the submission functionality can be found in btnAddressOk_Click
             Dim RmbNo = hfRmbNo.Value
             Dim rmbs = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo
             If (rmbs.Count > 0) Then
@@ -1929,9 +1931,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             rmb.First.Status = RmbStatus.Approved
                             rmb.First.ApprDate = Now
                             rmb.First.Locked = True
+                            sendApprovedEmail(rmb.First)
+                            Log(rmb.First.RMBNo, "Approved by EDMS")
                         End If
                     Case RmbStatus.PendingDirectorApproval
-                        If UserId = StaffRmbFunctions.getDirectorFor(rmb.First.CostCenter) Then
+                        Dim director = StaffRmbFunctions.getDirectorFor(rmb.First.CostCenter)
+                        If UserId = director Then
                             'Check to see if extra approval is still necessary (the requirement may have been removed)
                             If StaffRmbFunctions.RequiresExtraApproval(rmb.First.CostCenter) Then
                                 rmb.First.Status = RmbStatus.PendingEDMSApproval
@@ -1939,6 +1944,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                 rmb.First.Status = RmbStatus.Approved
                                 rmb.First.ApprDate = Now
                                 rmb.First.Locked = True
+                                SendApprovalEmail(rmb.First)
+                                Log(rmb.First.RMBNo, "Approved by " & director)
                             End If
                         End If
                     Case RmbStatus.Submitted
@@ -1946,11 +1953,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             If StaffRmbFunctions.RequiresExtraApproval(rmb.First.CostCenter) Then
                                 rmb.First.Status = RmbStatus.PendingDirectorApproval
                                 rmb.First.SpareField2 = StaffRmbFunctions.getDirectorFor(rmb.First.CostCenter)
+                                SendApprovalEmail(rmb.First)
                             Else
                                 rmb.First.Status = RmbStatus.Approved
                                 rmb.First.ApprDate = Now
                                 rmb.First.Locked = True
+                                sendApprovedEmail(rmb.First)
                             End If
+                            Log(rmb.First.RMBNo, "Approved")
                         End If
                 End Select
                 rmb.First.Period = Nothing
@@ -1969,24 +1979,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     refreshMenuTasks.Add(buildAllApprovedTreeAsync(allStaff))
                 End If
 
-                Dim ObjAppr As UserInfo = UserController.GetUserById(PortalId, Me.UserId)
-                Dim theUser As UserInfo = UserController.GetUserById(PortalId, rmb.First.UserId)
-
-                'SEND APRROVAL EMAIL
-                Dim Emessage = ""
-                Emessage = StaffBrokerFunctions.GetTemplate("RmbApprovedEmail", PortalId)
-                Emessage = Emessage.Replace("[STAFFNAME]", theUser.DisplayName).Replace("[RMBNO]", rmb.First.RID).Replace("[USERREF]", IIf(rmb.First.UserRef <> "", rmb.First.UserRef, "None"))
-                Emessage = Emessage.Replace("[APPROVER]", ObjAppr.DisplayName)
-                If rmb.First.Changed = True Then
-                    Emessage = Emessage.Replace("[CHANGES]", ". " & Translate("EmailApproverChanged"))
-                    rmb.First.Changed = False
-                    SubmitChanges()
-                Else
-                    Emessage = Emessage.Replace("[CHANGES]", "")
-                End If
-                DotNetNuke.Services.Mail.Mail.SendMail("P2C Reimbursements <reimbursements@p2c.com>", theUser.Email, "", Translate("EmailApprovedSubjectP").Replace("[RMBNO]", rmb.First.RID).Replace("[USERREF]", rmb.First.UserRef), Emessage, "", "HTML", "", "", "", "")
-
-                Log(rmb.First.RMBNo, "Approved")
                 Dim message As String = Translate("RmbApproved").Replace("[RMBNO]", rmb.First.RID)
                 Dim t As Type = btnApprove.GetType()
 
@@ -3525,6 +3517,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Function
 
         Protected Sub SendApprovalEmail(ByVal theRmb As AP_Staff_Rmb)
+            'Sends an email to the creator, indicating who the form has been submitted to
+            'AND sends an email to the approver, alerting him to the awaiting form.
             Try
 
                 Dim SpouseId As Integer = StaffBrokerFunctions.GetSpouseId(theRmb.UserId)
@@ -3532,15 +3526,27 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim approverMessage As String = StaffBrokerFunctions.GetTemplate("RmbApproverEmail", PortalId)
                 Dim owner = UserController.GetUserById(theRmb.PortalId, theRmb.UserId)
                 Dim approver = UserController.GetUserById(theRmb.PortalId, theRmb.ApprUserId)
+                Dim extra = If(StaffRmbFunctions.RequiresExtraApproval(theRmb.RMBNo), Translate("ExtraApproval"), "")
                 Dim toEmail = approver.Email
                 Dim toName = approver.FirstName
-                Dim Approvers = approver.DisplayName
                 Dim hasReceipts = (From c In theRmb.AP_Staff_RmbLines Where c.Receipt = True And (c.ReceiptImageId Is Nothing)).Count > 0
 
-                'Email to the submitter here 
-                ownerMessage = ownerMessage.Replace("[APPROVER]", Approvers).Replace("[EXTRA]", "").Replace("[STAFFNAME]", owner.FirstName) _
-                    .Replace("[RMBNO]", theRmb.RID).Replace("[USERREF]", theRmb.UserRef)
-                ownerMessage = ownerMessage.Replace("[STAFFACTION]", If(hasReceipts, Translate("PostReceipts"), Translate("NoPostRecipts")))
+                If theRmb.Status = RmbStatus.Submitted Then
+                    ownerMessage = ownerMessage.Replace("[APPROVER]", approver.DisplayName).Replace("[EXTRA]", extra)
+                    ownerMessage = ownerMessage.Replace("[STAFFACTION]", If(hasReceipts, Translate("PostReceipts"), Translate("NoPostRecipts")))
+                ElseIf theRmb.Status = RmbStatus.PendingDirectorApproval Then
+                    Dim director = UserController.GetUserById(PortalId, StaffRmbFunctions.getDirectorFor(theRmb.CostCenter))
+                    ownerMessage = ownerMessage.Replace("[APPROVER]", director.DisplayName)
+                    toEmail = director.Email
+                    toName = director.FirstName
+                ElseIf theRmb.Status = RmbStatus.PendingEDMSApproval Then
+                    Dim edms = UserController.GetUserById(PortalId, Settings("EDMSId"))
+                    ownerMessage = ownerMessage.Replace("[APPROVER]", edms.DisplayName)
+                    toEmail = edms.Email
+                    toName = edms.FirstName
+                End If
+                ownerMessage = ownerMessage.Replace("[EXTRA]", "").Replace("[STAFFACTION]", "")
+                ownerMessage = ownerMessage.Replace("[STAFFNAME]", owner.FirstName).Replace("[RMBNO]", theRmb.RID).Replace("[USERREF]", theRmb.UserRef)
                 ownerMessage = ownerMessage.Replace("[PRINTOUT]", "<a href='" & Request.Url.Scheme & "://" & Request.Url.Authority & Request.ApplicationPath & "DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & theRmb.RMBNo & "&UID=" & theRmb.UserId & "' target-'_blank' style='width: 134px; display:block;)'><div style='text-align: center; width: 122px; margin: 10px;'><img src='" _
                     & Request.Url.Scheme & "://" & Request.Url.Authority & Request.ApplicationPath & "DesktopModules/AgapeConnect/StaffRmb/Images/PrintoutIcon.jpg' /><br />Printout</div></a><style> a div:hover{border: solid 1px blue;}</style>")
                 DotNetNuke.Services.Mail.Mail.SendMail("P2C Reimbursements <reimbursements@p2c.com>", UserInfo.Email, "", Translate("EmailSubmittedSubject").Replace("[RMBNO]", theRmb.RID), ownerMessage, "", "HTML", "", "", "", "")
@@ -3550,6 +3556,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim subject = Translate("SubmittedApprEmailSubject").Replace("[STAFFNAME]", UserInfo.DisplayName)
                     approverMessage = approverMessage.Replace("[STAFFNAME]", UserInfo.DisplayName).Replace("[RMBNO]", theRmb.RID).Replace("[USERREF]", IIf(theRmb.UserRef <> "", theRmb.UserRef, "None"))
                     approverMessage = approverMessage.Replace("[APPRNAME]", toName)
+                    approverMessage = approverMessage.Replace("[EXTRA]", extra)
                     approverMessage = approverMessage.Replace("[OLDEXPENSES]", If(hasOldExpenses(), Translate("WarningOldExpenses"), ""))
                     approverMessage = approverMessage.Replace("[COMMENTS]", If(theRmb.UserComment <> "", Translate("EmailComments") & "<br />" & theRmb.UserComment, ""))
                     If StaffRmbFunctions.isStaffAccount(theRmb.CostCenter) Then
@@ -3568,6 +3575,25 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 lblError.Visible = True
             End Try
 
+        End Sub
+
+        Sub SendApprovedEmail(ByVal theRmb As AP_Staff_Rmb)
+            Dim ObjAppr As UserInfo = UserController.GetUserById(PortalId, Me.UserId)
+            Dim theUser As UserInfo = UserController.GetUserById(PortalId, theRmb.UserId)
+            Dim subject = Translate("EmailApprovedSubjectP").Replace("[RMBNO]", theRmb.RID).Replace("[USERREF]", theRmb.UserRef)
+            Dim Emessage = ""
+
+            Emessage = StaffBrokerFunctions.GetTemplate("RmbApprovedEmail", PortalId)
+            Emessage = Emessage.Replace("[STAFFNAME]", theUser.DisplayName).Replace("[RMBNO]", theRmb.RID).Replace("[USERREF]", IIf(theRmb.UserRef <> "", theRmb.UserRef, "None"))
+            Emessage = Emessage.Replace("[APPROVER]", ObjAppr.DisplayName)
+            If theRmb.Changed = True Then
+                Emessage = Emessage.Replace("[CHANGES]", ". " & Translate("EmailApproverChanged"))
+                theRmb.Changed = False
+                SubmitChanges()
+            Else
+                Emessage = Emessage.Replace("[CHANGES]", "")
+            End If
+            DotNetNuke.Services.Mail.Mail.SendMail("P2C Reimbursements <reimbursements@p2c.com>", theUser.Email, "", subject, Emessage, "", "HTML", "", "", "", "")
         End Sub
 
         Public Function Translate(ByVal ResourceString As String) As String
@@ -4139,7 +4165,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     Next
 
-                    'SEND APRROVE EMAIL
+                    'SEND APRROVED EMAIL
 
 
                     ' Dim Emessage As String = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("AdvApprovedEmail", PortalId))

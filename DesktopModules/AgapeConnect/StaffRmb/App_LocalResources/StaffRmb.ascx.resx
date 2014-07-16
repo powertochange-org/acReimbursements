@@ -604,7 +604,7 @@
     <value>Warning</value>
   </data>
   <data name="WarningLowBalance.Text" xml:space="preserve">
-    <value>Warning: Fulfilling this reimbursement would bring the balance of account#[ACCT] to [ACCTBAL], which is significantly below the budgeted balance of [BUDGBAL].  You may still choose approve this reimbursement, but this budget discrepancy will be reported to your director for review.</value>
+    <value>Warning: There are insufficient funds in account#[ACCT] to fulfil this reimbursement.  You may still approve this reimbursement, but overspending could result in stricter oversight on this account.</value>
   </data>
   <data name="btnSubmitHelp.Text" xml:space="preserve">
     <value>Please select an account and an approver in order to submit</value>
@@ -698,5 +698,8 @@
   </data>
   <data name="MultipleReceipts.Text" xml:space="preserve">
     <value>There are multiple receipts for this item</value>
+  </data>
+  <data name="ExtraApproval.Text" xml:space="preserve">
+    <value>This account has been flagged as requiring a stricter-than-normal approval process.  As a result, this reimbursement will require the additional approval of the Ministry Director, and the Executive Directory of Ministry Services before it can be processed.</value>
   </data>
 </root>
