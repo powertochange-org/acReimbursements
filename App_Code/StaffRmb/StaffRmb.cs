@@ -291,6 +291,10 @@ namespace StaffRmb
             string postData = string.Format("_reportPath=/General/Account%20Balance&_renderFormat=XML&_apiToken={0}&ProjectCodeSearch={1}&ExecuteAsUser={2}", Constants.getApiToken(), account, user_logon);
             string url = "https://1chronicles/CallRptServicesTest/CallRpt.aspx";
             string response = await getResultFromWebServiceAsync(url, postData);
+            if (response.Length == 0)
+            {
+                return "ERROR geting account balance: Web Service did not return any data";
+            }
             string result = "";
             //**XML Parsing code **
             try
