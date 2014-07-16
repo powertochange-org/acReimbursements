@@ -4916,8 +4916,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If account = "" Then
                 Return BALANCE_INCONCLUSIVE
             End If
+            Dim accountBalance = ""
             Try
-                Dim accountBalance = Await StaffRmbFunctions.getAccountBalanceAsync(account, logon)
+                accountBalance = Await StaffRmbFunctions.getAccountBalanceAsync(account, logon)
                 If accountBalance.Length = 0 Then
                     Return BALANCE_PERMISSION_DENIED
                 End If
@@ -4927,7 +4928,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Double.Parse(accountBalance)
                 Return accountBalance
             Catch
-                Return BALANCE_INCONCLUSIVE
+                Return "<span title='" + accountBalance + "'>" + BALANCE_INCONCLUSIVE + "</span>"
             End Try
         End Function
 
