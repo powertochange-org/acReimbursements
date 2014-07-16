@@ -4922,7 +4922,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 If accountBalance.Length = 0 Then
                     Return BALANCE_PERMISSION_DENIED
                 End If
-                If accountBalance.Substring(0, 5).Equals("ERROR") Then
+                If accountBalance.Length > 6 AndAlso accountBalance.Substring(0, 5).Equals("ERROR") Then
                     Return "<span title='" + accountBalance + "'>Error</span>"
                 End If
                 Double.Parse(accountBalance)
