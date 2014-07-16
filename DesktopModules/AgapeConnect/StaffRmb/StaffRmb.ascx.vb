@@ -1923,30 +1923,36 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If rmb.Count > 0 Then
                 Dim rmbTotal = CType((From a In d.AP_Staff_RmbLines Where a.RmbNo = rmb.First.RMBNo Select a.GrossAmount).Sum(), Decimal?).GetValueOrDefault(0)
                 rmb.First.SpareField1 = rmbTotal.ToString("C") ' currency formatted string
-                If StaffRmbFunctions.RequiresExtraApproval(rmb.First.CostCenter) Then
-                    Select Case rmb.First.Status
-                        Case RmbStatus.PendingEDMSApproval
-                            If UserId = Settings("EDMSId") Then
+                Select Case rmb.First.Status
+                    Case RmbStatus.PendingEDMSApproval
+                        If UserId = Settings("EDMSId") Then
+                            rmb.First.Status = RmbStatus.Approved
+                            rmb.First.ApprDate = Now
+                            rmb.First.Locked = True
+                        End If
+                    Case RmbStatus.PendingDirectorApproval
+                        If UserId = StaffRmbFunctions.getDirectorFor(rmb.First.CostCenter) Then
+                            'Check to see if extra approval is still necessary (the requirement may have been removed)
+                            If StaffRmbFunctions.RequiresExtraApproval(rmb.First.CostCenter) Then
+                                rmb.First.Status = RmbStatus.PendingEDMSApproval
+                            Else
                                 rmb.First.Status = RmbStatus.Approved
                                 rmb.First.ApprDate = Now
                                 rmb.First.Locked = True
                             End If
-                        Case RmbStatus.PendingDirectorApproval
-                            If UserId = StaffRmbFunctions.getDirectorFor(rmb.First.CostCenter) Then
-                                rmb.First.Status = RmbStatus.PendingEDMSApproval
-                            End If
-                        Case RmbStatus.Submitted
-                            If UserId = rmb.First.ApprUserId Then
+                        End If
+                    Case RmbStatus.Submitted
+                        If UserId = rmb.First.ApprUserId Then
+                            If StaffRmbFunctions.RequiresExtraApproval(rmb.First.CostCenter) Then
                                 rmb.First.Status = RmbStatus.PendingDirectorApproval
+                                rmb.First.SpareField2 = StaffRmbFunctions.getDirectorFor(rmb.First.CostCenter)
+                            Else
+                                rmb.First.Status = RmbStatus.Approved
+                                rmb.First.ApprDate = Now
+                                rmb.First.Locked = True
                             End If
-                    End Select
-                Else
-                    If UserId = rmb.First.ApprUserId Then
-                        rmb.First.Status = RmbStatus.Approved
-                        rmb.First.ApprDate = Now
-                        rmb.First.Locked = True
-                    End If
-                End If
+                        End If
+                End Select
                 rmb.First.Period = Nothing
                 rmb.First.Year = Nothing
                 SubmitChanges()
