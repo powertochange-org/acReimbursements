@@ -4947,7 +4947,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Function
 
         Private Sub checkLowBalance()
-            If (lblStatus.Text = RmbStatus.StatusName(RmbStatus.Submitted) Or lblStatus.Text = RmbStatus.StatusName(RmbStatus.PendingDirectorApproval) Or lblStatus.Text = RmbStatus.StatusName(RmbStatus.PendingEDMSApproval) AndAlso isLowBalance()) Then
+            If (lblStatus.Text = RmbStatus.StatusName(RmbStatus.Submitted) Or lblStatus.Text = RmbStatus.StatusName(RmbStatus.PendingDirectorApproval) Or lblStatus.Text = RmbStatus.StatusName(RmbStatus.PendingEDMSApproval)) AndAlso isLowBalance() Then
                 Dim accountBalance = hfAccountBalance.Value - GetTotal(hfRmbNo.Value)
                 lblWarningLabel.Text = Translate("WarningLowBalance").Replace("[ACCTBAL]", Format(accountBalance, "Currency")).Replace("[ACCT]", tbChargeTo.Text)
                 Dim t As Type = Me.GetType()
@@ -4956,7 +4956,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Sub
 
         Private Function isLowBalance() As Boolean
-            If isStaffAccount() Or (lblAccBal.Text = BALANCE_PERMISSION_DENIED) Or (lblAccBal.Text = BALANCE_INCONCLUSIVE) Then
+            If isStaffAccount() Or (lblAccBal.Text = "") Or (lblAccBal.Text = BALANCE_PERMISSION_DENIED) Or (lblAccBal.Text = BALANCE_INCONCLUSIVE) Then
                 Return False
             End If
             Return (GetTotal(hfRmbNo.Value) > hfAccountBalance.Value)
