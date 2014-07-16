@@ -1108,7 +1108,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     lblAccountBalance.Text = "not loaded"
 
                     Dim getAccountBalanceTask = getAccountBalanceAsync(Rmb.CostCenter, StaffRmbFunctions.logonFromId(PortalId, UserId))
-                    Dim getBudgetBalanceTask = getBudgetBalanceAsync(Rmb.CostCenter, StaffRmbFunctions.logonFromId(PortalId, UserId))
 
                     Dim DRAFT = Rmb.Status = RmbStatus.Draft
                     Dim MORE_INFO = (Rmb.MoreInfoRequested IsNot Nothing AndAlso Rmb.MoreInfoRequested = True)
@@ -2629,7 +2628,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo And c.PortalId = PortalId
                 If (rmb.Count > 0) Then
                     Dim getAccountBalanceTask = getAccountBalanceAsync(hfChargeToValue.Value, StaffRmbFunctions.logonFromId(PortalId, UserId))
-                    Dim getBudgetBalanceTask = getBudgetBalanceAsync(hfChargeToValue.Value, StaffRmbFunctions.logonFromId(PortalId, UserId))
                     rmb.First.CostCenter = hfChargeToValue.Value
                     rmb.First.Department = Dept
 
@@ -4930,21 +4928,21 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End Try
         End Function
 
-        Private Async Function getBudgetBalanceAsync(account As String, logon As String) As Task(Of String)
-            If account = "" Then
-                Return BALANCE_INCONCLUSIVE
-            End If
-            Dim budgetBalance = Await StaffRmbFunctions.getBudgetBalanceAsync(account, logon)
-            If budgetBalance.Length = 0 Then
-                Return BALANCE_PERMISSION_DENIED
-            End If
-            Try
-                Double.Parse(budgetBalance)
-            Catch
-                Return BALANCE_INCONCLUSIVE
-            End Try
-            Return budgetBalance
-        End Function
+        'Private Async Function getBudgetBalanceAsync(account As String, logon As String) As Task(Of String)
+        '    If account = "" Then
+        '        Return BALANCE_INCONCLUSIVE
+        '    End If
+        '    Dim budgetBalance = Await StaffRmbFunctions.getBudgetBalanceAsync(account, logon)
+        '    If budgetBalance.Length = 0 Then
+        '        Return BALANCE_PERMISSION_DENIED
+        '    End If
+        '    Try
+        '        Double.Parse(budgetBalance)
+        '    Catch
+        '        Return BALANCE_INCONCLUSIVE
+        '    End Try
+        '    Return budgetBalance
+        'End Function
 
         Private Sub checkLowBalance()
             If (lblStatus.Text = RmbStatus.StatusName(RmbStatus.Submitted) Or lblStatus.Text = RmbStatus.StatusName(RmbStatus.PendingDirectorApproval) Or lblStatus.Text = RmbStatus.StatusName(RmbStatus.PendingEDMSApproval)) AndAlso isLowBalance() Then
