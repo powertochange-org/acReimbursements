@@ -1925,44 +1925,48 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If rmb.Count > 0 Then
                 Dim rmbTotal = CType((From a In d.AP_Staff_RmbLines Where a.RmbNo = rmb.First.RMBNo Select a.GrossAmount).Sum(), Decimal?).GetValueOrDefault(0)
                 rmb.First.SpareField1 = rmbTotal.ToString("C") ' currency formatted string
-                Select Case rmb.First.Status
-                    Case RmbStatus.PendingEDMSApproval
-                        If UserId = Settings("EDMSId") Then
+                ' The following If statements are ordered to allow an approver who is also a director to not have to approve twice.
+                Dim shouldSendApprovalEmail = False
+                If rmb.First.Status = RmbStatus.Submitted Then
+                    If UserId = rmb.First.ApprUserId Then
+                        If StaffBrokerFunctions.RequiresExtraApproval(rmb.First.CostCenter) Then
+                            rmb.First.Status = RmbStatus.PendingDirectorApproval
+                            rmb.First.SpareField2 = StaffBrokerFunctions.getDirectorFor(rmb.First.CostCenter, Settings("EDMSId"))
+                            shouldSendApprovalEmail = True
+                        Else
                             rmb.First.Status = RmbStatus.Approved
                             rmb.First.ApprDate = Now
                             rmb.First.Locked = True
-                            sendApprovedEmail(rmb.First)
-                            Log(rmb.First.RMBNo, "Approved by EDMS")
+                            SendApprovedEmail(rmb.First)
                         End If
-                    Case RmbStatus.PendingDirectorApproval
-                        Dim director = StaffBrokerFunctions.getDirectorFor(rmb.First.CostCenter, Settings("EDMSId"))
-                        If UserId = director Then
-                            'Check to see if extra approval is still necessary (the requirement may have been removed)
-                            If StaffBrokerFunctions.RequiresExtraApproval(rmb.First.CostCenter) Then
-                                rmb.First.Status = RmbStatus.PendingEDMSApproval
-                            Else
-                                rmb.First.Status = RmbStatus.Approved
-                                rmb.First.ApprDate = Now
-                                rmb.First.Locked = True
-                                SendApprovalEmail(rmb.First)
-                                Log(rmb.First.RMBNo, "Approved by " & director)
-                            End If
+                        Log(rmb.First.RMBNo, "Approved")
+                    End If
+                End If
+                If rmb.First.Status = RmbStatus.PendingDirectorApproval Then
+                    Dim directorId = StaffBrokerFunctions.getDirectorFor(rmb.First.CostCenter, Settings("EDMSId"))
+                    If UserId = directorId Then
+                        'Check to see if extra approval is still necessary (the requirement may have been removed)
+                        If StaffBrokerFunctions.RequiresExtraApproval(rmb.First.CostCenter) Then
+                            rmb.First.Status = RmbStatus.PendingEDMSApproval
+                        Else
+                            rmb.First.Status = RmbStatus.Approved
+                            rmb.First.ApprDate = Now
+                            rmb.First.Locked = True
+                            shouldSendApprovalEmail = True
+                            Log(rmb.First.RMBNo, "Approved by " & UserController.GetCurrentUserInfo.DisplayName)
                         End If
-                    Case RmbStatus.Submitted
-                        If UserId = rmb.First.ApprUserId Then
-                            If StaffBrokerFunctions.RequiresExtraApproval(rmb.First.CostCenter) Then
-                                rmb.First.Status = RmbStatus.PendingDirectorApproval
-                                rmb.First.SpareField2 = StaffBrokerFunctions.getDirectorFor(rmb.First.CostCenter, Settings("EDMSId"))
-                                SendApprovalEmail(rmb.First)
-                            Else
-                                rmb.First.Status = RmbStatus.Approved
-                                rmb.First.ApprDate = Now
-                                rmb.First.Locked = True
-                                SendApprovedEmail(rmb.First)
-                            End If
-                            Log(rmb.First.RMBNo, "Approved")
-                        End If
-                End Select
+                    End If
+                End If
+                If rmb.First.Status = RmbStatus.PendingEDMSApproval Then
+                    If UserId = Settings("EDMSId") Then
+                        rmb.First.Status = RmbStatus.Approved
+                        rmb.First.ApprDate = Now
+                        rmb.First.Locked = True
+                        SendApprovedEmail(rmb.First)
+                        Log(rmb.First.RMBNo, "Approved by EDMS")
+                    End If
+                End If
+                If shouldSendApprovalEmail Then SendApprovalEmail(rmb.First)
                 rmb.First.Period = Nothing
                 rmb.First.Year = Nothing
                 SubmitChanges()
