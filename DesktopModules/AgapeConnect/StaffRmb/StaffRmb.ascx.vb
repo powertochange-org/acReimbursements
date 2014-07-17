@@ -1124,7 +1124,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     Dim isOwner = (UserId = Rmb.UserId)
                     Dim isSpouse = (StaffBrokerFunctions.GetSpouseId(UserId) = Rmb.UserId)
-                    Dim isApprover = (UserId = Rmb.ApprUserId) And Not (isOwner Or isSpouse)
+                    Dim isApprover = ((UserId = Rmb.ApprUserId) And Not (isOwner Or isSpouse)) _
+                                    Or ((Rmb.Status = RmbStatus.PendingDirectorApproval) And (UserId = CType(Rmb.SpareField2, Integer))) _
+                                    Or ((Rmb.Status = RmbStatus.PendingEDMSApproval) And (UserId = CType(Settings("EDMSId"), Integer)))
                     Dim isSupervisor = (Not isOwner) And StaffBrokerFunctions.isLeaderOf(UserId, Rmb.UserId)
                     Dim isFinance = IsAccounts() And Not (isOwner Or isSpouse) And Not DRAFT
 
