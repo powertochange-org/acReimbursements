@@ -702,4 +702,10 @@
   <data name="ExtraApproval.Text" xml:space="preserve">
     <value>This account has been flagged as requiring a stricter-than-normal approval process.  As a result, this reimbursement will require the additional approval of the Ministry Director, and the Executive Directory of Ministry Services before it can be processed.</value>
   </data>
+  <data name="PendingDirectorApproval.Text" xml:space="preserve">
+    <value>Awaiting Director's Approval</value>
+  </data>
+  <data name="PendingEDMSApproval.Text" xml:space="preserve">
+    <value>Awaiting Approval of the Executive Director of Ministry Services</value>
+  </data>
 </root>

@@ -49,6 +49,7 @@ namespace StaffRmb
         public const int Paid = 8;
         public const int PendingDownload = 10;
         public const int DownloadFailed = 20;
+
         static public string StatusName(int StatusNo)
         {
             switch (StatusNo)

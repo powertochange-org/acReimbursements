@@ -342,7 +342,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             '--OR Status=PendingDirectorApproval, SpareField2 = UserId
             '--OR Status=PendingEDMSApproval, and user is EDMS
             '--**NOTE: Director's UserId is stored in rmb.SpareField2 during form submission if director's approval is necessary
-            Dim userIsEDMS = (Settings("EDMSId") = UserId)
+            Dim userIsEDMS = (UserId = CType(Settings("EDMSId"), Integer))
             Try
                 Dim ApprovableRmbs = (From c In d.AP_Staff_Rmbs
                             Where ((c.Status = RmbStatus.Submitted And c.ApprUserId = UserId) Or (c.Status = RmbStatus.PendingDirectorApproval And c.SpareField2 IsNot Nothing AndAlso c.SpareField2 = UserId)) And c.ApprDate Is Nothing And c.PortalId = PortalId
@@ -1839,7 +1839,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     tbComments.Enabled = False
                 Else
                     If StaffBrokerFunctions.RequiresExtraApproval(rmb.CostCenter) Then
-                        rmb.SpareField2 = StaffBrokerFunctions.getDirectorFor(rmb.CostCenter, Settings("EDMSId"))
+                        rmb.SpareField2 = StaffBrokerFunctions.getDirectorFor(rmb.CostCenter, CType(Settings("EDMSId"), Integer))
                     End If
                     NewStatus = RmbStatus.Submitted
                     rmb.Locked = False
@@ -1931,7 +1931,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     If UserId = rmb.First.ApprUserId Then
                         If StaffBrokerFunctions.RequiresExtraApproval(rmb.First.CostCenter) Then
                             rmb.First.Status = RmbStatus.PendingDirectorApproval
-                            rmb.First.SpareField2 = StaffBrokerFunctions.getDirectorFor(rmb.First.CostCenter, Settings("EDMSId"))
+                            rmb.First.SpareField2 = StaffBrokerFunctions.getDirectorFor(rmb.First.CostCenter, CType(Settings("EDMSId"), Integer))
                             shouldSendApprovalEmail = True
                         Else
                             rmb.First.Status = RmbStatus.Approved
@@ -1943,7 +1943,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
                 End If
                 If rmb.First.Status = RmbStatus.PendingDirectorApproval Then
-                    Dim directorId = StaffBrokerFunctions.getDirectorFor(rmb.First.CostCenter, Settings("EDMSId"))
+                    Dim directorId = StaffBrokerFunctions.getDirectorFor(rmb.First.CostCenter, CType(Settings("EDMSId"), Integer))
                     If UserId = directorId Then
                         'Check to see if extra approval is still necessary (the requirement may have been removed)
                         If StaffBrokerFunctions.RequiresExtraApproval(rmb.First.CostCenter) Then
@@ -1958,7 +1958,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
                 End If
                 If rmb.First.Status = RmbStatus.PendingEDMSApproval Then
-                    If UserId = Settings("EDMSId") Then
+                    If UserId = CType(Settings("EDMSId"), Integer) Then
                         rmb.First.Status = RmbStatus.Approved
                         rmb.First.ApprDate = Now
                         rmb.First.Locked = True
@@ -3539,12 +3539,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ownerMessage = ownerMessage.Replace("[APPROVER]", approver.DisplayName).Replace("[EXTRA]", extra)
                     ownerMessage = ownerMessage.Replace("[STAFFACTION]", If(hasReceipts, Translate("PostReceipts"), Translate("NoPostRecipts")))
                 ElseIf theRmb.Status = RmbStatus.PendingDirectorApproval Then
-                    Dim director = UserController.GetUserById(PortalId, StaffBrokerFunctions.getDirectorFor(theRmb.CostCenter, Settings("EDMSId")))
+                    Dim director = UserController.GetUserById(PortalId, StaffBrokerFunctions.getDirectorFor(theRmb.CostCenter, CType(Settings("EDMSId"), Integer)))
                     ownerMessage = ownerMessage.Replace("[APPROVER]", director.DisplayName)
                     toEmail = director.Email
                     toName = director.FirstName
                 ElseIf theRmb.Status = RmbStatus.PendingEDMSApproval Then
-                    Dim edms = UserController.GetUserById(PortalId, Settings("EDMSId"))
+                    Dim edms = UserController.GetUserById(PortalId, CType(Settings("EDMSId"), Integer))
                     ownerMessage = ownerMessage.Replace("[APPROVER]", edms.DisplayName)
                     toEmail = edms.Email
                     toName = edms.FirstName
@@ -3557,8 +3557,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 'Send Approvers Instructions Here
                 If toEmail.Length > 0 Then
-                    Dim subject = Translate("SubmittedApprEmailSubject").Replace("[STAFFNAME]", UserInfo.DisplayName)
-                    approverMessage = approverMessage.Replace("[STAFFNAME]", UserInfo.DisplayName).Replace("[RMBNO]", theRmb.RID).Replace("[USERREF]", IIf(theRmb.UserRef <> "", theRmb.UserRef, "None"))
+                    Dim subject = Translate("SubmittedApprEmailSubject").Replace("[STAFFNAME]", owner.DisplayName)
+                    approverMessage = approverMessage.Replace("[STAFFNAME]", owner.DisplayName).Replace("[RMBNO]", theRmb.RID).Replace("[USERREF]", IIf(theRmb.UserRef <> "", theRmb.UserRef, "None"))
                     approverMessage = approverMessage.Replace("[APPRNAME]", toName)
                     approverMessage = approverMessage.Replace("[EXTRA]", extra)
                     approverMessage = approverMessage.Replace("[OLDEXPENSES]", If(hasOldExpenses(), Translate("WarningOldExpenses"), ""))
