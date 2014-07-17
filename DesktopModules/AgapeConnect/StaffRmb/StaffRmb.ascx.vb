@@ -1950,11 +1950,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         'Check to see if extra approval is still necessary (the requirement may have been removed)
                         If StaffBrokerFunctions.RequiresExtraApproval(rmb.First.CostCenter) Then
                             rmb.First.Status = RmbStatus.PendingEDMSApproval
+                            shouldSendApprovalEmail = True
                         Else
                             rmb.First.Status = RmbStatus.Approved
                             rmb.First.ApprDate = Now
                             rmb.First.Locked = True
-                            shouldSendApprovalEmail = True
+                            shouldSendApprovalEmail = False
+                            SendApprovedEmail(rmb.First)
                             Log(rmb.First.RMBNo, "Approved by " & UserController.GetCurrentUserInfo.DisplayName)
                         End If
                     End If
@@ -1964,6 +1966,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         rmb.First.Status = RmbStatus.Approved
                         rmb.First.ApprDate = Now
                         rmb.First.Locked = True
+                        shouldSendApprovalEmail = False
                         SendApprovedEmail(rmb.First)
                         Log(rmb.First.RMBNo, "Approved by EDMS")
                     End If
