@@ -2389,7 +2389,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
 
                     ddlLineTypes.Items.Clear()
-                    Dim lineTypes = From c In d.AP_StaffRmb_PortalLineTypes Where c.PortalId = PortalId Order By c.LocalName Select c.AP_Staff_RmbLineType.LineTypeId, c.LocalName, c.PCode, c.DCode
+                    Dim lineTypes = From c In d.AP_StaffRmb_PortalLineTypes Where c.PortalId = PortalId Order By c.ViewOrder Select c.AP_Staff_RmbLineType.LineTypeId, c.LocalName, c.PCode, c.DCode
 
                     If StaffBrokerFunctions.IsDept(PortalId, theLine.First.CostCenter) Then
                         lineTypes = lineTypes.Where(Function(x) x.DCode <> "")
@@ -2602,7 +2602,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If lblIncType.Visible And ddlLineTypes.SelectedIndex <> ddlLineTypes.Items.Count - 1 Then
                 Dim oldValue = ddlLineTypes.SelectedValue
                 ddlLineTypes.Items.Clear()
-                Dim lineTypes = From c In d.AP_StaffRmb_PortalLineTypes Where c.PortalId = PortalId Order By c.LocalName Select c.AP_Staff_RmbLineType.LineTypeId, c.LocalName, c.PCode, c.DCode
+                Dim lineTypes = From c In d.AP_StaffRmb_PortalLineTypes Where c.PortalId = PortalId Order By c.ViewOrder Select c.AP_Staff_RmbLineType.LineTypeId, c.LocalName, c.PCode, c.DCode
 
                 If StaffBrokerFunctions.IsDept(PortalId, tbCostcenter.Text) Then
                     lineTypes = lineTypes.Where(Function(x) x.DCode <> "")
