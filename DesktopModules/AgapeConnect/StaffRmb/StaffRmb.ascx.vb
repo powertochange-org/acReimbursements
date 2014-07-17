@@ -3553,7 +3553,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 ownerMessage = ownerMessage.Replace("[STAFFNAME]", owner.FirstName).Replace("[RMBNO]", theRmb.RID).Replace("[USERREF]", theRmb.UserRef)
                 ownerMessage = ownerMessage.Replace("[PRINTOUT]", "<a href='" & Request.Url.Scheme & "://" & Request.Url.Authority & Request.ApplicationPath & "DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & theRmb.RMBNo & "&UID=" & theRmb.UserId & "' target-'_blank' style='width: 134px; display:block;)'><div style='text-align: center; width: 122px; margin: 10px;'><img src='" _
                     & Request.Url.Scheme & "://" & Request.Url.Authority & Request.ApplicationPath & "DesktopModules/AgapeConnect/StaffRmb/Images/PrintoutIcon.jpg' /><br />Printout</div></a><style> a div:hover{border: solid 1px blue;}</style>")
-                DotNetNuke.Services.Mail.Mail.SendMail("P2C Reimbursements <reimbursements@p2c.com>", UserInfo.Email, "", Translate("EmailSubmittedSubject").Replace("[RMBNO]", theRmb.RID), ownerMessage, "", "HTML", "", "", "", "")
+                DotNetNuke.Services.Mail.Mail.SendMail("P2C Reimbursements <reimbursements@p2c.com>", owner.Email, "", Translate("EmailSubmittedSubject").Replace("[RMBNO]", theRmb.RID), ownerMessage, "", "HTML", "", "", "", "")
 
                 'Send Approvers Instructions Here
                 If toEmail.Length > 0 Then
