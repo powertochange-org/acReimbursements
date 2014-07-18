@@ -1136,6 +1136,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     If RmbRel = RmbAccess.Denied And Not (isApprover Or isFinance) Then
                         'Need an access denied warning
                         pnlMain.Visible = False
+                        ltSplash.Text = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbSplash", PortalId))
                         pnlSplash.Visible = True
                         Return
                     End If
@@ -1292,6 +1293,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Await Task.WhenAll(updateApproverListTask, resetPostingDataTask)
                 Else
                     pnlMain.Visible = False
+                    ltSplash.Text = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbSplash", PortalId))
                     pnlSplash.Visible = True
                 End If
 
@@ -1909,6 +1911,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     DotNetNuke.Services.Mail.Mail.SendMail("P2C Reimbursements <reimbursements@p2c.com>", StaffMbr.Email, "", Translate("EmailCancelledSubject").Replace("[RMBNO]", rmb.First.RID).Replace("[USERREF]", rmb.First.UserRef), Message, "", "HTML", "", "", "", "")
 
                     pnlMain.Visible = False
+                    ltSplash.Text = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbSplash", PortalId))
                     pnlSplash.Visible = True
 
                     Log(rmb.First.RMBNo, "DELETED")
@@ -1996,6 +1999,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 ScriptManager.RegisterStartupScript(btnApprove, t, "select2", "selectIndex(2); alert(""" & message & """);", True)
                 btnApprove.Visible = False
                 pnlMain.Visible = False
+                ltSplash.Text = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbSplash", PortalId))
                 pnlSplash.Visible = True
 
             End If
