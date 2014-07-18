@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Explanation.Text" xml:space="preserve">
-    <value>... for claiming daily expenses incurred while traveling.</value>
+    <value>... Per diem meal expenses.</value>
   </data>
   <data name="lblAmount.Help" xml:space="preserve">
     <value>Please enter the number of people (you can only claim Per Diem for yourself and your spouse), the number of days and the type of Per Diem.</value>
