@@ -22,28 +22,18 @@ Namespace DotNetNuke.Modules.StaffRmb
 
                     Dim d As New StaffBroker.StaffBrokerDataContext
 
-
-                    Dim stafflist = (From c In d.AP_StaffBroker_Staffs Where c.PortalId = PortalId And c.Active Select UID = c.UserId1, DisplayName = c.DisplayName).AsEnumerable
-                    ' Dim dr As New StaffRmbDataContext
-
-                    'cblExpenseTypes.DataSource = From c In dr.AP_Staff_RmbLineTypes Order By c.ViewOrder
-
-                    'cblExpenseTypes.DataTextField = "TypeName"
-                    'cblExpenseTypes.DataValueField = "LineTypeId"
-                    'cblExpenseTypes.DataBind()
-
-
-
-                    stafflist = stafflist.Union(From c In d.AP_StaffBroker_Staffs Where c.UserId2 > 0 And c.PortalId = PortalId And c.Active Select UID = CInt(c.UserId2), DisplayName = c.DisplayName)
-
+                    ' Clear out all of the items from the lists
                     ddlAuthUser.Items.Clear()
                     ddlAuthAuthUser.Items.Clear()
                     ddlEDMS.Items.Clear()
-                    For Each row In (From c In stafflist Order By c.DisplayName)
-                        Dim user = UserController.GetUserById(PortalId, row.UID).LastName & ", " & UserController.GetUserById(PortalId, row.UID).FirstName
-                        ddlAuthUser.Items.Add(New ListItem(user, row.UID))
-                        ddlAuthAuthUser.Items.Add(New ListItem(user, row.UID))
-                        ddlEDMS.Items.Add(New ListItem(user, row.UID))
+                    ' Get the user list: it should only get active users that are in the staff table
+                    Dim userList = (From u In d.Users Where (From p In d.UserPortals Select p.PortalId).Contains(PortalId) And ((From s In d.AP_StaffBroker_Staffs where s.Active Select s.UserId1).Contains(u.UserID) Or (From s In d.AP_StaffBroker_Staffs where s.Active Select s.UserId2).Contains(u.UserID)) Order By u.LastName, u.FirstName)
+                    ' Iterate through our new list
+                    For Each user In userList
+                        ' Add each one as LASTNAME, FIRSTNAME, with the UserID as the value. To avoid conflicts, each list has to have a new ListItem
+                        ddlEDMS.Items.Add(New ListItem(user.LastName & ", " & user.FirstName, user.UserID))
+                        ddlAuthUser.Items.Add(New ListItem(user.LastName & ", " & user.FirstName, user.UserID))
+                        ddlAuthAuthUser.Items.Add(New ListItem(user.LastName & ", " & user.FirstName, user.UserID))
                     Next
                     If CType(TabModuleSettings("AuthUser"), String) <> "" Then
                         ddlAuthUser.SelectedValue = CType(TabModuleSettings("AuthUser"), Integer)
