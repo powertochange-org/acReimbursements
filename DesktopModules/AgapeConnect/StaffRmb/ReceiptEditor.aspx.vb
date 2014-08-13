@@ -159,6 +159,11 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
             img.Src = "images/pdf.png"
         Else ' Otherwise, we just use the same as the navigation url
             img.Src = link.NavigateUrl
+            ' IE-specific hack to reload images
+            If (Request.Browser.Browser = "InternetExplorer" OrElse Request.Browser.Browser = "IE") Then
+                ' Append the timestamp to the img's source
+                img.Src = img.Src & "&r=" & DateTime.Now.Ticks
+            End If
             ' Also add in the rotation buttons, since these
             ' won't be used when we have a pdf
             div.Controls.Add(createButton("↻", file.FileName))
@@ -387,6 +392,19 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
             ' Replace the image with the rotated version
             FileManager.Instance.AddFile(theFolder, theFile.FileName, myMemoryStream, True)
             myMemoryStream.Dispose()
+            ' A little hack to force internet explorer to reload the image; otherwise, it 
+            ' won't show the rotation
+            If (Request.Browser.Browser = "InternetExplorer" OrElse Request.Browser.Browser = "IE") Then
+                Try
+                    ' Get the html image
+                    Dim htmlImage = CType(b.Parent.Controls.Item(3).Controls.Item(0), HtmlImage)
+                    ' Append timestamp to image's url, forcing IE to reload it
+                    htmlImage.Src = htmlImage.Src & "&r=" & DateTime.Now.Ticks
+                Catch Exception As Exception
+                    lblError.Text = "The image was probably rotated successfully, but the view could not be updated properly"
+                End Try
+            End If
+
         Catch Exception As Exception
             lblError.Text = "Error while attempting to rotate image"
         End Try

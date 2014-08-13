@@ -460,7 +460,15 @@
             var url = ""
             $(".viewReceipt").hover(function(e){
                 console.log(this.id);
-                $("body").append("<div id='preview' style='position:fixed; top:300px; right:25px'><img src='"+this.id+"' alt='Missing Receipt Image' style='width:250px'/></div>");
+                var html;
+                // Force IE to reload image every time, to keep up with any rotations
+                if (window.navigator.userAgent.indexOf("MSIE ") > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
+                    html = "<div id='preview' style='position:fixed; top:300px; right:25px'><img src='"+this.id+"&r="+new Date().getTime()+"' alt='Missing Receipt Image' style='width:250px'/></div>";
+                }
+                else { // Not IE
+                    html = "<div id='preview' style='position:fixed; top:300px; right:25px'><img src='"+this.id+"' alt='Missing Receipt Image' style='width:250px'/></div>";
+                }
+                $("body").append(html);
                 $("#preview").fadeIn("fast");
             },function(){
                 $("#preview").remove();
