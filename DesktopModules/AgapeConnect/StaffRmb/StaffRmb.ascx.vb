@@ -1520,7 +1520,17 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     sb.Append("</script>")
                     Await LoadRmbAsync(hfRmbNo.Value)
                     ScriptManager.RegisterClientScriptBlock(Page, t, "", sb.ToString, False)
-
+                Else ' The form was not valid
+                    ' Need to check the current state of the electronic receipts, 
+                    ' and set the attribute to match; otherwise, it will get reset
+                    ' to the original state. 
+                    If (CInt(ucType.GetProperty("ReceiptType").GetValue(theControl, Nothing) = 2)) Then
+                        ' If the receipt type is set to 2, we keep it visible
+                        pnlElecReceipts.Attributes("style") = ""
+                    Else
+                        ' Hide it
+                        pnlElecReceipts.Attributes("style") = "display: none"
+                    End If
                 End If
             ElseIf btnSaveLine.CommandName = "Edit" Then
                 If ucType.GetMethod("ValidateForm").Invoke(theControl, New Object() {UserId}) = True Then
@@ -1737,6 +1747,17 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     sb.Append("</script>")
                     Await LoadRmbAsync(hfRmbNo.Value)
                     ScriptManager.RegisterClientScriptBlock(Page, t, "", sb.ToString, False)
+                Else ' The form was not valid
+                    ' Need to check the current state of the electronic receipts, 
+                    ' and set the attribute to match; otherwise, it will get reset
+                    ' to the original state. 
+                    If (CInt(ucType.GetProperty("ReceiptType").GetValue(theControl, Nothing) = 2)) Then
+                        ' If the receipt type is set to 2, we keep it visible
+                        pnlElecReceipts.Attributes("style") = ""
+                    Else
+                        ' Hide it
+                        pnlElecReceipts.Attributes("style") = "display: none"
+                    End If
                 End If
             End If
         End Sub
