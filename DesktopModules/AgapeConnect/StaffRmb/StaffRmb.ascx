@@ -715,6 +715,8 @@
                 $("#<%= hfOrigCurrency.ClientID%>").attr('value',selectedCurrency);
                 $('.ddlCur').val(selectedCurrency);
                 console.log('selectedCurrency: ' + selectedCurrency) ;
+                // Always ensure that the hfExchangeRate is up to date
+                $("#<%= hfExchangeRate.ClientId %>").attr('value', xRate);
 
                 if(xRate!=1.0)
                 {
@@ -722,7 +724,6 @@
                     console.log(jsonCall);
                     //$('.rmbAmount').val('');
            
-                    $("#<%= hfExchangeRate.ClientId %>").attr('value', xRate);
                     $.getJSON( jsonCall ,function(x) {
                         console.log(x);
 
