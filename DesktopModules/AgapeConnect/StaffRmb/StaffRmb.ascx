@@ -156,6 +156,8 @@
                 //TODO $('.foreignCurrency').val($('.rmbAmount').val());
                 // Re-calculate the exchange rate
                 calculateXRate();
+                // We have foreign currency
+                $('#<%= hfCurOpen.ClientID %>').val("true")
             }
 
             $('.ddlReceipt').change(function() { 
@@ -739,7 +741,10 @@
         if(inCur.length>0){
                 
             $('.rmbAmount').val( (parseFloat(xRate) * parseFloat(inCur)).toFixed(2));
-             
+
+            // Need to update some values for the backend:
+            $("#<%= hfOrigCurrency.ClientID%>").attr('value', $('.ddlCur').val()); // ie, USD
+            $("#<%= hfOrigCurrencyValue.ClientID%>").attr('value', inCur);
         }
     }
     function calculateRevXRate() {
