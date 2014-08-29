@@ -130,10 +130,10 @@
     <value>Desktop Computer</value>
   </data>
   <data name="Standard.Text">
-    <value>Paper receipt (must be sent by mail)</value>
+    <value>Paper receipt and proof of exchange rate (must be sent by mail)</value>
   </data>
   <data name="Electronic.Text">
-    <value>Electronic Receipt (attach an image file)</value>
+    <value>Electronic Receipt and proof of exchange rate (attach image file(s))</value>
   </data>
   <data name="lblDesc.Text">
     <value>Description &amp; Min. Purpose</value>

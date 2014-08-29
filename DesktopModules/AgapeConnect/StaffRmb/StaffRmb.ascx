@@ -147,9 +147,16 @@
     (function ($, Sys) {
         function setUpMyTabs() {
             var stop = false;
-           
-            $('.hlCur').click(function() { var tempValue=$('.rmbAmount').val();  $('.ddlCur').change();$('.rmbAmount').val(tempValue); $('.divCur').show(); $('#' + this.id).hide();  $('#<%= hfCurOpen.ClientID %>').val("true");   });
-            
+
+            // If the foreign currency is currently visible...
+            if ($('.divCur').length) {
+                // Disable the amount field; it will get calculated automatically
+                $('.rmbAmount').prop('disabled', true);
+                // Set the foreign currency amount to whatever the original amount is
+                //TODO $('.foreignCurrency').val($('.rmbAmount').val());
+                // Re-calculate the exchange rate
+                calculateXRate();
+            }
 
             $('.ddlReceipt').change(function() { 
                 
@@ -163,42 +170,12 @@
             });
 
            
-            
-            $('.currency').keyup(function() { calculateXRate(); checkRecReq;});
-          
-            $('.ddlCur').change(function() { 
-                console.log('ddlChanged');
-               
-                var ToCur= $("#<%= hfAccountingCurrency.ClientId %>").attr('value') ;
-                var FromCur = $('#' + this.id).val();
-                $("#<%= hfOrigCurrency.ClientID%>").attr('value', FromCur);
-                if(FromCur == ToCur)
-                {
-                    $("#<%= hfExchangeRate.ClientId %>").attr('value', 1.0);
-                    calculateXRate();
-                    return;
-                }
-                else
-                {
-                   
+            // This is within the currency converter; anytime the currency or exchange rate
+            // gets changed:
+            $('.foreignCurrency, .exchangeRate').keyup(function() { calculateXRate(); checkRecReq;});
+         
 
-                    var jsonCall= "/MobileCAS/MobileCAS.svc/ConvertCurrency?FromCur=" + FromCur + "&ToCur=" + ToCur;
-               
-                    $('.rmbAmount').val('');
-                    $("#<%= hfExchangeRate.ClientId %>").attr('value', -1);
-                    $.getJSON( jsonCall ,function(x) {
-                    
-                        $("#<%= hfExchangeRate.ClientId %>").attr('value', x);
-                        //now need to convert any value in the TextBox
-                        calculateXRate();
- 
-                    }) ;
-                    
-                    }
-    
-            });
-
-            
+                // The actual reimbursement amount
                 $('.rmbAmount').keyup(function(){
                     calculateRevXRate();
                
@@ -553,7 +530,6 @@
 
         function tweakControl() {
             $("#<%= UpdatePanel2.ClientID %> input[name$='tbDesc']").attr('maxlength', '27').attr('style', 'width:22em');
-            $("#<%= UpdatePanel2.ClientID %> a.hlCur").hide();
         }
 
         function setUpConfirms() {
@@ -700,7 +676,6 @@
                 $("#<%= hfExchangeRate.ClientID%>").attr('value', parseFloat($('.rmbAmount').val())/parseFloat(origCurVal));
                 calculateRevXRate();    
                 $('.divCur').show(); 
-                $('.hlCur').hide(); 
             
                 $('.hfCurOpen').val("true");
 
@@ -746,18 +721,20 @@
     }
 
 
-
+    // This function calculates the new amount based on foreign amount and
+    // exchange rate, and updates the amount field
     function calculateXRate() {
-        var xRate = $("#<%= hfExchangeRate.ClientId %>").attr('value');
-        var inCur=$('.currency').val() ;
-        if(parseFloat(xRate) <0)
+        var xRate = $('.exchangeRate').val();
+        var inCur=$('.foreignCurrency').val() ;
+
+        // If user didn't enter valid rate
+        if(parseFloat(xRate) < 0)
         {
-            $('.rmbAmount').val('');
-            $("#<%= hfOrigCurrencyValue.ClientID%>").attr('value',"");
-         
-            return;
+            // Reset exchange rate to 1.00
+            $('.exchangeRate').val('1.00');
+            xRate = 1.00;
+            
         }
-        $("#<%= hfOrigCurrencyValue.ClientID%>").attr('value',inCur);
              
         if(inCur.length>0){
                 

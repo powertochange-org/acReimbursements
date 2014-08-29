@@ -117,10 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="btnConvertCurrency.Text" xml:space="preserve">
-    <value>Convert Currency</value>
+  <data name="exchangeTitle.Text" xml:space="preserve">
+    <value>Foreign Currency</value>
   </data>
-  <data name="lblTitle.Text" xml:space="preserve">
-    <value>Currency Converter</value>
+  <data name="amount.Text" xml:space="preserve">
+    <value>Enter Foreign Amount</value>
+  </data>
+  <data name="exchangeRate.Text" xml:space="preserve">
+    <value>Exchange Rate:</value>
+  </data>
+  <data name="uploadProof.Text" xml:space="preserve">
+    <value>Please provide photo proof of exchange rate. You can upload a photo by selecting "Electronic receipts and proof of exchange rate."</value>
   </data>
 </root>
