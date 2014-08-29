@@ -562,6 +562,10 @@
             })
         }
 
+        function setUpHelpLink() {
+            $("#help-link").attr("href", "https://wiki.powertochange.org/help/index.php/Online_Reimbursements").attr("target", "_blank");        
+        }
+
         $(document).ready(function () {
             setUpMyTabs();
             setUpAutocomplete();
@@ -569,6 +573,7 @@
             checkForMinistryAccount();
             loadFinanceTrees();
             setUpConfirms();
+            setUpHelpLink();
                          
 
             Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
