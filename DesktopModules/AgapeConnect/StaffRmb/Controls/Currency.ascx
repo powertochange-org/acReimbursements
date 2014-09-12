@@ -1,14 +1,11 @@
 ﻿<%@ Control Language="VB" AutoEventWireup="false" CodeFile="Currency.ascx.vb" Inherits="DesktopModules_AgapeConnect_StaffRmb_Controls_Currency" %>
+<%@ Register TagPrefix="dnn" TagName="Label" Src="~/controls/LabelControl.ascx" %>
 <asp:UpdatePanel ID="currencyUpdatePanel" runat="server">
     <ContentTemplate>
-        <div>
-                <asp:Label for="cbForeignCurrency" ID="cbForeignCurrencyLbl" runat="server" ResourceKey="exchangeTitle"></asp:Label>
-                <asp:CheckBox ID="cbForeignCurrency" runat="server" class='hlcur' AutoPostBack="true"></asp:CheckBox>
-        </div>
-        <div id="dCurrency" runat="server" class="divCur">
-            <asp:Label for="tbCurrency" ID="tbCurrencyLbl" runat="server" ResourceKey="amount"></asp:Label>
-            <asp:TextBox ID="tbCurrency" runat="server" class="numeric foreignCurrency" Width="90px"></asp:TextBox>
-            <asp:DropDownList ID="ddlCurrencies" runat="server" class="ddlCur" AutoPostBack="true" >
+        <div id="dCurrency" class="divCur" >
+            <table style="font-size:9pt"><tr>
+            <td style="margin-left:30px">
+                <asp:DropDownList ID="ddlCurrencies" runat="server" CssClass="ddlCur" onChange="currency_changed(this);" >
                 <asp:ListItem Value="ALL">Albanian Lek</asp:ListItem>
                 <asp:ListItem Value="DZD">Algerian Dinar</asp:ListItem>
                 <asp:ListItem Value="ARS">Argentine Peso</asp:ListItem>
@@ -155,17 +152,41 @@
                 <asp:ListItem Value="YER">Yemen Riyal</asp:ListItem>
                 <asp:ListItem Value="ZMK">Zambian Kwacha</asp:ListItem>
                 <asp:ListItem Value="ZWD">Zimbabwe Dollar</asp:ListItem>
-            </asp:DropDownList>
-            <br/>
-            <asp:RadioButton class="exchangeRateType" ID="rbManualExchange" Text="Manual Exchange Rate (must provide proof)" Checked="True" runat="server" groupname="exchangeRateType" AutoPostBack="true" ></asp:RadioButton>
-            <br/>                                    
-            <asp:RadioButton class="exchangeRateType" ID="rbAutomaticExchange" Text="Automatic Exchange Rate (calculated by system)" runat="server" groupname="exchangeRateType" AutoPostBack="true" ></asp:RadioButton>
-            <br/>
-            <asp:Label for="tbExchangeRate" ID="tbExchangeRateLbl" runat="server" Text="Exchange Rate: 1 USD = "></asp:Label>
-            <asp:TextBox ID="tbExchangeRate" runat="server" class="numeric exchangeRate" Width="60px" ></asp:TextBox>
-            <asp:Label ID="tbExchangeRatePostLbl" runat="server" Text="CAD"></asp:Label>
-            <br/>
-            <asp:Label ID="uploadProof" runat="server" ResourceKey="uploadProof" Font-Bold="true"></asp:Label>
-        </div> 
+            </asp:DropDownList> 
+            </td>
+            <td><table class="curDetails" style="font-size:9pt; margin-left:10px; border:1px solid green; border-radius:8px;"><tr>
+                <td style="text-align:center">
+                    <b><label for="exchange_rate"><%=DotNetNuke.Services.Localization.Localization.GetString("exchangeRate.Text", LocalResourceFile)%></label></b><br />
+                    <input type="text" id="exchange_rate" class="exchangeRate" value="1.0000"/>
+                </td>
+                <td style="text-align:center">
+                    <b><label for="canadian_amt"><%=DotNetNuke.Services.Localization.Localization.GetString("equivalentCAD.Text", LocalResourceFile)%></label></b><br />
+                    <input type="text" id="canadian_amt" class="equivalentCAD" >0</input>
+                </td>
+            </tr></table></td>
+            </tr></table>
+        </div>
     </ContentTemplate>
 </asp:UpdatePanel>
+
+<script type="text/javascript">
+    function initialize_currency() {
+        $('.hfCurOpen').val('true');
+        $('.curDetails').hide();
+    }
+
+    function currency_changed(sel) {
+        var local_currency = $("input[name$='hfAccountingCurrency']").val();
+        $(".ddlCur").val(sel.value);
+        $("[name$='hfOrigCurrency']").val(sel.value);
+        if (sel.value != local_currency) {
+            //foreign currency
+            $(".curDetails").show(300);
+        } else {
+            $("input[name$='hfExchangeRate']").val(1);
+            $("input[name$='hfOrigCurrencyValue']").val($(".rmbAmount").val());
+            $(".curDetails").hide(300);
+        }
+    }
+
+</script>

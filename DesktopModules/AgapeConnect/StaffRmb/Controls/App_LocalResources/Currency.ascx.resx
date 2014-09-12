@@ -124,9 +124,12 @@
     <value>Enter Foreign Amount</value>
   </data>
   <data name="exchangeRate.Text" xml:space="preserve">
-    <value>Exchange Rate:</value>
+    <value>Exchange&amp;nbsp;Rate:</value>
   </data>
   <data name="uploadProof.Text" xml:space="preserve">
     <value>Please provide photo proof of exchange rate. You can upload a photo by selecting "Electronic receipts and proof of exchange rate."</value>
+  </data>
+  <data name="equivalentCAD.Text" xml:space="preserve">
+    <value>Equivalent&amp;nbsp;Canadian&amp;nbsp;$:</value>
   </data>
 </root>
