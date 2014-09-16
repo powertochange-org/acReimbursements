@@ -5,7 +5,7 @@
         <div id="dCurrency" class="divCur" >
             <table style="font-size:9pt"><tr>
             <td style="margin-left:30px">
-                <asp:DropDownList ID="ddlCurrencies" runat="server" CssClass="ddlCur" onChange="currency_changed(this);" >
+                <asp:DropDownList ID="ddlCurrencies" runat="server" CssClass="ddlCur" onChange="currencyChange(this.value);">
                 <asp:ListItem Value="ALL">Albanian Lek</asp:ListItem>
                 <asp:ListItem Value="DZD">Algerian Dinar</asp:ListItem>
                 <asp:ListItem Value="ARS">Argentine Peso</asp:ListItem>
@@ -27,7 +27,7 @@
                 <asp:ListItem Value="BGN">Bulgarian Lev</asp:ListItem>
                 <asp:ListItem Value="BIF">Burundi Franc</asp:ListItem>
                 <asp:ListItem Value="KHR">Cambodia Riel</asp:ListItem>
-                <asp:ListItem Value="CAD">Canadian Dollar</asp:ListItem>
+                <asp:ListItem Value="CAD" Selected="True">Canadian Dollar</asp:ListItem>
                 <asp:ListItem Value="CVE">Cape Verde Escudo</asp:ListItem>
                 <asp:ListItem Value="KYD">Cayman Islands Dollar</asp:ListItem>
                 <asp:ListItem Value="XOF">CFA Franc (BCEAO)</asp:ListItem>
@@ -144,7 +144,7 @@
                 <asp:ListItem Value="AED">UAE Dirham</asp:ListItem>
                 <asp:ListItem Value="UGX">Ugandan Shilling</asp:ListItem>
                 <asp:ListItem Value="UAH">Ukraine Hryvnia</asp:ListItem>
-                <asp:ListItem Value="USD" Selected="true">United States Dollar</asp:ListItem>
+                <asp:ListItem Value="USD">United States Dollar</asp:ListItem>
                 <asp:ListItem Value="UYU">Uruguayan New Peso</asp:ListItem>
                 <asp:ListItem Value="VUV">Vanuatu Vatu</asp:ListItem>
                 <asp:ListItem Value="VEF">Venezuelan Bolivar Fuerte</asp:ListItem>
@@ -157,36 +157,16 @@
             <td><table class="curDetails" style="font-size:9pt; margin-left:10px; border:1px solid green; border-radius:8px;"><tr>
                 <td style="text-align:center">
                     <b><label for="exchange_rate"><%=DotNetNuke.Services.Localization.Localization.GetString("exchangeRate.Text", LocalResourceFile)%></label></b><br />
-                    <input type="text" id="exchange_rate" class="exchangeRate" value="1.0000"/>
+                    <input type="text" id="exchange_rate" class="exchangeRate" style="width:80px" />
                 </td>
-                <td style="text-align:center">
-                    <b><label for="canadian_amt"><%=DotNetNuke.Services.Localization.Localization.GetString("equivalentCAD.Text", LocalResourceFile)%></label></b><br />
-                    <input type="text" id="canadian_amt" class="equivalentCAD" >0</input>
+                <td style="text-align:center;margin-left:20px">
+                    <b><asp:Label runat="server" ResourceKey="equivalentCAD.Text"/></b><br />
+                    <asp:TextBox ID="CADAmount" runat="server" cssclass="equivalentCAD" style="width:80px;" />
                 </td>
-            </tr></table></td>
+                </tr></table>
+            </td>
             </tr></table>
         </div>
     </ContentTemplate>
 </asp:UpdatePanel>
 
-<script type="text/javascript">
-    function initialize_currency() {
-        $('.hfCurOpen').val('true');
-        $('.curDetails').hide();
-    }
-
-    function currency_changed(sel) {
-        var local_currency = $("input[name$='hfAccountingCurrency']").val();
-        $(".ddlCur").val(sel.value);
-        $("[name$='hfOrigCurrency']").val(sel.value);
-        if (sel.value != local_currency) {
-            //foreign currency
-            $(".curDetails").show(300);
-        } else {
-            $("input[name$='hfExchangeRate']").val(1);
-            $("input[name$='hfOrigCurrencyValue']").val($(".rmbAmount").val());
-            $(".curDetails").hide(300);
-        }
-    }
-
-</script>

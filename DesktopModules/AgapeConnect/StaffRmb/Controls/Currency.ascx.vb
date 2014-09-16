@@ -44,7 +44,9 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_Controls_Currency
     Protected Sub Page_Load(sender As Object, e As System.EventArgs) Handles Me.Load
         If StaffBrokerFunctions.GetSetting("CurConverter", PortalId) = "True" Then
             If (Page.IsPostBack) Then
-                ScriptManager.RegisterStartupScript(Page, Me.GetType(), "cur", "initialize_currency();", True)
+                Dim script As String = "$('.hfCurOpen').val('true');"
+                script = script + "if ($('.ddlCur').val() == '" & ac & "') {$('.curDetails').hide();}"
+                ScriptManager.RegisterStartupScript(Page, Me.GetType(), "cur", script, True)
             End If
         End If
     End Sub

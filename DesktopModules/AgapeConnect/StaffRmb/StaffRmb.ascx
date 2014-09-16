@@ -175,16 +175,30 @@
 
            
             // This is within the currency converter; anytime the exchange rate gets changed
-            $('.equivalentCAD,.exchangeRate').keyup(function() { 
+            $('.equivalentCAD').keyup(function() { 
                 calculateXRate(); 
                 checkRecReq; //receipt required?
             });
 
+            $('.equivalentCAD').blur(function() {
+                var value = $('.equivalentCAD').val();
+                if (value != null) {
+                    $('.equivalentCAD').val(value.toFixed(2));
+                }
+            });
+
 
             // The actual reimbursement amount
-            $('.rmbAmount').keyup(function(){
+            $('.rmbAmount,.exchangeRate').keyup(function(){
                 calculateEquivalentCAD();
                 checkRecReq();
+            });
+
+            $('.exchangeRate').blur(function() {
+                var value = $('.exchangeRate').val();
+                if (value != null) {
+                    $('.exchangeRate').val(value.toFixed(4));
+                }
             });
 
             
@@ -279,6 +293,7 @@
                 }
             });
             $("#divDownload").parent().appendTo($("form:first"));
+
             $("#divAccountWarning").dialog({
                 autoOpen: false,
                 position:['middle', 150],
@@ -300,7 +315,7 @@
                 modal:true,
                 title: '<%= Translate("GetPostingDetails") %>',
                 close: function() {}
-            })
+            });
             $("#divGetPostingData").parent().appendTo($("form:first"));
 
             $("#divSuggestedPayments").dialog({
@@ -313,16 +328,10 @@
                 close: function () {
                     //  allFields.val("").removeClass("ui-state-error");
                 }
-              });
+            });
             $("#divSuggestedPayments").parent().appendTo($("form:first"));
 
-
-
-
-
-
             $('.aButton').button();
-           
             $('.Excel').button({ icons: { primary: 'myExcel'} });
 
 
@@ -336,27 +345,22 @@
             $('.numeric').numeric();
             $('.Description').Watermark('<%= Translate("Description") %>');
             $('.Amount').Watermark('<%= Translate("Amount") %>');
-
-
-
-
-
-        }
+        };
 
 
         function setUpAccordion() {
             $("#accordion").accordion({
                 header: "> div > h3",
-                navigate: false,
-                active: <%= getSelectedTab() %>
+                active: <%= getSelectedTab() %>,
+                navigate: false
             });
-        }
+        };
 
         function checkForMinistryAccount() {
             var account = $("#<%= tbChargeTo.ClientID %>").val();
             if (! account) return false;
             isMinistryAccount = (account.charAt(0)!='8' && account.charAt(0)!='9');
-        }
+        };
 
         function setUpReceiptPreviews() {
             var url = ""
@@ -382,7 +386,7 @@
                 $("#multi_notify").remove();
             })
             
-        }
+        };
 
         function loadFinanceTrees() {
             $.getJSON(
@@ -496,7 +500,6 @@
         $.getJSON(jsonQuery, function(json){
         var amountString = '<%=StaffBrokerFunctions.GetSetting("Currency", PortalId)  %>' + json ;
         $("#<%= lblAccountBalance.ClientId %>").html(amountString) ;
-        $("#<%= AccBal.ClientId %>").html(amountString) ;
      });
 
  }
@@ -567,7 +570,6 @@
          if($('.divCur').length)
          {
             var origCur =   $("#<%= hfOrigCurrency.ClientID%>").attr('value');
-            console.log('origCur: ' + origCur) ;
             if(origCur != '<%= StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId) %>' && origCur != "")
             {
            
@@ -575,9 +577,7 @@
                 //$('.ddlCur').change();
                 //$('.rmbAmount').val(tempValue); 
                 $('.ddlCur').val(origCur);
-                console.log("selectedCur:" + origCur);
                 var origCurVal =   $("#<%= hfOrigCurrencyValue.ClientID%>").attr('value');
-                console.log("originalVal:" + origCurVal);
 
                 $("#<%= hfExchangeRate.ClientID%>").attr('value', parseFloat($('.rmbAmount').val())/parseFloat(origCurVal));
                 calculateRevXRate();    
@@ -632,30 +632,52 @@
     function calculateXRate() {
 
         var foreign = $('.rmbAmount').val();
-        var cad = $('#canadian_amt').val();
-        alert(foreign + "/" + cad);
+        var cad = $('.equivalentCAD').val();
         var xRate = 1;
         if (cad.length>0 && parseFloat(cad) != 0) {
             xRate = foreign/cad;
-        }
-        $('.exchangeRate').val($.number(xRate, 4));
+        };
+        $('.exchangeRate').val(xRate.toFixed(4));
         
         setXRate(xRate);
         // Need to update some values for the backend:
-        $("#<%= hfOrigCurrency.ClientID%>").attr('value', $('.ddlCur').val()); // ie, USD
-        $("#<%= hfOrigCurrencyValue.ClientID%>").attr('value', foreign);
-    }
+        $("#<%= hfOrigCurrencyValue.ClientID%>").val(foreign);
+        $("#<%= hfCADValue.ClientID%>").val(cad);
+    };
 
     function calculateEquivalentCAD() {
         var foreign = $('.rmbAmount').val();
         var xRate = $('.exchangeRate').val();
         if (xRate.length==0 || xRate<=0) {
-            xRate=1
-            $('.exchangeRate').val("1.0000");
-            setXRate(xRate);
+            $(".equivalentCAD").val("0.00");
+        } else {
+            $('.equivalentCAD').val((foreign/xRate).toFixed(2));
         }
-        $('.equivalentCAD').val($.number(foreign/xRate), 2);
-    }
+        $("#<%= hfOrigCurrencyValue.ClientID%>").val(foreign);
+        $("#<%= hfCADValue.ClientID%>").val($(".equivalentCAD").val());
+    };
+
+    function currencyChange(selected_currency) {
+        console.log("Currency Chaned to " + selected_currency);
+        var local_currency = $("input[name$='hfAccountingCurrency']").val();
+        $(".ddlCur").val(selected_currency);
+        $("[name$='hfOrigCurrency']").val(selected_currency);
+        if (selected_currency != local_currency) {
+            //foreign currency
+            if ($("#<%=hfCADValue.ClientID%>").val() != "0.00") {
+                $(".equivalentCAD").val($("#<%=hfCADValue.ClientID%>").val())
+            } else {
+                $(".equivalentCAD").val($(".rmbAmount").val())
+            }
+            calculateXRate();
+            $(".curDetails").show(300);
+            $(".ddlProvince").val("--");
+        } else {
+            $("input[name$='hfExchangeRate']").val(1);
+            $("input[name$='hfOrigCurrencyValue']").val($(".rmbAmount").val());
+            $(".curDetails").hide(300);
+        }
+    };
 
     function calculateRevXRate() {
         
@@ -678,13 +700,13 @@
             $("#<%= hfOrigCurrencyValue.ClientID%>").attr('value',value);
             console.log("Currency Value:" + value);
         }
-    }
+    };
 
 
     function setXRate(xRate){
         $("#<%= hfExchangeRate.ClientId %>").val(xRate );
 
-    }
+    };
 
     function checkRecReq(){
         try{
@@ -693,26 +715,26 @@
             var Am=$('.rmbAmount').val() ;
             //console.log(limit, Am);
             if( $('.ddlReceipt').val()==-1 && parseFloat(Am)>parseFloat(limit))
-                 $('.ddlReceipt').val(1);
+                $('.ddlReceipt').val(1);
 
 
             if(parseFloat(Am)>parseFloat(limit)){
                 $('.ddlReceipt option[value="-1"]').attr("disabled", "disabled");
-               //$('.ddlReceipt').attr("disabled", "disabled");
+                //$('.ddlReceipt').attr("disabled", "disabled");
             }
             else 
             {
                 $('.ddlReceipt option[value="-1"]').removeAttr("disabled");
             }
 
-           // else   $('.ddlReceipt').removeAttr("disabled");
+            // else   $('.ddlReceipt').removeAttr("disabled");
             
 
         }
         catch(err){
 
         }
-    }
+    };
 
 
     function calculateTotal() {
@@ -732,7 +754,7 @@
         {
             $("#<%= btnOK.ClientId %>").prop('disabled', true).addClass('aspNetDisabled');
         }
-   }
+    };
 
     function setUpAutocomplete() {
         var cache = {};
@@ -906,6 +928,7 @@
     <asp:HiddenField ID="hfExchangeRate" runat="server" Value="1" />
     <asp:HiddenField ID="hfOrigCurrency" runat="server" Value="" />
     <asp:HiddenField ID="hfOrigCurrencyValue" runat="server" Value="" />
+    <asp:HiddenField ID="hfCADValue" runat="server" Value="" />
     <asp:HiddenField ID="staffInitials" runat="server" Value="" />
     <asp:HiddenField ID="hfCurOpen" runat="server" Value="false" />
     <asp:HiddenField ID="hfChargeToValue" runat="server"  />
@@ -1492,6 +1515,17 @@
                                     </button>--%>
                                     <br />
                                     <br />
+                                    <div id="errorSection" style="margin-top:15px;">
+                                        <fieldset id="pnlError" runat="server" visible="false" style="margin-top: 15px;">
+-                                            <legend>
+-                                                <asp:Label ID="Label44" runat="server" CssClass="AgapeH4" ResourceKey="lblErrorMessage"></asp:Label>
+-                                            </legend>
+-                                            <asp:Label ID="lblWrongType" runat="server" class="ui-state-error ui-corner-all" Style="padding: 3px; margin-top: 5px; display: block;" resourceKey="lblWrongTypes"></asp:Label>
+-                                            <asp:Label ID="lblErrorMessage" runat="server" class="ui-state-error ui-corner-all" Style="padding: 3px; margin-top: 5px; display: block;"></asp:Label>
+-
+-                                        </fieldset>
+-                                        <div style="clear: both;" />
+                                    </div>
                                 </div>
 
                                 <asp:LinqDataSource ID="RmbLineDS" runat="server" ContextTypeName="StaffRmb.StaffRmbDataContext"

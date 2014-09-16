@@ -976,14 +976,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim insert As New AP_Staff_RmbLine
                     insert.Comment = CStr(ucType.GetProperty("Comment").GetValue(theControl, Nothing))
 
-                    insert.GrossAmount = CDbl(ucType.GetProperty("Amount").GetValue(theControl, Nothing))
 
                     'Look for currency conversion
 
                     If hfCurOpen.Value = "false" Or String.IsNullOrEmpty(hfOrigCurrency.Value) Or hfOrigCurrency.Value = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId) Then
+                        insert.GrossAmount = CDbl(ucType.GetProperty("Amount").GetValue(theControl, Nothing))
                         insert.OrigCurrency = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)
                         insert.OrigCurrencyAmount = insert.GrossAmount
                     Else
+                        insert.GrossAmount = CDbl(hfCADValue.Value)
                         insert.OrigCurrency = hfOrigCurrency.Value
                         insert.OrigCurrencyAmount = hfOrigCurrencyValue.Value
                     End If
@@ -1154,6 +1155,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         ' Hide it
                         pnlElecReceipts.Attributes("style") = "display: none"
                     End If
+                    
                 End If
             ElseIf btnSaveLine.CommandName = "Edit" Then
                 If ucType.GetMethod("ValidateForm").Invoke(theControl, New Object() {UserId}) = True Then
@@ -1162,12 +1164,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     If line.Count > 0 Then
 
                         Dim LineTypeName = d.AP_Staff_RmbLineTypes.Where(Function(c) c.LineTypeId = CInt(ddlLineTypes.SelectedValue)).First.TypeName.ToString()
-                        Dim GrossAmount = CDbl(ucType.GetProperty("Amount").GetValue(theControl, Nothing))
+
+                        ''Look for currency conversion
 
                         If String.IsNullOrEmpty(hfOrigCurrency.Value) Then
+                            line.First.GrossAmount = CDbl(ucType.GetProperty("Amount").GetValue(theControl, Nothing))
                             line.First.OrigCurrency = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)
                             line.First.OrigCurrencyAmount = line.First.GrossAmount
                         Else
+                            line.First.GrossAmount = CDbl(hfCADValue.Value)
                             line.First.OrigCurrency = hfOrigCurrency.Value
                             line.First.OrigCurrencyAmount = hfOrigCurrencyValue.Value
                         End If
@@ -1194,10 +1199,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         '    line.First.ShortComment = GetLineComment(comment, line.First.OrigCurrency, line.First.OrigCurrencyAmount, tbShortComment.Text, False, Nothing, IIf(LineTypeName = "Mileage", CStr(ucType.GetProperty("Spare2").GetValue(theControl, Nothing)), ""))
 
                         'End If
-
-
-
-                        line.First.GrossAmount = GrossAmount
 
                         If line.First.GrossAmount >= Settings("TeamLeaderLimit") Then
                             line.First.LargeTransaction = True
@@ -1381,6 +1382,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         ' Hide it
                         pnlElecReceipts.Attributes("style") = "display: none"
                     End If
+
                 End If
             End If
         End Sub
@@ -2045,15 +2047,29 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ddlLineTypes.SelectedValue = theLine.First.LineType
                     ddlLineTypes_SelectedIndexChanged(Me, Nothing)
 
-                    Dim ucType As Type = theControl.GetType()
-                    ucType.GetProperty("Comment").SetValue(theControl, theLine.First.Comment, Nothing)
-                    ucType.GetProperty("Amount").SetValue(theControl, CDbl(theLine.First.GrossAmount), Nothing)
                     Dim jscript As String = ""
+                    Dim ucType As Type = theControl.GetType()
+                    Dim ac = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)
+                    Dim xRate = 1
+                    If (theLine.First.GrossAmount > 0) Then
+                        Math.Round(CDbl(theLine.First.OrigCurrencyAmount / theLine.First.GrossAmount), 4)
+                    End If
+
+                    ucType.GetProperty("Comment").SetValue(theControl, theLine.First.Comment, Nothing)
+                    If (theLine.First.OrigCurrency = ac) Then
+                        ucType.GetProperty("Amount").SetValue(theControl, CDbl(theLine.First.GrossAmount), Nothing)
+                    Else
+                        ucType.GetProperty("Amount").SetValue(theControl, CDbl(theLine.First.OrigCurrencyAmount), Nothing)
+                        jscript &= " $('.equivalentCAD').val(" & theLine.First.GrossAmount & ");"
+                        jscript &= " $('.exchangeRate').val(" & xRate & ");"
+                        jscript &= " $('.curDetails').show();"
+                    End If
+                    jscript &= " $('#" & hfCADValue.ClientID & "').attr('value', '" & theLine.First.GrossAmount & "');"
                     If (Not theLine.First.OrigCurrencyAmount Is Nothing) Then
                         hfOrigCurrencyValue.Value = theLine.First.OrigCurrencyAmount
                         jscript &= " $('#" & hfOrigCurrencyValue.ClientID & "').attr('value', '" & theLine.First.OrigCurrencyAmount & "');"
                         'jscript &= " $('.currency').attr('value'," & theLine.First.OrigCurrencyAmount & ");"
-                        hfExchangeRate.Value = (theLine.First.GrossAmount / theLine.First.OrigCurrencyAmount).Value.ToString(New CultureInfo(""))
+                        hfExchangeRate.Value = xRate.ToString(New CultureInfo(""))
                     End If
                     If (Not String.IsNullOrEmpty(theLine.First.OrigCurrency)) Then
                         jscript &= " $('#" & hfOrigCurrency.ClientID & "').attr('value', '" & theLine.First.OrigCurrency & "');"
@@ -4088,7 +4104,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Sub
 
         Private Function isLowBalance() As Boolean
-            If isStaffAccount() Or (lblAccBal.Text = "") Or (lblAccBal.Text = BALANCE_PERMISSION_DENIED) Or (lblAccBal.Text = BALANCE_INCONCLUSIVE) Then
+            If isStaffAccount() Or (lblAccountBalance.Text = "") Or (lblAccountBalance.Text = BALANCE_PERMISSION_DENIED) Or (lblAccountBalance.Text = BALANCE_INCONCLUSIVE) Then
                 Return False
             End If
             Return (GetTotal(hfRmbNo.Value) > hfAccountBalance.Value)

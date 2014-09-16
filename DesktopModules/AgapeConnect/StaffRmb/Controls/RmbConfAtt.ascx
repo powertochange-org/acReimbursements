@@ -34,7 +34,7 @@
             </table></td>
 </tr>
 <tr><td><b><dnn:Label ID="lblProvince" runat="server" controlname="ddlProvince" ResourceKey="lblProvince" /></b></td>
-    <td ><asp:DropDownList ID="ddlProvince" runat="server">
+    <td ><asp:DropDownList ID="ddlProvince" cssClass="ddlProvince" runat="server">
             <asp:ListItem Text="British Columbia" Value="BC" />
             <asp:ListItem Text="Alberta" Value="AB" />
             <asp:ListItem Text="Saskatchewan" Value="SK" />
