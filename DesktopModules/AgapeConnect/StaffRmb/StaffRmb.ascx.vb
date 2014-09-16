@@ -2052,7 +2052,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim ac = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)
                     Dim xRate = 1
                     If (theLine.First.GrossAmount > 0) Then
-                        Math.Round(CDbl(theLine.First.OrigCurrencyAmount / theLine.First.GrossAmount), 4)
+                        xRate = Math.Round(CDbl(theLine.First.OrigCurrencyAmount / theLine.First.GrossAmount), 4)
                     End If
 
                     ucType.GetProperty("Comment").SetValue(theControl, theLine.First.Comment, Nothing)
@@ -2064,7 +2064,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         jscript &= " $('.exchangeRate').val(" & xRate & ");"
                         jscript &= " $('.curDetails').show();"
                     End If
-                    jscript &= " $('#" & hfCADValue.ClientID & "').attr('value', '" & theLine.First.GrossAmount & "');"
+                    jscript &= " $('#" & hfCADValue.ClientID & "').attr('value', '" & Math.Round(theLine.First.GrossAmount, 2) & "');"
                     If (Not theLine.First.OrigCurrencyAmount Is Nothing) Then
                         hfOrigCurrencyValue.Value = theLine.First.OrigCurrencyAmount
                         jscript &= " $('#" & hfOrigCurrencyValue.ClientID & "').attr('value', '" & theLine.First.OrigCurrencyAmount & "');"
@@ -3001,6 +3001,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim Receipt As Boolean = True
                     Dim Province As String = Nothing
                     Dim receiptMode As Integer = 1
+                    Dim currency As String = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)
 
                     If Not blankValues Then
                         Try
@@ -3017,6 +3018,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                 VAT = CStr(ucTypeOld.GetProperty("VAT").GetValue(theControl, Nothing))
                                 Receipt = CStr(ucTypeOld.GetProperty("Receipt").GetValue(theControl, Nothing))
                                 Province = CStr(ucTypeOld.GetProperty("Spare1").GetValue(theControl, Nothing))
+                                currency = hfOrigCurrency.Value
                             End If
                         Catch ex As Exception
                         End Try
@@ -3043,6 +3045,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ucType.GetProperty("Spare3").SetValue(theControl, "", Nothing)
                     ucType.GetProperty("Spare4").SetValue(theControl, "", Nothing)
                     ucType.GetProperty("Spare5").SetValue(theControl, "", Nothing)
+                    ScriptManager.RegisterStartupScript(Page, Me.GetType(), "setCur", "currencyChange('" & currency & "');", True)
                     ' Attempt to set the receipttype
                     Try
                         ucType.GetProperty("ReceiptType").SetValue(theControl, receiptMode, Nothing)

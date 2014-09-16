@@ -152,17 +152,21 @@
                 <asp:ListItem Value="YER">Yemen Riyal</asp:ListItem>
                 <asp:ListItem Value="ZMK">Zambian Kwacha</asp:ListItem>
                 <asp:ListItem Value="ZWD">Zimbabwe Dollar</asp:ListItem>
-            </asp:DropDownList> 
+            </asp:DropDownList> <br />
+                
             </td>
-            <td><table class="curDetails" style="font-size:9pt; margin-left:10px; border:1px solid green; border-radius:8px;"><tr>
-                <td style="text-align:center">
-                    <b><label for="exchange_rate"><%=DotNetNuke.Services.Localization.Localization.GetString("exchangeRate.Text", LocalResourceFile)%></label></b><br />
-                    <input type="text" id="exchange_rate" class="exchangeRate" style="width:80px" />
-                </td>
-                <td style="text-align:center;margin-left:20px">
-                    <b><asp:Label runat="server" ResourceKey="equivalentCAD.Text"/></b><br />
-                    <asp:TextBox ID="CADAmount" runat="server" cssclass="equivalentCAD" style="width:80px;" />
-                </td>
+            <td style="text-align:right;">
+                <table class="curDetails" style="display:inline-table"><tr>
+                    <th colspan="2">If you specify an exchange rate here,<br />please also include a receipt confirming that rate.</th></tr><tr>
+                    <td style="text-align:center">
+                        <b><label for="exchange_rate"><%=DotNetNuke.Services.Localization.Localization.GetString("exchangeRate.Text", LocalResourceFile)%></label></b><br />
+                        <input type="text" id="exchange_rate" class="exchangeRate" style="width:80px" />
+                    </td>
+                    <td style="text-align:center;margin-left:20px">
+                        <b><asp:Label runat="server" ResourceKey="equivalentCAD.Text"/></b><br />
+                        <asp:TextBox ID="CADAmount" runat="server" cssclass="equivalentCAD" style="width:80px;" />
+                    </td>
+                    <tr><td colspan="2" class="footer">Otherwise Finance will calculate it for you.</td></tr>
                 </tr></table>
             </td>
             </tr></table>

@@ -44,17 +44,20 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_Controls_Currency
     Protected Sub Page_Load(sender As Object, e As System.EventArgs) Handles Me.Load
         If StaffBrokerFunctions.GetSetting("CurConverter", PortalId) = "True" Then
             If (Page.IsPostBack) Then
-                Dim script As String = "$('.hfCurOpen').val('true');"
-                script = script + "if ($('.ddlCur').val() == '" & ac & "') {$('.curDetails').hide();}"
-                ScriptManager.RegisterStartupScript(Page, Me.GetType(), "cur", script, True)
+                display_currency_details()
             End If
         End If
     End Sub
 
-    ' Update the exchange rate text box
-    Private Sub updateExchangeRate()
-        ' Get the exchange rate based on the current country and our account currency
-        '        tbExchangeRate.Text = StaffBrokerFunctions.GetExchangeRate(ddlCurrencies.SelectedValue, ac)
+    'Public Sub setCurrency(currency As String)
+    '    ddlCurrencies.SelectedValue = currency
+    '    display_currency_details()
+    'End Sub
+
+    Private Sub display_currency_details()
+        Dim script As String = "$('.hfCurOpen').val('true');"
+        script = script + "if ($('.ddlCur').val() == '" & ac & "') {$('.curDetails').hide();}"
+        ScriptManager.RegisterStartupScript(Page, Me.GetType(), "cur", script, True)
     End Sub
 
 End Class
