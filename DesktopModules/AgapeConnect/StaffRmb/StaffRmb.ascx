@@ -1,7 +1,6 @@
 ﻿<%@ Control Language="VB" AutoEventWireup="false" CodeFile="StaffRmb.ascx.vb" Inherits="DotNetNuke.Modules.StaffRmbMod.ViewStaffRmb" %>
 <%@ Register TagPrefix="dnn" TagName="Label" Src="~/controls/LabelControl.ascx" %>
 
-<%@ Register Src="Controls/StaffAdvanceRmb.ascx" TagName="StaffAdvanceRmb" TagPrefix="uc1" %>
 <%@ Register Src="Controls/Currency.ascx" TagName="Currency" TagPrefix="uc1" %>
 <%@ Register Src="~/DesktopModules/AgapeConnect/StaffRmb/Controls/Currency.ascx" TagPrefix="dnn" TagName="Currency" %>
 
@@ -147,9 +146,21 @@
     (function ($, Sys) {
         function setUpMyTabs() {
             var stop = false;
-           
-            $('.hlCur').click(function() { var tempValue=$('.rmbAmount').val();  $('.ddlCur').change();$('.rmbAmount').val(tempValue); $('.divCur').show(); $('#' + this.id).hide();  $('#<%= hfCurOpen.ClientID %>').val("true");   });
-            
+
+            // If a foreign currency is selected...
+            if ($('.ddlCur :selected').val() != "<%=StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)%>") {
+                if ($(".exchangeRate").val() == 0) {
+                    $(".exchangeRate").val("1.0000");
+                    $(".equivalentCAD").val($(".rmbAmount").val());
+                }
+                // Disable the amount field; it will get calculated automatically
+                //$('.rmbAmount').prop('disabled', true);
+                // Set the foreign currency amount to whatever the original amount is
+                //TODO $('.foreignCurrency').val($('.rmbAmount').val());
+                // Re-calculate the exchange rate
+                // We have foreign currency
+                $('#<%= hfCurOpen.ClientID %>').val("true")
+            }
 
             $('.ddlReceipt').change(function() { 
                 
@@ -163,115 +174,32 @@
             });
 
            
-            
-            $('.currency').keyup(function() { calculateXRate(); checkRecReq;});
-          
-            $('.ddlCur').change(function() { 
-                console.log('ddlChanged');
-               
-                var ToCur= $("#<%= hfAccountingCurrency.ClientId %>").attr('value') ;
-                var FromCur = $('#' + this.id).val();
-                $("#<%= hfOrigCurrency.ClientID%>").attr('value', FromCur);
-                if(FromCur == ToCur)
-                {
-                    $("#<%= hfExchangeRate.ClientId %>").attr('value', 1.0);
-                    calculateXRate();
-                    return;
-                }
-                else
-                {
-                   
-
-                    var jsonCall= "/MobileCAS/MobileCAS.svc/ConvertCurrency?FromCur=" + FromCur + "&ToCur=" + ToCur;
-               
-                    $('.rmbAmount').val('');
-                    $("#<%= hfExchangeRate.ClientId %>").attr('value', -1);
-                    $.getJSON( jsonCall ,function(x) {
-                    
-                        $("#<%= hfExchangeRate.ClientId %>").attr('value', x);
-                        //now need to convert any value in the TextBox
-                        calculateXRate();
- 
-                    }) ;
-                    
-                    }
-    
+            // This is within the currency converter; anytime the exchange rate gets changed
+            $('.equivalentCAD').keyup(function() { 
+                calculateXRate(); 
+                checkRecReq; //receipt required?
             });
 
-            
-                $('.rmbAmount').keyup(function(){
-                    calculateRevXRate();
-               
-                    //Is over limit
-                    checkRecReq();
-               
-
-                });
-                $('.advAmount').keyup(function(){
-                    calculateRevXRateAdv();
-                });
-
-            //Advance Currency Coverter
-                $('.hlCurAdv').click(function() { var tempValue=$('.advAmount').val();  $('.ddlCurAdv').change();$('.rmbAmountAdv').val(tempValue); $('.divCurAdv').show(); $('#<%= hfCurOpen.ClientID %>').val("true"); $('#' + this.id).hide();  });
-            $('.currencyAdv').keyup(function() { calculateXRateAdv();});
-            $('.ddlCurAdv').change(function() { 
-               
-
-                var ToCur= $("#<%= hfAccountingCurrency.ClientId %>").attr('value') ;
-                var FromCur = $('#' + this.id).val();
-
-                if(FromCur == ToCur)
-                {
-                    $("#<%= hfExchangeRate.ClientId %>").attr('value', 1.0);
-                    calculateXRateAdv();
-                    return;
+            $('.equivalentCAD').blur(function() {
+                var value = $('.equivalentCAD').val();
+                if (value != null) {
+                    $('.equivalentCAD').val(value.toFixed(2));
                 }
-
-                $("#<%= hfOrigCurrency.ClientID%>").attr('value', FromCur);
-                var jsonCall= "/MobileCAS/MobileCAS.svc/ConvertCurrency?FromCur=" + FromCur + "&ToCur=" + ToCur;
-                $('.advAmount').val('');
-                $("#<%= hfExchangeRate.ClientId %>").attr('value', -1);
-               $.getJSON( jsonCall ,function(x) {
-                    
-                   $("#<%= hfExchangeRate.ClientId %>").attr('value', x);
-                    //now need to convert any value in the TextBox
-                    calculateXRateAdv();
- 
-                })      ;
-    
             });
 
 
-            //Advance Pay Off Currency Coverter
-                $('.hlCurAdvPO').click(function() { var tempValue=$('.advPOAmount').val();  $('.ddlCurAdvPO').change();$('.rmbAmountAdvPO').val(tempValue); $('.divCurAdvPO').show(); $('#<%= hfCurOpenAdvPO.ClientID%>').val("true"); $('#' + this.id).hide();  });
-            $('.currencyAdvPO').keyup(function() {calculateXRateAdvPO();});
-            $('.ddlCurAdvPO').change(function() { 
-              
-
-                var ToCur= $("#<%= hfAccountingCurrency.ClientId %>").attr('value') ;
-                var FromCur = $('#' + this.id).val();
-
-                if(FromCur == ToCur)
-                {
-                    $("#<%= hfExchangeRateAdvPO.ClientID%>").attr('value', 1.0);
-                    calculateXRateAdvPO();
-                    return;
-                }
-
-                $("#<%= hfOrigCurrencyAdvPO.ClientID%>").attr('value', FromCur);
-                var jsonCall= "/MobileCAS/MobileCAS.svc/ConvertCurrency?FromCur=" + FromCur + "&ToCur=" + ToCur;
-                $('.advPOAmount').val('');
-                $("#<%= hfExchangeRateAdvPO.ClientID%>").attr('value', -1);
-                $.getJSON( jsonCall ,function(x) {
-                    
-                    $("#<%= hfExchangeRateAdvPO.ClientID%>").attr('value', x);
-                   //now need to convert any value in the TextBox
-                   calculateXRateAdvPO();
- 
-               })      ;
-    
+            // The actual reimbursement amount
+            $('.rmbAmount,.exchangeRate').keyup(function(){
+                calculateEquivalentCAD();
+                checkRecReq();
             });
 
+            $('.exchangeRate').blur(function() {
+                var value = $('.exchangeRate').val();
+                if (value != null) {
+                    $('.exchangeRate').val(value.toFixed(4));
+                }
+            });
 
             
             $("#accordion h3").click(function (event) {
@@ -314,18 +242,6 @@
                 }
             });
             $("#divSplitPopup").parent().appendTo($("form:first"));
-
-            $("#divAdvanceReq").dialog({
-                autoOpen: false,
-                height: 500,
-                width: 650,
-                modal: true,
-                title: '<%= Translate("AdvanceRequest") %>',
-                close: function () {
-                    //  allFields.val("").removeClass("ui-state-error");
-                }
-            });
-            $("#divAdvanceReq").parent().appendTo($("form:first"));
 
             $("#divNewItem").dialog({
                 autoOpen: false,
@@ -377,6 +293,7 @@
                 }
             });
             $("#divDownload").parent().appendTo($("form:first"));
+
             $("#divAccountWarning").dialog({
                 autoOpen: false,
                 position:['middle', 150],
@@ -398,7 +315,7 @@
                 modal:true,
                 title: '<%= Translate("GetPostingDetails") %>',
                 close: function() {}
-            })
+            });
             $("#divGetPostingData").parent().appendTo($("form:first"));
 
             $("#divSuggestedPayments").dialog({
@@ -411,16 +328,10 @@
                 close: function () {
                     //  allFields.val("").removeClass("ui-state-error");
                 }
-              });
+            });
             $("#divSuggestedPayments").parent().appendTo($("form:first"));
 
-
-
-
-
-
             $('.aButton').button();
-           
             $('.Excel').button({ icons: { primary: 'myExcel'} });
 
 
@@ -434,27 +345,22 @@
             $('.numeric').numeric();
             $('.Description').Watermark('<%= Translate("Description") %>');
             $('.Amount').Watermark('<%= Translate("Amount") %>');
-
-
-
-
-
-        }
+        };
 
 
         function setUpAccordion() {
             $("#accordion").accordion({
                 header: "> div > h3",
-                navigate: false,
-                active: <%= getSelectedTab() %>
+                active: <%= getSelectedTab() %>,
+                navigate: false
             });
-        }
+        };
 
         function checkForMinistryAccount() {
             var account = $("#<%= tbChargeTo.ClientID %>").val();
             if (! account) return false;
             isMinistryAccount = (account.charAt(0)!='8' && account.charAt(0)!='9');
-        }
+        };
 
         function setUpReceiptPreviews() {
             var url = ""
@@ -480,7 +386,7 @@
                 $("#multi_notify").remove();
             })
             
-        }
+        };
 
         function loadFinanceTrees() {
             $.getJSON(
@@ -553,7 +459,6 @@
 
         function tweakControl() {
             $("#<%= UpdatePanel2.ClientID %> input[name$='tbDesc']").attr('maxlength', '27').attr('style', 'width:22em');
-            $("#<%= UpdatePanel2.ClientID %> a.hlCur").hide();
         }
 
         function setUpConfirms() {
@@ -595,16 +500,6 @@
         $.getJSON(jsonQuery, function(json){
         var amountString = '<%=StaffBrokerFunctions.GetSetting("Currency", PortalId)  %>' + json ;
         $("#<%= lblAccountBalance.ClientId %>").html(amountString) ;
-        $("#<%= AccBal.ClientId %>").html(amountString) ;
-     });
-
- }
- function GetAdvanceBalance(jsonQuery){
-     $.getJSON(jsonQuery, function(json){
-         var amountString = '<%=StaffBrokerFunctions.GetSetting("Currency", PortalId)  %>' + json ;
-         $("#<%= lblAdvanceBalance.ClientId %>").html(amountString) ;
-         $("#<%= AdvBal.ClientId %>").html(amountString) ;
-            
      });
 
  }
@@ -623,7 +518,6 @@
  function closePopupDownload() {$("#divDownload").dialog("close");}
  function closePopupAccountWarning() {$("#divAccountWarning").dialog("close");}
  function closeSuggestedPayments() {$("#divSuggestedPayments").dialog("close");}
- function closeAdvanceReq()  {$("#divAdvanceReq").dialog("close");}
  function closePostDataDialog() {$("#divGetPostingData").dialog("close"); $("#loading").hide();}
 
  function selectIndex(tabIndex) {
@@ -671,21 +565,11 @@
      return false;
 
  }
- function showAdvanceReq()  {
-     $("#<%= hfOrigCurrencyValue.ClientID%>").attr('value', '');
-         $("#<%= hfOrigCurrency.ClientID%>").attr('value', '<%= StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId) %>');
-         $('.ddlCur').val( '<%= StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId) %>');
-         $("#<%= hfExchangeRate.ClientID%>").attr('value', '1.0');
-         $("#divAdvanceReq").dialog("open");  
-         return false;
-     }
 
-
-    function checkCur(){
+ function checkCur(){
          if($('.divCur').length)
          {
-             var origCur =   $("#<%= hfOrigCurrency.ClientID%>").attr('value');
-            console.log('origCur: ' + origCur) ;
+            var origCur =   $("#<%= hfOrigCurrency.ClientID%>").attr('value');
             if(origCur != '<%= StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId) %>' && origCur != "")
             {
            
@@ -693,14 +577,11 @@
                 //$('.ddlCur').change();
                 //$('.rmbAmount').val(tempValue); 
                 $('.ddlCur').val(origCur);
-                console.log("selectedCur:" + origCur);
                 var origCurVal =   $("#<%= hfOrigCurrencyValue.ClientID%>").attr('value');
-                console.log("originalVal:" + origCurVal);
 
                 $("#<%= hfExchangeRate.ClientID%>").attr('value', parseFloat($('.rmbAmount').val())/parseFloat(origCurVal));
                 calculateRevXRate();    
                 $('.divCur').show(); 
-                $('.hlCur').hide(); 
             
                 $('.hfCurOpen').val("true");
 
@@ -746,25 +627,58 @@
     }
 
 
-
+    // This function calculates the new exchange rate based on foreign amount and
+    // canadian amount, and updates the amount field
     function calculateXRate() {
-        var xRate = $("#<%= hfExchangeRate.ClientId %>").attr('value');
-        var inCur=$('.currency').val() ;
-        if(parseFloat(xRate) <0)
-        {
-            $('.rmbAmount').val('');
-            $("#<%= hfOrigCurrencyValue.ClientID%>").attr('value',"");
-         
-            return;
+
+        var foreign = $('.rmbAmount').val();
+        var cad = $('.equivalentCAD').val();
+        var xRate = 1;
+        if (cad.length>0 && parseFloat(cad) != 0) {
+            xRate = foreign/cad;
+        };
+        $('.exchangeRate').val(xRate.toFixed(4));
+        
+        setXRate(xRate);
+        // Need to update some values for the backend:
+        $("#<%= hfOrigCurrencyValue.ClientID%>").val(foreign);
+        $("#<%= hfCADValue.ClientID%>").val(cad);
+    };
+
+    function calculateEquivalentCAD() {
+        var foreign = $('.rmbAmount').val();
+        var xRate = $('#<%=hfExchangeRate.ClientID%>').val();
+        if (xRate.length==0 || xRate<=0) {
+            $(".equivalentCAD").val("0.00");
+        } else {
+            $('.equivalentCAD').val((foreign/xRate).toFixed(2));
         }
-        $("#<%= hfOrigCurrencyValue.ClientID%>").attr('value',inCur);
-             
-        if(inCur.length>0){
-                
-            $('.rmbAmount').val( (parseFloat(xRate) * parseFloat(inCur)).toFixed(2));
-             
+        $("#<%= hfOrigCurrencyValue.ClientID%>").val(foreign);
+        $("#<%= hfCADValue.ClientID%>").val($(".equivalentCAD").val());
+    };
+
+    function currencyChange(selected_currency) {
+        console.log("Currency Chaned to " + selected_currency);
+        var local_currency = $("input[name$='hfAccountingCurrency']").val();
+        $(".ddlCur").val(selected_currency);
+        $("[name$='hfOrigCurrency']").val(selected_currency);
+        if (selected_currency != local_currency) {
+            //foreign currency
+            if ($("#<%=hfCADValue.ClientID%>").val() != "0.00") {
+                $(".equivalentCAD").val($("#<%=hfCADValue.ClientID%>").val())
+            } else {
+                $(".equivalentCAD").val($(".rmbAmount").val())
+            }
+            calculateXRate();
+            $(".curDetails").show(300);
+            $(".ddlProvince").val("--");
+        } else {
+            $("input[name$='hfExchangeRate']").val(1);
+            $("input[name$='hfOrigCurrencyValue']").val($(".rmbAmount").val());
+            $(".curDetails").hide(300);
         }
-    }
+    };
+
     function calculateRevXRate() {
         
         var xRate = $("#<%= hfExchangeRate.ClientId %>").attr('value');
@@ -786,81 +700,14 @@
             $("#<%= hfOrigCurrencyValue.ClientID%>").attr('value',value);
             console.log("Currency Value:" + value);
         }
-    }
-
-    function calculateXRateAdv() {
-        var xRate = $("#<%= hfExchangeRate.ClientId %>").attr('value');
-        var inCur=$('.currencyAdv').val() ;
-        if(parseFloat(xRate) <0)
-        {
-            $('.advAmount').val('');
-            $("#<%= hfOrigCurrencyValue.ClientID%>").attr('value',"");
-            return;
-        }
-        $("#<%= hfOrigCurrencyValue.ClientID%>").attr('value',inCur);
-        if(inCur.length>0){
-            $("#<%= hfOrigCurrencyValue.ClientID%>").attr('value',inCur);
-            $('.advAmount').val( (parseFloat(xRate) * parseFloat(inCur)).toFixed(2));
-                     
-        }
-    }
-    function calculateRevXRateAdv() {
-        var xRate = $("#<%= hfExchangeRate.ClientId %>").attr('value');
-        var inAmt=$('.advAmount').val() ;
-        if(parseFloat(xRate) <0)
-        {
-            $('.currencyAdv').val('');
-            $("#<%= hfOrigCurrencyValue.ClientID%>").attr('value',"");
-            return;
-        }
-        $("#<%= hfOrigCurrencyValue.ClientID%>").attr('value',inAmt);
-        if(inAmt.length>0){
-            $("#<%= hfOrigCurrencyValue.ClientID%>").attr('value',inAmt);
-            $('.currencyAdv').val(   parseFloat(inAmt) /(parseFloat(xRate) ).toFixed(2));
-                     
-        }
-    }
-    
-   
-    function calculateXRateAdvPO() {
-        var xRate = $("#<%= hfExchangeRateAdvPO.ClientID%>").attr('value');
-        ;
-        var inCur=$('.currencyAdvPO').val() ;
-        if(parseFloat(xRate) <0)
-        {
-            $('.advPOAmount').val('');
-            $("#<%= hfOrigCurrencyValueAdvPO.ClientID%>").attr('value',"");
-            return;
-        }
-        $("#<%= hfOrigCurrencyValueAdvPO.ClientID%>").attr('value',inCur);
-        if(inCur.length>0){
-            $("#<%= hfOrigCurrencyValueAdvPO.ClientID%>").attr('value',inCur);
-            $('.advPOAmount').val( (parseFloat(xRate) * parseFloat(inCur)).toFixed(2));
-                     
-        }
-    }
-    function calculateRevXRateAdvPO() {
-        var xRate = $("#<%= hfExchangeRateAdvPO.ClientID%>").attr('value');
-        var inAmt=$('.advPOAmount').val() ;
-        if(parseFloat(xRate) <0)
-        {
-            $('.currencyAdvPO').val('');
-            $("#<%= hfOrigCurrencyValueAdvPO.ClientID%>").attr('value',"");
-            return;
-        }
-        $("#<%= hfOrigCurrencyValueAdvPO.ClientID%>").attr('value',inAmt);
-        if(inAmt.length>0){
-            $("#<%= hfOrigCurrencyValueAdvPO.ClientID%>").attr('value',inAmt);
-            $('.currencyAdvPO').val(   parseFloat(inAmt) /(parseFloat(xRate) ).toFixed(2));
-                     
-        }
-    }
+    };
 
 
     function setXRate(xRate){
+        xRate = xRate.toFixed(4)
         $("#<%= hfExchangeRate.ClientId %>").val(xRate );
-
-    }
+        $(".exchangeRate").val(xRate)
+    };
 
     function checkRecReq(){
         try{
@@ -869,26 +716,26 @@
             var Am=$('.rmbAmount').val() ;
             //console.log(limit, Am);
             if( $('.ddlReceipt').val()==-1 && parseFloat(Am)>parseFloat(limit))
-                 $('.ddlReceipt').val(1);
+                $('.ddlReceipt').val(1);
 
 
             if(parseFloat(Am)>parseFloat(limit)){
                 $('.ddlReceipt option[value="-1"]').attr("disabled", "disabled");
-               //$('.ddlReceipt').attr("disabled", "disabled");
+                //$('.ddlReceipt').attr("disabled", "disabled");
             }
             else 
             {
                 $('.ddlReceipt option[value="-1"]').removeAttr("disabled");
             }
 
-           // else   $('.ddlReceipt').removeAttr("disabled");
+            // else   $('.ddlReceipt').removeAttr("disabled");
             
 
         }
         catch(err){
 
         }
-    }
+    };
 
 
     function calculateTotal() {
@@ -908,7 +755,7 @@
         {
             $("#<%= btnOK.ClientId %>").prop('disabled', true).addClass('aspNetDisabled');
         }
-   }
+    };
 
     function setUpAutocomplete() {
         var cache = {};
@@ -1039,13 +886,6 @@
         padding: 3px;
     }
 
-    .AdvRequest {
-        background-color: #E2CB9A;
-        border-bottom-style: dashed;
-        border-width: 2px;
-        padding: 5px 5px 5px 5px;
-    }
-
     .myExcel {
         width: 16px;
         height: 16px;
@@ -1089,13 +929,10 @@
     <asp:HiddenField ID="hfExchangeRate" runat="server" Value="1" />
     <asp:HiddenField ID="hfOrigCurrency" runat="server" Value="" />
     <asp:HiddenField ID="hfOrigCurrencyValue" runat="server" Value="" />
+    <asp:HiddenField ID="hfCADValue" runat="server" Value="" />
     <asp:HiddenField ID="staffInitials" runat="server" Value="" />
     <asp:HiddenField ID="hfCurOpen" runat="server" Value="false" />
     <asp:HiddenField ID="hfChargeToValue" runat="server"  />
-    <asp:HiddenField ID="hfCurOpenAdvPO" runat="server" Value="false" />
-    <asp:HiddenField ID="hfExchangeRateAdvPO" runat="server" Value="1" />
-    <asp:HiddenField ID="hfOrigCurrencyAdvPO" runat="server" Value="" />
-    <asp:HiddenField ID="hfOrigCurrencyValueAdvPO" runat="server" Value="" />
     <asp:HiddenField ID="hfTabModuleId" runat="server" Value="-1" />
 
 
@@ -1183,26 +1020,6 @@
                                                     </table>
                                                 </ItemTemplate>
                                             </asp:DataList>
-                                            <asp:DataList ID="dlAdvToApprove" runat="server" Width="100%">
-                                                <ItemStyle CssClass="dnnGridItem" />
-                                                <AlternatingItemStyle CssClass="dnnGridAltItem" />
-                                                <ItemTemplate>
-                                                    <table width="100%">
-                                                        <tr valign="middle">
-                                                            <td>
-                                                                <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
-                                                            </td>
-                                                            <td align="left" width="100%">
-                                                                <asp:LinkButton ID="LinkButton" runat="server" OnClientClick='selectMenuItem(this);' CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Text='<%# GetAdvTitleTeam(Eval("LocalAdvanceId"),Eval("UserId"),  Eval("RequestDate"))  %>' 
-                                                                    Font-Size='<%# If(IsSelected(Eval("AdvanceId")), "9", "10")%>' Font-Bold='<%# IsSelected(Eval("AdvanceId")) %>' Width="100%"></asp:LinkButton>
-                                                            </td>
-                                                            <td>
-                                                                <img ID="Image1" runat="server" alt=">" src="~/images/action_right.gif" style='<%# if(IsSelected(Eval("RmbNo")), "display:block", "display:none") %>' />
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                </ItemTemplate>
-                                            </asp:DataList>
                                             <asp:Label ID="lblSubmitted" runat="server" class="my_section" ResourceKey="YourRmbs" Style="font-size: 8pt;"></asp:Label>
                                             <asp:DataList ID="dlSubmitted" runat="server" Width="100%">
                                                 <ItemStyle CssClass="dnnGridItem" />
@@ -1216,24 +1033,6 @@
                                                             <td align="left" width="100%">
                                                                 <asp:LinkButton ID="LinkButton" runat="server" OnClientClick='selectMenuItem(this);' CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>'
                                                                     Font-Size='<%# If(IsSelected(Eval("RmbNo")), "9", "10")%>' Font-Bold='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
-                                                            </td>
-                                                            <td>
-                                                                <img ID="Image1" runat="server" alt=">" src="~/images/action_right.gif" style='<%# if(IsSelected(Eval("RmbNo")), "display:block", "display:none") %>' />
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                </ItemTemplate>
-                                            </asp:DataList>
-                                            <asp:DataList ID="dlAdvSubmitted" runat="server" Width="100%">
-                                                <ItemTemplate>
-                                                    <table width="100%">
-                                                        <tr valign="middle">
-                                                            <td>
-                                                                <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
-                                                            </td>
-                                                            <td align="left" width="100%">
-                                                                <asp:LinkButton ID="LinkButton" runat="server" OnClientClick='selectMenuItem(this);' CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>' 
-                                                                    Font-Size='<%# If(IsSelected(Eval("AdvanceId")), "9", "10")%>' Font-Bold='<%# IsSelected(Eval("AdvanceId")) %>' Width="100%"></asp:LinkButton>
                                                             </td>
                                                             <td>
                                                                 <img ID="Image1" runat="server" alt=">" src="~/images/action_right.gif" style='<%# if(IsSelected(Eval("RmbNo")), "display:block", "display:none") %>' />
@@ -1288,25 +1087,7 @@
                                                     </table>
                                                 </ItemTemplate>
                                             </asp:DataList>
-                                            <asp:DataList ID="dlAdvApproved" runat="server" Width="100%">
-                                                <ItemTemplate>
-                                                    <table width="100%">
-                                                        <tr valign="middle">
-                                                            <td>
-                                                                <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
-                                                            </td>
-                                                            <td align="left" width="100%">
-                                                                <asp:LinkButton ID="LinkButton" runat="server" OnClientClick='selectMenuItem(this);' CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>'
-                                                                    Font-Size='<%# If(IsSelected(Eval("AdvanceId")), "9", "10")%>' Font-Bold='<%# IsSelected(Eval("AdvanceId")) %>' Width="100%"></asp:LinkButton>
-                                                            </td>
-                                                            <td>
-                                                                <img ID="Image1" runat="server" alt=">" src="~/images/action_right.gif" style='<%# if(IsSelected(Eval("AdvanceId")), "display:block", "display:none") %>' />
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                </ItemTemplate>
-                                            </asp:DataList>                   
-                                        </ContentTemplate>
+                                       </ContentTemplate>
                                     </asp:UpdatePanel>             
 
                             </div>
@@ -1351,24 +1132,6 @@
                                             </table>
                                         </ItemTemplate>
                                     </asp:DataList>
-                                    <asp:DataList ID="dlAdvProcessing" runat="server" Width="100%">
-                                        <ItemTemplate>
-                                            <table width="100%">
-                                                <tr valign="middle">
-                                                    <td>
-                                                        <asp:Image ID="Image2" runat="server" ImageUrl='<%# GetProfileImage(Eval("UserId")) %>' Width="35px" />
-                                                    </td>
-                                                    <td align="left" width="100%">
-                                                        <asp:LinkButton ID="LinkButton" runat="server" OnClientClick='selectMenuItem(this);' CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>' 
-                                                            Font-Size='<%# If(IsSelected(Eval("AdvanceId")), "9", "10")%>' Font-Bold='<%# IsSelected(Eval("AdvanceId")) %>' Width="100%"></asp:LinkButton>
-                                                    </td>
-                                                    <td>
-                                                        <img ID="Image1" runat="server" alt=">" src="~/images/action_right.gif" style='<%# if(IsSelected(Eval("RmbNo")), "display:block", "display:none") %>' />
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </ItemTemplate>
-                                    </asp:DataList>                                
                                 </ContentTemplate>
                             </asp:UpdatePanel>
                         </div>
@@ -1396,24 +1159,6 @@
                                                         <asp:LinkButton ID="LinkButton" runat="server" OnClientClick='selectMenuItem(this);' Text='<%# GetRmbTitle(Eval("UserRef"), Eval("RID"), Eval("RmbDate"))  %>' 
                                                             CommandArgument='<%# Eval("RmbNo") %>' CommandName="Goto" 
                                                             Font-Size='<%# If(IsSelected(Eval("RmbNo")), "9", "10")%>' Font-Bold='<%# IsSelected(Eval("RmbNo")) %>' ></asp:LinkButton>
-                                                    </td>
-                                                    <td width="10px">
-                                                        <img ID="Img1" runat="server" alt=">" src="~/images/action_right.gif" style='<%# if(IsSelected(Eval("RmbNo")), "display:block", "display:none") %>' />
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </ItemTemplate>
-                                    </asp:DataList>
-                                    <asp:DataList ID="dlAdvPaid" runat="server" Width="100%">
-                                        <ItemStyle CssClass="dnnGridItem" />
-                                        <AlternatingItemStyle CssClass="dnnGridAltItem" />
-                                        <ItemTemplate>
-                                            <table width="100%">
-                                                <tr valign="middle">
-                                                    <td width="100%">
-                                                        <asp:LinkButton ID="LinkButton" runat="server" OnClientClick='selectMenuItem(this);' Text='<%# GetAdvTitle(Eval("LocalAdvanceId"),  Eval("RequestDate"))  %>' 
-                                                            CommandArgument='<%# Eval("AdvanceId") %>' CommandName="GotoAdvance" 
-                                                            Font-Size='<%# If(IsSelected(Eval("AdvanceId")), "9", "10")%>' Font-Bold='<%# IsSelected(Eval("AdvanceId")) %>' ></asp:LinkButton>
                                                     </td>
                                                     <td width="10px">
                                                         <img ID="Img1" runat="server" alt=">" src="~/images/action_right.gif" style='<%# if(IsSelected(Eval("RmbNo")), "display:block", "display:none") %>' />
@@ -1771,51 +1516,17 @@
                                     </button>--%>
                                     <br />
                                     <br />
-
-                                    <div id="advanceSection" style="margin-top: 15px;">
-                                        <fieldset id="pnlAdvance" runat="server" visible="false" style="width:100%; font-size:12px">
-                                            <legend><span class="AgapeH4">Pay Off Advance</span> </legend>
-                                            <asp:Label ID="ttlAdvanceBalance" runat="server" ForeColor="Gray" resourcekey="AdvanceBalance"></asp:Label>
-                                            &nbsp;
-                                <asp:Label ID="lblAdvanceBalance" runat="server" ForeColor="Gray" Text="searching..."></asp:Label>
-                                            <table>
-                                                <tr>
-                                                    <td>
-                                                        <%--<asp:DropDownList ID="ddlAdvanceOption" runat="server">
-                                <asp:ListItem Selected="True" Value="0.00">Do not pay off advance</asp:ListItem>
-                                <asp:ListItem Value="-1.00">Pay off as much as possible</asp:ListItem>
-                                <asp:ListItem Value="1.00">Pay upto specified amount (enter here--->):</asp:ListItem>
-                            </asp:DropDownList>--%>
-                                                        <dnn:Label ID="Label3" runat="server" ControlName="tbAdvanceAmount" ResourceKey="PayOff" />
-                                                    </td>
-                                                    <td>
-                                                        <asp:TextBox ID="tbAdvanceAmount" runat="server" class="numeric advPOAmount"></asp:TextBox>
-                                                        <dnn:Currency runat="server" ID="Currency" AdvPayOffMode="true" />
-                                                    </td>
-                                                    <td>
-                                                        <asp:Button ID="btnSaveAdv" runat="server" resourcekey="btnSave" Font-Size="8pt"
-                                                            CommandName="Save" class="aButton" />
-                                                </tr>
-                                            </table>
-                                            <asp:Label ID="lblAdvError" runat="server" ForeColor="Red"></asp:Label>
-                                        </fieldset>
-
+                                    <div id="errorSection" style="margin-top:15px;">
                                         <fieldset id="pnlError" runat="server" visible="false" style="margin-top: 15px;">
-                                            <legend>
-                                                <asp:Label ID="Label44" runat="server" CssClass="AgapeH4" ResourceKey="lblErrorMessage"></asp:Label>
-                                            </legend>
-                                            <asp:Label ID="lblWrongType" runat="server" class="ui-state-error ui-corner-all"
-                                                Style="padding: 3px; margin-top: 5px; display: block;" resourceKey="lblWrongTypes">
-
-
-                                            </asp:Label>
-                                            <asp:Label ID="lblErrorMessage" runat="server" class="ui-state-error ui-corner-all"
-                                                Style="padding: 3px; margin-top: 5px; display: block;"></asp:Label>
-
-                                        </fieldset>
-                                        <div style="clear: both;" />
+-                                            <legend>
+-                                                <asp:Label ID="Label44" runat="server" CssClass="AgapeH4" ResourceKey="lblErrorMessage"></asp:Label>
+-                                            </legend>
+-                                            <asp:Label ID="lblWrongType" runat="server" class="ui-state-error ui-corner-all" Style="padding: 3px; margin-top: 5px; display: block;" resourceKey="lblWrongTypes"></asp:Label>
+-                                            <asp:Label ID="lblErrorMessage" runat="server" class="ui-state-error ui-corner-all" Style="padding: 3px; margin-top: 5px; display: block;"></asp:Label>
+-
+-                                        </fieldset>
+-                                        <div style="clear: both;" />
                                     </div>
-
                                 </div>
 
                                 <asp:LinqDataSource ID="RmbLineDS" runat="server" ContextTypeName="StaffRmb.StaffRmbDataContext"
@@ -1838,137 +1549,10 @@
 
                         </asp:Panel>
 
-                        <asp:Panel ID="pnlMainAdvance" runat="server" Visible="false" CssClass="ui-widget ui-widget-content ui-corner-all">
-                            <div class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all">
-                                <div style="width: 100%; vertical-align: middle; font-size: 20pt; margin: 3px 5px 3px 3px; font-weight: bold; border-width: 2pt; border-bottom-style: solid;">
-                                    <asp:Image ID="imgAdvAvatar" runat="server" Width="50px" ImageUrl="/images/no_avatar.gif" Style="float: left; color: blue; margin-right: 5px; border-width: 2pt; border-style: solid;" />
-
-                                    <asp:Label ID="Label42" runat="server" resourcekey="Advance" Style="float: left; margin-right: 3px; color: blue;"></asp:Label>
-                                    <asp:Label ID="lblAdvanceId" runat="server" Style="float: left; color: blue;"></asp:Label>:
-                           
-                                </div>
-
-                                <asp:Label ID="lblAdvStatus" runat="server" Style="font-size: small; float: left;"></asp:Label>
-                                <asp:Label ID="AdvBal" runat="server" Style="font-size: small; float: right; font-style: italic; margin-right: 3px;"></asp:Label>
-                                <asp:Label ID="lblAdvBal" runat="server" ResourceKey="AdvanceBalance" Style="font-size: small; float: right; font-style: italic; margin-right: 3px;"></asp:Label>
-                                <asp:Label ID="AccBal" runat="server" Style="font-size: small; float: right; font-style: italic; margin-right: 15px;"></asp:Label>
-                                <asp:Label ID="lblAccBal" runat="server" ResourceKey="AccountBalance" Style="font-size: small; float: right; font-style: italic; margin-right: 3px;"></asp:Label>
-
-
-                                <div style="clear: both;"></div>
-                            </div>
-                            <div style="font-size: large; margin-top: 10px; padding: 10px;">
-                                <asp:Label ID="lblAdv1" runat="server" Font-Italic="true"></asp:Label>
-                                <table cellpadding="5px" style="margin: 10px 20px 0px 20px;">
-                                    <tr valign="top">
-                                        <td style="width: 120px;">
-                                            <asp:Label ID="lblAdvAmout" runat="server" ResourceKey="Amount" Font-Bold="true"></asp:Label>:
-                               
-                                    
-                                        </td>
-                                        <td style="width: 100%">
-
-                                            <asp:TextBox ID="AdvAmount" runat="server" Enabled="false" Width="100px" CssClass="numeric rmbAmount"></asp:TextBox>
-                                            <div style="font-size: x-small; float: right;">
-                                                <uc1:Currency ID="advEditCurrency" runat="server" />
-                                            </div>
-                                            <div style="clear: both;"></div>
-                                            <asp:Label ID="lblAdvCur" runat="server" Font-Bold="true" Visible="False"> </asp:Label>
-                                        </td>
-                                        <td rowspan="4" style="width: 120px;">
-                                            <table style="color: Gray; font-size: x-small;">
-
-                                                <asp:Panel ID="pnlAdvPeriodYear" runat="server" Visible="false">
-                                                    <tr>
-                                                        <td>
-                                                            <asp:Label ID="Label41" runat="server" resourcekey="Period" Font-Bold="true"></asp:Label>
-                                                        </td>
-                                                        <td>
-                                                            <asp:DropDownList ID="ddlAdvPeriod" runat="server" Width="70px" Enabled="false">
-                                                                <asp:ListItem Text="Default" Value="" />
-                                                                <asp:ListItem Text="Jan" Value="1" />
-                                                                <asp:ListItem Text="Feb" Value="2" />
-                                                                <asp:ListItem Text="Mar" Value="3" />
-                                                                <asp:ListItem Text="Apr" Value="4" />
-                                                                <asp:ListItem Text="May" Value="5" />
-                                                                <asp:ListItem Text="Jun" Value="6" />
-                                                                <asp:ListItem Text="Jul" Value="7" />
-                                                                <asp:ListItem Text="Aug" Value="8" />
-                                                                <asp:ListItem Text="Sep" Value="9" />
-                                                                <asp:ListItem Text="Oct" Value="10" />
-                                                                <asp:ListItem Text="Nov" Value="11" />
-                                                                <asp:ListItem Text="Dec" Value="12" />
-                                                            </asp:DropDownList>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <asp:Label ID="lblAdvYear" runat="server" resourcekey="Year" Font-Bold="true"></asp:Label>
-                                                        </td>
-                                                        <td>
-                                                            <asp:DropDownList ID="ddlAdvYear" runat="server" Width="70px" Enabled="false">
-                                                                <asp:ListItem Text="Default" Value=""></asp:ListItem>
-                                                            </asp:DropDownList>
-                                                        </td>
-                                                    </tr>
-                                                </asp:Panel>
-                                            </table>
-
-
-                                        </td>
-                                    </tr>
-                                    <tr valign="top" style="height: 175px; min-height: 175px;">
-                                        <td>
-                                            <asp:Label ID="lblAdvReason" runat="server" ResourceKey="AdvReason" Font-Bold="true"></asp:Label>:
-                                        </td>
-                                        <td class="ui-widget ui-widget-content ui-corner-all" style="width: 100%; padding: 7px 7px 7px 7px;">
-                                            <asp:Label ID="AdvReason" runat="server" Font-Italic="true" Font-Size="Medium"></asp:Label>
-
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td>
-                                            <asp:Label ID="AdvDate" runat="server" Font-Italic="true" Font-Size="small" ForeColor="Gray" Style="float: right; text-align: right;"></asp:Label>
-
-
-                                            <div style="clear: both;"></div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="3" align="left" style="font-size: small; padding-top: 20px;">
-                                    <asp:Label ID="lblAdvErr" runat="server" CssClass="AgapeError" ></asp:Label>
-                                      <asp:Label ID="lblAdvDownloadError" runat="server" class="ui-state-error ui-corner-all"
-                Style="padding: 3px; margin-top: 5px; display: block; " Visible="false" ></asp:Label>
-                                            <asp:Button ID="btnAdvApprove" runat="server" ResourceKey="btnApprove" CssClass="aButton" />
-                                            <asp:Button ID="btnAdvReject" runat="server" ResourceKey="btnReject" CssClass="aButton" />
-                                            <asp:Button ID="btnAdvSave" runat="server" ResourceKey="btnSave" CssClass="aButton" />
-                                            <asp:Button ID="btnAdvCancel" runat="server" ResourceKey="btnDelete" CssClass="aButton" />
-                                            <asp:Button ID="btnAdvProcess" runat="server" ResourceKey="btnProcess" CssClass="aButton" />
-                                            <asp:Button ID="btnAdvUnProcess" runat="server" ResourceKey="btnUnProcess" CssClass="aButton" />
-                                            <asp:LinkButton ID="btnAdvDownload" runat="server">
-                                                <div style="vertical-align: middle; float: right; padding-top: 8px; margin-right: 20px">
-                                                    <img src="/DesktopModules/AgapeConnect/StaffRmb/Images/Excel_icon.gif" alt="" />
-                                                    <asp:Label ID="Label40" runat="server" resourcekey="btnDownload"></asp:Label>
-                                                </div>
-                                                <div style="clear: both;">
-                                                </div>
-                                            </asp:LinkButton>
-                                        </td>
-                                    </tr>
-
-                                </table>
-                            </div>
-                        </asp:Panel>
-
-
-
-
                         <asp:HiddenField ID="hfRmbNo" runat="server" />
                     </ContentTemplate>
                     <Triggers>
                         <asp:PostBackTrigger ControlID="btnDownload" />
-                        <asp:PostBackTrigger ControlID="btnAdvDownload" />
                     </Triggers>
                 </asp:UpdatePanel>
             </td>
@@ -2124,15 +1708,6 @@
                     <asp:Image ID="updating1" ImageUrl="~/Images/progressbar2.gif" runat="server" />
                 </ProgressTemplate>
             </asp:UpdateProgress>
-        </div>
-    </div>
-
-    <div id="divAdvanceReq" class="ui-widget">
-        <uc1:StaffAdvanceRmb ID="StaffAdvanceRmb1" runat="server" />
-        <div style="text-align: center; width: 100%;">
-            <asp:Button ID="btnAdvanceRequest" runat="server" resourcekey="btnAdvanceRequest" class="aButton" />
-            <input id="Button1" type="button" value='<%= Translate("btnCancel") %>' onclick="closeAdvanceReq();"
-                class="aButton" />
         </div>
     </div>
 
@@ -2367,9 +1942,6 @@
 <br />
 
 <div style="text-align: left">
-    <a onclick="showAdvanceReq();" style="cursor:pointer">
-        <asp:Label ID="lblAdvanceRequest" runat="server" ResourceKey="btnAdvReq" ></asp:Label>
-    </a>
 
     <asp:Label ID="lblMovedMenu" runat="server" Font-Size="XX-Small" Font-Italic="true" ForeColor="Gray" Text="If you are looking for Settings, Suggested Payments or Download Batched Transactions, these links have moved. Click the faint wrench/screwdriver icon at the top right corner of this module. "></asp:Label>
 

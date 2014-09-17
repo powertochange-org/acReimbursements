@@ -117,10 +117,25 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="btnConvertCurrency.Text" xml:space="preserve">
-    <value>Convert Currency</value>
+  <data name="exchangeTitle.Text" xml:space="preserve">
+    <value>Foreign Currency</value>
   </data>
-  <data name="lblTitle.Text" xml:space="preserve">
-    <value>Currency Converter</value>
+  <data name="amount.Text" xml:space="preserve">
+    <value>Enter Foreign Amount</value>
+  </data>
+  <data name="exchangeRate.Text" xml:space="preserve">
+    <value>exchange&amp;nbsp;rate:</value>
+  </data>
+  <data name="uploadProof.Text" xml:space="preserve">
+    <value>Please provide photo proof of exchange rate. You can upload a photo by selecting "Electronic receipts and proof of exchange rate."</value>
+  </data>
+  <data name="equivalentCAD.Text" xml:space="preserve">
+    <value>equivalent&amp;nbsp;$CAD:</value>
+  </data>
+  <data name="exchangeFooter.Text" xml:space="preserve">
+    <value>If you have receipts confirming a different rate,&lt;br /&gt;you may change it - but you must also include&lt;br /&gt;that receipt with this reimbursement</value>
+  </data>
+  <data name="exchangeHeader.Text" xml:space="preserve">
+    <value>This is the current online exchange rate</value>
   </data>
 </root>

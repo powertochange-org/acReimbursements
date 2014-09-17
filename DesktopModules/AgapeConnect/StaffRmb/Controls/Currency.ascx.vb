@@ -1,25 +1,14 @@
-﻿
+﻿Imports DotNetNuke.Services.FileSystem
+Imports System.IO
+Imports StaffBroker
+Imports System.Drawing.Imaging
+
 Partial Class DesktopModules_AgapeConnect_StaffRmb_Controls_Currency
     Inherits Entities.Modules.PortalModuleBase
 
-    Private _advMode As Boolean
-    Public Property AdvMode() As Boolean
-        Get
-            Return _advMode
-        End Get
-        Set(ByVal value As Boolean)
-            _advMode = value
-        End Set
-    End Property
-    Private _advPayoffMode As Boolean
-    Public Property AdvPayOffMode() As Boolean
-        Get
-            Return _advPayoffMode
-        End Get
-        Set(ByVal value As Boolean)
-            _advPayoffMode = value
-        End Set
-    End Property
+    Dim theFolder As IFolderInfo
+    Dim PS As PortalSettings = CType(HttpContext.Current.Items("PortalSettings"), PortalSettings)
+    Dim ac As String = StaffBrokerFunctions.GetSetting("AccountingCurrency", PS.PortalId)
 
     Protected Sub Page_Init(sender As Object, e As System.EventArgs) Handles Me.Init
         Dim FileName As String = System.IO.Path.GetFileNameWithoutExtension(Me.AppRelativeVirtualPath)
@@ -51,73 +40,33 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_Controls_Currency
             End If
         End If
     End Sub
+
     Protected Sub Page_Load(sender As Object, e As System.EventArgs) Handles Me.Load
-
-        If Not ((AdvMode Or AdvPayOffMode) And Page.IsPostBack) Then
-
-
-            Dim suffix = ""
-            Dim amount = "rmbAmount"
-            If AdvMode And Not btnCurrency.CssClass.EndsWith("Adv") Then
-                btnCurrency.CssClass &= "Adv"
-                tbCurrency.Attributes("class") &= "Adv"
-                ddlCurrencies.Attributes("class") &= "Adv"
-                dCurrency.Attributes("class") &= "Adv"
-                suffix = "Adv"
-                amount = "advAmount"
-            ElseIf AdvPayOffMode And Not btnCurrency.CssClass.EndsWith("AdvPO") Then
-                btnCurrency.CssClass &= "AdvPO"
-                tbCurrency.Attributes("class") &= "AdvPO"
-                ddlCurrencies.Attributes("class") &= "AdvPO"
-                dCurrency.Attributes("class") &= "AdvPO"
-                suffix = "AdvPO"
-                amount = "advPOAmount"
+        If StaffBrokerFunctions.GetSetting("CurConverter", PortalId) = "True" Then
+            ddlCurrencies.Attributes.Add("onchange", "currencyChange(this.value);")
+            If (Page.IsPostBack) Then
+                display_currency_details()
             End If
-
-
-
-            Dim PS = CType(HttpContext.Current.Items("PortalSettings"), PortalSettings)
-            Dim lc = StaffBrokerFunctions.GetSetting("LocalCurrency", PS.PortalId)
-            Dim ac = StaffBrokerFunctions.GetSetting("AccountingCurrency", PS.PortalId)
-            Dim x As New MobileCAS
-            Dim xrate = x.ConvertCurrency(lc, ac)
-            If lc = "" Then
-                StaffBrokerFunctions.SetSetting("LocalCurrency", "USD", PS.PortalId)
-                lc = "USD"
-            End If
-            ddlCurrencies.SelectedValue = lc
-
-
-
-
-            'sb.Append(" var jsonCall= ""/MobileCAS/MobileCAS.svc/ConvertCurrency?FromCur=" + lc + "&ToCur=" + ac + """;")
-            ' sb.Append("$.getJSON( jsonCall ,function(x) { setXRate(x);});")
-
-
-
-            ' sb.Append(" $('.ddlCur" & suffix & "').change();")
-            'sb.Append("setXRate(" & xrate & ");")
-
-
-
-            If StaffBrokerFunctions.GetSetting("CurConverter", PortalId) = "True" Then
-
-                Dim t As Type = Me.GetType()
-                Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
-                sb.Append("<script language='javascript'>")
-                If suffix = "" Then
-                    sb.Append(" var tempValue=$('." & amount & "').val();   $('.ddlCur" & suffix & "').change(); $('." & amount & "').val(tempValue);   $('.currency" & suffix & "').val((parseFloat(tempValue) / parseFloat(" & xrate.ToString("n8", New CultureInfo("en-US")) & ")).toFixed(2));  $('.divCur" & suffix & "').show(); $('#" & btnCurrency.ClientID & "').hide();")
-                Else
-                    sb.Append("$('.divCur" & suffix & "').show(); $('#" & btnCurrency.ClientID & "').hide();")
-
-                End If
-
-                sb.Append("$('.hfCurOpen').val('true');")
-                sb.Append("</script>")
-                ScriptManager.RegisterStartupScript(Page, t, "cur" & suffix, sb.ToString, False)
-            End If
-
-
         End If
     End Sub
+
+    Public Sub Currency_Change(ByVal sender As Object, ByVal e As System.EventArgs) Handles ddlCurrencies.SelectedIndexChanged
+        Dim accounting_currency = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)
+        Dim foreign_currency = ddlCurrencies.SelectedValue
+        Dim exchangeRate = StaffBrokerFunctions.GetExchangeRate(accounting_currency, foreign_currency)
+        Dim script = "setXRate(" & exchangeRate & "); calculateEquivalentCAD();"
+        ScriptManager.RegisterStartupScript(Page, Me.GetType(), "xrate", script, True)
+    End Sub
+
+    'Public Sub setCurrency(currency As String)
+    '    ddlCurrencies.SelectedValue = currency
+    '    display_currency_details()
+    'End Sub
+
+    Private Sub display_currency_details()
+        Dim script As String = "$('.hfCurOpen').val('true');"
+        script = script + "if ($('.ddlCur').val() == '" & ac & "') {$('.curDetails').hide();}"
+        ScriptManager.RegisterStartupScript(Page, Me.GetType(), "cur", script, True)
+    End Sub
+
 End Class
