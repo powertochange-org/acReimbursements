@@ -5,7 +5,7 @@
         <div id="dCurrency" class="divCur" >
             <table style="font-size:9pt"><tr>
             <td style="margin-left:30px">
-                <asp:DropDownList ID="ddlCurrencies" runat="server" CssClass="ddlCur" onChange="currencyChange(this.value);">
+                <asp:DropDownList ID="ddlCurrencies" runat="server" CssClass="ddlCur" AutoPostBack="true">
                 <asp:ListItem Value="ALL">Albanian Lek</asp:ListItem>
                 <asp:ListItem Value="DZD">Algerian Dinar</asp:ListItem>
                 <asp:ListItem Value="ARS">Argentine Peso</asp:ListItem>
@@ -157,7 +157,7 @@
             </td>
             <td style="text-align:right;">
                 <table class="curDetails" style="display:inline-table"><tr>
-                    <th colspan="2">If you specify an exchange rate here,<br />please also include a receipt confirming that rate.</th></tr><tr>
+                    <th colspan="2"><asp:Label runat="server" ResourceKey="exchangeHeader" /></th></tr><tr>
                     <td style="text-align:center">
                         <b><label for="exchange_rate"><%=DotNetNuke.Services.Localization.Localization.GetString("exchangeRate.Text", LocalResourceFile)%></label></b><br />
                         <input type="text" id="exchange_rate" class="exchangeRate" style="width:80px" />
@@ -166,7 +166,7 @@
                         <b><asp:Label runat="server" ResourceKey="equivalentCAD.Text"/></b><br />
                         <asp:TextBox ID="CADAmount" runat="server" cssclass="equivalentCAD" style="width:80px;" />
                     </td>
-                    <tr><td colspan="2" class="footer">Otherwise Finance will calculate it for you.</td></tr>
+                    <tr><td colspan="2" class="footer"><asp:label runat="server" ResourceKey="exchangeFooter"></asp:label></td></tr>
                 </tr></table>
             </td>
             </tr></table>

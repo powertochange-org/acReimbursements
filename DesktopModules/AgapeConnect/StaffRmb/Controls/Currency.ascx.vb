@@ -43,10 +43,19 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_Controls_Currency
 
     Protected Sub Page_Load(sender As Object, e As System.EventArgs) Handles Me.Load
         If StaffBrokerFunctions.GetSetting("CurConverter", PortalId) = "True" Then
+            ddlCurrencies.Attributes.Add("onchange", "currencyChange(this.value);")
             If (Page.IsPostBack) Then
                 display_currency_details()
             End If
         End If
+    End Sub
+
+    Public Sub Currency_Change(ByVal sender As Object, ByVal e As System.EventArgs) Handles ddlCurrencies.SelectedIndexChanged
+        Dim accounting_currency = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)
+        Dim foreign_currency = ddlCurrencies.SelectedValue
+        Dim exchangeRate = StaffBrokerFunctions.GetExchangeRate(accounting_currency, foreign_currency)
+        Dim script = "setXRate(" & exchangeRate & "); calculateEquivalentCAD();"
+        ScriptManager.RegisterStartupScript(Page, Me.GetType(), "xrate", script, True)
     End Sub
 
     'Public Sub setCurrency(currency As String)

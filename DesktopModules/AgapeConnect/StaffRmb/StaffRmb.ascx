@@ -647,7 +647,7 @@
 
     function calculateEquivalentCAD() {
         var foreign = $('.rmbAmount').val();
-        var xRate = $('.exchangeRate').val();
+        var xRate = $('#<%=hfExchangeRate.ClientID%>').val();
         if (xRate.length==0 || xRate<=0) {
             $(".equivalentCAD").val("0.00");
         } else {
@@ -704,8 +704,9 @@
 
 
     function setXRate(xRate){
+        xRate = xRate.toFixed(4)
         $("#<%= hfExchangeRate.ClientId %>").val(xRate );
-
+        $(".exchangeRate").val(xRate)
     };
 
     function checkRecReq(){

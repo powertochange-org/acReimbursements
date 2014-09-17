@@ -132,4 +132,10 @@
   <data name="equivalentCAD.Text" xml:space="preserve">
     <value>equivalent&amp;nbsp;$CAD:</value>
   </data>
+  <data name="exchangeFooter.Text" xml:space="preserve">
+    <value>If you have receipts confirming a different rate,&lt;br /&gt;you may change it - but you must also include&lt;br /&gt;that receipt with this reimbursement</value>
+  </data>
+  <data name="exchangeHeader.Text" xml:space="preserve">
+    <value>This is the current online exchange rate</value>
+  </data>
 </root>
