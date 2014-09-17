@@ -192,12 +192,20 @@ Partial Class controls_RmbTravel
             ErrorLbl.Text = value
         End Set
     End Property
+    Public Property CADValue() As Double
+        Get
+            Return CDbl(hfCADValue.Value)
+        End Get
+        Set(value As Double)
+            hfCADValue.Value = value
+        End Set
+    End Property
     Public Function ValidateForm(ByVal userId As Integer) As Boolean
         If ddlWorkplace.SelectedValue = "Yes" Then
             ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Work.Error", LocalResourceFile)
             Return False
         End If
-        if (tbDesc.Text.Length < 5) Then
+        If (tbDesc.Text.Length < 5) Then
             ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Description.Error", LocalResourceFile)
             Return False
         End If
@@ -214,7 +222,7 @@ Partial Class controls_RmbTravel
 
         Try
 
-            Dim theAmount As Double = Double.Parse(tbAmount.Text, New CultureInfo("en-US").NumberFormat)
+            Dim theAmount As Double = Double.Parse(hfCADValue.Value, New CultureInfo("en-US").NumberFormat)
             'If Amount > 5 And ddlVATReceipt.SelectedValue = -1 Then
             '    ErrorLbl.Text = "*For transactions £5 and over, a receipt must be supplied."
             '    Return False

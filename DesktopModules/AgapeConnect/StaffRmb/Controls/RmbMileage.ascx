@@ -3,7 +3,9 @@
 <%@ Register TagPrefix="dnn" TagName="Label" Src="~/controls/LabelControl.ascx" %>
 
 
-<div class="Agape_SubTitle"> <asp:HiddenField ID="hfNoReceiptLimit" runat="server" Value="0" />
+<div class="Agape_SubTitle"> 
+    <asp:HiddenField ID="hfNoReceiptLimit" runat="server" Value="0" />
+    <asp:HiddenField ID="hfCADValue" runat="server" Value="" />
     <asp:Label ID="Label2" runat="server" Font-Italic="true" ForeColor="Gray" resourcekey="Explanation"></asp:Label>
 </div>
 <br />

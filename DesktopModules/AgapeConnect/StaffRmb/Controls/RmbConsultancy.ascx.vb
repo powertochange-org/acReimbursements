@@ -179,6 +179,14 @@ Partial Class controls_RmbConsultancy
 
         End Set
     End Property
+    Public Property CADValue() As Double
+        Get
+            Return CDbl(hfCADValue.Value)
+        End Get
+        Set(value As Double)
+            hfCADValue.Value = value
+        End Set
+    End Property
 
     Public Function ValidateForm(ByVal userId As Integer) As Boolean
         if (tbDesc.Text.Length < 5) Then
@@ -197,7 +205,7 @@ Partial Class controls_RmbConsultancy
         End Try
 
         Try
-            Dim theAmount As Double = Double.Parse(tbAmount.Text, New CultureInfo("en-US").NumberFormat)
+            Dim theAmount As Double = Double.Parse(hfCADValue.Value, New CultureInfo("en-US").NumberFormat)
             If Amount <= 0.01 Then
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Amount.Error", LocalResourceFile)
                 Return False

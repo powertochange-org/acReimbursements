@@ -984,7 +984,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         insert.OrigCurrency = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)
                         insert.OrigCurrencyAmount = insert.GrossAmount
                     Else
-                        insert.GrossAmount = CDbl(hfCADValue.Value)
+                        insert.GrossAmount = ucType.GetProperty("CADValue").GetValue(theControl, Nothing)
                         insert.OrigCurrency = hfOrigCurrency.Value
                         insert.OrigCurrencyAmount = hfOrigCurrencyValue.Value
                     End If
@@ -1172,7 +1172,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             line.First.OrigCurrency = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)
                             line.First.OrigCurrencyAmount = line.First.GrossAmount
                         Else
-                            line.First.GrossAmount = CDbl(hfCADValue.Value)
+                            line.First.GrossAmount = ucType.GetProperty("CADValue").GetValue(theControl, Nothing)
                             line.First.OrigCurrency = hfOrigCurrency.Value
                             line.First.OrigCurrencyAmount = hfOrigCurrencyValue.Value
                         End If
@@ -2064,7 +2064,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         jscript &= " $('.exchangeRate').val(" & xRate & ");"
                         jscript &= " $('.curDetails').show();"
                     End If
-                    jscript &= " $('#" & hfCADValue.ClientID & "').attr('value', '" & Math.Round(theLine.First.GrossAmount, 2) & "');"
+                    ucType.GetProperty("CADValue").SetValue(theControl, Math.Round(theLine.First.GrossAmount, 2), Nothing)
                     If (Not theLine.First.OrigCurrencyAmount Is Nothing) Then
                         hfOrigCurrencyValue.Value = theLine.First.OrigCurrencyAmount
                         jscript &= " $('#" & hfOrigCurrencyValue.ClientID & "').attr('value', '" & theLine.First.OrigCurrencyAmount & "');"

@@ -642,7 +642,7 @@
         setXRate(xRate);
         // Need to update some values for the backend:
         $("#<%= hfOrigCurrencyValue.ClientID%>").val(foreign);
-        $("#<%= hfCADValue.ClientID%>").val(cad);
+        $("input[name$='hfCADValue']").val(cad);
     };
 
     function calculateEquivalentCAD() {
@@ -654,7 +654,7 @@
             $('.equivalentCAD').val((foreign/xRate).toFixed(2));
         }
         $("#<%= hfOrigCurrencyValue.ClientID%>").val(foreign);
-        $("#<%= hfCADValue.ClientID%>").val($(".equivalentCAD").val());
+        $("input[name$='hfCADValue']").val($(".equivalentCAD").val());
     };
 
     function currencyChange(selected_currency) {
@@ -664,8 +664,8 @@
         $("[name$='hfOrigCurrency']").val(selected_currency);
         if (selected_currency != local_currency) {
             //foreign currency
-            if ($("#<%=hfCADValue.ClientID%>").val() != "0.00") {
-                $(".equivalentCAD").val($("#<%=hfCADValue.ClientID%>").val())
+            if ($("input[name$='hfCADValue']").val() != "0.00") {
+                $(".equivalentCAD").val($("input[name$='hfCADValue']").val())
             } else {
                 $(".equivalentCAD").val($(".rmbAmount").val())
             }
@@ -713,7 +713,7 @@
         try{
             
             var limit =  $("#<%= hfNoReceiptLimit.ClientID%>").attr('value');
-            var Am=$('.rmbAmount').val() ;
+            var Am=$("input[name$='hfCADValue']").val() ;
             //console.log(limit, Am);
             if( $('.ddlReceipt').val()==-1 && parseFloat(Am)>parseFloat(limit))
                 $('.ddlReceipt').val(1);
@@ -929,7 +929,6 @@
     <asp:HiddenField ID="hfExchangeRate" runat="server" Value="1" />
     <asp:HiddenField ID="hfOrigCurrency" runat="server" Value="" />
     <asp:HiddenField ID="hfOrigCurrencyValue" runat="server" Value="" />
-    <asp:HiddenField ID="hfCADValue" runat="server" Value="" />
     <asp:HiddenField ID="staffInitials" runat="server" Value="" />
     <asp:HiddenField ID="hfCurOpen" runat="server" Value="false" />
     <asp:HiddenField ID="hfChargeToValue" runat="server"  />
