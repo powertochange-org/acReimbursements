@@ -984,9 +984,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         insert.OrigCurrency = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)
                         insert.OrigCurrencyAmount = insert.GrossAmount
                     Else
-                        insert.GrossAmount = ucType.GetProperty("CADValue").GetValue(theControl, Nothing)
+                        insert.GrossAmount = CDbl(ucType.GetProperty("CADValue").GetValue(theControl, Nothing))
                         insert.OrigCurrency = hfOrigCurrency.Value
-                        insert.OrigCurrencyAmount = hfOrigCurrencyValue.Value
+                        insert.OrigCurrencyAmount = CDbl(hfOrigCurrencyValue.Value)
                     End If
                     Dim LineTypeName = d.AP_Staff_RmbLineTypes.Where(Function(c) c.LineTypeId = CInt(ddlLineTypes.SelectedValue)).First.TypeName.ToString()
 
@@ -1167,7 +1167,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                         ''Look for currency conversion
 
-                        If String.IsNullOrEmpty(hfOrigCurrency.Value) Then
+                        If hfCurOpen.Value = "false" Or String.IsNullOrEmpty(hfOrigCurrency.Value) Or hfOrigCurrency.Value = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId) Then
                             line.First.GrossAmount = CDbl(ucType.GetProperty("Amount").GetValue(theControl, Nothing))
                             line.First.OrigCurrency = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)
                             line.First.OrigCurrencyAmount = line.First.GrossAmount
@@ -2064,9 +2064,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         jscript &= " $('.exchangeRate').val(" & xRate & ");"
                         jscript &= " $('.curDetails').show();"
                     End If
-                    ucType.GetProperty("CADValue").SetValue(theControl, Math.Round(theLine.First.GrossAmount, 2), Nothing)
+                    ucType.GetProperty("CADValue").SetValue(theControl, Math.Round(CDbl(theLine.First.GrossAmount), 2), Nothing)
                     If (Not theLine.First.OrigCurrencyAmount Is Nothing) Then
-                        hfOrigCurrencyValue.Value = theLine.First.OrigCurrencyAmount
+                        hfOrigCurrencyValue.Value = CDbl(theLine.First.OrigCurrencyAmount)
                         jscript &= " $('#" & hfOrigCurrencyValue.ClientID & "').attr('value', '" & theLine.First.OrigCurrencyAmount & "');"
                         'jscript &= " $('.currency').attr('value'," & theLine.First.OrigCurrencyAmount & ");"
                         hfExchangeRate.Value = xRate.ToString(New CultureInfo(""))

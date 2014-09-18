@@ -177,7 +177,7 @@
             // This is within the currency converter; anytime the exchange rate gets changed
             $('.equivalentCAD').keyup(function() { 
                 calculateXRate(); 
-                checkRecReq; //receipt required?
+                checkRecReq;
             });
 
             $('.equivalentCAD').blur(function() {
@@ -187,11 +187,13 @@
                 }
             });
 
-
-            // The actual reimbursement amount
             $('.rmbAmount,.exchangeRate').keyup(function(){
-                calculateEquivalentCAD();
-                checkRecReq();
+                var xRate = $(".exchangeRate").val();
+                console.log("setting exchange rate: "+xRate);
+                if (xRate != null) {
+                    setXRate(xRate);
+                    calculateEquivalentCAD();
+                }
             });
 
             $('.exchangeRate').blur(function() {
@@ -567,64 +569,31 @@
  }
 
  function checkCur(){
-         if($('.divCur').length)
-         {
-            var origCur =   $("#<%= hfOrigCurrency.ClientID%>").attr('value');
-            if(origCur != '<%= StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId) %>' && origCur != "")
-            {
-           
-                //var tempValue=$('.rmbAmount').val();  
-                //$('.ddlCur').change();
-                //$('.rmbAmount').val(tempValue); 
-                $('.ddlCur').val(origCur);
-                var origCurVal =   $("#<%= hfOrigCurrencyValue.ClientID%>").attr('value');
-
-                $("#<%= hfExchangeRate.ClientID%>").attr('value', parseFloat($('.rmbAmount').val())/parseFloat(origCurVal));
-                calculateRevXRate();    
-                $('.divCur').show(); 
-            
-                $('.hfCurOpen').val("true");
-
-        
-           
-            }else
-            {
-            
-
-                var selectedCurrency =  '<%= StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId) %>' ;
-                var xRate=1.0;
-                if(origCur == "")
-                {
-                    selectedCurrency ='<%= StaffBrokerFunctions.GetSetting("LocalCurrency", PortalId) %>' ;
-                    xRate=-1;
-                }
-                $("#<%= hfOrigCurrency.ClientID%>").attr('value',selectedCurrency);
-                $('.ddlCur').val(selectedCurrency);
-                console.log('selectedCurrency: ' + selectedCurrency) ;
-                // Always ensure that the hfExchangeRate is up to date
-                $("#<%= hfExchangeRate.ClientId %>").attr('value', xRate);
-
-                if(xRate!=1.0)
-                {
-                    var jsonCall= "/MobileCAS/MobileCAS.svc/ConvertCurrency?FromCur=" + selectedCurrency + "&ToCur=" +  '<%= StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId) %>';
-                    console.log(jsonCall);
-                    //$('.rmbAmount').val('');
-           
-                    $.getJSON( jsonCall ,function(x) {
-                        console.log(x);
-
-                        $("#<%= hfExchangeRate.ClientId %>").attr('value', x);
-                        //now need to convert any value in the TextBox
-                        calculateRevXRate();    
-
-                    }) ;
-
-                }
-
-            }
-        
-        }
+     var ac = '<%= StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId) %>';
+     var currency = $("#<%= hfOrigCurrency.ClientID%>").val();
+     var amount = $("#<%= hfOrigCurrencyValue.ClientID%>").val();
+     if ($('.divCur').length) {
+         var exchangerate=1;
+         if (currency == ac) {
+             console.log("Canadian Currency");
+             setXRate(1.0000);
+         } else {
+             $('.ddlCur').val(currency);
+             var CADAmount = $(".equivalentCAD").val();
+             if (CADAmount>0) {
+                 exchangerate = (amount/CADAmount).toFixed(4);
+                 setXRate(exchangerate);
+                 calculateRevXRate();
+             } else {
+                 console.log("ERROR: $CAD = 0");
+             }
+             console.log("Foreign Currency: "+currency+ "  " );
+             console.log("  Foreign Amount: "+amount);
+             console.log(" Canadian Amount: "+CADAmount);
+             console.log("   Exchange Rate: "+exchangerate);
+         }
     }
+}
 
 
     // This function calculates the new exchange rate based on foreign amount and
@@ -655,10 +624,11 @@
         }
         $("#<%= hfOrigCurrencyValue.ClientID%>").val(foreign);
         $("input[name$='hfCADValue']").val($(".equivalentCAD").val());
+        checkRecReq();
     };
 
     function currencyChange(selected_currency) {
-        console.log("Currency Chaned to " + selected_currency);
+        console.log("Currency Chanegd to " + selected_currency);
         var local_currency = $("input[name$='hfAccountingCurrency']").val();
         $(".ddlCur").val(selected_currency);
         $("[name$='hfOrigCurrency']").val(selected_currency);
@@ -672,10 +642,12 @@
             calculateXRate();
             $(".curDetails").show(300);
             $(".ddlProvince").val("--");
+            $('#<%= hfCurOpen.ClientID %>').val("true");
         } else {
             $("input[name$='hfExchangeRate']").val(1);
             $("input[name$='hfOrigCurrencyValue']").val($(".rmbAmount").val());
             $(".curDetails").hide(300);
+            $('#<%= hfCurOpen.ClientID %>').val("false");
         }
     };
 
@@ -704,8 +676,8 @@
 
 
     function setXRate(xRate){
-        xRate = xRate.toFixed(4)
-        $("#<%= hfExchangeRate.ClientId %>").val(xRate );
+        xRate = Number(xRate);
+        $("#<%= hfExchangeRate.ClientId %>").val(xRate);
         $(".exchangeRate").val(xRate)
     };
 
