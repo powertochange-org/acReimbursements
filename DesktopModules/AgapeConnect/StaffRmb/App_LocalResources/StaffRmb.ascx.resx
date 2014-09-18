@@ -708,4 +708,7 @@
   <data name="PendingEDMSApproval.Text" xml:space="preserve">
     <value>Awaiting Approval of the Executive Director of Ministry Services</value>
   </data>
+  <data name="Extra.Text" xml:space="preserve">
+    <value>...</value>
+  </data>
 </root>

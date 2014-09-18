@@ -165,10 +165,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 '                Order By value
 
                 GridView1.Columns(0).HeaderText = Translate("TransDate")
-                GridView1.Columns(1).HeaderText = Translate("LineType")
-                GridView1.Columns(2).HeaderText = Translate("Comment")
-                GridView1.Columns(3).HeaderText = Translate("Amount")
-                GridView1.Columns(4).HeaderText = Translate("ReceiptNo")
+                GridView1.Columns(1).HeaderText = Translate("Extra")
+                GridView1.Columns(2).HeaderText = Translate("LineType")
+                GridView1.Columns(3).HeaderText = Translate("Comment")
+                GridView1.Columns(4).HeaderText = Translate("Amount")
+                GridView1.Columns(5).HeaderText = Translate("ReceiptNo")
 
                 pnlVAT.Visible = Settings("VatAttrib")
 

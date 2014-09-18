@@ -1356,6 +1356,16 @@
                                                     </ItemTemplate>
                                                     <ItemStyle HorizontalAlign="Left" Width="50px" />
                                                 </asp:TemplateField>
+
+                                                <asp:TemplateField HeaderText="Extra" SortExpression="Spare1">
+                                                    <EditItemTemplate>
+                                                    </EditItemTemplate>
+                                                    <ItemTemplate>
+                                                        <asp:Label ID="lblExtra" runat="server" Text='<%#  Eval("Spare1") + IIf(Eval("LineType")=31, " (" + Eval("Spare2")+ IIf(Eval("Spare3"),"mi","km") + ")" ,"") %>'></asp:Label>
+                                                    </ItemTemplate>
+                                                    <ItemStyle HorizontalAlign="Center" />
+                                                </asp:TemplateField>
+
                                                 <asp:TemplateField HeaderText="Line Type" SortExpression="LineType" ItemStyle-Width="110px">
                                                     <EditItemTemplate>
                                                         <asp:TextBox ID="TextBox1" runat="server" Text='<%# Bind("LineType") %>'></asp:TextBox>
