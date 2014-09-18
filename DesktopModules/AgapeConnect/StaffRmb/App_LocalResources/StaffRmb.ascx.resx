@@ -274,7 +274,7 @@
     <value>If you are going to insert these transactions manually into your accounts package, you should select YES. Be aware that by selected YES, these transactions will be marked as processed and therfore ignored by the automatic datapump.</value>
   </data>
   <data name="NewLineTitle.Text" xml:space="preserve">
-    <value>Add New Reimbursement Transaction</value>
+    <value>Expense Details</value>
   </data>
   <data name="NextBatch.Text" xml:space="preserve">
     <value>This reimbursement will be downloaded in the next batch.</value>

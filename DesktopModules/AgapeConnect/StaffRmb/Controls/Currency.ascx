@@ -156,7 +156,7 @@
                 
             </td>
             <td style="text-align:right;">
-                <table class="curDetails" style="display:inline-table"><tr>
+                <table class="curDetails" style="display:inline-table; margin-left:30px"><tr>
                     <th colspan="2"><asp:Label runat="server" ResourceKey="exchangeHeader" /></th></tr><tr>
                     <td style="text-align:center">
                         <b><label for="exchange_rate"><%=DotNetNuke.Services.Localization.Localization.GetString("exchangeRate.Text", LocalResourceFile)%></label></b><br />

@@ -1145,17 +1145,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Await LoadRmbAsync(hfRmbNo.Value)
                     ScriptManager.RegisterClientScriptBlock(Page, t, "", sb.ToString, False)
                 Else ' The form was not valid
-                    ' Need to check the current state of the electronic receipts, 
-                    ' and set the attribute to match; otherwise, it will get reset
-                    ' to the original state. 
-                    If (CInt(ucType.GetProperty("ReceiptType").GetValue(theControl, Nothing) = 2)) Then
-                        ' If the receipt type is set to 2, we keep it visible
-                        pnlElecReceipts.Attributes("style") = ""
-                    Else
-                        ' Hide it
-                        pnlElecReceipts.Attributes("style") = "display: none"
-                    End If
-                    
+                    ReloadInvalidForm()
                 End If
             ElseIf btnSaveLine.CommandName = "Edit" Then
                 If ucType.GetMethod("ValidateForm").Invoke(theControl, New Object() {UserId}) = True Then
@@ -1372,18 +1362,25 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Await LoadRmbAsync(hfRmbNo.Value)
                     ScriptManager.RegisterClientScriptBlock(Page, t, "", sb.ToString, False)
                 Else ' The form was not valid
-                    ' Need to check the current state of the electronic receipts, 
-                    ' and set the attribute to match; otherwise, it will get reset
-                    ' to the original state. 
-                    If (CInt(ucType.GetProperty("ReceiptType").GetValue(theControl, Nothing) = 2)) Then
-                        ' If the receipt type is set to 2, we keep it visible
-                        pnlElecReceipts.Attributes("style") = ""
-                    Else
-                        ' Hide it
-                        pnlElecReceipts.Attributes("style") = "display: none"
-                    End If
-
+                    ReloadInvalidForm()
                 End If
+            End If
+        End Sub
+
+        Private Sub ReloadInvalidForm()
+            ' Need to check the current state of the electronic receipts and currency conversions 
+            ' and set the attribute to match; otherwise, it will get reset to the default state. 
+            If (hfOrigCurrency.Value <> StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)) Then
+                Dim jscript = "$('.exchangeRate').val('" & hfExchangeRate.Value + "');"
+                jscript &= "$('.equivalentCAD').val('" & hfOrigCurrencyValue.Value / hfExchangeRate.Value & "');"
+                ScriptManager.RegisterClientScriptBlock(Page, Me.GetType(), "fixCurrency", jscript, True)
+            End If
+            If (CInt(theControl.GetType().GetProperty("ReceiptType").GetValue(theControl, Nothing) = 2)) Then
+                ' If the receipt type is set to 2, we keep it visible
+                pnlElecReceipts.Attributes("style") = ""
+            Else
+                ' Hide it
+                pnlElecReceipts.Attributes("style") = "display: none"
             End If
         End Sub
 
