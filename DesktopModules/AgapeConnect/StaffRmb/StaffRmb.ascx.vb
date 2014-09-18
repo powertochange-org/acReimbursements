@@ -2058,7 +2058,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Else
                         ucType.GetProperty("Amount").SetValue(theControl, CDbl(theLine.First.OrigCurrencyAmount), Nothing)
                         jscript &= " $('.equivalentCAD').val(" & theLine.First.GrossAmount & ");"
-                        jscript &= " $('.exchangeRate').val(" & xRate & ");"
+                        jscript &= " $('.exchangeRate').val(Number(" & xRate & ").toFixed(4));"
                         jscript &= " $('.curDetails').show();"
                     End If
                     ucType.GetProperty("CADValue").SetValue(theControl, Math.Round(CDbl(theLine.First.GrossAmount), 2), Nothing)

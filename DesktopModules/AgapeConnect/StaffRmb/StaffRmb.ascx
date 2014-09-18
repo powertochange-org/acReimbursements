@@ -175,19 +175,19 @@
 
            
             // This is within the currency converter; anytime the exchange rate gets changed
-            $('.equivalentCAD').keyup(function() { 
+            $('.equivalentCAD').keypress(function() { 
                 calculateXRate(); 
                 checkRecReq;
             });
 
             $('.equivalentCAD').blur(function() {
-                var value = $('.equivalentCAD').val();
+                var value = Number($('.equivalentCAD').val());
                 if (value != null) {
                     $('.equivalentCAD').val(value.toFixed(2));
                 }
             });
 
-            $('.rmbAmount,.exchangeRate').keyup(function(){
+            $('.rmbAmount,.exchangeRate').keypress(function(event){
                 var xRate = $(".exchangeRate").val();
                 console.log("setting exchange rate: "+xRate);
                 if (xRate != null) {
@@ -197,7 +197,7 @@
             });
 
             $('.exchangeRate').blur(function() {
-                var value = $('.exchangeRate').val();
+                var value = Number($('.exchangeRate').val());
                 if (value != null) {
                     $('.exchangeRate').val(value.toFixed(4));
                 }
@@ -606,7 +606,8 @@
         if (cad.length>0 && parseFloat(cad) != 0) {
             xRate = foreign/cad;
         };
-        $('.exchangeRate').val(xRate.toFixed(4));
+        xRate = Number(xRate).toFixed(4);
+        $('.exchangeRate').val(xRate);
         
         setXRate(xRate);
         // Need to update some values for the backend:
@@ -676,8 +677,7 @@
 
 
     function setXRate(xRate){
-        xRate = Number(xRate);
-        $("#<%= hfExchangeRate.ClientId %>").val(xRate);
+        $("#<%= hfExchangeRate.ClientId %>").val(Number(xRate));
         $(".exchangeRate").val(xRate)
     };
 
