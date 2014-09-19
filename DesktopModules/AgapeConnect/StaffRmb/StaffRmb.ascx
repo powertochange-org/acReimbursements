@@ -1361,7 +1361,7 @@
                                                     <EditItemTemplate>
                                                     </EditItemTemplate>
                                                     <ItemTemplate>
-                                                        <asp:Label ID="lblExtra" runat="server" Text='<%#  Eval("Spare1") + IIf(Eval("LineType")=31, " (" + Eval("Spare2")+ IIf(Eval("Spare3"),"mi","km") + ")" ,"") %>'></asp:Label>
+                                                        <asp:Label ID="lblExtra" runat="server" Text='<%#  Eval("Spare1") + IIf(Eval("LineType")=31, " (" + Eval("Spare2")+ IIf(Eval("Spare3").Equals("1"),"mi","km") + ")" ,"") %>'></asp:Label>
                                                     </ItemTemplate>
                                                     <ItemStyle HorizontalAlign="Center" />
                                                 </asp:TemplateField>
