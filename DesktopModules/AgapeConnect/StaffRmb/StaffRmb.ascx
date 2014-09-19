@@ -1920,15 +1920,13 @@
 
 </asp:Panel>
 
-<br />
 
 <div style="text-align: left">
 
     <asp:Label ID="lblMovedMenu" runat="server" Font-Size="XX-Small" Font-Italic="true" ForeColor="Gray" Text="If you are looking for Settings, Suggested Payments or Download Batched Transactions, these links have moved. Click the faint wrench/screwdriver icon at the top right corner of this module. "></asp:Label>
 
-    &nbsp;<%--  <asp:PostBackTrigger ControlID="btnSaveLine" />--%>
-    <br />
-
+    <%--  <asp:PostBackTrigger ControlID="btnSaveLine" />--%>
+    
 </div>
 
 

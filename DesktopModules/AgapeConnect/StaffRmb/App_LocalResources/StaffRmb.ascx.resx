@@ -169,7 +169,7 @@
     <value>Download Batched Transactions</value>
   </data>
   <data name="btnEnter.Text" xml:space="preserve">
-    <value>Enter</value>
+    <value>Save this expense</value>
   </data>
   <data name="btnNew.Text" xml:space="preserve">
     <value>New Reimbursement</value>
