@@ -1003,7 +1003,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
 
                     insert.Comment = CStr(ucType.GetProperty("Comment").GetValue(theControl, Nothing))
-                    insert.ShortComment = GetLineComment(insert.Comment, insert.OrigCurrency, insert.OrigCurrencyAmount, tbShortComment.Text, False, Nothing, IIf(LineTypeName = "Mileage", CStr(ucType.GetProperty("Spare2").GetValue(theControl, Nothing)), ""))
+                    insert.ShortComment = GetLineComment(insert.Comment, insert.OrigCurrency, insert.OrigCurrencyAmount, tbShortComment.Text, False, Nothing, IIf(LineTypeName = "Mileage", CStr(ucType.GetProperty("Mileage").GetValue(theControl, Nothing)), ""))
 
                     'Taxes
                     If ddlOverideTax.SelectedIndex > 0 Then
@@ -1107,7 +1107,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
 
                     insert.Spare1 = CStr(ucType.GetProperty("Spare1").GetValue(theControl, Nothing)) 'province
-                    insert.Spare2 = CStr(ucType.GetProperty("Spare2").GetValue(theControl, Nothing)) 'mileage
+                    insert.Spare2 = CStr(ucType.GetProperty("Spare2").GetValue(theControl, Nothing))
                     insert.Spare3 = CStr(ucType.GetProperty("Spare3").GetValue(theControl, Nothing)) 'mileageunitindex
                     insert.Spare4 = CStr(ucType.GetProperty("Spare4").GetValue(theControl, Nothing))
                     insert.Spare5 = CStr(ucType.GetProperty("Spare5").GetValue(theControl, Nothing))
@@ -1153,7 +1153,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         Dim LineTypeName = d.AP_Staff_RmbLineTypes.Where(Function(c) c.LineTypeId = CInt(ddlLineTypes.SelectedValue)).First.TypeName.ToString()
 
                         ''Look for currency conversion
-
                         If hfCurOpen.Value = "false" Or String.IsNullOrEmpty(hfOrigCurrency.Value) Or hfOrigCurrency.Value = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId) Then
                             line.First.GrossAmount = CDbl(ucType.GetProperty("Amount").GetValue(theControl, Nothing))
                             line.First.OrigCurrency = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)
@@ -1168,9 +1167,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         Dim sc = tbShortComment.Text
                         If (sc <> line.First.ShortComment) Then
                             'the short comment was manully changed, so this should take precidence over anything else.
-                            line.First.ShortComment = GetLineComment(comment, line.First.OrigCurrency, line.First.OrigCurrencyAmount, tbShortComment.Text, False, Nothing, IIf(LineTypeName = "Mileage", CStr(ucType.GetProperty("Spare2").GetValue(theControl, Nothing)), ""))
+                            line.First.ShortComment = GetLineComment(comment, line.First.OrigCurrency, line.First.OrigCurrencyAmount, tbShortComment.Text, False, Nothing, IIf(LineTypeName = "Mileage", CStr(ucType.GetProperty("Mileage").GetValue(theControl, Nothing)), ""))
                         Else
-                            line.First.ShortComment = GetLineComment(comment, line.First.OrigCurrency, line.First.OrigCurrencyAmount, "", False, Nothing, IIf(LineTypeName = "Mileage", CStr(ucType.GetProperty("Spare2").GetValue(theControl, Nothing)), ""))
+                            line.First.ShortComment = GetLineComment(comment, line.First.OrigCurrency, line.First.OrigCurrencyAmount, "", False, Nothing, IIf(LineTypeName = "Mileage", CStr(ucType.GetProperty("Mileage").GetValue(theControl, Nothing)), ""))
                         End If
                         'If line.First.ShortComment <> comment Then
                         '    line.First.Comment = comment
@@ -1297,6 +1296,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         '    ucType.GetProperty("ErrorText").SetValue(theControl, "*For transactions over " & Settings("NoReceipt") & ", a receipt must be supplied.", Nothing)
                         '    Return
                         'End If
+
+                        'mileage
+                        If (LineTypeName.Equals("Mileage")) Then
+                            line.First.Mileage = CInt(ucType.GetProperty("Mileage").GetValue(theControl, Nothing))
+                            line.First.MileageRate = ucType.GetProperty("MileageRate").GetValue(theControl, Nothing)
+                        End If
 
                         line.First.Spare1 = CStr(ucType.GetProperty("Spare1").GetValue(theControl, Nothing))
                         line.First.Spare2 = CStr(ucType.GetProperty("Spare2").GetValue(theControl, Nothing))
@@ -2081,6 +2086,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ucType.GetProperty("Spare4").SetValue(theControl, theLine.First.Spare4, Nothing)
                     ucType.GetProperty("Spare5").SetValue(theControl, theLine.First.Spare5, Nothing)
 
+                    If (ucType.GetProperty("Mileage") IsNot Nothing) Then
+                        If (theLine.First.Mileage IsNot Nothing) Then
+                            ucType.GetProperty("Mileage").SetValue(theControl, theLine.First.Mileage, Nothing)
+                        Else
+                            ucType.GetProperty("Mileage").SetValue(theControl, 0, Nothing)
+                        End If
+                    End If
+
                     Dim receiptMode = 1
                     If theLine.First.VATReceipt Then
                         receiptMode = 0
@@ -2115,7 +2128,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
 
                     Try
-                        tbShortComment.Text = GetLineComment(theLine.First.Comment, theLine.First.OrigCurrency, If(theLine.First.OrigCurrencyAmount Is Nothing, 0, theLine.First.OrigCurrencyAmount), theLine.First.ShortComment, False, Nothing, IIf(theLine.First.AP_Staff_RmbLineType.TypeName = "Mileage", theLine.First.Spare2, ""))
+                        tbShortComment.Text = GetLineComment(theLine.First.Comment, theLine.First.OrigCurrency, If(theLine.First.OrigCurrencyAmount Is Nothing, 0, theLine.First.OrigCurrencyAmount), theLine.First.ShortComment, False, Nothing, IIf(theLine.First.AP_Staff_RmbLineType.TypeName = "Mileage", theLine.First.Mileage, ""))
                     Catch
                         tbShortComment.Text = ""
                     End Try
@@ -2145,77 +2158,77 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     sb.Append("</script>")
                     ScriptManager.RegisterStartupScript(GridView1, t, "popupedit", sb.ToString, False)
                 End If
-            ElseIf e.CommandName = "mySplit" Then
-                hfRows.Value = 1
-                hfSplitLineId.Value = CInt(e.CommandArgument)
-                lblSplitError.Visible = False
-                Dim theLine = From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(e.CommandArgument)
+                ElseIf e.CommandName = "mySplit" Then
+                    hfRows.Value = 1
+                    hfSplitLineId.Value = CInt(e.CommandArgument)
+                    lblSplitError.Visible = False
+                    Dim theLine = From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(e.CommandArgument)
 
-                If theLine.Count > 0 Then
-                    lblOriginalDesc.Text = theLine.First.Comment
-                    lblOriginalAmt.Text = theLine.First.GrossAmount.ToString("0.00")
-                    tbSplitDesc.Text = lblOriginalDesc.Text
-                End If
-                tbSplitAmt.Attributes.Add("onblur", "calculateTotal();")
-                tbSplitAmt.Text = ""
-                tbSplitDesc.Text = ""
-
-                Dim t As Type = GridView1.GetType()
-                Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
-                sb.Append("<script language='javascript'>")
-                sb.Append("showPopupSplit();")
-                sb.Append("</script>")
-                ScriptManager.RegisterStartupScript(GridView1, t, "popupSplit", sb.ToString, False)
-
-            ElseIf e.CommandName = "myDefer" Then
-                'Try to find a deferred transactions pending reimbursement
-                Dim theLine = From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(e.CommandArgument)
-                If theLine.Count > 0 Then
-                    theLine.First.Spare5 = theLine.First.RmbNo
-                    Dim q = From c In d.AP_Staff_RmbLines Where c.Spare5 = theLine.First.RmbNo And c.AP_Staff_Rmb.Status = RmbStatus.Draft And c.AP_Staff_Rmb.UserId = theLine.First.AP_Staff_Rmb.UserId And c.AP_Staff_Rmb.PortalId = PortalId Select c.AP_Staff_Rmb
-                    If q.Count = 0 Then
-
-                        Dim insert As New AP_Staff_Rmb
-                        insert.UserRef = "Deferred"
-                        insert.AcctComment = "Contains transactions deferred from previous month"
-                        insert.RID = StaffRmbFunctions.GetNewRID(PortalId)
-                        insert.CostCenter = theLine.First.AP_Staff_Rmb.CostCenter
-
-                        insert.UserComment = ""
-                        insert.UserId = theLine.First.AP_Staff_Rmb.UserId
-                        ' insert.PersonalCC = ddlNewChargeTo.Items(0).Value
-
-                        insert.PortalId = PortalId
-
-                        insert.Status = RmbStatus.Draft
-
-                        insert.Locked = False
-                        insert.SupplierCode = theLine.First.AP_Staff_Rmb.SupplierCode
-
-                        insert.Department = theLine.First.AP_Staff_Rmb.Department
-
-                        d.AP_Staff_Rmbs.InsertOnSubmit(insert)
-                        d.SubmitChanges()
-                        theLine.First.AP_Staff_Rmb = insert
-
-                    Else
-                        theLine.First.AP_Staff_Rmb = q.First
+                    If theLine.Count > 0 Then
+                        lblOriginalDesc.Text = theLine.First.Comment
+                        lblOriginalAmt.Text = theLine.First.GrossAmount.ToString("0.00")
+                        tbSplitDesc.Text = lblOriginalDesc.Text
                     End If
-                    Dim loadRmbTask = LoadRmbAsync(hfRmbNo.Value)
-                    SubmitChanges()
+                    tbSplitAmt.Attributes.Add("onblur", "calculateTotal();")
+                    tbSplitAmt.Text = ""
+                    tbSplitDesc.Text = ""
 
-                    Dim theUser = UserController.GetUserById(PortalId, theLine.First.AP_Staff_Rmb.UserId)
                     Dim t As Type = GridView1.GetType()
                     Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
                     sb.Append("<script language='javascript'>")
-                    sb.Append("window.open('mailto:" & theUser.Email & "?subject=Reimbursment " & theLine.First.AP_Staff_Rmb.RID & ": Deferred Transactions');")
+                    sb.Append("showPopupSplit();")
                     sb.Append("</script>")
-                    Await loadRmbTask
+                    ScriptManager.RegisterStartupScript(GridView1, t, "popupSplit", sb.ToString, False)
 
-                    ScriptManager.RegisterStartupScript(GridView1, t, "email", sb.ToString, False)
+                ElseIf e.CommandName = "myDefer" Then
+                    'Try to find a deferred transactions pending reimbursement
+                    Dim theLine = From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(e.CommandArgument)
+                    If theLine.Count > 0 Then
+                        theLine.First.Spare5 = theLine.First.RmbNo
+                        Dim q = From c In d.AP_Staff_RmbLines Where c.Spare5 = theLine.First.RmbNo And c.AP_Staff_Rmb.Status = RmbStatus.Draft And c.AP_Staff_Rmb.UserId = theLine.First.AP_Staff_Rmb.UserId And c.AP_Staff_Rmb.PortalId = PortalId Select c.AP_Staff_Rmb
+                        If q.Count = 0 Then
 
+                            Dim insert As New AP_Staff_Rmb
+                            insert.UserRef = "Deferred"
+                            insert.AcctComment = "Contains transactions deferred from previous month"
+                            insert.RID = StaffRmbFunctions.GetNewRID(PortalId)
+                            insert.CostCenter = theLine.First.AP_Staff_Rmb.CostCenter
+
+                            insert.UserComment = ""
+                            insert.UserId = theLine.First.AP_Staff_Rmb.UserId
+                            ' insert.PersonalCC = ddlNewChargeTo.Items(0).Value
+
+                            insert.PortalId = PortalId
+
+                            insert.Status = RmbStatus.Draft
+
+                            insert.Locked = False
+                            insert.SupplierCode = theLine.First.AP_Staff_Rmb.SupplierCode
+
+                            insert.Department = theLine.First.AP_Staff_Rmb.Department
+
+                            d.AP_Staff_Rmbs.InsertOnSubmit(insert)
+                            d.SubmitChanges()
+                            theLine.First.AP_Staff_Rmb = insert
+
+                        Else
+                            theLine.First.AP_Staff_Rmb = q.First
+                        End If
+                        Dim loadRmbTask = LoadRmbAsync(hfRmbNo.Value)
+                        SubmitChanges()
+
+                        Dim theUser = UserController.GetUserById(PortalId, theLine.First.AP_Staff_Rmb.UserId)
+                        Dim t As Type = GridView1.GetType()
+                        Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
+                        sb.Append("<script language='javascript'>")
+                        sb.Append("window.open('mailto:" & theUser.Email & "?subject=Reimbursment " & theLine.First.AP_Staff_Rmb.RID & ": Deferred Transactions');")
+                        sb.Append("</script>")
+                        Await loadRmbTask
+
+                        ScriptManager.RegisterStartupScript(GridView1, t, "email", sb.ToString, False)
+
+                    End If
                 End If
-            End If
 
         End Sub
 
@@ -3039,6 +3052,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ucType.GetProperty("Spare3").SetValue(theControl, "", Nothing)
                     ucType.GetProperty("Spare4").SetValue(theControl, "", Nothing)
                     ucType.GetProperty("Spare5").SetValue(theControl, "", Nothing)
+                    If (ucType.GetProperty("Mileage") IsNot Nothing) Then
+                        ucType.GetProperty("Mileage").SetValue(theControl, 0, Nothing)
+                    End If
                     ScriptManager.RegisterStartupScript(Page, Me.GetType(), "setCur", "currencyChange('" & currency & "');", True)
                     ' Attempt to set the receipttype
                     Try
@@ -3166,6 +3182,19 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
 
         End Function
+
+        Public Function GetMileageString(ByVal mileage As Integer, unitIndex As String) As String
+            Dim result As String
+            If mileage = 0 Then
+                Return ""
+            End If
+            result = "(" & mileage
+            If unitIndex IsNot Nothing Then
+                result &= Settings("MRate" & (unitIndex + 1) & "Name")
+            End If
+            Return result & ")"
+        End Function
+
 #End Region
 
 #Region "Downloading"
@@ -3206,7 +3235,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Else
                         Credit = -line.GrossAmount.ToString("0.00")
                     End If
-                    Dim shortComment = GetLineComment(line.Comment, line.OrigCurrency, line.OrigCurrencyAmount, line.ShortComment, True, Left(theUser.FirstName, 1) & Left(theUser.LastName, 1), IIf(line.AP_Staff_RmbLineType.TypeName = "Mileage", line.Spare2, ""))
+                    Dim shortComment = GetLineComment(line.Comment, line.OrigCurrency, line.OrigCurrencyAmount, line.ShortComment, True, Left(theUser.FirstName, 1) & Left(theUser.LastName, 1), IIf(line.AP_Staff_RmbLineType.TypeName = "Mileage", line.Mileage, ""))
                     rtn &= GetOrderedString(shortComment,
                                          Debit, Credit)
 

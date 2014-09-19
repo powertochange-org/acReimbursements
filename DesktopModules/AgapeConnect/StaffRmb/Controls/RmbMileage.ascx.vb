@@ -85,18 +85,10 @@ Partial Class controls_Mileage
         End Set
     End Property
     Public Property Spare2() As String
-        Get
-
-            Return tbAmount.Text
+         Get
+            Return Nothing
         End Get
         Set(ByVal value As String)
-            Try
-                tbAmount.Text = CInt(value)
-            Catch ex As Exception
-                tbAmount.Text = 0
-            End Try
-
-
         End Set
     End Property
     Public Property Spare3() As String
@@ -127,21 +119,22 @@ Partial Class controls_Mileage
         Set(ByVal value As String)
         End Set
     End Property
-    Public ReadOnly Property Mileage As Integer
+    Public Property Mileage As Integer
         Get
             Return CInt(tbAmount.Text)
         End Get
+        Set(ByVal value As Integer)
+            Try
+                tbAmount.Text = CInt(value)
+            Catch ex As Exception
+                tbAmount.Text = 0
+            End Try
+        End Set
     End Property
-    Public ReadOnly Property MileageUnits() As String
+
+    Public ReadOnly Property MileageRate() As Decimal
         Get
-            Dim unitAndRate = ddlDistUnits.SelectedItem.Text
-            Dim rate = Regex.Match(unitAndRate, "\(#*\)").Value
-            Return unitAndRate.Replace(rate, "")
-        End Get
-    End Property
-    Public ReadOnly Property MileageRate() As Double
-        Get
-            Return ddlDistUnits.SelectedValue
+            Return CDec(ddlDistUnits.SelectedValue)
         End Get
     End Property
     Public Property Receipt() As Boolean
@@ -196,7 +189,7 @@ Partial Class controls_Mileage
             If theMiles <= 0 Then
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Reverse.Error", LocalResourceFile)
                 Return False
-            ElseIf theMiles <= 1 Then
+            ElseIf theMiles <= 1 Or theMiles > 9999 Then
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Miles.Error", LocalResourceFile)
                 Return False
             End If
