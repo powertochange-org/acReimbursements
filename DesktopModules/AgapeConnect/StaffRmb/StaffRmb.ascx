@@ -1361,7 +1361,7 @@
                                                     <EditItemTemplate>
                                                     </EditItemTemplate>
                                                     <ItemTemplate>
-                                                        <asp:Label ID="lblExtra" runat="server" Text='<%#  Eval("Spare1") + IIf(Eval("LineType")=31, " (" + Eval("Spare2")+ IIf(Eval("Spare3").Equals("1"),"mi","km") + ")" ,"") %>'></asp:Label>
+                                                        <asp:Label ID="lblExtra" runat="server" Text='<%# Eval("Spare1")%>'></asp:Label>
                                                     </ItemTemplate>
                                                     <ItemStyle HorizontalAlign="Center" />
                                                 </asp:TemplateField>
@@ -1371,7 +1371,7 @@
                                                         <asp:TextBox ID="TextBox1" runat="server" Text='<%# Bind("LineType") %>'></asp:TextBox>
                                                     </EditItemTemplate>
                                                     <ItemTemplate>
-                                                        <asp:Label ID="Label1" runat="server" CssClass='<%# IIF(IsWrongType(Eval("CostCenter"), Eval("LineType")), "ui-state-error ui-corner-all","") %>' ToolTip='<%# IIF(IsWrongType(Eval("CostCenter"), Eval("LineType")),Translate("lblWrongType"),"") %>' Text='<%# GetLocalTypeName(Eval("AP_Staff_RmbLineType.LineTypeId") )%>'></asp:Label>
+                                                        <asp:Label ID="Label1" runat="server" CssClass='<%# IIF(IsWrongType(Eval("CostCenter"), Eval("LineType")), "ui-state-error ui-corner-all","") %>' ToolTip='<%# IIF(IsWrongType(Eval("CostCenter"), Eval("LineType")),Translate("lblWrongType"),"") %>' Text='<%# GetLocalTypeName(Eval("AP_Staff_RmbLineType.LineTypeId") )  + If(Eval("LineType")=31, " (" + Eval("Spare2") + If(Eval("Spare3").Equals("1"),"mi","km") + ")" ,"") %>'></asp:Label>
                                                     </ItemTemplate>
                                                     <ItemStyle HorizontalAlign="Left" />
                                                 </asp:TemplateField>

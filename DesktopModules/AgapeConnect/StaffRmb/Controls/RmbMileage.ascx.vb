@@ -127,6 +127,23 @@ Partial Class controls_Mileage
         Set(ByVal value As String)
         End Set
     End Property
+    Public ReadOnly Property Mileage As Integer
+        Get
+            Return CInt(tbAmount.Text)
+        End Get
+    End Property
+    Public ReadOnly Property MileageUnits() As String
+        Get
+            Dim unitAndRate = ddlDistUnits.SelectedItem.Text
+            Dim rate = Regex.Match(unitAndRate, "\(#*\)").Value
+            Return unitAndRate.Replace(rate, "")
+        End Get
+    End Property
+    Public ReadOnly Property MileageRate() As Double
+        Get
+            Return ddlDistUnits.SelectedValue
+        End Get
+    End Property
     Public Property Receipt() As Boolean
         Get
             Return False ' ddlVATReceipt.SelectedValue = "Yes"

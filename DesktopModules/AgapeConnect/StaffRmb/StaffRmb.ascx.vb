@@ -973,13 +973,20 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     'Dim AccType = Right(ddlChargeTo.SelectedValue, 1)
 
+                    Dim transactionDate = CDate(ucType.GetProperty("theDate").GetValue(theControl, Nothing))
+                    Dim LineTypeName = d.AP_Staff_RmbLineTypes.Where(Function(c) c.LineTypeId = CInt(ddlLineTypes.SelectedValue)).First.TypeName.ToString()
+                    Dim age = DateDiff(DateInterval.Day, transactionDate, Today)
 
+                    '# Insert Main Database Data
                     Dim insert As New AP_Staff_RmbLine
-                    insert.Comment = CStr(ucType.GetProperty("Comment").GetValue(theControl, Nothing))
 
+                    insert.RmbNo = hfRmbNo.Value
+                    insert.TransDate = transactionDate
+                    insert.AccountCode = ddlAccountCode.SelectedValue
+                    insert.CostCenter = tbCostcenter.Text
+                    insert.LineType = CInt(ddlLineTypes.SelectedValue)
 
-                    'Look for currency conversion
-
+                    'Amount (with or without currency conversion)
                     If hfCurOpen.Value = "false" Or String.IsNullOrEmpty(hfOrigCurrency.Value) Or hfOrigCurrency.Value = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId) Then
                         insert.GrossAmount = CDbl(ucType.GetProperty("Amount").GetValue(theControl, Nothing))
                         insert.OrigCurrency = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)
@@ -989,21 +996,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         insert.OrigCurrency = hfOrigCurrency.Value
                         insert.OrigCurrencyAmount = CDbl(hfOrigCurrencyValue.Value)
                     End If
-                    Dim LineTypeName = d.AP_Staff_RmbLineTypes.Where(Function(c) c.LineTypeId = CInt(ddlLineTypes.SelectedValue)).First.TypeName.ToString()
-
-
-                    insert.ShortComment = GetLineComment(insert.Comment, insert.OrigCurrency, insert.OrigCurrencyAmount, tbShortComment.Text, False, Nothing, IIf(LineTypeName = "Mileage", CStr(ucType.GetProperty("Spare2").GetValue(theControl, Nothing)), ""))
-
-
                     If insert.GrossAmount >= Settings("TeamLeaderLimit") Then
                         insert.LargeTransaction = True
                     Else
                         insert.LargeTransaction = False
                     End If
-                    insert.LineType = CInt(ddlLineTypes.SelectedValue)
-                    insert.TransDate = CDate(ucType.GetProperty("theDate").GetValue(theControl, Nothing))
 
-                    Dim age = DateDiff(DateInterval.Day, insert.TransDate, Today)
+                    insert.Comment = CStr(ucType.GetProperty("Comment").GetValue(theControl, Nothing))
+                    insert.ShortComment = GetLineComment(insert.Comment, insert.OrigCurrency, insert.OrigCurrencyAmount, tbShortComment.Text, False, Nothing, IIf(LineTypeName = "Mileage", CStr(ucType.GetProperty("Spare2").GetValue(theControl, Nothing)), ""))
+
+                    'Taxes
                     If ddlOverideTax.SelectedIndex > 0 Then
                         insert.Taxable = (ddlOverideTax.SelectedValue = 1)
                         If (age > Settings("Expire")) Then
@@ -1056,9 +1058,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                         End If
                     End If
-
                     insert.VATReceipt = CBool(ucType.GetProperty("VAT").GetValue(theControl, Nothing))
-
                     Try
                         If cbRecoverVat.Checked And CDbl(tbVatRate.Text) > 0 Then
                             insert.VATRate = CDbl(tbVatRate.Text)
@@ -1069,9 +1069,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         insert.VATRate = Nothing
                     End Try
 
+                    'receipts
                     insert.Receipt = CBool(ucType.GetProperty("Receipt").GetValue(theControl, Nothing))
-                    insert.RmbNo = hfRmbNo.Value
-
                     Dim theFile As IFileInfo
                     Dim ElectronicReceipt As Boolean = False
                     ' Get each of the files from the line - file table
@@ -1090,22 +1089,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         StaffBrokerFunctions.EventLog("Rmb" & hfRmbNo.Value, "Failed to Add Electronic Receipt: " & ex.ToString, UserId)
 
                     End Try
-
-                    insert.Spare1 = CStr(ucType.GetProperty("Spare1").GetValue(theControl, Nothing))
-                    insert.Spare2 = CStr(ucType.GetProperty("Spare2").GetValue(theControl, Nothing))
-                    insert.Spare3 = CStr(ucType.GetProperty("Spare3").GetValue(theControl, Nothing))
-                    insert.Spare4 = CStr(ucType.GetProperty("Spare4").GetValue(theControl, Nothing))
-                    insert.Spare5 = CStr(ucType.GetProperty("Spare5").GetValue(theControl, Nothing))
-                    insert.Split = False
-
-
-                    ' insert.AnalysisCode = GetAnalysisCode(insert.LineType)
-
-                    'insert.AccountCode = GetAccountCode(insert.LineType, insert.AP_Staff_Rmb.CostCenter, insert.AP_Staff_Rmb.UserId)
-                    'insert.CostCenter = insert.AP_Staff_Rmb.CostCenter
-                    insert.AccountCode = ddlAccountCode.SelectedValue
-                    insert.CostCenter = tbCostcenter.Text
-
                     If insert.Receipt Then
                         If q.Count = 0 Then
                             insert.ReceiptNo = 1
@@ -1116,6 +1099,19 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         End If
 
                     End If
+
+                    'mileage
+                    If (LineTypeName.Equals("Mileage")) Then
+                        insert.Mileage = CInt(ucType.GetProperty("Mileage").GetValue(theControl, Nothing))
+                        insert.MileageRate = ucType.GetProperty("MileageRate").GetValue(theControl, Nothing)
+                    End If
+
+                    insert.Spare1 = CStr(ucType.GetProperty("Spare1").GetValue(theControl, Nothing)) 'province
+                    insert.Spare2 = CStr(ucType.GetProperty("Spare2").GetValue(theControl, Nothing)) 'mileage
+                    insert.Spare3 = CStr(ucType.GetProperty("Spare3").GetValue(theControl, Nothing)) 'mileageunitindex
+                    insert.Spare4 = CStr(ucType.GetProperty("Spare4").GetValue(theControl, Nothing))
+                    insert.Spare5 = CStr(ucType.GetProperty("Spare5").GetValue(theControl, Nothing))
+                    insert.Split = False
 
                     d.AP_Staff_RmbLines.InsertOnSubmit(insert)
 
