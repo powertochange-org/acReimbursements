@@ -157,8 +157,10 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
         ' If it's a pdf, need to use the generic pdf button
         If file.Extension.ToLower = "pdf" Then
             img.Src = "images/pdf.png"
+            img.Width = 64
         Else ' Otherwise, we just use the same as the navigation url
             img.Src = link.NavigateUrl
+            img.Width = 200
             ' IE-specific hack to reload images
             If (Request.Browser.Browser = "InternetExplorer" OrElse Request.Browser.Browser = "IE") Then
                 ' Append the timestamp to the img's source
@@ -173,7 +175,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
         img.Alt = "Click to open fullsize in new tab..."
         ' Provide mouse-over
         img.Attributes("title") = "Click to open fullsize in new tab..."
-        img.Width = 200
+
 
         ' Add the elements appropriately
         link.Controls.Add(img)

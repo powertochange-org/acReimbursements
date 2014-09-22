@@ -1003,7 +1003,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
 
                     insert.Comment = CStr(ucType.GetProperty("Comment").GetValue(theControl, Nothing))
-                    insert.ShortComment = GetLineComment(insert.Comment, insert.OrigCurrency, insert.OrigCurrencyAmount, tbShortComment.Text, False, Nothing, IIf(LineTypeName = "Mileage", CStr(ucType.GetProperty("Mileage").GetValue(theControl, Nothing)), ""))
+                    insert.ShortComment = GetLineComment(insert.Comment, insert.OrigCurrency, insert.OrigCurrencyAmount, tbShortComment.Text, False, Nothing, If(LineTypeName = "Mileage", CStr(ucType.GetProperty("Mileage").GetValue(theControl, Nothing)), ""))
 
                     'Taxes
                     If ddlOverideTax.SelectedIndex > 0 Then
@@ -1167,9 +1167,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         Dim sc = tbShortComment.Text
                         If (sc <> line.First.ShortComment) Then
                             'the short comment was manully changed, so this should take precidence over anything else.
-                            line.First.ShortComment = GetLineComment(comment, line.First.OrigCurrency, line.First.OrigCurrencyAmount, tbShortComment.Text, False, Nothing, IIf(LineTypeName = "Mileage", CStr(ucType.GetProperty("Mileage").GetValue(theControl, Nothing)), ""))
+                            line.First.ShortComment = GetLineComment(comment, line.First.OrigCurrency, line.First.OrigCurrencyAmount, tbShortComment.Text, False, Nothing, If(LineTypeName = "Mileage", CStr(ucType.GetProperty("Mileage").GetValue(theControl, Nothing)), ""))
                         Else
-                            line.First.ShortComment = GetLineComment(comment, line.First.OrigCurrency, line.First.OrigCurrencyAmount, "", False, Nothing, IIf(LineTypeName = "Mileage", CStr(ucType.GetProperty("Mileage").GetValue(theControl, Nothing)), ""))
+                            line.First.ShortComment = GetLineComment(comment, line.First.OrigCurrency, line.First.OrigCurrencyAmount, "", False, Nothing, If(LineTypeName = "Mileage", CStr(ucType.GetProperty("Mileage").GetValue(theControl, Nothing)), ""))
                         End If
                         'If line.First.ShortComment <> comment Then
                         '    line.First.Comment = comment

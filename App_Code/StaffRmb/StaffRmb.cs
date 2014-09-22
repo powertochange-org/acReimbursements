@@ -334,11 +334,11 @@ namespace StaffRmb
                     String response_string = await reader.ReadToEndAsync();
                     return response_string;
                 }
-                return "NO-DATA";
+                return "{'ERROR':['NO-DATA']}";
             }
             catch (WebException e)
             {
-                return "ERROR";
+                return "{'EXCEPTION': ['"+e.Message+"']}";
             }
         }
 

@@ -189,11 +189,14 @@
 
             $('.rmbAmount,.exchangeRate').keypress(function(event){
                 var xRate = $(".exchangeRate").val();
-                console.log("setting exchange rate: "+xRate);
-                if (xRate != null) {
+                if (xRate == null) {
+                    var amount = $('.rmbAmount').val();
+                    $("input[name$='hfCADValue']").val(amount);
+                } else {
+                    console.log("setting exchange rate: "+xRate);
                     setXRate(xRate);
                     calculateEquivalentCAD();
-                }
+                } 
             });
 
             $('.exchangeRate').blur(function() {
@@ -617,7 +620,7 @@
 
     function calculateEquivalentCAD() {
         var foreign = $('.rmbAmount').val();
-        var xRate = $('#%=hfExchangeRate.ClientID%>').val();
+        var xRate = $('#<%=hfExchangeRate.ClientID%>').val();
         if (xRate.length==0 || xRate<=0) {
             $(".equivalentCAD").val("0.00");
         } else {
