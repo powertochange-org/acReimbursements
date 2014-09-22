@@ -1681,22 +1681,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             'PopupTitle.Text = "Add New Reimbursement Expense"
             btnSaveLine.CommandName = "Save"
 
-            hfOrigCurrency.Value = ""
-            hfOrigCurrencyValue.Value = ""
-
             ifReceipt.Attributes("src") = Request.Url.Scheme & "://" & Request.Url.Authority & "/DesktopModules/AgapeConnect/StaffRmb/ReceiptEditor.aspx?RmbNo=" & hfRmbNo.Value & "&RmbLine=New"
             pnlElecReceipts.Attributes("style") = "display: none;"
-            Dim jscript As String = ""
-            jscript &= " $('#" & hfOrigCurrency.ClientID & "').attr('value', '');"
-            jscript &= " $('#" & hfOrigCurrencyValue.ClientID & "').attr('value', '');"
-
-            Dim t As Type = addLinebtn2.GetType()
-            Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
-            sb.Append("<script language='javascript'>")
-
-            sb.Append(jscript & "showNewLinePopup();")
-            sb.Append("</script>")
-            ScriptManager.RegisterStartupScript(addLinebtn2, t, "popupAdd", sb.ToString, False)
+            ScriptManager.RegisterStartupScript(addLinebtn2, addLinebtn2.GetType(), "popupAdd", "showNewLinePopup();", True)
         End Sub
 
         'Protected Sub btnSettings_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSettings.Click
@@ -2819,7 +2806,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     row.CostCenter = tbChargeTo.Text
                 Next
             End If
-            If (ddlApprovedBy.SelectedValue.Length > 0) AndAlso (Rmb.ApprUserId <> ddlApprovedBy.SelectedValue) Then
+            If (ddlApprovedBy.SelectedValue <> Nothing) AndAlso (Rmb.ApprUserId <> ddlApprovedBy.SelectedValue) Then
                 save_necessary = True
                 Rmb.ApprUserId = ddlApprovedBy.SelectedValue
             End If
@@ -3038,6 +3025,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ddlOverideTax.SelectedIndex = 0
                     theControl = LoadControl(lt.First.ControlPath)
 
+                    hfOrigCurrency.Value = currency
+                    hfOrigCurrencyValue.Value = 0
+
                     theControl.ID = "theControl"
                     phLineDetail.Controls.Add(theControl)
 
@@ -3055,7 +3045,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     If (ucType.GetProperty("Mileage") IsNot Nothing) Then
                         ucType.GetProperty("Mileage").SetValue(theControl, 0, Nothing)
                     End If
-                    ScriptManager.RegisterStartupScript(Page, Me.GetType(), "setCur", "$('.ddlCur')val('" & currency & "'); currencyChange('" & currency & "');", True)
+                    ScriptManager.RegisterClientScriptBlock(Page, Me.GetType(), "setCur", "currencyChange('" & currency & "');", True)
                     ' Attempt to set the receipttype
                     Try
                         ucType.GetProperty("ReceiptType").SetValue(theControl, receiptMode, Nothing)

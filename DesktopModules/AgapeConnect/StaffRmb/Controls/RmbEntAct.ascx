@@ -7,7 +7,7 @@
 <div class="Agape_SubTitle"> 
     <asp:HiddenField ID="hfNoReceiptLimit" runat="server" Value="0" />
     <asp:HiddenField ID="hfCADValue" runat="server" Value="" />
-    <asp:Label ID="Label6" runat="server" Font-Italic="true" ForeColor="Gray" resourcekey="Explanation"></asp:Label>
+    <asp:Label ID="Label6" runat="server" Font-Italic="true" ForeColor="Gray" CssClass="explanation" resourcekey="Explanation"></asp:Label>
 </div><br />
 
 <table   style="font-size:9pt; ">

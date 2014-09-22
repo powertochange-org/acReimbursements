@@ -150,4 +150,7 @@
   <data name="Description.Error" xml:space="preserve">
     <value>* You must enter a (better) description</value>
   </data>
+  <data name="lblDate.Text">
+    <value>Date of transaction</value>
+  </data>
 </root>

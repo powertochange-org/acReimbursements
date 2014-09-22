@@ -460,7 +460,7 @@
         }
 
         function tweakControl() {
-            $("#<%= UpdatePanel2.ClientID %> input[name$='tbDesc']").attr('maxlength', '27').attr('style', 'width:22em');
+            $("#<%= UpdatePanel2.ClientID %> input[name$='tbDesc']").attr('maxlength', '27').attr('style', 'width:15em').attr('placeholder', '<%= Translate("DescriptionHint") %>');
         }
 
         function setUpConfirms() {
@@ -571,8 +571,8 @@
  function checkCur(){
      var ac = '<%= StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId) %>';
      var currency = $("#<%= hfOrigCurrency.ClientID%>").val();
-     var amount = $("#<%= hfOrigCurrencyValue.ClientID%>").val();
-     if ($('.divCur').length) {
+     var amount = Number($("#<%= hfOrigCurrencyValue.ClientID%>").val());
+     if ($('.divCur').is(':visible')) {
          var exchangerate=1;
          if (currency == ac) {
              console.log("Canadian Currency");
@@ -617,7 +617,7 @@
 
     function calculateEquivalentCAD() {
         var foreign = $('.rmbAmount').val();
-        var xRate = $('#<%=hfExchangeRate.ClientID%>').val();
+        var xRate = $('#%=hfExchangeRate.ClientID%>').val();
         if (xRate.length==0 || xRate<=0) {
             $(".equivalentCAD").val("0.00");
         } else {
@@ -1555,7 +1555,7 @@
                         <br />
                         <table style="font-size: 9pt" width="100%">
                             <tr valign="top">
-                                <td style="white-space: nowrap;">
+                                <td style="white-space: nowrap; min-width:194px;">
                                     <b>
                                         <dnn:Label ID="Label4" runat="server" ControlName="ddlLineTypes" ResourceKey="LineTypes" />
                                     </b>
@@ -1591,9 +1591,7 @@
                                             </WhereParameters>
                                         </asp:LinqDataSource>
                                     </div>
-                                    <div style="clear: both;">
-                                        &nbsp;
-                                    </div>
+
                                 </td>
                             </tr>
                         </table>

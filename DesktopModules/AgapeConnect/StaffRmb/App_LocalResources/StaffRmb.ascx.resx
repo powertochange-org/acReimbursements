@@ -711,4 +711,7 @@
   <data name="Extra.Text" xml:space="preserve">
     <value>...</value>
   </data>
+  <data name="DescriptionHint.Text" xml:space="preserve">
+    <value>Max 27 chars. Abbreviate pls.</value>
+  </data>
 </root>
