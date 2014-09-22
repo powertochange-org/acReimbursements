@@ -3055,7 +3055,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     If (ucType.GetProperty("Mileage") IsNot Nothing) Then
                         ucType.GetProperty("Mileage").SetValue(theControl, 0, Nothing)
                     End If
-                    ScriptManager.RegisterStartupScript(Page, Me.GetType(), "setCur", "currencyChange('" & currency & "');", True)
+                    ScriptManager.RegisterStartupScript(Page, Me.GetType(), "setCur", "$('.ddlCur')val('" & currency & "'); currencyChange('" & currency & "');", True)
                     ' Attempt to set the receipttype
                     Try
                         ucType.GetProperty("ReceiptType").SetValue(theControl, receiptMode, Nothing)
