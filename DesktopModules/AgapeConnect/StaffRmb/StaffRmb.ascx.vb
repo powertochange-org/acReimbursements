@@ -902,12 +902,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     btnAddressOk.OnClientClick = ""
                     btnTempAddressChange.OnClientClick = ""
                     btnPermAddressChange.OnClientClick = ""
+                    btnReject.Visible = isApprover And SUBMITTED
+                    btnReject.Enabled = isApprover And SUBMITTED
                     btnApprove.Visible = isApprover And SUBMITTED
-                    btnApprove.Enabled = btnApprove.Visible
+                    btnApprove.Enabled = isApprover And SUBMITTED
                     btnProcess.Visible = isFinance And APPROVED
-                    btnProcess.Enabled = btnProcess.Visible
+                    btnProcess.Enabled = isFinance And APPROVED
                     btnUnProcess.Visible = isFinance And (PROCESSING Or PAID)
-                    btnUnProcess.Enabled = btnUnProcess.Visible
+                    btnUnProcess.Enabled = isFinance And (PROCESSING Or PAID)
                     btnDownload.Visible = (isFinance Or isOwner Or isSpouse) And FORM_HAS_ITEMS
 
                     tbCostcenter.Enabled = isFinance

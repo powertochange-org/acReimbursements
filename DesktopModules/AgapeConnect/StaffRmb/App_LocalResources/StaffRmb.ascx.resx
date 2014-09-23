@@ -493,7 +493,7 @@
     <value>More information is required in order to continue processing Reimbursement [RMBNO] - [USERREF].</value>
   </data>
   <data name="MoreInfoMsg.Text" xml:space="preserve">
-    <value>This reimbursment will be highlighted to the staff member on this page. However, you should email the staff member directly, to let him/her know what information you need.</value>
+    <value>This reimbursment will be highlighted to the staff member when they log into this site; however, you should email them directly, to let him/her know that changes are required.</value>
   </data>
   <data name="AdvAmountSpecial.Text" xml:space="preserve">
     <value>Since you have a transaction over [TEAMLEADERLIMIT] in your advance, it must be approved by [AUTHUSER].</value>
