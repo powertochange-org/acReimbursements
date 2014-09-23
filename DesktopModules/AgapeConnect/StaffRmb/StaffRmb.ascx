@@ -1305,7 +1305,7 @@
                                         <td colspan="2" style="font-size: 8pt; width: 33%;">
                                             <fieldset>
                                                 <legend class="AgapeH4">
-                                                    <asp:Label ID="ttlYourComments" runat="server" resourcekey="YourComments" Visible="false" /><asp:Label
+                                                    <asp:Label ID="ttlYourComments" runat="server" CssClass="hdrTitle" resourcekey="YourComments" Visible="false" /><asp:Label
                                                         ID="ttlUserComments" runat="server" Text="User's Comments" /></legend>
                                                 <asp:Label ID="lblComments" runat="server" Height="60px" Visible="false"></asp:Label>
                                                 <asp:TextBox ID="tbComments" runat="server" Height="55px" TextMode="MultiLine" Width="100%"
@@ -1315,7 +1315,7 @@
                                         <td colspan="2" style="font-size: 8pt; width: 33%;">
                                             <fieldset>
                                                 <legend class="AgapeH4">
-                                                    <asp:Label ID="Label26" runat="server" resourcekey="ApproversComments"></asp:Label></legend>
+                                                    <asp:Label ID="Label26" runat="server" CssClass="hdrTitle" resourcekey="ApproversComments"></asp:Label></legend>
                                                 <asp:Label ID="lblApprComments" runat="server" Height="60px"></asp:Label>
                                                 <asp:TextBox ID="tbApprComments" runat="server" Height="35px" TextMode="MultiLine"
                                                     Width="100%" Visible="false"  onChange="showSaveButton();"></asp:TextBox>
@@ -1325,7 +1325,7 @@
                                         <td colspan="2" style="font-size: 8pt; width: 33%;">
                                             <fieldset>
                                                 <legend class="AgapeH4">
-                                                    <asp:Label ID="Label27" runat="server" resourcekey="AccountsComments"></asp:Label></legend>
+                                                    <asp:Label ID="Label27" runat="server" CssClass="hdrTitle" resourcekey="AccountsComments"></asp:Label></legend>
                                                 <asp:Label ID="lblAccComments" runat="server" Height="60px"></asp:Label>
                                                 <asp:TextBox ID="tbAccComments" runat="server" Height="35px" TextMode="MultiLine" Width="100%"
                                                     Visible="false"  onKeyPress="showSaveButton();"></asp:TextBox>
@@ -1421,7 +1421,7 @@
 
                                                 <asp:TemplateField HeaderText="Receipt" ItemStyle-Width="20px">
                                                     <ItemTemplate>
-                                                        <%# If(Not Eval("Receipt"), "<img src='/Icons/Sigma/Unchecked_32X32_Standard.png' width=20 alt='none' title='no receipt (less than $" & Settings("NoReceipt") & ")' />",
+                                                        <%# If(Not Eval("Receipt"), "<img src='/Icons/Sigma/no_receipt_32x32.png' width=20 alt='none' title='no receipt (less than $" & Settings("NoReceipt") & ")' />",
                                                                 If(Eval("ReceiptImageId") Is Nothing, "<img src='/Icons/Sigma/BulkMail_32X32_Standard.png' width=20 alt='mail' title='receipt will be sent by mail'/>",
                                                                    If({"jpg", "jpeg", "png", "gif", "bmp"}.Contains(GetImageType(Eval("RmbLineNo"))), "<a target='_Blank' href=" + GetImageUrl(Eval("RmbLineNo")) + "><img id='" +
                                                                                                 GetImageUrl(Eval("RmbLineNo")) + "' class='viewReceipt" & If(hasMultipleReceipts(Eval("RmbLineNo"))," multiReceipt","") & "' src='/Icons/Sigma/ExtPng_32x32_Standard.png' width=20 alt='img' /></a>",

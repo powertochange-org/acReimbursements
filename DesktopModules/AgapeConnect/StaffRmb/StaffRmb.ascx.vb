@@ -810,6 +810,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     staffInitials.Value = user.FirstName.Substring(0, 1) & user.LastName.Substring(0, 1)
                     tbChargeTo.Text = If(Rmb.CostCenter Is Nothing, "", Rmb.CostCenter)
                     tbChargeTo.Enabled = DRAFT Or MORE_INFO Or CANCELLED Or (SUBMITTED And (isOwner Or isSpouse))
+                    tbChargeTo.Attributes.Add("placeholder", Translate("tbChargeToHint"))
                     lblStatus.Text = Translate(RmbStatus.StatusName(Rmb.Status))
                     If (Rmb.MoreInfoRequested) Then
                         lblStatus.Text = lblStatus.Text & " - " & Translate("StatusMoreInfo")
@@ -934,15 +935,28 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Function
 
         Private Async Function updateApproversListAsync(ByVal obj As Object) As Task
-            Dim approvers As Object
+            Dim approvers As StaffRmbFunctions.Approvers
             Dim approverId = -1
             approvers = Await StaffRmbFunctions.getApproversAsync(obj, Nothing, Nothing)
             approverId = obj.ApprUserId
             
             ddlApprovedBy.Items.Clear()
             Dim blank As ListItem
-            blank = New ListItem("", "-1")
+            If (tbChargeTo.Text.Length = 0) Then
+                blank = New ListItem(Translate("ddlApprovedByNoAccountHint"), "-1")
+                ddlApprovedBy.Style.Add("color", "gray")
+            Else
+                If (approvers.UserIds.Count = 0) Then
+                    blank = New ListItem(Translate("ddlApprovedByNoApproversHint"), "-1")
+                    ddlApprovedBy.Style.Add("color", "gray")
+                Else
+                    blank = New ListItem("", "-1")
+                    ddlApprovedBy.Style.Add("color", "black")
+                End If
+            End If
             blank.Attributes.Add("disabled", "disabled")
+            blank.Attributes.Add("selected", "selected")
+            blank.Attributes.Add("style", "display:none") 'hide in dropdown list
             ddlApprovedBy.Items.Add(blank)
             For Each row In approvers.UserIds
                 If Not row Is Nothing Then
@@ -951,9 +965,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Next
             Try
                 ddlApprovedBy.SelectedValue = approverId
+                btnSubmit.Enabled = (approverId >= 0)
                 lblApprovedBy.Text = ddlApprovedBy.SelectedItem.ToString
             Catch ex As Exception
                 ddlApprovedBy.SelectedValue = -1
+                btnSubmit.Enabled = False
                 lblApprovedBy.Text = "[NOBODY]"
             End Try
         End Function
@@ -2826,7 +2842,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 save_necessary = True
                 Rmb.AcctComment = tbAccComments.Text
             End If
-            If (Rmb.MoreInfoRequested <> (cbMoreInfo.Checked Or cbApprMoreInfo.Checked)) Then
+            If ((Rmb.MoreInfoRequested Is Nothing And (cbMoreInfo.Checked Or cbApprMoreInfo.Checked)) Or
+                Rmb.MoreInfoRequested <> (cbMoreInfo.Checked Or cbApprMoreInfo.Checked)) Then
                 save_necessary = True
                 Rmb.Locked = False
                 Rmb.MoreInfoRequested = (cbMoreInfo.Checked Or cbApprMoreInfo.Checked)
