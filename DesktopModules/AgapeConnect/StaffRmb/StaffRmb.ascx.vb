@@ -3203,6 +3203,21 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Return result & ")"
         End Function
 
+        Public Function differentExchangeRate(xRate1 As Double, xRate2 As Double) As Boolean
+            'determine whether the 2 exchange rates differ by more than the fudge factor
+            Dim fudge_factor = 0.001
+            Dim max_difference As Double = 0.0
+            If (xRate1 >= xRate2) Then
+                max_difference = xRate1 * fudge_factor
+            Else
+                max_difference = xRate2 * fudge_factor
+            End If
+
+            Return Math.Abs(xRate1 - xRate2) > max_difference
+        End Function
+
+
+
 #End Region
 
 #Region "Downloading"

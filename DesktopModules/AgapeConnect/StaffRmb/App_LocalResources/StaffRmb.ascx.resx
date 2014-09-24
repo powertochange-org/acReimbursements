@@ -723,4 +723,7 @@
   <data name="tbChargeToHint.Text" xml:space="preserve">
     <value>Account #</value>
   </data>
+  <data name="DifferentExchangeRate.Text" xml:space="preserve">
+    <value>This foreign amount has been edited, and requires a receipt to confirm the rate.</value>
+  </data>
 </root>
