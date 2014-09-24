@@ -65,7 +65,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_Controls_Currency
 
     Private Sub display_currency_details()
         Dim script As String = "$('.hfCurOpen').val('true');"
-        script = script + "if ($('.ddlCur').val() == '" & ac & "') {$('.curDetails').hide();}"
+        script = script + "if ($('.ddlCur').val() == '" & ac & "') {$('.curDetails').hide();} else {$('.curDetails').show();}"
         ScriptManager.RegisterStartupScript(Page, Me.GetType(), "cur", script, True)
     End Sub
 

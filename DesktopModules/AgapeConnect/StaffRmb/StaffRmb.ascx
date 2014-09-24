@@ -644,13 +644,13 @@
                 $(".equivalentCAD").val($(".rmbAmount").val())
             }
             calculateXRate();
-            $(".curDetails").show(300);
+            $(".curDetails").show();
             $(".ddlProvince").val("--");
             $('#<%= hfCurOpen.ClientID %>').val("true");
         } else {
             $("input[name$='hfExchangeRate']").val(1);
             $("input[name$='hfOrigCurrencyValue']").val($(".rmbAmount").val());
-            $(".curDetails").hide(300);
+            $(".curDetails").hide();
             $('#<%= hfCurOpen.ClientID %>').val("false");
         }
     };

@@ -2060,6 +2060,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     If (theLine.First.GrossAmount > 0) Then
                         xRate = Math.Round(CDbl(theLine.First.OrigCurrencyAmount / theLine.First.GrossAmount), 4)
                     End If
+                    hfExchangeRate.Value = xRate.ToString(New CultureInfo(""))
 
                     ucType.GetProperty("Comment").SetValue(theControl, theLine.First.Comment, Nothing)
                     If (theLine.First.OrigCurrency = ac) Then
@@ -2073,15 +2074,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ucType.GetProperty("CADValue").SetValue(theControl, Math.Round(CDbl(theLine.First.GrossAmount), 2), Nothing)
                     If (Not theLine.First.OrigCurrencyAmount Is Nothing) Then
                         hfOrigCurrencyValue.Value = CDbl(theLine.First.OrigCurrencyAmount)
-                        jscript &= " $('#" & hfOrigCurrencyValue.ClientID & "').attr('value', '" & theLine.First.OrigCurrencyAmount & "');"
-                        'jscript &= " $('.currency').attr('value'," & theLine.First.OrigCurrencyAmount & ");"
-                        hfExchangeRate.Value = xRate.ToString(New CultureInfo(""))
                     End If
                     If (Not String.IsNullOrEmpty(theLine.First.OrigCurrency)) Then
-                        jscript &= " $('#" & hfOrigCurrency.ClientID & "').attr('value', '" & theLine.First.OrigCurrency & "');"
                         hfOrigCurrency.Value = theLine.First.OrigCurrency
-                        'jscript &= " $('.ddlCur').val('" & theLine.First.OrigCurrency & "');"
-
+                    Else
+                        hfOrigCurrency.Value = ac
                     End If
 
                     ucType.GetProperty("theDate").SetValue(theControl, theLine.First.TransDate, Nothing)
@@ -3066,7 +3063,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     If (ucType.GetProperty("Mileage") IsNot Nothing) Then
                         ucType.GetProperty("Mileage").SetValue(theControl, 0, Nothing)
                     End If
-                    ScriptManager.RegisterClientScriptBlock(Page, Me.GetType(), "setCur", "currencyChange('" & currency & "');", True)
+                    ScriptManager.RegisterStartupScript(Page, Me.GetType(), "setCur", "currencyChange('" & currency & "');", True)
                     ' Attempt to set the receipttype
                     Try
                         ucType.GetProperty("ReceiptType").SetValue(theControl, receiptMode, Nothing)
@@ -3081,7 +3078,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         pnlElecReceipts.Attributes("style") = "display: none;"
                     End Try
                     ucType.GetMethod("Initialize").Invoke(theControl, New Object() {Settings})
-
                     ddlAccountCode.SelectedValue = GetAccountCode(lt.First.LineTypeId, tbCostcenter.Text)
                 End If
             Catch ex As Exception
