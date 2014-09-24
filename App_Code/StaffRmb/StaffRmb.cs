@@ -338,7 +338,7 @@ namespace StaffRmb
             }
             catch (WebException e)
             {
-                return "{'EXCEPTION': ['"+e.Message+"']}";
+                return "{'EXCEPTION': ['exception']}";
             }
         }
 

@@ -1006,15 +1006,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     'Amount (with or without currency conversion)
                     Dim accounting_currency = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)
-                    If hfCurOpen.Value = "false" Or String.IsNullOrEmpty(hfOrigCurrency.Value) Or hfOrigCurrency.Value = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId) Then
+                    If hfCurOpen.Value = "false" Or String.IsNullOrEmpty(hfOrigCurrency.Value) Or hfOrigCurrency.Value = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId) Then 'local currency
                         insert.GrossAmount = CDbl(ucType.GetProperty("Amount").GetValue(theControl, Nothing))
                         insert.OrigCurrency = accounting_currency
                         insert.OrigCurrencyAmount = insert.GrossAmount
-                    Else
+                    Else 'Foreign Currency
                         insert.GrossAmount = CDbl(ucType.GetProperty("CADValue").GetValue(theControl, Nothing))
+                        insert.ExchangeRate = StaffBrokerFunctions.GetExchangeRate(accounting_currency, hfOrigCurrency.Value)
                         insert.OrigCurrency = hfOrigCurrency.Value
                         insert.OrigCurrencyAmount = CDbl(hfOrigCurrencyValue.Value)
-                        insert.ExchangeRate = StaffBrokerFunctions.GetExchangeRate(accounting_currency, hfOrigCurrency.Value)
                     End If
                     If insert.GrossAmount >= Settings("TeamLeaderLimit") Then
                         insert.LargeTransaction = True
@@ -1171,16 +1171,17 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     If line.Count > 0 Then
 
                         Dim LineTypeName = d.AP_Staff_RmbLineTypes.Where(Function(c) c.LineTypeId = CInt(ddlLineTypes.SelectedValue)).First.TypeName.ToString()
-
+                        Dim accounting_currency = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)
                         ''Look for currency conversion
                         If hfCurOpen.Value = "false" Or String.IsNullOrEmpty(hfOrigCurrency.Value) Or hfOrigCurrency.Value = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId) Then
                             line.First.GrossAmount = CDbl(ucType.GetProperty("Amount").GetValue(theControl, Nothing))
-                            line.First.OrigCurrency = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)
+                            line.First.OrigCurrency = accounting_currency
                             line.First.OrigCurrencyAmount = line.First.GrossAmount
                         Else
                             line.First.GrossAmount = ucType.GetProperty("CADValue").GetValue(theControl, Nothing)
                             line.First.OrigCurrency = hfOrigCurrency.Value
                             line.First.OrigCurrencyAmount = hfOrigCurrencyValue.Value
+                            line.First.ExchangeRate = StaffBrokerFunctions.GetExchangeRate(accounting_currency, hfOrigCurrency.Value)
                         End If
 
                         Dim comment As String = CStr(ucType.GetProperty("Comment").GetValue(theControl, Nothing))
@@ -2053,7 +2054,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ddlLineTypes.SelectedValue = theLine.First.LineType
                     ddlLineTypes_SelectedIndexChanged(Me, Nothing)
 
-                    Dim jscript As String = ""
+                    Dim jscript As System.Text.StringBuilder = New System.Text.StringBuilder()
                     Dim ucType As Type = theControl.GetType()
                     Dim ac = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)
                     Dim xRate = 1
@@ -2067,18 +2068,21 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         ucType.GetProperty("Amount").SetValue(theControl, CDbl(theLine.First.GrossAmount), Nothing)
                     Else
                         ucType.GetProperty("Amount").SetValue(theControl, CDbl(theLine.First.OrigCurrencyAmount), Nothing)
-                        jscript &= " $('.equivalentCAD').val(" & theLine.First.GrossAmount & ");"
-                        jscript &= " $('.exchangeRate').val(Number(" & xRate & ").toFixed(4));"
-                        jscript &= " $('.curDetails').show();"
+                        jscript.Append(" $('.equivalentCAD').val(" & theLine.First.GrossAmount & ");")
+                        jscript.Append(" $('.exchangeRate').val(Number(" & xRate & ").toFixed(4));")
+                        jscript.Append(" $('.curDetails').show();")
                     End If
                     ucType.GetProperty("CADValue").SetValue(theControl, Math.Round(CDbl(theLine.First.GrossAmount), 2), Nothing)
                     If (Not theLine.First.OrigCurrencyAmount Is Nothing) Then
-                        hfOrigCurrencyValue.Value = CDbl(theLine.First.OrigCurrencyAmount)
+                        'hfOrigCurrencyValue.Value = CDbl(theLine.First.OrigCurrencyAmount)
+                        jscript.Append(" $('#" & hfOrigCurrencyValue.ClientID & "').val(" & theLine.First.OrigCurrencyAmount & ");")
                     End If
                     If (Not String.IsNullOrEmpty(theLine.First.OrigCurrency)) Then
-                        hfOrigCurrency.Value = theLine.First.OrigCurrency
+                        'hfOrigCurrency.Value = theLine.First.OrigCurrency
+                        jscript.Append(" currencyChange('" & theLine.First.OrigCurrency & "');")
                     Else
-                        hfOrigCurrency.Value = ac
+                        'hfOrigCurrency.Value = ac
+                        jscript.Append(" $('#" & hfOrigCurrency.ClientID & "').val('" & ac & "');")
                     End If
 
                     ucType.GetProperty("theDate").SetValue(theControl, theLine.First.TransDate, Nothing)
@@ -2156,11 +2160,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
 
                     Dim t As Type = GridView1.GetType()
-                    Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
-                    sb.Append("<script language='javascript'>")
-                    sb.Append(jscript & "showNewLinePopup();")
-                    sb.Append("</script>")
-                    ScriptManager.RegisterStartupScript(GridView1, t, "popupedit", sb.ToString, False)
+                    jscript.Append(" showNewLinePopup();")
+                    ScriptManager.RegisterStartupScript(GridView1, t, "popupedit", jscript.ToString, True)
                 End If
                 ElseIf e.CommandName = "mySplit" Then
                     hfRows.Value = 1

@@ -149,10 +149,11 @@
 
             // If a foreign currency is selected...
             if ($('.ddlCur :selected').val() != "<%=StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)%>") {
-                if ($(".exchangeRate").val() == 0) {
-                    $(".exchangeRate").val("1.0000");
-                    $(".equivalentCAD").val($(".rmbAmount").val());
-                }
+                //if ($(".exchangeRate").val() == Null || $('.exchangeRate').val() == 0) {
+                //    $(".exchangeRate").val("1.0000");
+                //    $(".equivalentCAD").val($(".rmbAmount").val());
+                //}
+
                 // Disable the amount field; it will get calculated automatically
                 //$('.rmbAmount').prop('disabled', true);
                 // Set the foreign currency amount to whatever the original amount is
@@ -175,7 +176,7 @@
 
            
             // This is within the currency converter; anytime the exchange rate gets changed
-            $('.equivalentCAD').keypress(function() { 
+            $('.equivalentCAD').keyup(function() { 
                 calculateXRate(); 
                 checkRecReq;
             });
@@ -187,7 +188,7 @@
                 }
             });
 
-            $('.rmbAmount,.exchangeRate').keypress(function(event){
+            $('.rmbAmount,.exchangeRate').keyup(function(event){
                 var xRate = $(".exchangeRate").val();
                 if (xRate == null) {
                     var amount = $('.rmbAmount').val();
@@ -578,7 +579,7 @@
      if ($('.divCur').is(':visible')) {
          var exchangerate=1;
          if (currency == ac) {
-             console.log("Canadian Currency");
+             console.log("Canadian Currency, exchange rate set to 1.0000");
              setXRate(1.0000);
          } else {
              $('.ddlCur').val(currency);
@@ -586,14 +587,12 @@
              if (CADAmount>0) {
                  exchangerate = (amount/CADAmount).toFixed(4);
                  setXRate(exchangerate);
-                 calculateRevXRate();
+                 //calculateRevXRate();
+                 console.log("checkCur(): "+amount+" "+currency+ " = " + CADAmount + " CAD @ " + exchangerate);
              } else {
                  console.log("ERROR: $CAD = 0");
              }
-             console.log("Foreign Currency: "+currency+ "  " );
-             console.log("  Foreign Amount: "+amount);
-             console.log(" Canadian Amount: "+CADAmount);
-             console.log("   Exchange Rate: "+exchangerate);
+             
          }
     }
 }
@@ -602,7 +601,6 @@
     // This function calculates the new exchange rate based on foreign amount and
     // canadian amount, and updates the amount field
     function calculateXRate() {
-
         var foreign = $('.rmbAmount').val();
         var cad = $('.equivalentCAD').val();
         var xRate = 1;
@@ -611,7 +609,7 @@
         };
         xRate = Number(xRate).toFixed(4);
         $('.exchangeRate').val(xRate);
-        
+        console.log("calculateXRate(): "+xRate);
         setXRate(xRate);
         // Need to update some values for the backend:
         $("#<%= hfOrigCurrencyValue.ClientID%>").val(foreign);
@@ -628,11 +626,12 @@
         }
         $("#<%= hfOrigCurrencyValue.ClientID%>").val(foreign);
         $("input[name$='hfCADValue']").val($(".equivalentCAD").val());
+        console.log("calculateEquivalentCAD(): " + foreign + " " + $("input[name$='hfOrigCurrency']").val() + " equals: " + $(".equivalentCAD").val() + " CAD");
         checkRecReq();
     };
 
     function currencyChange(selected_currency) {
-        console.log("Currency Chanegd to " + selected_currency);
+        console.log("currencyChange(" + selected_currency + ");");
         var local_currency = $("input[name$='hfAccountingCurrency']").val();
         $(".ddlCur").val(selected_currency);
         $("[name$='hfOrigCurrency']").val(selected_currency);
@@ -659,8 +658,7 @@
         
         var xRate = $("#<%= hfExchangeRate.ClientId %>").attr('value');
         var inAmt=$('.rmbAmount').val() ;
-        console.log('xRate:' + xRate);
-        console.log('inAmt:' + inAmt);
+
         if(parseFloat(xRate) <0)
         {
             $('.currency').val('');
