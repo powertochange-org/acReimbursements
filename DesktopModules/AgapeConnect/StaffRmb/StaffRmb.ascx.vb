@@ -1005,14 +1005,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     insert.LineType = CInt(ddlLineTypes.SelectedValue)
 
                     'Amount (with or without currency conversion)
+                    Dim accounting_currency = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)
                     If hfCurOpen.Value = "false" Or String.IsNullOrEmpty(hfOrigCurrency.Value) Or hfOrigCurrency.Value = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId) Then
                         insert.GrossAmount = CDbl(ucType.GetProperty("Amount").GetValue(theControl, Nothing))
-                        insert.OrigCurrency = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)
+                        insert.OrigCurrency = accounting_currency
                         insert.OrigCurrencyAmount = insert.GrossAmount
                     Else
                         insert.GrossAmount = CDbl(ucType.GetProperty("CADValue").GetValue(theControl, Nothing))
                         insert.OrigCurrency = hfOrigCurrency.Value
                         insert.OrigCurrencyAmount = CDbl(hfOrigCurrencyValue.Value)
+                        insert.ExchangeRate = StaffBrokerFunctions.GetExchangeRate(accounting_currency, hfOrigCurrency.Value)
                     End If
                     If insert.GrossAmount >= Settings("TeamLeaderLimit") Then
                         insert.LargeTransaction = True

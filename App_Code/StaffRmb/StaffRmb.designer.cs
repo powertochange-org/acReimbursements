@@ -2877,6 +2877,8 @@ namespace StaffRmb
 		
 		private string _ReceiptText;
 		
+		private System.Nullable<double> _ExchangeRate;
+		
 		private EntityRef<AP_Staff_Rmb> _AP_Staff_Rmb;
 		
 		private EntityRef<AP_Staff_RmbLineType> _AP_Staff_RmbLineType;
@@ -2951,6 +2953,8 @@ namespace StaffRmb
     partial void OnReceiptImageIdChanged();
     partial void OnReceiptTextChanging(string value);
     partial void OnReceiptTextChanged();
+    partial void OnExchangeRateChanging(System.Nullable<double> value);
+    partial void OnExchangeRateChanged();
     #endregion
 		
 		public AP_Staff_RmbLine()
@@ -3624,6 +3628,26 @@ namespace StaffRmb
 					this._ReceiptText = value;
 					this.SendPropertyChanged("ReceiptText");
 					this.OnReceiptTextChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ExchangeRate")]
+		public System.Nullable<double> ExchangeRate
+		{
+			get
+			{
+				return this._ExchangeRate;
+			}
+			set
+			{
+				if ((this._ExchangeRate != value))
+				{
+					this.OnExchangeRateChanging(value);
+					this.SendPropertyChanging();
+					this._ExchangeRate = value;
+					this.SendPropertyChanged("ExchangeRate");
+					this.OnExchangeRateChanged();
 				}
 			}
 		}

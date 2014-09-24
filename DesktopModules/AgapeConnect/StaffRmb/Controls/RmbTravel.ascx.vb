@@ -142,24 +142,16 @@ Partial Class controls_RmbTravel
     End Property
     Public Property Spare4() As String
         Get
-            Return "" ' cbOyster.Checked
+            Return ""
         End Get
         Set(ByVal value As String)
-
-            'If value = "True" Then
-            '    cbOyster.Checked = True
-            'Else
-            '    cbOyster.Checked = False
-            'End If
-
         End Set
     End Property
     Public Property Spare5() As String
         Get
-            Return "" 'tbOyster.Text
+            Return ""
         End Get
         Set(ByVal value As String)
-            ' tbOyster.Text = value
         End Set
     End Property
     Public Property Receipt() As Boolean

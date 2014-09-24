@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?><Database Name="AgapeConnect" Class="StaffRmbDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
-  <Connection Mode="WebSettings" ConnectionString="Data Source=DEV_SQL2012;Initial Catalog=PTC_Staff;User ID=PTC_Staff" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="SiteSqlServer" Provider="System.Data.SqlClient" />
+  <Connection Mode="WebSettings" ConnectionString="Data Source=localhost\SQLEXPRESS;Initial Catalog=PTC_Staff;User ID=PTC_Staff" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="SiteSqlServer" Provider="System.Data.SqlClient" />
   <Table Name="dbo.AP_Staff_RmbLineType" Member="AP_Staff_RmbLineTypes">
     <Type Name="AP_Staff_RmbLineType">
       <Column Name="LineTypeId" Type="System.Int16" DbType="SmallInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -162,6 +162,7 @@
       <Column Name="ReceiptMode" Type="System.Byte" DbType="TinyInt" CanBeNull="true" />
       <Column Name="ReceiptImageId" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="ReceiptText" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
+      <Column Member="ExchangeRate" Type="System.Double" CanBeNull="true" />
       <Association Name="AP_Staff_Rmb_AP_Staff_RmbLine" Member="AP_Staff_Rmb" ThisKey="RmbNo" OtherKey="RMBNo" Type="AP_Staff_Rmb" IsForeignKey="true" />
       <Association Name="AP_Staff_RmbLineType_AP_Staff_RmbLine" Member="AP_Staff_RmbLineType" ThisKey="LineType" OtherKey="LineTypeId" Type="AP_Staff_RmbLineType" IsForeignKey="true" />
     </Type>

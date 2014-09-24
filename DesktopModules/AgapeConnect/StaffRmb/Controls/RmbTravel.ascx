@@ -52,11 +52,7 @@
          <asp:ListItem Value="No" ResourceKey="No">No</asp:ListItem>
      </asp:DropDownList>
      <br />
-   <%--  <asp:Panel ID="pnlOyster" runat="server">
-     
-         <asp:CheckBox ID="cbOyster" runat="server" Text="I have only reimbursed itemized journeys. (Bus journeys must be itemized below)" /><br />
-            <asp:TextBox ID="tbOyster" runat="server" TextMode="MultiLine" Width="400px" Height="50px"></asp:TextBox>
-            </asp:Panel>--%>
+
      </asp:Panel>
      <br />
             <asp:Panel ID="pnlWorlPlace" runat="server" Visible="false">
