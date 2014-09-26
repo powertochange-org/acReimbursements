@@ -3114,6 +3114,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim approverMessage As String = StaffBrokerFunctions.GetTemplate("RmbApproverEmail", PortalId)
                 Dim owner = UserController.GetUserById(theRmb.PortalId, theRmb.UserId)
                 Dim approver = UserController.GetUserById(theRmb.PortalId, theRmb.ApprUserId)
+                Dim amount = theRmb.SpareField1
                 Dim extra = If(StaffBrokerFunctions.RequiresExtraApproval(theRmb.RMBNo), Translate("ExtraApproval"), "")
                 Dim toEmail = approver.Email
                 Dim toName = approver.FirstName
@@ -3145,6 +3146,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     approverMessage = approverMessage.Replace("[STAFFNAME]", owner.DisplayName).Replace("[RMBNO]", theRmb.RID).Replace("[USERREF]", IIf(theRmb.UserRef <> "", theRmb.UserRef, "None"))
                     approverMessage = approverMessage.Replace("[APPRNAME]", toName)
                     approverMessage = approverMessage.Replace("[EXTRA]", extra)
+                    approverMessage = approverMessage.Replace("[AMOUNT]", amount)
                     approverMessage = approverMessage.Replace("[OLDEXPENSES]", If(hasOldExpenses(), Translate("WarningOldExpenses"), ""))
                     approverMessage = approverMessage.Replace("[COMMENTS]", If(theRmb.UserComment <> "", Translate("EmailComments") & "<br />" & theRmb.UserComment, ""))
                     If StaffRmbFunctions.isStaffAccount(theRmb.CostCenter) Then
