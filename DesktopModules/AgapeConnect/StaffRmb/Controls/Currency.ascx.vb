@@ -47,6 +47,8 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_Controls_Currency
             If (Page.IsPostBack) Then
                 display_currency_details()
             End If
+        Else
+            currencyUpdatePanel.Visible = False
         End If
     End Sub
 
