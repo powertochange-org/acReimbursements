@@ -607,7 +607,7 @@
     <value>Warning: There are insufficient funds in account#[ACCT] to fulfil this reimbursement.  You may still approve this reimbursement, but overspending could result in stricter oversight on this account.</value>
   </data>
   <data name="btnSubmitHelp.Text" xml:space="preserve">
-    <value>Please select an account and an approver in order to submit</value>
+    <value>Please select both an account and an approver to enable the Submit button.</value>
   </data>
   <data name="TeamLeader.Text" xml:space="preserve">
     <value>Team Leader</value>

@@ -502,7 +502,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                         Join b In d.AP_StaffBroker_CostCenters
                                             On c.CostCenter Equals b.CostCentreCode _
                                                 And c.PortalId Equals b.PortalId
-                                        Where c.UserId = team_member.UserID And c.Status = RmbStatus.Processing And b.Type = CostCentreType.Staff And c.PortalId = PortalId
+                                        Where c.UserId = team_member.UserID And c.Status = RmbStatus.Processing And c.PortalId = PortalId
                                         Select c.RMBNo, c.RmbDate, c.RID, c.SpareField1
 
                     If (TeamProcessing.Count > 0) Then
@@ -550,7 +550,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                         Join b In d.AP_StaffBroker_CostCenters
                                             On c.CostCenter Equals b.CostCentreCode _
                                                 And c.PortalId Equals b.PortalId
-                                        Where c.UserId = team_member.UserID And c.Status = RmbStatus.Paid And b.Type = CostCentreType.Staff And c.PortalId = PortalId
+                                        Where c.UserId = team_member.UserID And c.Status = RmbStatus.Paid And c.PortalId = PortalId
                                         Select c.RMBNo, c.RmbDate, c.RID, c.SpareField1
                     If (TeamPaid.Count > 0) Then
                         Dim TeamMemberPaidNode As New TreeNode(team_member.LastName & ", " & team_member.FirstName)
@@ -897,8 +897,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     btnPrint.OnClientClick = "window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & RmbNo & "&UID=" & Rmb.UserId & "', '_blank'); "
                     btnSubmit.Visible = (isOwner Or isSpouse) And (DRAFT Or MORE_INFO Or CANCELLED) And FORM_HAS_ITEMS
                     btnSubmit.Text = If(DRAFT, Translate("btnSubmit"), Translate("btnResubmit"))
-                    btnSubmit.Enabled = btnSubmit.Visible And Rmb.CostCenter IsNot Nothing And Rmb.ApprUserId IsNot Nothing AndAlso (Rmb.CostCenter.Length = 6) And (Rmb.ApprUserId >= 0)
-                    btnSubmit.ToolTip = If(btnSubmit.Enabled, "", Translate("btnSubmitHelp"))
+                    enableSubmitButton(btnSubmit.Visible And Rmb.CostCenter IsNot Nothing And Rmb.ApprUserId IsNot Nothing AndAlso (Rmb.CostCenter.Length = 6) And (Rmb.ApprUserId >= 0))
                     btnAddressOk.OnClientClick = ""
                     btnTempAddressChange.OnClientClick = ""
                     btnPermAddressChange.OnClientClick = ""
@@ -967,14 +966,28 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Next
             Try
                 ddlApprovedBy.SelectedValue = approverId
-                btnSubmit.Enabled = (approverId >= 0)
+                enableSubmitButton(approverId >= 0)
                 lblApprovedBy.Text = ddlApprovedBy.SelectedItem.ToString
             Catch ex As Exception
                 ddlApprovedBy.SelectedValue = -1
-                btnSubmit.Enabled = False
+                enableSubmitButton(False)
                 lblApprovedBy.Text = "[NOBODY]"
             End Try
         End Function
+
+        Private Sub enableSubmitButton(enable As Boolean)
+            btnSubmit.Enabled = True
+            Dim classes = btnSubmit.Attributes("class")
+            If enable Then
+                btnSubmit.Attributes("class") = classes.Replace("aspNetDisabled", "")
+                btnSubmit.OnClientClick = "showAddressDialog();"
+                btnSubmit.ToolTip = ""
+            Else
+                btnSubmit.Attributes("class") = classes.Replace("aspNetDisabled", "") & " aspNetDisabled"
+                btnSubmit.OnClientClick = ""
+                btnSubmit.ToolTip = Translate("btnSubmitHelp")
+            End If
+        End Sub
 #End Region
 
 #Region "Button Events"
@@ -1444,7 +1457,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             btnApprove.Visible = False
             btnSubmit.Visible = True
-            btnSubmit.ToolTip = If(btnSubmit.Enabled, "", Translate("btnSubmitHelp"))
+            btnSubmit.ToolTip = If(Not btnSubmit.Attributes("class").Contains("aspNetDisabled"), "", Translate("btnSubmitHelp"))
 
             d.AP_Staff_Rmbs.InsertOnSubmit(insert)
             d.SubmitChanges()
@@ -1463,6 +1476,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Sub
 
         Protected Sub btnSubmit_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSubmit.Click
+            If btnSubmit.Attributes("class").Contains("aspNetDisabled") Then
+                'show alert
+                ScriptManager.RegisterClientScriptBlock(btnSubmit, btnSubmit.GetType, "submitAlert", "alert('" & Translate("btnSubmitHelp") & "');", True)
+                Return
+            End If
             'This function simply kicks off the address confirmation dialogue.
             'the submission functionality can be found in btnAddressOk_Click
             Dim RmbNo = hfRmbNo.Value
@@ -2344,7 +2362,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             btnDelete.Visible = True
             btnSubmit.Visible = True
             btnSubmit.Text = Translate("btnSubmit")
-            btnSubmit.Enabled = tbChargeTo.Text.Length = 6 And ddlApprovedBy.SelectedIndex > 0 And GridView1.Rows.Count > 0
+            enableSubmitButton(tbChargeTo.Text.Length = 6 And ddlApprovedBy.SelectedIndex > 0 And GridView1.Rows.Count > 0)
             btnSubmit.ToolTip = Translate("btnSubmitHelp")
         End Sub
 
@@ -2772,7 +2790,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If rtn Then
                 lblWrongType.Visible = True
                 pnlError.Visible = True
-                btnSubmit.Enabled = False
+                enableSubmitButton(False)
                 btnProcess.Enabled = False
                 btnApprove.Enabled = False
             End If
