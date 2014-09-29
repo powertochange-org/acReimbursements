@@ -1476,6 +1476,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Sub
 
         Protected Sub btnSubmit_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSubmit.Click
+            saveIfNecessary()
             If btnSubmit.Attributes("class").Contains("aspNetDisabled") Then
                 'show alert
                 ScriptManager.RegisterClientScriptBlock(btnSubmit, btnSubmit.GetType, "submitAlert", "alert('" & Translate("btnSubmitHelp") & "');", True)
