@@ -21,7 +21,7 @@
         deselectPreviousMenuItem();
         menu_item.style.fontWeight = 'bold';
         menu_item.style.fontSize = '9pt';
-        $(menu_item).parent().next().children().show();
+        $(menu_item).parent().next().children().css('visibility', 'visible');
         previous_menu_item = menu_item;
     }
 
@@ -30,7 +30,7 @@
             return;
         previous_menu_item.style.fontWeight = 'normal';
         previous_menu_item.style.fontSize = '10pt';
-        $(previous_menu_item).parent().next().children().hide();
+        $(previous_menu_item).parent().next().children().css('visibility', 'hidden');
     }
 
     
@@ -917,8 +917,7 @@
         <tr valign="top">
             <td>
                 <div align="center" width="100%">
-                    <input id="btnNewRmb" type="button" onclick="showNewRmbPopup();" class="aButton" value='<%= Translate("btnNew") %>'
-                        style="margin-bottom: 5px; font-weight: bold; min-width: 220px;" />
+                    <input id="btnNewRmb" type="button" onclick="showNewRmbPopup();" class="aButton" value='<%= Translate("btnNew") %>'/>
                 </div>
                 <div id="accordion">
                     <div style="text-align:center">
@@ -950,7 +949,7 @@
                                                             Font-Size='<%# If(IsSelected(Eval("RmbNo")), "9", "10")%>' Font-Bold='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
                                                     </td>
                                                     <td>
-                                                        <img ID="Image1" runat="server" alt=">" src="~/images/action_right.gif" style='<%# if(IsSelected(Eval("RmbNo")), "display:block", "display:none") %>' />
+                                                        <img ID="Image1" runat="server" alt=">" src="~/images/action_right.gif" style='<%# "visibility:" & if(IsSelected(Eval("RmbNo")), "visible", "hidden") & "; margin:-6px" %>' />
                                                     </td>
                                                 </tr>
                                             </table>
@@ -991,7 +990,7 @@
                                                                     Font-Size='<%# If(IsSelected(Eval("RmbNo")), "9", "10")%>' Font-Bold='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
                                                             </td>
                                                             <td>
-                                                                <img ID="Image1" runat="server" alt=">" src="~/images/action_right.gif" style='<%# if(IsSelected(Eval("RmbNo")), "display:block", "display:none") %>' />
+                                                                <img ID="Image1" runat="server" alt=">" src="~/images/action_right.gif" style='<%# "visibility:" & if(IsSelected(Eval("RmbNo")), "visible", "hidden") & "; margin:-6px" %>' />
                                                             </td>
                                                         </tr>
                                                     </table>
@@ -1012,7 +1011,7 @@
                                                                     Font-Size='<%# If(IsSelected(Eval("RmbNo")), "9", "10")%>' Font-Bold='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
                                                             </td>
                                                             <td>
-                                                                <img ID="Image1" runat="server" alt=">" src="~/images/action_right.gif" style='<%# if(IsSelected(Eval("RmbNo")), "display:block", "display:none") %>' />
+                                                                <img ID="Image1" runat="server" alt=">" src="~/images/action_right.gif" style='<%# "visibility:" & if(IsSelected(Eval("RmbNo")), "visible", "hidden") & "; margin:-6px" %>' />
                                                             </td>
                                                         </tr>
                                                     </table>
@@ -1058,7 +1057,7 @@
                                                                     Font-Size='<%# If(IsSelected(Eval("RmbNo")), "9", "10")%>' Font-Bold='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
                                                             </td>
                                                             <td>
-                                                                <img ID="Image1" runat="server" alt=">" src="~/images/action_right.gif" style='<%# if(IsSelected(Eval("RmbNo")), "display:block", "display:none") %>' />
+                                                                <img ID="Image1" runat="server" alt=">" src="~/images/action_right.gif" style='<%# "visibility:" & if(IsSelected(Eval("RmbNo")), "visible", "hidden") & "; margin:-6px" %>' />
                                                             </td>
                                                         </tr>
                                                     </table>
@@ -1103,7 +1102,7 @@
                                                             Font-Size='<%# If(IsSelected(Eval("RmbNo")), "9", "10")%>' Font-Bold='<%# IsSelected(Eval("RmbNo")) %>' Width="100%"></asp:LinkButton>
                                                     </td>
                                                     <td>
-                                                        <img ID="Image1" runat="server" alt=">" src="~/images/action_right.gif" style='<%# if(IsSelected(Eval("RmbNo")), "display:block", "display:none") %>' />
+                                                        <img ID="Image1" runat="server" alt=">" src="~/images/action_right.gif" style='<%# "visibility:" & if(IsSelected(Eval("RmbNo")), "visible", "hidden") & "; margin:-6px" %>' />
                                                     </td>
                                                 </tr>
                                             </table>
@@ -1138,7 +1137,7 @@
                                                             Font-Size='<%# If(IsSelected(Eval("RmbNo")), "9", "10")%>' Font-Bold='<%# IsSelected(Eval("RmbNo")) %>' ></asp:LinkButton>
                                                     </td>
                                                     <td width="10px">
-                                                        <img ID="Img1" runat="server" alt=">" src="~/images/action_right.gif" style='<%# if(IsSelected(Eval("RmbNo")), "display:block", "display:none") %>' />
+                                                        <img ID="Img1" runat="server" alt=">" src="~/images/action_right.gif" style='<%# "visibility:" & if(IsSelected(Eval("RmbNo")), "visible", "hidden") & "; margin:-6px" %>' />
                                                     </td>
                                                 </tr>
                                             </table>
@@ -1165,7 +1164,7 @@
                                                             Font-Size='<%# If(IsSelected(Eval("RmbNo")), "9", "10")%>' Font-Bold='<%# IsSelected(Eval("RmbNo")) %>' ></asp:LinkButton>
                                                     </td>
                                                     <td width="10px">
-                                                        <img ID="Img1" runat="server" alt=">" src="~/images/action_right.gif" style='<%# if(IsSelected(Eval("RmbNo")), "display:block", "display:none") %>' />
+                                                        <img ID="Img1" runat="server" alt=">" src="~/images/action_right.gif" style='<%# "visibility:" & if(IsSelected(Eval("RmbNo")), "visible", "hidden") & "; margin:-6px" %>' />
                                                     </td>
                                                 </tr>
                                             </table>
