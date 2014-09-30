@@ -957,7 +957,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
             blank.Attributes.Add("disabled", "disabled")
             blank.Attributes.Add("selected", "selected")
-            blank.Attributes.Add("style", "display:none") 'hide in dropdown list
+            blank.Attributes.Add("style", "visibility:hidden") 'hide in dropdown list (display:none doesn't work in firefox)
             ddlApprovedBy.Items.Add(blank)
             For Each row In approvers.UserIds
                 If Not row Is Nothing Then
