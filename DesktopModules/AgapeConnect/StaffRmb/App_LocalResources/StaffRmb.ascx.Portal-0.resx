@@ -132,4 +132,10 @@
   <data name="AccountsComments.Text">
     <value>Finance Comments</value>
   </data>
+  <data name="NoReceipts.Text">
+    <value>Receipts attached</value>
+  </data>
+  <data name="Receipts.Text">
+    <value>Receipts by mail</value>
+  </data>
 </root>

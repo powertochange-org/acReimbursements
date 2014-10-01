@@ -72,63 +72,6 @@ public class WebService : System.Web.Services.WebService {
         return result.ToArray();
     }
 
-    //[WebMethod]
-    //[ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-    //public void AllRmbs2(int portalid, int tabmoduleid, int status)
-    //{
-    //    string result = "";
-    //    if (isFinance(tabmoduleid))
-    //    {
-    //        result += "[{label:'All Staff'";
-    //        if (status == RmbStatus.Submitted || status == RmbStatus.Processing || status == RmbStatus.Paid)
-    //        {
-    //            StaffRmbDataContext d = new StaffRmbDataContext();
-    //            IQueryable<AP_Staff_Rmb> rmbs = from c in d.AP_Staff_Rmbs
-    //                                            where c.Status == status && c.PortalId == portalid
-    //                                            orderby c.RID descending
-    //                                            select c;
-    //            string letters = "";
-    //            for (char letter = 'A'; letter <= 'Z'; letter++)
-    //            {
-    //                IQueryable<StaffBroker.User> staffmembers = StaffBrokerFunctions.GetStaff().Where(w => w.LastName.ToUpper()[0] == letter);
-    //                if (staffmembers.Count() > 0)
-    //                {
-    //                    string people = "";
-    //                    foreach (StaffBroker.User staffmember in staffmembers)
-    //                    {
-    //                        string nodes = "";
-    //                        string name = staffmember.DisplayName;
-    //                        IQueryable<AP_Staff_Rmb> staffrmbs = rmbs.Where(w => w.UserId == staffmember.UserID);
-    //                        if (staffrmbs.Count() > 0)
-    //                        {
-    //                            foreach (AP_Staff_Rmb rmb in staffrmbs)
-    //                            {
-    //                                if (nodes.Length > 0) nodes += ",";
-    //                                nodes += "{label:'" + rmb.RID + " : " + (rmb.RmbDate == null ? "" : rmb.RmbDate.Value.ToShortDateString()) + " : " + rmb.SpareField1 + "'}";
-    //                            }
-    //                            if (nodes.Length > 0)
-    //                            {
-    //                                people += "{label:'" + staffmember.DisplayName + "',children:[" + nodes + "]}";
-    //                            }
-    //                        }
-    //                    }
-    //                    if (people.Length > 0)
-    //                    {
-    //                        letters += "{label:'" + letter + "',children:[" + people + "]}";
-    //                    }
-    //                }
-    //            }
-    //            if (letters.Length > 0)
-    //            {
-    //                result += ",children:[" + letters + "]";
-    //            }
-    //            result += "}]";
-    //        }
-    //    }
-    //    HttpContext.Current.Response.ContentType = "text/json";
-    //    HttpContext.Current.Response.Write(result);
-    //}
-
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json, UseHttpGet=true)]
     public void AllRmbs(int portalid, int tabmoduleid, int status)
@@ -159,6 +102,41 @@ public class WebService : System.Web.Services.WebService {
             HttpContext.Current.Response.Write(result);
         }
 
+    }
+
+    [WebMethod]
+    [ScriptMethod(ResponseFormat = ResponseFormat.Xml, UseHttpGet=true)]
+    public String getStaffAppsButton()
+    {
+        String ABSENCE_TRACKER = "<a href='https://absences.powertochange.org'> <img src='https://staff.powertochange.org/wp-content/images/Absence-Tracker-Icon.png' alt='Absence Tracker'></a>";
+        String REPORTS = "<a href='https://staff.powertochange.org/reports/'> <img src='https://staff.powertochange.org/wp-content/images/Reports-Icon.png' alt='Reports'></a>";
+        String STAFF_DIRECTORY = "<a href='https://staff.powertochange.org/staff-directory/'> <img src='https://staff.powertochange.org/wp-content/images/Staff-Directory-Icon.png' alt='Staff Directory'></a>";
+        String REIMBURSEMENTS = "<a href='https://apps.powertochange.org/Reimbursement-form'><img src='https://staff.powertochange.org/wp-content/images/Reimbursements-Icon.png' alt='Reimbursements' /></a>";
+        String HELPDESK = "<a href='mailto:helpdesk@powertochange.org'> <img src='https://staff.powertochange.org/wp-content/images/HelpDesk-Icon.png' alt='Help Desk'></a>";
+        String WIKI = "<a href='https://wiki.powertochange.org/help'><img src='https://staff.powertochange.org/wp-content/images/Self-Help-Wiki-Icon.png' alt='Self-Help Wiki'></a>";
+        String SETTINGS = "<a href='https://staff.powertochange.org/staff-directory/?page=profile'><img src='https://staff.powertochange.org/wp-content/images/My-Settings-Icon.png' alt='Settings' /></a>";
+
+        String STYLE = "<style type='text/css' scoped>#staffAppsButton:hover, #staffAppsButton:active, #staffAppsButton:focus {color: #000000!important;text-decoration: none;}</style>";
+        String SCRIPT = "<script type='text/javascript'>function staffAppsMenuShow() {$('#staffAppsMenu').show();var e = document.getElementById('staffAppsButton');e.style.background = '#f4f4f4';e.style.border = '1px solid #d6d7d4';e.style.borderBottom = '1px solid #f4f4f4';}" +
+               "function staffAppsMenuHide() {$('#staffAppsMenu').hide(); var e = document.getElementById('staffAppsButton');e.style.background = '#f58220';e.style.border = '1px solid #eb8528';}</script>";
+
+        String code = "<div id='staff-app-container' style='display:inline-block; position:relative; float:right; min-width:302px;'>" +
+               "<a id='staffAppsButton' class='button related' onmouseout='staffAppsMenuHide();' onmouseover='staffAppsMenuShow();' style='background:#f58220; border:1px solid #eb8528; cursor:default;  z-index:910; position:relative; float:right; width:103px; height:21px; color:#000000; " +
+               "text-align:center; font-family:sans-serif; font-weight:300; font-size:13px;  padding:5px 0 5px; margin:10px 10px; border-radius:5px; border:1px solid rgb(235, 133, 40); background:rgb(245, 130, 32);'>Staff Apps</a>" +
+               "<div id='staffAppsMenu' onmouseout='staffAppsMenuHide();' onmouseover='staffAppsMenuShow();' style='position:absolute; display:none; border:1px solid rgb(214, 215, 212); padding: 10px 40px; right:10px; top:37px; z-index:900; background-color: rgb(244, 244, 244);' >" +
+               "<center><ul class='staffAppsPopupMenu' style='margin:15px 0; padding:15px 0; color:#adafb2; font-size:15px;'><table><tbody>" +
+               "<tr><td style='border:0;'>" + ABSENCE_TRACKER + "</td>" +
+               "<td style='border:0;'>" + REPORTS + "</td>" +
+               "<td style='border:0;'>" + STAFF_DIRECTORY + "</td>" +
+               "<td style='border:0;'>" + REIMBURSEMENTS + "</td>" +
+               "</tr><tr>" +
+               "<td style='border:0;'>" + HELPDESK + "</td>" +
+               "<td style='border:0;'>" + WIKI + "</td>" +
+               "<td></td>" +
+               "<td style='border:0;'>" + SETTINGS + "</td>" +
+               "</tr></tbody></table></ul></center></div>" +
+                STYLE + SCRIPT + "</div>";
+        return code;
     }
 
     public class Item
