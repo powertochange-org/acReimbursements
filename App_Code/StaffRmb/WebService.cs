@@ -105,8 +105,8 @@ public class WebService : System.Web.Services.WebService {
     }
 
     [WebMethod]
-    [ScriptMethod(ResponseFormat = ResponseFormat.Xml, UseHttpGet=true)]
-    public String getStaffAppsButton()
+    [ScriptMethod(ResponseFormat = ResponseFormat.Json, UseHttpGet=true)]
+    public void getStaffAppsButton()
     {
         String ABSENCE_TRACKER = "<a href='https://absences.powertochange.org'> <img src='https://staff.powertochange.org/wp-content/images/Absence-Tracker-Icon.png' alt='Absence Tracker'></a>";
         String REPORTS = "<a href='https://staff.powertochange.org/reports/'> <img src='https://staff.powertochange.org/wp-content/images/Reports-Icon.png' alt='Reports'></a>";
@@ -136,7 +136,9 @@ public class WebService : System.Web.Services.WebService {
                "<td style='border:0;'>" + SETTINGS + "</td>" +
                "</tr></tbody></table></ul></center></div>" +
                 STYLE + SCRIPT + "</div>";
-        return code;
+        HttpContext.Current.Response.ContentType = "application/json";
+        HttpContext.Current.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+        HttpContext.Current.Response.Write(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(code));
     }
 
     public class Item
