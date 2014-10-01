@@ -128,17 +128,17 @@ public class WebService : System.Web.Services.WebService {
                "<tr><td style='border:0;'>" + ABSENCE_TRACKER + "</td>" +
                "<td style='border:0;'>" + REPORTS + "</td>" +
                "<td style='border:0;'>" + STAFF_DIRECTORY + "</td>" +
-               "<td style='border:0;'>" + REIMBURSEMENTS + "</td>" +
+               //"<td style='border:0;'>" + REIMBURSEMENTS + "</td>" +
                "</tr><tr>" +
                "<td style='border:0;'>" + HELPDESK + "</td>" +
                "<td style='border:0;'>" + WIKI + "</td>" +
-               "<td></td>" +
+               //"<td style='border:0;'></td>" +
                "<td style='border:0;'>" + SETTINGS + "</td>" +
                "</tr></tbody></table></ul></center></div>" +
                 STYLE + SCRIPT + "</div>";
         HttpContext.Current.Response.ContentType = "application/json";
         HttpContext.Current.Response.Headers.Add("Access-Control-Allow-Origin", "*");
-        HttpContext.Current.Response.Write(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(code));
+        HttpContext.Current.Response.Write(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(origin+code));
     }
 
     public class Item
