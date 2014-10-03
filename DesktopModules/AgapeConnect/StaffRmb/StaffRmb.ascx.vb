@@ -2598,7 +2598,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Function
 
         Protected Function CanEdit(ByVal status As Integer) As Boolean
-            Return status <> RmbStatus.Processing And status <> RmbStatus.PendingDownload And status <> RmbStatus.DownloadFailed And (status <> RmbStatus.Approved Or IsAccounts())
+            Return status <> RmbStatus.Paid And status <> RmbStatus.Processing And status <> RmbStatus.PendingDownload And status <> RmbStatus.DownloadFailed And (status <> RmbStatus.Approved Or IsAccounts())
         End Function
 
         Protected Function isStaffAccount() As Boolean
