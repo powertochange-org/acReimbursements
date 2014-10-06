@@ -1425,17 +1425,10 @@
 
                                                 <asp:TemplateField HeaderText="Receipt" ItemStyle-Width="20px">
                                                     <ItemTemplate>
-                                                        <%# If(Not Eval("Receipt"), "<img src='/Icons/Sigma/no_receipt_32x32.png' width=20 alt='none' title='no receipt (less than $" & Settings("NoReceipt") & ")' />",
-                                                                If(Eval("ReceiptImageId") Is Nothing, "<img src='/Icons/Sigma/BulkMail_32X32_Standard.png' width=20 alt='mail' title='receipt will be sent by mail'/>",
-                                                                   If({"jpg", "jpeg", "png", "gif", "bmp"}.Contains(GetImageType(Eval("RmbLineNo"))), "<a target='_Blank' href=" + GetImageUrl(Eval("RmbLineNo")) + "><img id='" +
-                                                                                                GetImageUrl(Eval("RmbLineNo")) + "' class='viewReceipt" & If(hasMultipleReceipts(Eval("RmbLineNo"))," multiReceipt","") & "' src='/Icons/Sigma/ExtPng_32x32_Standard.png' width=20 alt='img' /></a>",
-                                                                      If(GetImageType(Eval("RmbLineNo")).Equals("pdf"), "<a target='_Blank' href='" + GetImageUrl(Eval("RmbLineNo")) +
-                                                                                                "' title = 'click to download'><img class='" & If(hasMultipleReceipts(Eval("RmbLineNo")),"multiReceipt","") & "' src='/Icons/Sigma/ExtPdf_32X32_Standard.png' width=20 alt='pdf' /></a>",
-                                                                         "<img src='/Icons/Sigma/ErrorWarning_16X16_Standard.png' width=20 alt='missing' title='" & GetImageType(Eval("RmbLineNo")) & "'/>"
-                                                                      )
-                                                                   )
-                                                                )
-                                                            )%>
+                                                        <%# If(Not Eval("Receipt"), "<img src='/Icons/Sigma/no_receipt_32x32.png' width=20 alt='none' title='no receipt' />",
+                                                              If(Eval("ReceiptImageId") is Nothing,  "<img src='/Icons/Sigma/BulkMail_32X32_Standard.png' width=20 alt='mail' title='receipt will be sent by mail'/>",
+                                                                ElectronicReceiptTags(Eval("RmbLineNo"))))
+                                                        %>
                                                     </ItemTemplate>
                                                     <ItemStyle HorizontalAlign="Center" />
                                                 </asp:TemplateField>

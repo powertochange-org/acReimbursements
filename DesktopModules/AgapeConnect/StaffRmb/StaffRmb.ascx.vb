@@ -2567,29 +2567,31 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Return False
         End Function
 
-        Protected Function GetImageType(lineId As Integer) As String
-            'Returns the image type of the first image associated with the lineId
-            Dim receiptIds = From e In d.AP_Staff_RmbLine_Files Where e.RmbLineNo = lineId Order By e.RecNum Select e.FileId
-            If receiptIds.Count() < 1 Then
-                Return "no receipts found"
-            End If
-            Dim file = DotNetNuke.Services.FileSystem.FileManager.Instance.GetFile(receiptIds.first)
-            If file Is Nothing Then
-                Return "missing file"
-            End If
-            Return file.Extension.ToLower()
-        End Function
-
-        Protected Function GetImageUrl(lineId As Integer) As String
-            Dim urls = From e In d.AP_Staff_RmbLine_Files Where e.RmbLineNo = lineId Order By e.RecNum Select e.URL
-            If urls.Count() < 1 Then
-                Return "no receipts found"
-            End If
-            If (urls.First) Is Nothing Then
-                Return ""
+        Protected Function ElectronicReceiptTags(lineId As Integer) As String
+            Dim ERR = "<span color='red'>!</span>"
+            Dim result = ""
+            Dim receipts = From e In d.AP_Staff_RmbLine_Files Where e.RmbLineNo = lineId Order By e.RecNum Select e.URL, e.FileId
+            If (receipts.Count < 1) Then
+                result = ERR
             Else
-                Return urls.First
+                For Each receipt In receipts
+                    Dim extension = "NONE"
+                    Dim file = DotNetNuke.Services.FileSystem.FileManager.Instance.GetFile(receipt.FileId)
+                    If (file Is Nothing) Then
+                        result += ERR
+                    Else
+                        extension = file.Extension.ToLower()
+                        If extension = "pdf" Then
+                            result += "<a target='_Blank' href='" + receipt.URL + "' title = 'click to download'><img class='" & "' src='/Icons/Sigma/ExtPdf_32X32_Standard.png' width=20 alt='pdf' /></a>"
+                        ElseIf {"jpg", "jpeg", "png", "gif", "bmp"}.Contains(extension) Then
+                            result += "<a target='_Blank' href=" + receipt.URL + "><img id='" + receipt.URL + "' class='viewReceipt" & "' src='/Icons/Sigma/ExtPng_32x32_Standard.png' width=20 alt='img' /></a>"
+                        Else
+                            result += "<img src='/Icons/Sigma/ErrorWarning_16X16_Standard.png' width=20 alt='missing' title='" & extension & "'/>"
+                        End If
+                    End If
+                Next
             End If
+            Return result
         End Function
 
         Protected Function HasMultipleReceipts(lineId As Integer) As Boolean
