@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Web.Services;
 using System.Web.Services.Protocols;
 using DotNetNuke.Entities.Users;
+using DotNetNuke.Services.Log.EventLog;
 using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
@@ -19,6 +20,7 @@ using System.Threading.Tasks;
 /// 
 namespace StaffRmb
 {
+
     public static class RmbReceiptMode
     {
         public const int Disabled = 0;
@@ -101,16 +103,23 @@ namespace StaffRmb
     }
     public class StaffRmbFunctions
     {
+        public const String WEB_SERVICE_ERROR = "ERROR in web service";
+        public const String WEB_SERVICE_ERROR_OBJECT = "{'EXCEPTION': ['" + WEB_SERVICE_ERROR + "']}";
+        private static EventLogController eventLog = new EventLogController();
+        private static DotNetNuke.Entities.Portals.PortalSettings portalSettings = new DotNetNuke.Framework.UserControlBase().PortalSettings;
+        private static int userId = new DotNetNuke.Entities.Modules.PortalModuleBase().UserId;
+
+
+        public StaffRmbFunctions()
+        {
+        }
+
         public struct Approvers
         {
             public List<DotNetNuke.Entities.Users.UserInfo> UserIds;
             public Boolean CCMSpecial, SpouseSpecial, AmountSpecial, isDept;
             public string Name;
         }
-        public StaffRmbFunctions()
-        {
-        }
-
         static public String getCostCentres()
         {
             var result = new StaffRmbDataContext().AP_StaffBroker_CostCenters.Select(s => new { label = s.CostCentreCode + ":" + s.CostCentreName, value = s.CostCentreCode}).OrderBy(o => o.value);
@@ -169,30 +178,31 @@ namespace StaffRmb
             return result;
         }
 
-        static public async Task<Approvers> getAdvApproversAsync(AP_Staff_AdvanceRequest adv, Double largeTransaction, DotNetNuke.Entities.Users.UserInfo authUser, DotNetNuke.Entities.Users.UserInfo authAuthUser)
-        {
-            String staff_logon = logonFromId(adv.PortalId , (int)adv.UserId);
-            String spouse_logon = logonFromId(adv.PortalId, StaffBrokerFunctions.GetSpouseId((int)adv.UserId));
-            // initialize the response
-            Approvers result = new Approvers();
-            result.CCMSpecial = false;
-            result.SpouseSpecial = false;
-            result.AmountSpecial = false;
-            result.isDept = false;
-            result.UserIds = new List<DotNetNuke.Entities.Users.UserInfo>();
+        //** ADV
+        //static public async Task<Approvers> getAdvApproversAsync(AP_Staff_AdvanceRequest adv, Double largeTransaction, DotNetNuke.Entities.Users.UserInfo authUser, DotNetNuke.Entities.Users.UserInfo authAuthUser)
+        //{
+        //    String staff_logon = logonFromId(adv.PortalId , (int)adv.UserId);
+        //    String spouse_logon = logonFromId(adv.PortalId, StaffBrokerFunctions.GetSpouseId((int)adv.UserId));
+        //    // initialize the response
+        //    Approvers result = new Approvers();
+        //    result.CCMSpecial = false;
+        //    result.SpouseSpecial = false;
+        //    result.AmountSpecial = false;
+        //    result.isDept = false;
+        //    result.UserIds = new List<DotNetNuke.Entities.Users.UserInfo>();
 
-            string[] potential_approvers = null;
-            Decimal amount = (Decimal)adv.RequestAmount;
-            potential_approvers = await staffWithSigningAuthorityAsync(personalCostCenter((int)adv.UserId), amount);
-            foreach (String potential_approver in potential_approvers)
-            {
-                if (!(potential_approver.Equals(staff_logon) || potential_approver.Equals(spouse_logon)))
-                { //exclude staff and spouse
-                    result.UserIds.Add(UserController.GetUserByName(adv.PortalId, potential_approver + adv.PortalId.ToString()));
-                }
-            }
-            return result;
-        }
+        //    string[] potential_approvers = null;
+        //    Decimal amount = (Decimal)adv.RequestAmount;
+        //    potential_approvers = await staffWithSigningAuthorityAsync(personalCostCenter((int)adv.UserId), amount);
+        //    foreach (String potential_approver in potential_approvers)
+        //    {
+        //        if (!(potential_approver.Equals(staff_logon) || potential_approver.Equals(spouse_logon)))
+        //        { //exclude staff and spouse
+        //            result.UserIds.Add(UserController.GetUserByName(adv.PortalId, potential_approver + adv.PortalId.ToString()));
+        //        }
+        //    }
+        //    return result;
+        //}
 
         static private string[] combineArrays(string[] a1, string[] a2)
         {
@@ -227,6 +237,10 @@ namespace StaffRmb
             string postData = string.Format("logon={0}", logon);
             string url = "https://staffapps.powertochange.org/AuthManager/webservice/get_department_supervisors";
             string result = await getResultFromWebServiceAsync(url, postData);
+            if (result.Length == 0 || result.Equals(WEB_SERVICE_ERROR))
+            {
+                result = "[\"ERR\"]"; //this will not produce a visible error, just an empty dropdown
+            }
             return JsonConvert.DeserializeObject<string[]>(result);
         }
 
@@ -236,17 +250,22 @@ namespace StaffRmb
             string postData = string.Format("account={0}&amount={1}&exclude_administrators={2}", account, amount, "true");
             string url = "https://staffapps.powertochange.org/AuthManager/webservice/get_signatories";
             string result = await getResultFromWebServiceAsync(url, postData);
+            if (result.Length == 0 || result.Equals(WEB_SERVICE_ERROR))
+            {
+                result = "[\"ERR\"]"; //this will not produce a visible error, just an empty dropdown
+            }
             return JsonConvert.DeserializeObject<string[]>(result);
         }
 
-        static public async Task<string[]> staffWhoReportToAsync(string logon, Boolean directly)
-        // Returns a list of staff who report (either directly or indirectly) to the given user
-        {
-            string postData = string.Format("logon={0}&directly{1}", logon, directly);
-            string url = "https://staffapps.powertochange.org/Authmanager/webservice/get_subordinates";
-            string result = await getResultFromWebServiceAsync(url, postData);
-            return JsonConvert.DeserializeObject<string[]>(result);
-        }
+        //** Unused?
+        //static public async Task<string[]> staffWhoReportToAsync(string logon, Boolean directly)
+        //// Returns a list of staff who report (either directly or indirectly) to the given user
+        //{
+        //    string postData = string.Format("logon={0}&directly{1}", logon, directly);
+        //    string url = "https://staffapps.powertochange.org/Authmanager/webservice/get_subordinates";
+        //    string result = await getResultFromWebServiceAsync(url, postData);
+        //    return JsonConvert.DeserializeObject<string[]>(result);
+        //}
 
         static public async Task<object> getCompanies()
         // Returns a list of companies
@@ -254,6 +273,7 @@ namespace StaffRmb
             string postData = "";
             string url = "http://gpapp/gpimport/webservice/GetCompanies";
             string result = await getResultFromWebServiceAsync(url, postData);
+            if (result.Length == 0 || result.Equals(WEB_SERVICE_ERROR)) result = "[{\"CompanyID\":\"ERR\",\"CompanyName\":\"Oops! No companies found\"}]";
             return JsonConvert.DeserializeObject(result);
         }
 
@@ -263,17 +283,19 @@ namespace StaffRmb
             string postData = string.Format("company={0}&vendorId={1}", company, vendorId);
             string url = "http://gpapp/gpimport/webservice/GetRemitToAddresses";
             string result = await getResultFromWebServiceAsync(url, postData);
+            if (result.Length == 0 || result.Equals(WEB_SERVICE_ERROR) ) result = "[{\"AddressID\":\"ERR\",\"DefaultRemitToAddress\":\"N\",\"Address1\":\"Oops! No addresses found\"}]";
             return JsonConvert.DeserializeObject(result);
         }
 
-        static public async Task<string> getAccountsAsync(string logon)
-        // Returns a list of all accounts, provided the given logon is valid (using checkAuthorizations where user==logon)
-        {
-            string postData = string.Format("logon={0}", logon);
-            string url = "https://staffapps.powertochange.org/Authmanager/webservice/get_accounts";
-            string result = await getResultFromWebServiceAsync(url, postData);
-            return result;
-        }
+        //** Unused??
+        //static public async Task<string> getAccountsAsync(string logon)
+        //// Returns a list of all accounts, provided the given logon is valid (using checkAuthorizations where user==logon)
+        //{
+        //    string postData = string.Format("logon={0}", logon);
+        //    string url = "https://staffapps.powertochange.org/Authmanager/webservice/get_accounts";
+        //    string result = await getResultFromWebServiceAsync(url, postData);
+        //    return result;
+        //}
 
         static public async Task<string> getAccountBalanceAsync(string account, string user_logon)
         // Returns the balance of the account, or "" if the specified user does not have View Finanicals access to the account
@@ -281,12 +303,8 @@ namespace StaffRmb
             string postData = string.Format("_reportPath=/General/Account%20Balance&_renderFormat=XML&_apiToken={0}&ProjectCodeSearch={1}&ExecuteAsUser={2}", Constants.getApiToken(), account, user_logon);
             string url = "https://1chronicles/CallRptServicesTest/CallRpt.aspx";
             string response = await getResultFromWebServiceAsync(url, postData);
-            if (response.Length == 0)
-            {
-                return "ERROR getting account balance: Web Service did not return any data";
-            }
+            if (response.Length == 0) return "";
             string result = "";
-            //**XML Parsing code **
             try
             {
                 XmlDocument xDoc = new XmlDocument();
@@ -294,13 +312,9 @@ namespace StaffRmb
                 Double balance = Double.Parse(xDoc.GetElementsByTagName("Detail")[0].Attributes["Balance"].Value);
                 result = Math.Round(balance, 2).ToString("0.00");
             } catch (Exception e) {
-                return "ERROR getting account balance: " + response;
+                eventLog.AddLog("getAccountBalanceAsync()", e.Message, portalSettings, userId, EventLogController.EventLogType.ADMIN_ALERT);
+                return WEB_SERVICE_ERROR;
             }
-            //**CSV Parsing code **
-            //Match match = Regex.Match(response, @"\""([0-9,\-\.]+)\""\r?\n?$");  //Look at digits, comma, period and minus in quotes at the end of the string.
-            //if (match.Success) {
-            //    result = match.Groups[1].Value;
-            //}
             return result;
         }
 
@@ -334,11 +348,13 @@ namespace StaffRmb
                     String response_string = await reader.ReadToEndAsync();
                     return response_string;
                 }
-                return "{'ERROR':['NO-DATA']}";
+                eventLog.AddLog("getResultFromWebServiceAsync()", "No data returned", portalSettings, userId, EventLogController.EventLogType.ADMIN_ALERT);
+                return "";
             }
             catch (WebException e)
             {
-                return "{'EXCEPTION': ['exception']}";
+                eventLog.AddLog("getResultFromWebServiceAsync()", e.Message, portalSettings, userId, EventLogController.EventLogType.ADMIN_ALERT);
+                return WEB_SERVICE_ERROR;
             }
         }
 

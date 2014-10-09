@@ -4135,14 +4135,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Return "<span title='Error: no account number'>" + BALANCE_INCONCLUSIVE + "</span>"
             End If
             Dim accountBalance = ""
+            accountBalance = Await StaffRmbFunctions.getAccountBalanceAsync(account, logon)
+            If accountBalance.Length = 0 Then
+                Return BALANCE_PERMISSION_DENIED
+            End If
+            If (accountBalance = StaffRmbFunctions.WEB_SERVICE_ERROR) Then
+                Return "<span title='" + accountBalance + "'>Error</span>"
+            End If
             Try
-                accountBalance = Await StaffRmbFunctions.getAccountBalanceAsync(account, logon)
-                If accountBalance.Length = 0 Then
-                    Return BALANCE_PERMISSION_DENIED
-                End If
-                If accountBalance.Length > 6 AndAlso accountBalance.Substring(0, 5).Equals("ERROR") Then
-                    Return "<span title='" + accountBalance + "'>Error</span>"
-                End If
                 Double.Parse(accountBalance)
                 Return accountBalance
             Catch e As Exception
