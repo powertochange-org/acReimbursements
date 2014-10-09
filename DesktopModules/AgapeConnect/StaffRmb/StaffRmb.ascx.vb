@@ -4136,7 +4136,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
             Dim accountBalance = ""
             accountBalance = Await StaffRmbFunctions.getAccountBalanceAsync(account, logon)
-            If accountBalance.Length = 0 Then
+            If accountBalance = StaffRmbFunctions.PERMISSION_DENIED_ERROR Then
                 Return BALANCE_PERMISSION_DENIED
             End If
             If (accountBalance = StaffRmbFunctions.WEB_SERVICE_ERROR) Then

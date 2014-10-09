@@ -104,7 +104,7 @@ namespace StaffRmb
     public class StaffRmbFunctions
     {
         public const String WEB_SERVICE_ERROR = "ERROR in web service";
-        public const String WEB_SERVICE_ERROR_OBJECT = "{'EXCEPTION': ['" + WEB_SERVICE_ERROR + "']}";
+        public const String PERMISSION_DENIED_ERROR = "ERROR permission denied";
         private static EventLogController eventLog = new EventLogController();
         private static DotNetNuke.Entities.Portals.PortalSettings portalSettings = new DotNetNuke.Framework.UserControlBase().PortalSettings;
         private static int userId = new DotNetNuke.Entities.Modules.PortalModuleBase().UserId;
@@ -310,6 +310,9 @@ namespace StaffRmb
                 XmlDocument xDoc = new XmlDocument();
                 xDoc.LoadXml(response);
                 Double balance = Double.Parse(xDoc.GetElementsByTagName("Detail")[0].Attributes["Balance"].Value);
+                if (xDoc.GetElementsByTagName("Detail")[0].Attributes["AccountDescription"].Value.Contains("YOU DON'T HAVE ACCESS TO THIS ACCOUNT")) {
+                    return PERMISSION_DENIED_ERROR;
+                }
                 result = Math.Round(balance, 2).ToString("0.00");
             } catch (Exception e) {
                 eventLog.AddLog("getAccountBalanceAsync()", e.Message, portalSettings, userId, EventLogController.EventLogType.ADMIN_ALERT);
