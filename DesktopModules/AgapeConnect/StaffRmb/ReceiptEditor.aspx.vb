@@ -275,7 +275,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
                 End If
 
                 ' Set the proper folder permissions
-                Dim permissionsTask = CheckFolderPermissions(PS.PortalId, theFolder, theRmb.UserId)
+                Await CheckFolderPermissions(PS.PortalId, theFolder, theRmb.UserId)
                 Dim _theFile As IFileInfo
 
                 If ext.ToLower = "pdf" Then
@@ -329,7 +329,6 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
 
                 ' Add this file-rmb line relationship to the database
                 AddFileLine(_theFile, RmbLine, RmbNo, RecNum)
-                Await permissionsTask
             Else
                 'Not image file
                 lblError.Text = "* File must end in .jpg, .jpeg, .gif, .png, .bmp or .pdf<br />"
