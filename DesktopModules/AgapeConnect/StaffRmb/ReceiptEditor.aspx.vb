@@ -104,18 +104,17 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
             folderPermissions.Add(permission, True)
         Next
         
-        ' Get the team leads for this department
-        For Each teamLead In (Await StaffRmbFunctions.managersInDepartmentAsync(StaffRmbFunctions.logonFromId(PortalId, theUserId)))
-            ' Create a new permission for this teamLead
+        ' Get the supervisors for this staff member
+        Await StaffRmbFunctions.managersInDepartmentAsync(StaffRmbFunctions.logonFromId(PortalId, theUserId))
+        For Each leaderId In (StaffBrokerFunctions.GetLeaders(theUserId, False))
+            ' Create a new permission for this leader
             permission = New Permissions.FolderPermissionInfo()
             ' Initialize all the variables
             initFolderPermission(permission, theFolder.FolderID, PortalId, w.PermissionID)
-            ' Set the userid to the teamLead's id
-            If (UserController.GetUserByName(PortalId, teamLead + PortalId.ToString()) IsNot Nothing) Then
-                permission.UserID = UserController.GetUserByName(PortalId, teamLead + PortalId.ToString()).UserID
-                ' Add permission for teamLead
-                folderPermissions.Add(permission, True)
-            End If
+            ' Set the userid to the leader's id
+            permission.UserID = leaderId
+            ' Add permission for leader
+            folderPermissions.Add(permission, True)
         Next
 
         ' Finally, add permissions for the accounts team:

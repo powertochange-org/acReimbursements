@@ -172,7 +172,11 @@ namespace StaffRmb
 
             foreach (String potential_approver in potential_approvers) {
                 if (! (potential_approver.Equals(staff_logon) || potential_approver.Equals(spouse_logon))) { //exclude rmb creator and spouse
-                    result.UserIds.Add(UserController.GetUserByName(rmb.PortalId, potential_approver+rmb.PortalId.ToString()));
+                    UserInfo user = UserController.GetUserByName(rmb.PortalId, potential_approver + rmb.PortalId.ToString());
+                    if (user != null)
+                    {
+                        result.UserIds.Add(user);
+                    }
                 }
             }
             return result;
