@@ -111,9 +111,11 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
             ' Initialize all the variables
             initFolderPermission(permission, theFolder.FolderID, PortalId, w.PermissionID)
             ' Set the userid to the teamLead's id
-            permission.UserID = UserController.GetUserByName(PortalId, teamLead + PortalId.ToString()).UserID
-            ' Add permission for teamLead
-            folderPermissions.Add(permission, True)
+            If (UserController.GetUserByName(PortalId, teamLead + PortalId.ToString()) IsNot Nothing) Then
+                permission.UserID = UserController.GetUserByName(PortalId, teamLead + PortalId.ToString()).UserID
+                ' Add permission for teamLead
+                folderPermissions.Add(permission, True)
+            End If
         Next
 
         ' Finally, add permissions for the accounts team:
@@ -401,7 +403,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
         End Try
     End Sub
 
-    Protected Sub Page_Load(sender As Object, e As System.EventArgs) Handles Me.Load
+    Protected Async Sub Page_Load(sender As Object, e As System.EventArgs) Handles Me.Load
         ' Get the reimbursement and line number
         RmbNo = Request.QueryString("RmbNo")
         RmbLine = Request.QueryString("RmbLine")
@@ -417,7 +419,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
             ' Try to get the folder; if this fails, we'll throw an exception and break out of this block
             theFolder = FolderManager.Instance.GetFolder(PS.PortalId, "/_RmbReceipts/" & theRmb.UserId)
             ' Set the proper folder permissions
-            CheckFolderPermissions(PS.PortalId, theFolder, theRmb.UserId)
+            Await CheckFolderPermissions(PS.PortalId, theFolder, theRmb.UserId)
             Dim theFiles As Object
             ' If this isn't a new line we're creating
             If (RmbLine <> "New") Then
