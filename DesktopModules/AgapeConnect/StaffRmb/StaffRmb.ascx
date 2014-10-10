@@ -1535,6 +1535,7 @@
                     </ContentTemplate>
                     <Triggers>
                         <asp:PostBackTrigger ControlID="btnDownload" />
+                        <asp:AsyncPostBackTrigger ControlID="btnCreate" />
                     </Triggers>
                 </asp:UpdatePanel>
             </td>
@@ -1728,18 +1729,12 @@
                             </td>
                         </tr>
                     </table>
-                    <asp:Button ID="btnCreate" runat="server" resourcekey="btnCreate" UseSubmitBehavior="false" OnClientClick="closeNewRmbPopup(); show_loading_spinner();"
-                        class="aButton" />
-                    <input id="btnCancel2" type="button" value='<%= Translate("btnCancel") %>' onclick="closeNewRmbPopup();"
-                        class="aButton" />
+                    <asp:Button ID="btnCreate" runat="server" resourcekey="btnCreate" class="aButton" OnClientClick="closeNewRmbPopup(); show_loading_spinner();" />
+                    <input id="btnCancel2" type="button" value='<%= Translate("btnCancel") %>' onclick="closeNewRmbPopup();" class="aButton" />
                 </ContentTemplate>
-                <Triggers>
-                    <%-- <asp:AsyncPostBackTrigger ControlID="btnCreate" EventName="Click" />--%>
-                    <asp:PostBackTrigger ControlID="btnCreate" />
-                </Triggers>
             </asp:UpdatePanel>
         </div>
- 
+
     </div>
     <div id="divInsufficientFunds" class="ui-widget">
         <%--Not Used?--%>

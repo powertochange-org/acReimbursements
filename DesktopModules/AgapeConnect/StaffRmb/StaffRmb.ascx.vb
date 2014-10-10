@@ -1425,9 +1425,17 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If tbNewYourRef.Text = "" Then
                 insert.UserRef = Translate("Expenses")
             Else
-
                 insert.UserRef = tbNewYourRef.Text
             End If
+
+            ''prevent inserting duplicate new reimbursements (especially on resubmitting post data)
+            'If (From r In d.AP_Staff_Rmbs Where r.UserId = UserId And r.Status = RmbStatus.Draft And r.UserRef = insert.UserRef And r.CostCenter = hfNewChargeTo.Value And r.UserComment = tbNewComments.Text).Count > 0 Then
+            '    pnlMain.Visible = False
+            '    pnlSplash.Visible = True
+            '    ScriptManager.RegisterClientScriptBlock(Me, Me.GetType(), "duplicate", "$('#loading').hide(); alert('" + Translate("DuplicateError") + "');", True)
+            '    Return
+            'End If
+
             insert.RID = StaffRmbFunctions.GetNewRID(PortalId)
             insert.CostCenter = hfNewChargeTo.Value
             insert.UserComment = tbNewComments.Text
@@ -1461,18 +1469,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             d.AP_Staff_Rmbs.InsertOnSubmit(insert)
             d.SubmitChanges()
-            Dim resetMenuTask = LoadMenuAsync()
-            Dim loadRmbTask = LoadRmbAsync(insert.RMBNo)
-
-            Dim t As Type = tbNewChargeTo.GetType()
-            Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
-            sb.Append("<script language='javascript'>")
-            sb.Append("closeNewRmbPopup();")
-            sb.Append("</script>")
-            Await resetMenuTask
-            Await loadRmbTask
-            ScriptManager.RegisterClientScriptBlock(tbNewChargeTo, t, "", sb.ToString, False)
-
+            Dim taskList = New List(Of Task)
+            taskList.Add(LoadMenuAsync())
+            taskList.Add(LoadRmbAsync(insert.RMBNo))
+            Await Task.WhenAll(taskList)
+            ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "hide_loading_spinner", "$('#loading').hide();", True)
         End Sub
 
         Protected Sub btnSubmit_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSubmit.Click

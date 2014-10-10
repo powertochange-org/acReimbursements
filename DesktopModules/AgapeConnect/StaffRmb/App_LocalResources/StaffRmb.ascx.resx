@@ -729,4 +729,7 @@
   <data name="AccessDenied.Text" xml:space="preserve">
     <value>Access Denied</value>
   </data>
+  <data name="DuplicateError.Text" xml:space="preserve">
+    <value>Duplicate Reimbursement could not be created. </value>
+  </data>
 </root>
