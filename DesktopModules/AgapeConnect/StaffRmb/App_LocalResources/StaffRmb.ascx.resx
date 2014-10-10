@@ -726,4 +726,7 @@
   <data name="DifferentExchangeRate.Text" xml:space="preserve">
     <value>This foreign amount has been edited, and requires a receipt to confirm the rate.</value>
   </data>
+  <data name="AccessDenied.Text" xml:space="preserve">
+    <value>Access Denied</value>
+  </data>
 </root>

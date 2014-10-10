@@ -273,7 +273,7 @@ namespace StaffRmb
             string postData = "";
             string url = "http://gpapp/gpimport/webservice/GetCompanies";
             string result = await getResultFromWebServiceAsync(url, postData);
-            if (result.Length == 0 || result.Equals(WEB_SERVICE_ERROR)) result = "[{\"CompanyID\":\"ERR\",\"CompanyName\":\"Oops! No companies found\"}]";
+            if (result.Length == 0 || result.Equals(WEB_SERVICE_ERROR)) result = "[{\"CompanyID\":\"ERR\",\"CompanyName\":\"Oops, No companies!  Press F5 to reload the page.\"}]";
             return JsonConvert.DeserializeObject(result);
         }
 
@@ -283,7 +283,7 @@ namespace StaffRmb
             string postData = string.Format("company={0}&vendorId={1}", company, vendorId);
             string url = "http://gpapp/gpimport/webservice/GetRemitToAddresses";
             string result = await getResultFromWebServiceAsync(url, postData);
-            if (result.Length == 0 || result.Equals(WEB_SERVICE_ERROR) ) result = "[{\"AddressID\":\"ERR\",\"DefaultRemitToAddress\":\"N\",\"Address1\":\"Oops! No addresses found\"}]";
+            if (result.Length == 0 || result.Equals(WEB_SERVICE_ERROR) ) result = "[{\"AddressID\":\"ERR\",\"DefaultRemitToAddress\":\"N\",\"Address1\":\"Oops, No addresses!  Re-select the vendor to try again.\"}]";
             return JsonConvert.DeserializeObject(result);
         }
 

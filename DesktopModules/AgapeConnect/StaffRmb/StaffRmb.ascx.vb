@@ -789,7 +789,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim RmbRel As Integer
                     RmbRel = StaffRmbFunctions.Authenticate(UserId, RmbNo, PortalId)
                     If RmbRel = RmbAccess.Denied And Not (isApprover Or isFinance) Then
-                        'Need an access denied warning
+                        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "accessDenied", "alert('" + Translate("AccessDenied") + "');", True)
                         pnlMain.Visible = False
                         ltSplash.Text = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbSplash", PortalId))
                         pnlSplash.Visible = True
@@ -2263,7 +2263,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
         End Sub
 
-        Protected Async Sub menu_subtree_ItemCommand(ByVal node As TreeView, ByVal e As System.EventArgs) Handles tvTeamApproved.SelectedNodeChanged, tvTeamProcessing.SelectedNodeChanged, tvFinance.SelectedNodeChanged
+        Protected Async Sub menu_subtree_ItemCommand(ByVal node As TreeView, ByVal e As System.EventArgs) Handles tvTeamApproved.SelectedNodeChanged, tvTeamProcessing.SelectedNodeChanged, tvTeamPaid.SelectedNodeChanged, tvFinance.SelectedNodeChanged
             Await LoadRmbAsync(node.SelectedValue)
             ScriptManager.RegisterStartupScript(GridView1, GridView1.GetType(), "deselect_menu", "deselectPreviousMenuItem()", True)
         End Sub
