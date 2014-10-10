@@ -239,7 +239,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
 
     End Sub
 
-    Protected Sub btnUploadReceipt_Click(sender As Object, e As System.EventArgs) Handles btnUploadReceipt.Click
+    Protected Async Sub btnUploadReceipt_Click(sender As Object, e As System.EventArgs) Handles btnUploadReceipt.Click
         If fuReceipt.HasFile Then
             Dim Filename As String = fuReceipt.FileName
             Dim ext As String = Filename.Substring(Filename.LastIndexOf(".") + 1)
@@ -275,11 +275,11 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
                 End If
 
                 ' Set the proper folder permissions
-                CheckFolderPermissions(PS.PortalId, theFolder, theRmb.UserId)
+                Dim permissionsTask = CheckFolderPermissions(PS.PortalId, theFolder, theRmb.UserId)
                 Dim _theFile As IFileInfo
 
                 If ext.ToLower = "pdf" Then
-                     _theFile = FileManager.Instance.AddFile(theFolder, "R" & RmbNo & "L" & RmbLine & "Rec" & RecNum + 1 & ".pdf", fuReceipt.FileContent, True)
+                    _theFile = FileManager.Instance.AddFile(theFolder, "R" & RmbNo & "L" & RmbLine & "Rec" & RecNum + 1 & ".pdf", fuReceipt.FileContent, True)
                 Else
 
 
@@ -329,25 +329,15 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
 
                 ' Add this file-rmb line relationship to the database
                 AddFileLine(_theFile, RmbLine, RmbNo, RecNum)
-
-
-
-
-
-
-
-
+                Await permissionsTask
             Else
                 'Not image file
                 lblError.Text = "* File must end in .jpg, .jpeg, .gif, .png, .bmp or .pdf<br />"
             End If
-
-
         End If
-
-
-
     End Sub
+
+
     Private Sub Delete(sender As Object, e As System.EventArgs)
         ' Get the button that caused the event
         Dim b As Button = CType(sender, Button)
