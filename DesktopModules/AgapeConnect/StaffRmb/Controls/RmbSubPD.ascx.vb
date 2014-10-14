@@ -176,7 +176,7 @@ Partial Class controls_RmbSubPD
         End Try
 
         Try
-            Dim theAmount As Double = Double.Parse(hfCADValue.Value, New CultureInfo("en-US").NumberFormat)
+            Dim theAmount As Double = Double.Parse(tbAmount.Text, New CultureInfo("en-US").NumberFormat)
             If theAmount > CDbl(lblMaxAmt.Text) Then
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Limit.Error", LocalResourceFile)
                 Return False

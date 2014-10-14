@@ -214,7 +214,7 @@ Partial Class controls_RmbTravel
 
         Try
 
-            Dim theAmount As Double = Double.Parse(hfCADValue.Value, New CultureInfo("en-US").NumberFormat)
+            Dim theAmount As Double = Double.Parse(tbAmount.Text, New CultureInfo("en-US").NumberFormat)
             'If Amount > 5 And ddlVATReceipt.SelectedValue = -1 Then
             '    ErrorLbl.Text = "*For transactions £5 and over, a receipt must be supplied."
             '    Return False

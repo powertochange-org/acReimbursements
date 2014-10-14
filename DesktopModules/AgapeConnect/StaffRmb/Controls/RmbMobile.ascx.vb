@@ -200,7 +200,7 @@ Partial Class controls_RmbMobile
         End Try
 
         Try
-            Dim theAmount As Double = Double.Parse(hfCADValue.Value, New CultureInfo("en-US").NumberFormat)
+            Dim theAmount As Double = Double.Parse(tbAmount.Text, New CultureInfo("en-US").NumberFormat)
             If Amount <= 0.01 Then
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Amount.Error", LocalResourceFile)
                 Return False
