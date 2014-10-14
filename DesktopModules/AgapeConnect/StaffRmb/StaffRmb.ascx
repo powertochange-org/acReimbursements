@@ -961,16 +961,12 @@
                     </div>
                     <div>
                         <h3>
-                            <a href="#" id="Tab1" class="aLink">
                                 <asp:Panel ID="pnlSubmitted" runat="server">
-
+                                    <a href="#" id="Tab1" class="AcHdr">
                                     <asp:Label ID="Label6" runat="server" Font-Bold="true" ResourceKey="Submitted"></asp:Label>
-                                    <asp:Label ID="lblSubmittedCount" runat="server" Font-Bold="true"></asp:Label>
-                                </asp:Panel>
-                            </a>
-
-                           </h3>
-                            <div id="SubmittedPane">
+                                    <asp:Label ID="lblSubmittedCount" runat="server" Font-Bold="true"></asp:Label></a>
+                                </asp:Panel></h3>
+                            <div id="SubmittedPane" class="AcPane">
                                 <asp:UpdatePanel ID="SubmittedUpdatePanel" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional" >
                                     <ContentTemplate>
                                         <asp:Placeholder id="submittedPlaceholder" runat="server"></asp:Placeholder>
@@ -1023,17 +1019,13 @@
                             </div>
                     </div>
                     <div>
-                        <h3>
-
-                            <a href="#" id="Tab2" class="aLink">
+                        <h3>                            
                                 <asp:Panel ID="pnlToProcess" runat="server">
-
+                                    <a href="#" id="Tab2" class="AcHdr">
                                     <asp:Label ID="Label7" runat="server" Font-Bold="true" ResourceKey="Approved"></asp:Label>
-                                    <asp:Label ID="lblToProcess" runat="server" Font-Bold="true"></asp:Label>
-                                </asp:Panel>
-                            </a>
-                            </h3>
-                            <div id="ApprovedPane">
+                                    <asp:Label ID="lblToProcess" runat="server" Font-Bold="true"></asp:Label></a>
+                                </asp:Panel></h3>
+                            <div id="ApprovedPane" class="AcPane">
                                 <asp:UpdatePanel ID="ApprovedUpdatePanel" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional" >
                                     <ContentTemplate>
                                         <asp:TreeView ID="tvTeamApproved" class="team_leader" runat="server" ResourceKey="TeamRmbs" NodeIndent="10">
@@ -1071,15 +1063,9 @@
                     </div>
                     <div>
                         <h3>
-                            <a href="#" class="aLink">
-
-
-                                <asp:Label ID="Label8" runat="server" Font-Bold="true" ResourceKey="Processing"></asp:Label>
-
-
-                            </a>
-                        </h3>
-                       <div id="ProcessingPane">
+                            <a href="#" id="tab3" class="AcHdr">
+                                <asp:Label ID="Label8" runat="server" Font-Bold="true" ResourceKey="Processing"></asp:Label></a></h3>
+                       <div id="ProcessingPane" class="AcPane">
                             <asp:UpdatePanel ID="ProcessingUpdatePanel" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional" >
                                  <ContentTemplate>
                                     <asp:Placeholder id="processingPlaceholder" runat="server"></asp:Placeholder>
@@ -1114,9 +1100,9 @@
                     </div>
                     <div>
                         <h3>
-                            <a href="#" class="aLink">
+                            <a href="#" id="tab4" class="AcHdr">
                                 <asp:Label ID="Label9" runat="server" Font-Bold="true" ResourceKey="Paid"></asp:Label></a></h3>
-                        <div id="PaidPane">
+                        <div id="PaidPane" class="AcPane">
                             <asp:UpdatePanel ID="PaidUpdatePanel" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional" >
                                 <ContentTemplate>
                                     <asp:Placeholder id="paidPlaceholder" runat="server"></asp:Placeholder>
@@ -1147,9 +1133,9 @@
                             </asp:UpdatePanel>
                         </div>
                         <h3>
-                            <a href="#" class="aLink">
+                            <a href="#" id="tab5" class="AcHdr">
                                 <asp:Label ID="Label50" runat="server" Font-Bold="true" ResourceKey="Cancelled"></asp:Label></a></h3>
-                        <div id="CancelledPane">
+                        <div id="CancelledPane" class="AcPane">
                             <asp:UpdatePanel ID="CancelledUpdatePanel" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional" >
                                 <ContentTemplate>
                                     <asp:DataList ID="dlCancelled" runat="server" Width="100%">
