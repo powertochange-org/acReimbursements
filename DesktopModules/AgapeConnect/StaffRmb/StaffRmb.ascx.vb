@@ -610,7 +610,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Private Function GenerateTreeControl(ByVal id As String) As Control
             Dim control = New HtmlGenericControl("div")
             control.Attributes.Add("class", "accounts_team")
-            control.Attributes.Add("id", ID)
+            control.Attributes.Add("id", id)
             Return control
         End Function
 
@@ -944,7 +944,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim approverId = -1
             approvers = Await StaffRmbFunctions.getApproversAsync(obj, Nothing, Nothing)
             approverId = obj.ApprUserId
-            
+
             ddlApprovedBy.Items.Clear()
             Dim blank As ListItem
             If (tbChargeTo.Text.Length = 0) Then

@@ -252,7 +252,7 @@
             $("#divNewItem").dialog({
                 autoOpen: false,
                 position:['middle', 120],
-                height: '<%= If(isAccounts(),760,700)%>',
+                //height: '<%= If(isAccounts(),760,700)%>',
                 width: 780,
                 modal: true,
                 title: '<%= Translate("AddEditRmb") %>',
@@ -1530,91 +1530,81 @@
             </td>
         </tr>
     </table>
-    <asp:UpdateProgress ID="UpdateProgress3" runat="server" DisplayAfter="0" DynamicLayout="true"
-        AssociatedUpdatePanelID="UpdatePanel1">
-        <ProgressTemplate>
-            <asp:Image ID="updating3" ImageUrl="~/Images/progressbar2.gif" runat="server" style="margin-left:60px"/>
-        </ProgressTemplate>
-    </asp:UpdateProgress>
 
-    <div id="divNewItem" class="ui-widget">
+    <div id="divNewItem" class="ui-widget" >
         <div>
             <asp:UpdatePanel ID="UpdatePanel2" runat="server">
                 <ContentTemplate>
                     <div align="left">
                         <asp:Label ID="PopupTitle" runat="server" resourcekey="NewLineTitle" CssClass="AgapeH2"></asp:Label><br />
                         <br />
-                        <table style="font-size: 9pt" width="100%">
-                            <tr valign="top">
-                                <td style="white-space: nowrap; min-width:194px;">
-                                    <b>
-                                        <dnn:Label ID="Label4" runat="server" ControlName="ddlLineTypes" ResourceKey="LineTypes" />
-                                    </b>
-                                </td>
-                                <td width="100%">
-                                    <asp:DropDownList ID="ddlLineTypes" runat="server" DataTextField="LocalName" DataValueField="LineTypeId"
-                                        AppendDataBoundItems="true" AutoPostBack="true">
-                                    </asp:DropDownList>
-                                    <asp:Label ID="lblIncType" runat="server" CssClass="ui-state-error ui-corner-all" Text="Incompatible Type" Visible="false"></asp:Label>
-
-                                    <div id="manualCodes" runat="server" style="float: right;">
-                                        <asp:DropDownList ID="ddlAccountCode" runat="server" Width="70px" DataSourceID="dsAccountCodes"
-                                            DataTextField="DisplayName" DataValueField="AccountCode" Enabled="false">
+                        <div style="max-height:450px; overflow-y:auto; overflow-x:hidden;">
+                            <table style="font-size: 9pt" width="100%">
+                                <tr valign="top">
+                                    <td style="white-space: nowrap; min-width:194px;">
+                                        <b>
+                                            <dnn:Label ID="Label4" runat="server" ControlName="ddlLineTypes" ResourceKey="LineTypes" />
+                                        </b>
+                                    </td>
+                                    <td width="100%">
+                                        <asp:DropDownList ID="ddlLineTypes" runat="server" DataTextField="LocalName" DataValueField="LineTypeId"
+                                            AppendDataBoundItems="true" AutoPostBack="true">
                                         </asp:DropDownList>
+                                        <asp:Label ID="lblIncType" runat="server" CssClass="ui-state-error ui-corner-all" Text="Incompatible Type" Visible="false"></asp:Label>
+
+                                        <div id="manualCodes" runat="server" style="float: right;">
+                                            <asp:DropDownList ID="ddlAccountCode" runat="server" Width="70px" DataSourceID="dsAccountCodes"
+                                                DataTextField="DisplayName" DataValueField="AccountCode" Enabled="false">
+                                            </asp:DropDownList>
 
 
-                                        <asp:LinqDataSource ID="dsAccountCodes" runat="server" ContextTypeName="StaffRmb.StaffRmbDataContext"
-                                            EntityTypeName="" Select="new (AccountCode,  AccountCode + ' ' + '-' + ' ' + AccountCodeName  as DisplayName )"
-                                            TableName="AP_StaffBroker_AccountCodes" OrderBy="AccountCode" Where="PortalId == @PortalId">
-                                            <WhereParameters>
-                                                <asp:ControlParameter ControlID="hfPortalId" DefaultValue="-1" Name="PortalId" PropertyName="Value"
-                                                    Type="Int32" />
-                                            </WhereParameters>
-                                        </asp:LinqDataSource>
-                                        <asp:TextBox ID="tbCostcenter" runat="server" Width="90px" Enabled="false">
-                                        </asp:TextBox>
-                                        <asp:LinqDataSource ID="dsCostCenters" runat="server" ContextTypeName="StaffBroker.StaffBrokerDataContext"
-                                            EntityTypeName="" OrderBy="CostCentreCode" Select="new (CostCentreCode,CostCentreCode + ' ' + '-' + ' ' + CostCentreName as DisplayName)"
-                                            TableName="AP_StaffBroker_CostCenters" Where="PortalId == @PortalId">
-                                            <WhereParameters>
-                                                <asp:ControlParameter ControlID="hfPortalId" DefaultValue="-1" Name="PortalId" PropertyName="Value"
-                                                    Type="Int32" />
-                                            </WhereParameters>
-                                        </asp:LinqDataSource>
-                                    </div>
+                                            <asp:LinqDataSource ID="dsAccountCodes" runat="server" ContextTypeName="StaffRmb.StaffRmbDataContext"
+                                                EntityTypeName="" Select="new (AccountCode,  AccountCode + ' ' + '-' + ' ' + AccountCodeName  as DisplayName )"
+                                                TableName="AP_StaffBroker_AccountCodes" OrderBy="AccountCode" Where="PortalId == @PortalId">
+                                                <WhereParameters>
+                                                    <asp:ControlParameter ControlID="hfPortalId" DefaultValue="-1" Name="PortalId" PropertyName="Value"
+                                                        Type="Int32" />
+                                                </WhereParameters>
+                                            </asp:LinqDataSource>
+                                            <asp:TextBox ID="tbCostcenter" runat="server" Width="90px" Enabled="false">
+                                            </asp:TextBox>
+                                            <asp:LinqDataSource ID="dsCostCenters" runat="server" ContextTypeName="StaffBroker.StaffBrokerDataContext"
+                                                EntityTypeName="" OrderBy="CostCentreCode" Select="new (CostCentreCode,CostCentreCode + ' ' + '-' + ' ' + CostCentreName as DisplayName)"
+                                                TableName="AP_StaffBroker_CostCenters" Where="PortalId == @PortalId">
+                                                <WhereParameters>
+                                                    <asp:ControlParameter ControlID="hfPortalId" DefaultValue="-1" Name="PortalId" PropertyName="Value"
+                                                        Type="Int32" />
+                                                </WhereParameters>
+                                            </asp:LinqDataSource>
+                                        </div>
 
-                                </td>
-                            </tr>
-                        </table>
-                        <asp:PlaceHolder ID="phLineDetail" runat="server"></asp:PlaceHolder>
-                        <asp:Panel ID="pnlElecReceipts" runat="server" style="display: none;">
-                        <table style="font-size: 9pt;">
-                            <tr valign="top">
-                                <td width="150px;"><b>
-                                    <dnn:Label ID="lblElectronicReceipts" runat="server"  ResourceKey="lblElectronicReceipts" />
-                                </b></td>
-                                <td>
+                                    </td>
+                                </tr>
+                            </table>
+                            <asp:PlaceHolder ID="phLineDetail" runat="server"></asp:PlaceHolder>
+                            <asp:Panel ID="pnlElecReceipts" runat="server" style="display: none;">
+                            <table style="font-size: 9pt;">
+                                <tr valign="top">
+                                    <td width="150px;"><b>
+                                        <dnn:Label ID="lblElectronicReceipts" runat="server"  ResourceKey="lblElectronicReceipts" />
+                                    </b></td>
+                                    <td>
                                   
-                                 <iframe id="ifReceipt" runat="server" src="" width="530" height="280" >
+                                     <iframe id="ifReceipt" runat="server" src="" width="530" height="280" >
 
-                                 </iframe>
-                                </td>
-                            </tr>
-
-
-                        </table>
-                        </asp:Panel>
+                                     </iframe>
+                                    </td>
+                                </tr>
 
 
-
-                        <br />
-                        <asp:Button ID="btnSaveLine" runat="server" resourcekey="btnEnter" CommandName="Save"
-                            class="aButton" />
-                        <input type="button" value='<%= Translate("btnCancel") %>' onclick="closeNewItemPopup();"
-                            class="aButton" />
-                        <br />
-                        <br />
-                        <fieldset id="pnlAccountsOptions" runat="server">
+                            </table>
+                            </asp:Panel>
+                            <div style="width:100%;text-align:right; margin-top:10px;">
+                                <input type="button" value='<%= Translate("btnCancel") %>' onclick="closeNewItemPopup();" class="aButton" />
+                                <asp:Button ID="btnSaveLine" runat="server" resourcekey="btnEnter" CommandName="Save"  class="aButton" />
+                            </div>
+                            </div>
+                        <fieldset id="pnlAccountsOptions" runat="server" class="accounts_options">
                             <legend>
                                 <asp:Label ID="Label31" runat="server" resourcekey="AccountsOnly"></asp:Label></legend>
                             <table>
