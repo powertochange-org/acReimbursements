@@ -265,8 +265,8 @@
             $("#divNewRmb").dialog({
                 autoOpen: false,
                 position:['middle', 150],
-                height: 350,
-                width: 600,
+                height: 250,
+                width: 500,
                 modal: true,
                 title: '<%= Translate("CreateRmb") %>',
                 close: function () {
@@ -1712,14 +1712,16 @@
                                 <fieldset>
                                     <legend class="AgapeH4">
                                         <asp:Label ID="Label34" runat="server" resourcekey="YourComments"></asp:Label></legend>
-                                    <asp:TextBox ID="tbNewComments" runat="server" Height="100" TextMode="MultiLine"
+                                    <asp:TextBox ID="tbNewComments" runat="server" Height="100" TextMode="MultiLine" CssClass="prevent_resize"
                                         Width="100%"></asp:TextBox>
                                 </fieldset>
                             </td>
                         </tr>
                     </table>
-                    <asp:Button ID="btnCreate" runat="server" resourcekey="btnCreate" class="aButton" OnClientClick="closeNewRmbPopup(); show_loading_spinner();" />
-                    <input id="btnCancel2" type="button" value='<%= Translate("btnCancel") %>' onclick="closeNewRmbPopup();" class="aButton" />
+                    <div width="100%" style="text-align:right; margin-top:10px;">
+                        <input id="btnCancel2" type="button" value='<%= Translate("btnCancel") %>' class="aButton" onclick="closeNewRmbPopup();" class="aButton" />
+                        <asp:Button ID="btnCreate" runat="server" resourcekey="btnCreate" class="aButton" CssClass="aButton" OnClientClick="closeNewRmbPopup(); show_loading_spinner();" />
+                    </div>
                 </ContentTemplate>
             </asp:UpdatePanel>
         </div>
