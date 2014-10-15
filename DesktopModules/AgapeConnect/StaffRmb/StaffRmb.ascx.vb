@@ -351,14 +351,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 If approvable_count > 0 Then
                     lblSubmitted.Visible = True
                     lblSubmittedCount.Text = "(" & approvable_count & ")"
-                    pnlSubmitted.CssClass = "ui-state-highlight ui-corner-all"
+                    pnlSubmitted.Attributes.Add("class", "ui-state-highlight ui-corner-all")
                 Else
                     lblSubmittedCount.Text = ""
-                    pnlSubmitted.CssClass = ""
+                    pnlSubmitted.Attributes.Remove("class")
                 End If
 
                 lblApproveHeading.Visible = isApprover
                 SubmittedUpdatePanel.Update()
+                pnlSubmitted.Update()
             Catch ex As Exception
                 Throw New Exception("Error loading approvable rmbs: " + ex.Message)
             End Try
@@ -374,6 +375,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 dlApproved.DataSource = Approved
                 dlApproved.DataBind()
                 ApprovedUpdatePanel.Update()
+                pnlToProcess.Update()
             Catch ex As Exception
                 Throw New Exception("Error loading approved rmbs: " + ex.Message)
             End Try
@@ -643,10 +645,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 '-- Add a count of items to the 'Approved' heading
                 If total > 0 Then
                     lblToProcess.Text = "(" & total & ")"
-                    pnlToProcess.CssClass = "ui-state-highlight ui-corner-all"
+                    pnlToProcess.Attributes.Add("class", "ui-state-highlight ui-corner-all")
                 Else
                     lblToProcess.Text = ""
-                    pnlToProcess.CssClass = ""
+                    pnlToProcess.Attributes.Remove("class")
                 End If
                 ApprovedUpdatePanel.Update()
             Catch ex As Exception

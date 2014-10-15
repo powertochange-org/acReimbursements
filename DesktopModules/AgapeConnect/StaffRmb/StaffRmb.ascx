@@ -961,11 +961,12 @@
                     </div>
                     <div>
                         <h3>
-                                <asp:Panel ID="pnlSubmitted" runat="server">
-                                    <a href="#" id="Tab1" class="AcHdr">
-                                    <asp:Label ID="Label6" runat="server" Font-Bold="true" ResourceKey="Submitted"></asp:Label>
-                                    <asp:Label ID="lblSubmittedCount" runat="server" Font-Bold="true"></asp:Label></a>
-                                </asp:Panel></h3>
+                                <asp:UpdatePanel ID="pnlSubmitted" runat="server" UpdateMode="Conditional">
+                                    <ContentTemplate>
+                                        <a href="#" id="Tab1" class="AcHdr">
+                                        <asp:Label ID="Label6" runat="server" Font-Bold="true" ResourceKey="Submitted"></asp:Label>&nbsp;<asp:Label ID="lblSubmittedCount" runat="server" Font-Bold="true"></asp:Label></a>
+                                    </ContentTemplate>
+                                </asp:UpdatePanel></h3>
                             <div id="SubmittedPane" class="AcPane">
                                 <asp:UpdatePanel ID="SubmittedUpdatePanel" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional" >
                                     <ContentTemplate>
@@ -1020,11 +1021,12 @@
                     </div>
                     <div>
                         <h3>                            
-                                <asp:Panel ID="pnlToProcess" runat="server">
-                                    <a href="#" id="Tab2" class="AcHdr">
-                                    <asp:Label ID="Label7" runat="server" Font-Bold="true" ResourceKey="Approved"></asp:Label>
-                                    <asp:Label ID="lblToProcess" runat="server" Font-Bold="true"></asp:Label></a>
-                                </asp:Panel></h3>
+                                <asp:UpdatePanel ID="pnlToProcess" runat="server" UpdateMode="Conditional">
+                                    <ContentTemplate>
+                                        <a href="#" id="Tab2" class="AcHdr">
+                                        <asp:Label ID="Label7" runat="server" Font-Bold="true" ResourceKey="Approved"></asp:Label>&nbsp;<asp:Label ID="lblToProcess" runat="server" Font-Bold="true"></asp:Label></a>
+                                    </ContentTemplate>
+                                </asp:UpdatePanel></h3>
                             <div id="ApprovedPane" class="AcPane">
                                 <asp:UpdatePanel ID="ApprovedUpdatePanel" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional" >
                                     <ContentTemplate>
