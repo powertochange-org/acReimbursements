@@ -730,10 +730,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Else
                 Dim user = UserController.GetUserById(PortalId, UserId)
                 Dim initials = Left(user.FirstName, 1) + Left(user.LastName, 1)
+                ddlCompany.SelectedIndex = -1
                 dtPostingDate.Text = Today.ToString("MM/dd/yyyy")
                 tbBatchId.Text = Today.ToString("yyMMdd") & initials
                 tbPostingReference.Text = ""
                 tbInvoiceNumber.Text = "REIMB" & lblRmbNo.Text
+                tbVendorId.Text = ""
                 tbVendorId.Enabled = ddlCompany.SelectedIndex > 0
                 If (tbVendorId.Enabled) Then
                     'Await LoadVendorsAsync()
@@ -1877,7 +1879,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim allStaff = StaffBrokerFunctions.GetStaff()
                 TaskList.Add(buildAllApprovedTreeAsync(allStaff))
             End If
-
             PostingData.RMBNo = CInt(hfRmbNo.Value)
             PostingData.Company = ddlCompany.SelectedValue
             Dim fmt = New DateTimeFormatInfo()
@@ -1890,13 +1891,18 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             PostingData.RemitToAddress = ddlRemitTo.SelectedValue
             Log(theRmb.First.RMBNo, "Processed - this reimbursement will be added to the next download batch")
 
-            TaskList.Add(LoadRmbAsync(hfRmbNo.Value))
+            'TaskList.Add(LoadRmbAsync(hfRmbNo.Value))
             If (insert) Then
                 d.AP_Staff_Rmb_Post_Extras.InsertOnSubmit(PostingData)
             End If
             SubmitChanges()
+            pnlSplash.Visible = True
+            pnlMain.Visible = False
             Await Task.WhenAll(TaskList)
-
+            If (tvFinance.Nodes.Count = 1 And tvFinance.Nodes.Item(0).ChildNodes.Count = 3) Then
+                tvFinance.Nodes.Item(0).ChildNodes.Item(0).Expand()
+                tvFinance.Nodes.Item(0).ChildNodes.Item(1).Expand()
+            End If
             Dim message = Translate("NextBatch")
             ScriptManager.RegisterStartupScript(Page, Me.GetType(), "closePostData", "closePostDataDialog(); alert(""" & message & """);", True)
         End Sub
