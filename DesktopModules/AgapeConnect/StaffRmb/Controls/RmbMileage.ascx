@@ -14,6 +14,11 @@
 <ContentTemplate>
     <table style="font-size:9pt; ">
         <tr>
+            <td><b><dnn:Label ID="lblOrigin" runat="server" ControlName="tbOrigin" ResourceKey="lblOrigin" /></b></td>
+            <td ><asp:TextBox ID="tbOrigin" runat="server"></asp:TextBox></td>
+            <td><asp:TextBox ID="tbDestination" runat="server"></asp:TextBox> </td>
+        </tr>
+        <tr>
             <td ><b><dnn:label id="lblDesc"  runat="server" controlname="tbDesc" ResourceKey="lblDesc"  /></b></td>
             <td colspan="2"><asp:TextBox ID="tbDesc" runat="server" Width="450px"></asp:TextBox></td>
         </tr>

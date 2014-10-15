@@ -32,7 +32,11 @@ Partial Class controls_Mileage
         End If
     End Sub
 
-   
+    Public Function Translate(ByVal ResourceString As String) As String
+        Return DotNetNuke.Services.Localization.Localization.GetString(ResourceString, LocalResourceFile)
+
+    End Function
+
 
     Public Property Comment() As String
         Get
@@ -107,16 +111,18 @@ Partial Class controls_Mileage
     End Property
     Public Property Spare4() As String
         Get
-            Return Nothing
+            Return tbOrigin.Text
         End Get
         Set(ByVal value As String)
+            tbOrigin.Text = value
         End Set
     End Property
     Public Property Spare5() As String
         Get
-            Return Nothing
+            Return tbDestination.Text
         End Get
         Set(ByVal value As String)
+            tbDestination.Text = value
         End Set
     End Property
     Public Property Mileage As Integer
@@ -173,6 +179,14 @@ Partial Class controls_Mileage
             ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Description.Error", LocalResourceFile)
             Return False
         End If
+        If (tbOrigin.Text.Length < 3) Then
+            ErrorLbl.Text = Translate("Origin.Error")
+            Return False
+        End If
+        If (tbDestination.Text.Length < 3) Then
+            ErrorLbl.Text = Translate("Destination.Error")
+            Return False
+        End If
         Try
             Dim theDate As Date = dtDate.Text
             If theDate > Today Then
@@ -226,7 +240,8 @@ Partial Class controls_Mileage
                 End If
             Next I
         End If
-
+        tbOrigin.Attributes.Add("placeholder", Translate("Origin.Hint"))
+        tbDestination.Attributes.Add("placeholder", Translate("Destination.Hint"))
         Session("RmbSettings") = Settings
     End Sub
 

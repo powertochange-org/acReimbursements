@@ -183,7 +183,7 @@
     <comment>Error</comment>
   </data>
   <data name="Description.Error" xml:space="preserve">
-    <value>* You must enter a destination/purpose</value>
+    <value>* You must enter a ministry purpose</value>
     <comment>Error</comment>
   </data>
   <data name="OldDate.Error" xml:space="preserve">
@@ -210,5 +210,29 @@
   </data>
   <data name="lblProvince.Text" xml:space="preserve">
     <value>Province:</value>
+  </data>
+  <data name="Destination.Error" xml:space="preserve">
+    <value>You must enter a trip destination.</value>
+  </data>
+  <data name="lblDestination.Help" xml:space="preserve">
+    <value>Where did you end this ministry trip?</value>
+  </data>
+  <data name="lblDestination.Text" xml:space="preserve">
+    <value>Destination:</value>
+  </data>
+  <data name="lblOrigin.Help" xml:space="preserve">
+    <value>Where did you begin / end this ministry trip?</value>
+  </data>
+  <data name="lblOrigin.Text" xml:space="preserve">
+    <value>Origin / Destination:</value>
+  </data>
+  <data name="Origin.Error" xml:space="preserve">
+    <value>You must enter a trip origin.</value>
+  </data>
+  <data name="Destination.Hint" xml:space="preserve">
+    <value>destination</value>
+  </data>
+  <data name="Origin.Hint" xml:space="preserve">
+    <value>origin</value>
   </data>
 </root>

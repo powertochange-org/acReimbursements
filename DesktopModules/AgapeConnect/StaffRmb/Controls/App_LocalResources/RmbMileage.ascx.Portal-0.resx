@@ -117,44 +117,43 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="lblAmount.Text">
+  <data name="lblAmount.Text" xml:space="preserve">
     <value>Distance</value>
   </data>
-  <data name="Explanation.Text">
+  <data name="Explanation.Text" xml:space="preserve">
     <value>...for claiming expenses incurred through driving your personal vehicle for ministry use.</value>
   </data>
-  <data name="lblDate.Help">
+  <data name="lblDate.Help" xml:space="preserve">
     <value>Date of the trip.  If this trip lasted for more than a day, enter the date of the start of the trip.</value>
   </data>
-  <data name="lblReceipt.Help" />
-  <data name="lblVehicle.Help">
+  <data name="lblReceipt.Help" xml:space="preserve">
     <value>Please select the mileage units used for this reimbursement.</value>
   </data>
-  <data name="lblDesc.Help">
-    <value>Please enter a brief description. (eg - support visit to Waldheim)</value>
+  <data name="lblDesc.Help" xml:space="preserve">
+    <value>Please enter the ministry purpose of this trip. (eg - support visit to Waldheim)</value>
   </data>
-  <data name="lblVehicle.Text">
+  <data name="lblVehicle.Text" xml:space="preserve">
     <value>Distance units</value>
   </data>
-  <data name="Miles.Error">
+  <data name="Miles.Error" xml:space="preserve">
     <value>Invalid distance.</value>
   </data>
-  <data name="Reverse.Error">
+  <data name="Reverse.Error" xml:space="preserve">
     <value>You cannot enter zero, or a negative mileage.</value>
   </data>
-  <data name="Standard.Text">
+  <data name="Standard.Text" xml:space="preserve">
     <value>Paper receipt (must be sent by mail)</value>
   </data>
-  <data name="Electronic.Text">
+  <data name="Electronic.Text" xml:space="preserve">
     <value>Electronic Receipt (attach an image file)</value>
   </data>
-  <data name="lblDesc.Text">
-    <value>Destination &amp; Min. Purpose</value>
+  <data name="lblDesc.Text" xml:space="preserve">
+    <value>Ministry Purpose:</value>
   </data>
-  <data name="Description.Error">
+  <data name="Description.Error" xml:space="preserve">
     <value>* You must enter a (better) description</value>
   </data>
-  <data name="lblDate.Text">
+  <data name="lblDate.Text" xml:space="preserve">
     <value>Date of transaction</value>
   </data>
 </root>

@@ -1142,8 +1142,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     insert.Spare1 = CStr(ucType.GetProperty("Spare1").GetValue(theControl, Nothing)) 'province
                     insert.Spare2 = CStr(ucType.GetProperty("Spare2").GetValue(theControl, Nothing))
                     insert.Spare3 = CStr(ucType.GetProperty("Spare3").GetValue(theControl, Nothing)) 'mileageunitindex
-                    insert.Spare4 = CStr(ucType.GetProperty("Spare4").GetValue(theControl, Nothing))
-                    insert.Spare5 = CStr(ucType.GetProperty("Spare5").GetValue(theControl, Nothing))
+                    insert.Spare4 = CStr(ucType.GetProperty("Spare4").GetValue(theControl, Nothing)) 'mileageorigin
+                    insert.Spare5 = CStr(ucType.GetProperty("Spare5").GetValue(theControl, Nothing)) 'mileagedestination
                     insert.Split = False
 
                     d.AP_Staff_RmbLines.InsertOnSubmit(insert)
@@ -1411,12 +1411,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 jscript &= "$('.equivalentCAD').val('" & hfOrigCurrencyValue.Value / hfExchangeRate.Value & "');"
                 ScriptManager.RegisterClientScriptBlock(Page, Me.GetType(), "fixCurrency", jscript, True)
             End If
-            If (CInt(theControl.GetType().GetProperty("ReceiptType").GetValue(theControl, Nothing) = 2)) Then
-                ' If the receipt type is set to 2, we keep it visible
-                pnlElecReceipts.Attributes("style") = ""
-            Else
-                ' Hide it
-                pnlElecReceipts.Attributes("style") = "display: none"
+            If (theControl.GetType().GetProperty("ReceiptType") IsNot Nothing) Then
+                If (CInt(theControl.GetType().GetProperty("ReceiptType").GetValue(theControl, Nothing) = 2)) Then
+                    ' If the receipt type is set to 2, we keep it visible
+                    pnlElecReceipts.Attributes("style") = ""
+                Else
+                    ' Hide it
+                    pnlElecReceipts.Attributes("style") = "display: none"
+                End If
             End If
         End Sub
 
