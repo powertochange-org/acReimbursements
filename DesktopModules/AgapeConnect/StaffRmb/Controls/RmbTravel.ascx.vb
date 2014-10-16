@@ -121,22 +121,16 @@ Partial Class controls_RmbTravel
     End Property
     Public Property Spare2() As String
         Get
-            Return DropDownList1.SelectedValue
+            Return Nothing
         End Get
         Set(ByVal value As String)
-            DropDownList1.SelectedValue = value
         End Set
     End Property
     Public Property Spare3() As String
         Get
-            Return ddlWorkplace.SelectedValue = "Yes"
+            Return Nothing
         End Get
         Set(ByVal value As String)
-            If value = "True" Then
-                ddlWorkplace.SelectedValue = "Yes"
-            Else
-                ddlWorkplace.SelectedValue = "No"
-            End If
 
         End Set
     End Property
@@ -166,11 +160,7 @@ Partial Class controls_RmbTravel
     End Property
     Public Property Taxable() As Boolean
         Get
-            If DropDownList1.SelectedValue = 4 Then
-                Return ddlWorkplace.SelectedValue = "Yes"
-          Else
-                Return False
-            End If
+            Return False
         End Get
         Set(ByVal value As Boolean)
 
@@ -193,10 +183,6 @@ Partial Class controls_RmbTravel
         End Set
     End Property
     Public Function ValidateForm(ByVal userId As Integer) As Boolean
-        If ddlWorkplace.SelectedValue = "Yes" Then
-            ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Work.Error", LocalResourceFile)
-            Return False
-        End If
         If (tbDesc.Text.Length < 5) Then
             ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Description.Error", LocalResourceFile)
             Return False
@@ -236,23 +222,19 @@ Partial Class controls_RmbTravel
         Return True
     End Function
 
-    Protected Sub UpdatePanel1_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles UpdatePanel1.PreRender
+    'Protected Sub UpdatePanel1_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles UpdatePanel1.PreRender
 
-        If DropDownList1.SelectedValue = 4 Then
-            pnlTravelcard.Visible = True
-            'pnlOyster.Visible = False
-        ElseIf DropDownList1.SelectedValue = 5 Then
-            pnlTravelcard.Visible = True
-            'pnlOyster.Visible = True
+    '    If DropDownList1.SelectedValue = 5 Then
+    '        pnlTravelcard.Visible = True
+    '        'pnlOyster.Visible = False
+    '    Else
+    '        pnlTravelcard.Visible = False
+    '        'pnlOyster.Visible = False
+    '        DropDownList3.SelectedValue = "Yes"
 
-        Else
-            pnlTravelcard.Visible = False
-            'pnlOyster.Visible = False
-            DropDownList3.SelectedValue = "Yes"
+    '    End If
 
-        End If
-
-    End Sub
+    'End Sub
 End Class
 
 

@@ -224,4 +224,13 @@
   <data name="lblProvince.Text" xml:space="preserve">
     <value>Province:</value>
   </data>
+  <data name="Fuel.Text" xml:space="preserve">
+    <value>Fuel</value>
+  </data>
+  <data name="TravelAgent.Text" xml:space="preserve">
+    <value>Travel Agent Fees</value>
+  </data>
+  <data name="Visa.Text" xml:space="preserve">
+    <value>Foreign Visa</value>
+  </data>
 </root>

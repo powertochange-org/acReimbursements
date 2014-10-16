@@ -26,7 +26,7 @@
     </td>
 </tr>
 
-<tr>
+<%--<tr>
     <td><b><dnn:label id="Label5"  runat="server" controlname="tbDesc" ResourceKey="lblType"  text="Type:" HelpText="Please enter the type of travel that best describes this expense" /></b></td>
   
     <td>
@@ -34,13 +34,16 @@
         <ContentTemplate>
        <asp:DropDownList ID="DropDownList1" runat="server" AutoPostBack="true">
          <asp:ListItem Value="0" ResourceKey="Parking">Parking</asp:ListItem>
-         <asp:ListItem Value="1" ResourceKey="Train">Train or bus ticket</asp:ListItem>
-         <asp:ListItem Value="2" ResourceKey="Flight">Flight</asp:ListItem>
-         <asp:ListItem Value="3" ResourceKey="Taxi">Taxi</asp:ListItem>
-         <asp:ListItem Value="4" ResourceKey="Travelcard">Travelcard/Season Ticket</asp:ListItem>
-         <asp:ListItem Value="5" ResourceKey="HireCar">Hire Car</asp:ListItem>
+         <asp:ListItem Value="1" ResourceKey="Fuel">Fuel</asp:ListItem>
+         <asp:ListItem Value="2" ResourceKey="Train">Train or bus ticket</asp:ListItem>
+         <asp:ListItem Value="3" ResourceKey="Flight">Flight</asp:ListItem>
+         <asp:ListItem Value="4" ResourceKey="Taxi">Taxi</asp:ListItem>
+         <asp:ListItem Value="5" ResourceKey="Travelcard">Travelcard/Season Ticket</asp:ListItem>
+         <asp:ListItem Value="6" ResourceKey="HireCar">Rental Car</asp:ListItem>
+         <asp:ListItem Value="7" ResourceKey="Visa">Foreign Visa</asp:ListItem>
+         <asp:ListItem Value="8" ResourceKey="TravelAgent">Travel Agent Fees</asp:ListItem>
 
-         <asp:ListItem Value="6">Other</asp:ListItem>
+         <asp:ListItem Value="9" ResourceKey="Other">Other</asp:ListItem>
            
    </asp:DropDownList>
         <asp:Panel ID="pnlTravelcard" runat="server">
@@ -71,7 +74,7 @@
         
    
     </td>
-</tr>
+</tr>--%>
 
 <tr>
    <td><b><dnn:label id="Label2"  runat="server" controlname="tbAmount" ResourceKey="lblAmount"  /></b></td>
