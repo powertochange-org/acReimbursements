@@ -80,14 +80,6 @@ Partial Class controls_RmbConf
             tbDesc.Text = value
         End Set
     End Property
-    Public Property Supplier() As String
-        Get
-            Return tbSupplier.Text
-        End Get
-        Set(value As String)
-            tbSupplier.Text = value
-        End Set
-    End Property
     Public Property theDate() As Date
         Get
             Return CDate(dtDate.Text)
