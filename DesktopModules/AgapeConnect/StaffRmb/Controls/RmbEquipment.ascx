@@ -15,14 +15,12 @@
 <br />
 <table style="font-size: 9pt;">
     <tr>
-        <td>
-            <b>
-                <dnn:Label ID="Label4" runat="server" ControlName="tbDesc" ResourceKey="lblDesc" />
-            </b>
-        </td>
-        <td>
-            <asp:TextBox ID="tbDesc" runat="server" Width="550px"></asp:TextBox>
-        </td>
+        <td width="150px;"><b><dnn:Label runat="server" ControlName="tbSupplier" ResourceKey="lblSupplier" /></b></td>
+        <td><asp:TextBox ID="tbSupplier" runat="server" Width="278px"></asp:TextBox></td>
+    </tr>
+    <tr>
+        <td width="200px;"><b><dnn:label id="Label4"  runat="server" controlname="tbDesc" ResourceKey="lblDesc"  /></b></td>
+        <td><asp:TextBox ID="tbDesc" runat="server" maxlength="27" CSSStyle="width:15em"> </asp:TextBox></td>
     </tr>
     <tr>
         <td>

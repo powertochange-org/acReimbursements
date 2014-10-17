@@ -178,4 +178,14 @@
   <data name="lblProvince.Text" xml:space="preserve">
     <value>Province:</value>
   </data>
+  <data name="lblSupplier.Help" xml:space="preserve">
+    <value>Please enter the name of the shop, vendor or supplier</value>
+  </data>
+  <data name="lblSupplier.Text" xml:space="preserve">
+    <value>Supplier</value>
+  </data>
+  <data name="Supplier.Error" xml:space="preserve">
+    <value>You must provide the name of the supplier</value>
+    <comment>Error</comment>
+  </data>
 </root>

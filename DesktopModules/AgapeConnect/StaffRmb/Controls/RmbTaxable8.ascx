@@ -9,10 +9,14 @@
     <asp:Label ID="Label5" runat="server" Font-Italic="true" ForeColor="Gray" CssClass="explanation" resourcekey="Explanation"></asp:Label>
 </div><br />
 <table   style="font-size:9pt; ">
-<tr>
-    <td><b><dnn:label id="Label4"  runat="server" controlname="tbDesc"  ResourceKey="lblDesc"  /></b></td>
-    <td><asp:TextBox ID="tbDesc" runat="server" Width="550px"></asp:TextBox></td>
-</tr>
+    <tr>
+        <td width="150px;"><b><dnn:Label runat="server" ControlName="tbSupplier" ResourceKey="lblSupplier" /></b></td>
+        <td><asp:TextBox ID="tbSupplier" runat="server" Width="278px"></asp:TextBox></td>
+    </tr>
+    <tr>
+        <td width="150px;"><b><dnn:label id="Label4"  runat="server" controlname="tbDesc" ResourceKey="lblDesc"  /></b></td>
+        <td><asp:TextBox ID="tbDesc" runat="server" maxlength="27" CSSStyle="width:15em" ></asp:TextBox></td>
+    </tr>
 <tr>
   <td><b><dnn:label id="Label1"  runat="server" controlname="dtDate" ResourceKey="lblDate"  /></b></td>
     <td  colspan="2">

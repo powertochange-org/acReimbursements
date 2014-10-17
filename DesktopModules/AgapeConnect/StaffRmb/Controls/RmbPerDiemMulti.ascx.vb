@@ -33,6 +33,14 @@ Partial Class controls_RmbPerDiemMulti
     End Sub
 
 
+    Public Property Supplier() As String
+        Get
+            Return ""
+        End Get
+        Set(value As String)
+
+        End Set
+    End Property
     Public Property Comment() As String
         Get
             Return tbDesc.Text
@@ -216,6 +224,7 @@ Partial Class controls_RmbPerDiemMulti
         DropDownList2.DataValueField = "Value"
 
         DropDownList2.DataBind()
+        tbDesc.Attributes.Add("placeholder", DotNetNuke.Services.Localization.Localization.GetString("DescriptionHint.Text", "/DesktopModules/AgapeConnect/StaffRmb/App_LocalResources/StaffRmb.ascx.resx"))
 
 
     End Sub

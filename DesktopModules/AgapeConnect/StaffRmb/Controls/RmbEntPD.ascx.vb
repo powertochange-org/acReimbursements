@@ -34,6 +34,14 @@ Partial Class controls_RmbEntPD
 
 
 
+    Public Property Supplier() As String
+        Get
+            Return ""
+        End Get
+        Set(value As String)
+
+        End Set
+    End Property
     Public Property Comment() As String
         Get
             Return tbDesc.Text
@@ -199,6 +207,7 @@ Partial Class controls_RmbEntPD
         DropDownList2.Items(2).Value = Settings("EntLunch")
         DropDownList2.Items(3).Value = Settings("EntDinner")
         DropDownList2.Items(4).Value = Settings("EntOvernight")
+        tbDesc.Attributes.Add("placeholder", DotNetNuke.Services.Localization.Localization.GetString("DescriptionHint.Text", "/DesktopModules/AgapeConnect/StaffRmb/App_LocalResources/StaffRmb.ascx.resx"))
 
 
     End Sub

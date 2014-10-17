@@ -463,9 +463,6 @@
             );
         }
 
-        function tweakControl() {
-            $("#<%= UpdatePanel2.ClientID %> input[name$='tbDesc']").attr('maxlength', '27').attr('style', 'width:15em').attr('placeholder', '<%= Translate("DescriptionHint") %>');
-        }
 
         function setUpConfirms() {
             $('.confirm').click(function() {
@@ -492,7 +489,6 @@
                 setUpAutocomplete();
                 checkForMinistryAccount();
                 setUpReceiptPreviews();
-                tweakControl();
                 setUpConfirms();
             });
 

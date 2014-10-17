@@ -281,6 +281,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 For Each row In MoreInfo
                     Dim hyp As New HyperLink()
                     hyp.CssClass = "ui-state-highlight ui-corner-all AgapeWarning"
+                    hyp.Attributes.Add("style", "padding:8px; margin-top:2px;")
                     hyp.Font.Size = FontUnit.Small
                     hyp.Font.Bold = True
                     hyp.Text = Translate("MoreInfo").Replace("[RMBNO]", row.RID).Replace("[USERREF]", row.UserRef)
@@ -1039,6 +1040,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         insert.LargeTransaction = False
                     End If
 
+                    insert.Supplier = CStr(ucType.GetProperty("Supplier").GetValue(theControl, Nothing))
                     insert.Comment = CStr(ucType.GetProperty("Comment").GetValue(theControl, Nothing))
                     insert.ShortComment = GetLineComment(insert.Comment, insert.OrigCurrency, insert.OrigCurrencyAmount, tbShortComment.Text, False, Nothing, If(LineTypeName = "Mileage", CStr(ucType.GetProperty("Mileage").GetValue(theControl, Nothing)), ""))
 
@@ -1258,6 +1260,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         line.First.AccountCode = ddlAccountCode.SelectedValue
                         line.First.CostCenter = tbCostcenter.Text
                         line.First.LineType = CInt(ddlLineTypes.SelectedValue)
+                        line.First.Supplier = CStr(ucType.GetProperty("Supplier").GetValue(theControl, Nothing))
                         line.First.Comment = ucType.GetProperty("Comment").GetValue(theControl, Nothing)
                         line.First.TransDate = CDate(ucType.GetProperty("theDate").GetValue(theControl, Nothing))
                         Dim age = DateDiff(DateInterval.Month, line.First.TransDate, Today)
@@ -1801,6 +1804,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
                     Dim insert As New AP_Staff_RmbLine()
                     insert.AnalysisCode = theLine.First.AnalysisCode
+                    insert.Supplier = theLine.First.Supplier
                     insert.Comment = RowDesc
                     insert.GrossAmount = CDbl(RowAmount)
                     insert.LargeTransaction = RowAmount > CDbl(Settings("TeamLeaderLimit"))
@@ -2093,6 +2097,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
                     hfExchangeRate.Value = xRate.ToString(New CultureInfo(""))
 
+                    ucType.GetProperty("Supplier").SetValue(theControl, theLine.First.Supplier, Nothing)
                     ucType.GetProperty("Comment").SetValue(theControl, theLine.First.Comment, Nothing)
                     If (theLine.First.OrigCurrency = ac) Then
                         ucType.GetProperty("Amount").SetValue(theControl, CDbl(theLine.First.GrossAmount), Nothing)
@@ -3039,6 +3044,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Try
                 Dim lt = From c In d.AP_Staff_RmbLineTypes Where c.LineTypeId = ddlLineTypes.SelectedValue
                 If lt.Count > 0 Then
+                    Dim Supplier As String = ""
                     Dim Comment As String = ""
                     Dim Amount As Double = 0.0
                     Dim theDate As Date = Today
@@ -3057,6 +3063,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                     receiptMode = CInt(ucTypeOld.GetProperty("ReceiptType").GetValue(theControl, Nothing))
                                 Catch ex As Exception ' We couldn't get one; no big deal, but keep going with this block of code
                                 End Try
+                                Supplier = CStr(ucTypeOld.GetProperty("Supplier").GetValue(theControl, Nothing))
                                 Comment = CStr(ucTypeOld.GetProperty("Comment").GetValue(theControl, Nothing))
                                 theDate = CDate(ucTypeOld.GetProperty("theDate").GetValue(theControl, Nothing))
                                 Amount = CDbl(ucTypeOld.GetProperty("Amount").GetValue(theControl, Nothing))
@@ -3083,6 +3090,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     phLineDetail.Controls.Add(theControl)
 
                     Dim ucType As Type = theControl.GetType()
+                    ucType.GetProperty("Supplier").SetValue(theControl, Supplier, Nothing)
                     ucType.GetProperty("Comment").SetValue(theControl, Comment, Nothing)
                     ucType.GetProperty("Amount").SetValue(theControl, Amount, Nothing)
                     ucType.GetProperty("theDate").SetValue(theControl, theDate, Nothing)

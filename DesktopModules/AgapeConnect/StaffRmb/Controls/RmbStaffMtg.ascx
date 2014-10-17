@@ -11,8 +11,12 @@
 </div><br />
 <table  style="font-size:9pt; ">
 <tr>
-    <td width="150px;"><b><dnn:label id="Label4"  runat="server" controlname="tbConfName" ResourceKey="lblDesc"  /></b></td>
-    <td><asp:TextBox ID="tbConfName" runat="server" Width="550px"></asp:TextBox></td>
+    <td width="150px;"><b><dnn:Label runat="server" ControlName="tbSupplier" ResourceKey="lblSupplier" /></b></td>
+    <td><asp:TextBox ID="tbSupplier" runat="server" Width="278px"></asp:TextBox></td>
+</tr>
+<tr>
+    <td width="200px;"><b><dnn:label id="Label4"  runat="server" controlname="tbConfName" ResourceKey="lblDesc"  /></b></td>
+    <td><asp:TextBox ID="tbConfName" runat="server" MaxLength="27" CSSStyle="width:15em"></asp:TextBox></td>
 </tr>
 <tr>
     <td><b><dnn:label id="dtConfDate"  runat="server" controlname="dtConfDate"  ResourceKey="lblDate"  /></b></td>
