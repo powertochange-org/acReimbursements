@@ -1398,8 +1398,8 @@
 
                                                         <asp:Panel ID="pnlCur" runat="server" Visible='<%# Not String.IsNullOrEmpty(Eval("OrigCurrency")) And Eval("OrigCurrency") <> StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)%>'>
                                                             <asp:Label ID="lblCur" runat="server" Font-Size="XX-Small" ForeColor="#AAAAAA" Text='<%# Eval("OrigCurrency") & Eval("OrigCurrencyAmount", "{0:F2}")%>' 
-                                                                CssClass='<%# IF(Eval("ExchangeRate") isNot Nothing, If(differentExchangeRate(Eval("ExchangeRate"), Eval("OrigCurrencyAmount")/Eval("GrossAmount")), "highlight",""),"") %>' 
-                                                                ToolTip='<%# If(Eval("ExchangeRate") isNot Nothing, If(differentExchangeRate(Eval("ExchangeRate"), Eval("OrigCurrencyAmount")/Eval("GrossAmount")), Translate("DifferentExchangeRate"), ""),"")%>'></asp:Label>
+                                                                CssClass='<%# IF(Eval("ExchangeRate") isNot Nothing, If(IsDifferentExchangeRate(Eval("ExchangeRate"), Eval("OrigCurrencyAmount")/Eval("GrossAmount")), "highlight",""),"") %>' 
+                                                                ToolTip='<%# If(Eval("ExchangeRate") isNot Nothing, If(IsDifferentExchangeRate(Eval("ExchangeRate"), Eval("OrigCurrencyAmount")/Eval("GrossAmount")), Translate("DifferentExchangeRate"), ""),"")%>'></asp:Label>
                                                         </asp:Panel>
                                                     </ItemTemplate>
                                                     <FooterTemplate>
