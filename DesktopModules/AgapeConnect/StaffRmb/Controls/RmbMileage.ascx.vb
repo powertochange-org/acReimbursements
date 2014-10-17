@@ -63,7 +63,7 @@ Partial Class controls_Mileage
         Get
             If tbAmount.Text <> "" Then
                 Try
-                    Return (CDbl(tbAmount.Text) * CDbl(ddlDistUnits.SelectedValue))
+                    Return Math.Round((CInt(tbAmount.Text) * CDbl(ddlDistUnits.SelectedValue)), 2)
                 Catch
                     Return 0
                 End Try
