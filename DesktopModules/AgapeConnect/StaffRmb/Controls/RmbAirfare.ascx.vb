@@ -1,5 +1,5 @@
-﻿
-Partial Class controls_RmbConfProv
+﻿Imports System.Linq
+Partial Class controls_Mileage
     Inherits Entities.Modules.PortalModuleBase
     Protected Sub Page_Init(sender As Object, e As System.EventArgs) Handles Me.Init
         Dim FileName As String = System.IO.Path.GetFileNameWithoutExtension(Me.AppRelativeVirtualPath)
@@ -32,45 +32,17 @@ Partial Class controls_RmbConfProv
         End If
     End Sub
 
-    Public Sub Initialize(ByVal settings As Hashtable)
+    Public Function Translate(ByVal ResourceString As String) As String
+        Return DotNetNuke.Services.Localization.Localization.GetString(ResourceString, LocalResourceFile)
 
-        If settings("NoReceipt") = 0 Then
-            If settings("VatAttrib") = False And settings("ElectonicReceipts") = False Then
-                'receipts are always required (and no VAT issues) so don't ask... Just assume receipts
+    End Function
 
-                ddlVATReceipt.SelectedValue = 1
-                ReceiptLine.Visible = False
 
-            End If
-            ddlVATReceipt.Items(3).Enabled = False
-        Else
-            hfNoReceiptLimit.Value = settings("NoReceipt")
-            Dim _LIMIT As String = StaffBrokerFunctions.GetSetting("Currency", PortalId) & settings("NoReceipt")
-            ddlVATReceipt.Items(3).Text = DotNetNuke.Services.Localization.Localization.GetString("NoReceipt.Text", LocalResourceFile).Replace("[LIMIT]", _LIMIT)
-            ttlReceipt.Text = DotNetNuke.Services.Localization.Localization.GetString("lblReceipt.Text", LocalResourceFile)
-            ttlReceipt.HelpText = DotNetNuke.Services.Localization.Localization.GetString("lblReceipt.Help", LocalResourceFile).Replace("[LIMIT]", _LIMIT)
-            ReceiptLine.Visible = True
-            ddlVATReceipt.Items(3).Enabled = True
-        End If
-
-        tbDesc.Attributes.Add("placeholder", DotNetNuke.Services.Localization.Localization.GetString("DescriptionHint.Text", "/DesktopModules/AgapeConnect/StaffRmb/App_LocalResources/StaffRmb.ascx.resx"))
-        ddlVATReceipt.Items(0).Enabled = settings("VatAttrib")
-        ddlVATReceipt.Items(2).Enabled = settings("ElectronicReceipts") Or ddlVATReceipt.SelectedValue = 2
-    End Sub
-    Public Property ReceiptType() As Integer
-        Get
-            Return ddlVATReceipt.SelectedValue
-        End Get
-        Set(ByVal value As Integer)
-            ddlVATReceipt.SelectedValue = value
-        End Set
-    End Property
     Public Property Supplier() As String
         Get
-            Return tbSupplier.Text
+            Return ""
         End Get
         Set(value As String)
-            tbSupplier.Text = value
         End Set
     End Property
     Public Property Comment() As String
@@ -93,27 +65,22 @@ Partial Class controls_RmbConfProv
             End If
         End Set
     End Property
-    Public Property VAT() As Boolean
-        Get
-            Return (ddlVATReceipt.SelectedValue = 0)
-        End Get
-        Set(ByVal value As Boolean)
-            If value = True Then
-                ddlVATReceipt.SelectedValue = 0
-            Else
-                ddlVATReceipt.SelectedValue = 1
-            End If
-
-
-        End Set
-    End Property
 
     Public Property Amount() As Double
         Get
-            Return Double.Parse(tbAmount.Text, New CultureInfo("en-US").NumberFormat)
+            If tbAmount.Text <> "" Then
+                Try
+                    Return Math.Round((CInt(tbAmount.Text) * CDbl(ddlDistUnits.SelectedValue)), 2)
+                Catch
+                    Return 0
+                End Try
+            Else
+                Return 0
+            End If
+
         End Get
         Set(ByVal value As Double)
-            tbAmount.Text = value.ToString("n2", New CultureInfo("en-US"))
+            'tbAmount.Text = CInt(value / ((ddlDistUnits.SelectedValue + (5 * CInt(ddlStaff.SelectedValue))) / 100))
         End Set
     End Property
     Public Property Spare1() As String
@@ -129,53 +96,73 @@ Partial Class controls_RmbConfProv
         End Set
     End Property
     Public Property Spare2() As String
-        Get
+         Get
             Return Nothing
         End Get
         Set(ByVal value As String)
-
         End Set
     End Property
     Public Property Spare3() As String
         Get
-            Return Nothing
+            Return ddlDistUnits.SelectedIndex
         End Get
         Set(ByVal value As String)
+            Try
+                ddlDistUnits.ClearSelection()
+                ddlDistUnits.SelectedIndex = CInt(value)
+            Catch ex As Exception
+                ddlDistUnits.SelectedIndex = 0
 
+            End Try
         End Set
     End Property
     Public Property Spare4() As String
         Get
-            Return Nothing
+            Return tbOrigin.Text
         End Get
         Set(ByVal value As String)
-
+            tbOrigin.Text = value
         End Set
     End Property
     Public Property Spare5() As String
         Get
-            Return Nothing
+            Return tbDestination.Text
         End Get
         Set(ByVal value As String)
-
+            tbDestination.Text = value
         End Set
+    End Property
+    Public Property Mileage As Integer
+        Get
+            Return CInt(tbAmount.Text)
+        End Get
+        Set(ByVal value As Integer)
+            Try
+                tbAmount.Text = CInt(value)
+            Catch ex As Exception
+                tbAmount.Text = 0
+            End Try
+        End Set
+    End Property
+
+    Public ReadOnly Property MileageRate() As Decimal
+        Get
+            Return CDec(ddlDistUnits.SelectedValue)
+        End Get
     End Property
     Public Property Receipt() As Boolean
         Get
-            Return ddlVATReceipt.SelectedValue >= 0
+            Return False ' ddlVATReceipt.SelectedValue = "Yes"
         End Get
         Set(ByVal value As Boolean)
-            If value = False Then
-                ddlVATReceipt.SelectedValue = -1
-            End If
         End Set
     End Property
-    Public Property ErrorText() As String
+    Public Property VAT() As Boolean
         Get
-            Return ""
+            Return False
         End Get
-        Set(ByVal value As String)
-            ErrorLbl.Text = value
+        Set(ByVal value As Boolean)
+
         End Set
     End Property
     Public Property Taxable() As Boolean
@@ -183,7 +170,7 @@ Partial Class controls_RmbConfProv
             Return False
         End Get
         Set(ByVal value As Boolean)
-           
+
         End Set
     End Property
     Public Property CADValue() As Double
@@ -194,14 +181,17 @@ Partial Class controls_RmbConfProv
             hfCADValue.Value = value
         End Set
     End Property
-
     Public Function ValidateForm(ByVal userId As Integer) As Boolean
-        If (tbSupplier.Text.Length = 0) Then
-            ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Supplier.Error", LocalResourceFile)
-            Return False
-        End If
         If (tbDesc.Text.Length < 5) Then
             ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Description.Error", LocalResourceFile)
+            Return False
+        End If
+        If (tbOrigin.Text.Length < 3) Then
+            ErrorLbl.Text = Translate("Origin.Error")
+            Return False
+        End If
+        If (tbDestination.Text.Length < 3) Then
+            ErrorLbl.Text = Translate("Destination.Error")
             Return False
         End If
         Try
@@ -216,24 +206,64 @@ Partial Class controls_RmbConfProv
         End Try
 
         Try
-            Dim theAmount As Double = Double.Parse(tbAmount.Text, New CultureInfo("en-US").NumberFormat)
-            If Amount <= 0.01 Then
-                ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Amount.Error", LocalResourceFile)
+            Dim theMiles As Double = tbAmount.Text
+            If theMiles <= 0 Then
+                ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Reverse.Error", LocalResourceFile)
                 Return False
-            End If
-            If ddlVATReceipt.SelectedValue = "-1" And theAmount > CDbl(hfNoReceiptLimit.Value) Then
-                ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("AmountRec.Error", LocalResourceFile).Replace("[LIMIT]", StaffBrokerFunctions.GetSetting("Currency", PortalId) & hfNoReceiptLimit.Value)
-                ddlVATReceipt.SelectedValue = 1
+            ElseIf theMiles <= 1 Or theMiles > 9999 Then
+                ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Miles.Error", LocalResourceFile)
                 Return False
             End If
         Catch ex As Exception
-            ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Amount.Error", LocalResourceFile)
+            ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Miles.Error", LocalResourceFile)
             Return False
         End Try
+
+        Dim staff As New ArrayList
+        Dim staff2 As New ArrayList
+
+
         ErrorLbl.Text = ""
         Return True
     End Function
 
+
+    Public Property ErrorText() As String
+        Get
+            Return ""
+        End Get
+        Set(ByVal value As String)
+            ErrorLbl.Text = value
+        End Set
+    End Property
+
+    Public Sub Initialize(ByVal Settings As System.Collections.Hashtable)
+        Dim PS = CType(HttpContext.Current.Items("PortalSettings"), PortalSettings)
+        If (ddlDistUnits.Items.Count() = 0) Then
+            For I As Integer = 1 To 4
+                Dim value As String = Settings("MRate" & I)
+                If value <> "" Then
+                    ddlDistUnits.Items.Add(New ListItem(Settings("MRate" & I & "Name") & " (" & StaffBrokerFunctions.GetSetting("Currency", PS.PortalId) & CDbl(value).ToString("0.00") & ")", CDbl(value)))
+                End If
+            Next I
+        End If
+        tbOrigin.Attributes.Add("placeholder", Translate("Origin.Hint"))
+        tbDestination.Attributes.Add("placeholder", Translate("Destination.Hint"))
+        tbDesc.Attributes.Add("placeholder", DotNetNuke.Services.Localization.Localization.GetString("DescriptionHint.Text", "/DesktopModules/AgapeConnect/StaffRmb/App_LocalResources/StaffRmb.ascx.resx"))
+        Session("RmbSettings") = Settings
+    End Sub
+
+    Protected Sub UpdatePanel1_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles UpdatePanel1.PreRender
+        If Not Session("RmbSettings") Is Nothing Then
+            Initialize(Session("RmbSettings"))
+        End If
+
+    End Sub
+
+
+    Protected Sub Page_Load(sender As Object, e As EventArgs) Handles Me.Load
+
+    End Sub
 End Class
 
 

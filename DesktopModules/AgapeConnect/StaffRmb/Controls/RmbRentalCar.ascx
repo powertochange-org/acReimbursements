@@ -1,4 +1,4 @@
-﻿<%@ Control Language="VB" AutoEventWireup="false" CodeFile="RmbStaffMtg.ascx.vb" Inherits="controls_RmbStaffMtg" ClassName="controls_RmbStaffMtg"  %>
+﻿<%@ Control Language="VB" AutoEventWireup="false" CodeFile="RmbRentalCar.ascx.vb" Inherits="controls_RmbStaffMtg" ClassName="controls_RmbStaffMtg"  %>
 
 <%@ Register assembly="DotNetNuke" namespace="DotNetNuke.UI.WebControls" tagprefix="cc1" %>
 <%@ Register TagPrefix="dnn" TagName="Label" Src="~/controls/LabelControl.ascx" %>
