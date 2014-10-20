@@ -1042,7 +1042,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     insert.Supplier = CStr(ucType.GetProperty("Supplier").GetValue(theControl, Nothing))
                     insert.Comment = CStr(ucType.GetProperty("Comment").GetValue(theControl, Nothing))
-                    insert.ShortComment = GetLineComment(insert.Comment, insert.OrigCurrency, insert.OrigCurrencyAmount, tbShortComment.Text, False, Nothing, If(LineTypeName = "Mileage", CStr(ucType.GetProperty("Mileage").GetValue(theControl, Nothing)), ""))
+
+                    'mileage
+                    Dim mileageString As String = ""
+                    If (LineTypeName.Equals("Mileage")) Then
+                        insert.Mileage = CInt(ucType.GetProperty("Mileage").GetValue(theControl, Nothing))
+                        insert.MileageRate = ucType.GetProperty("MileageRate").GetValue(theControl, Nothing)
+                        mileageString = GetMileageString(insert.Mileage, insert.MileageRate)
+                    End If
+                    insert.ShortComment = GetLineComment(insert.Comment, insert.OrigCurrency, insert.OrigCurrencyAmount, tbShortComment.Text, False, Nothing, mileageString)
 
                     'Taxes
                     If ddlOverideTax.SelectedIndex > 0 Then
@@ -1139,11 +1147,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     End If
 
-                    'mileage
-                    If (LineTypeName.Equals("Mileage")) Then
-                        insert.Mileage = CInt(ucType.GetProperty("Mileage").GetValue(theControl, Nothing))
-                        insert.MileageRate = ucType.GetProperty("MileageRate").GetValue(theControl, Nothing)
-                    End If
 
                     insert.Spare1 = CStr(ucType.GetProperty("Spare1").GetValue(theControl, Nothing)) 'province
                     insert.Spare2 = CStr(ucType.GetProperty("Spare2").GetValue(theControl, Nothing))
@@ -1205,11 +1208,18 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                         Dim comment As String = CStr(ucType.GetProperty("Comment").GetValue(theControl, Nothing))
                         Dim sc = tbShortComment.Text
+                        'mileage
+                        Dim mileageString As String = ""
+                        If (LineTypeName.Equals("Mileage")) Then
+                            line.First.Mileage = CInt(ucType.GetProperty("Mileage").GetValue(theControl, Nothing))
+                            line.First.MileageRate = ucType.GetProperty("MileageRate").GetValue(theControl, Nothing)
+                            mileageString = GetMileageString(line.First.Mileage, line.First.MileageRate)
+                        End If
                         If (sc <> line.First.ShortComment) Then
                             'the short comment was manully changed, so this should take precidence over anything else.
-                            line.First.ShortComment = GetLineComment(comment, line.First.OrigCurrency, line.First.OrigCurrencyAmount, tbShortComment.Text, False, Nothing, If(LineTypeName = "Mileage", CStr(ucType.GetProperty("Mileage").GetValue(theControl, Nothing)), ""))
+                            line.First.ShortComment = GetLineComment(comment, line.First.OrigCurrency, line.First.OrigCurrencyAmount, tbShortComment.Text, False, Nothing, mileageString)
                         Else
-                            line.First.ShortComment = GetLineComment(comment, line.First.OrigCurrency, line.First.OrigCurrencyAmount, "", False, Nothing, If(LineTypeName = "Mileage", CStr(ucType.GetProperty("Mileage").GetValue(theControl, Nothing)), ""))
+                            line.First.ShortComment = GetLineComment(comment, line.First.OrigCurrency, line.First.OrigCurrencyAmount, "", False, Nothing, mileageString)
                         End If
                         'If line.First.ShortComment <> comment Then
                         '    line.First.Comment = comment
@@ -1337,12 +1347,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         '    ucType.GetProperty("ErrorText").SetValue(theControl, "*For transactions over " & Settings("NoReceipt") & ", a receipt must be supplied.", Nothing)
                         '    Return
                         'End If
-
-                        'mileage
-                        If (LineTypeName.Equals("Mileage")) Then
-                            line.First.Mileage = CInt(ucType.GetProperty("Mileage").GetValue(theControl, Nothing))
-                            line.First.MileageRate = ucType.GetProperty("MileageRate").GetValue(theControl, Nothing)
-                        End If
 
                         line.First.Spare1 = CStr(ucType.GetProperty("Spare1").GetValue(theControl, Nothing))
                         line.First.Spare2 = CStr(ucType.GetProperty("Spare2").GetValue(theControl, Nothing))
@@ -2129,9 +2133,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ucType.GetProperty("Spare4").SetValue(theControl, theLine.First.Spare4, Nothing)
                     ucType.GetProperty("Spare5").SetValue(theControl, theLine.First.Spare5, Nothing)
 
+                    Dim mileageString As String = ""
                     If (ucType.GetProperty("Mileage") IsNot Nothing) Then
                         If (theLine.First.Mileage IsNot Nothing) Then
                             ucType.GetProperty("Mileage").SetValue(theControl, theLine.First.Mileage, Nothing)
+                            mileageString = GetMileageString(theLine.First.Mileage, theLine.First.MileageRate)
                         Else
                             ucType.GetProperty("Mileage").SetValue(theControl, 0, Nothing)
                         End If
@@ -2171,7 +2177,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
 
                     Try
-                        tbShortComment.Text = GetLineComment(theLine.First.Comment, theLine.First.OrigCurrency, If(theLine.First.OrigCurrencyAmount Is Nothing, 0, theLine.First.OrigCurrencyAmount), theLine.First.ShortComment, False, Nothing, If(theLine.First.AP_Staff_RmbLineType.TypeName = "Mileage", theLine.First.Mileage, ""))
+                        tbShortComment.Text = GetLineComment(theLine.First.Comment, theLine.First.OrigCurrency, If(theLine.First.OrigCurrencyAmount Is Nothing, 0, theLine.First.OrigCurrencyAmount), theLine.First.ShortComment, False, Nothing, mileageString)
                     Catch
                         tbShortComment.Text = ""
                     End Try
@@ -3300,7 +3306,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Else
                         Credit = -line.GrossAmount.ToString("0.00")
                     End If
-                    Dim shortComment = GetLineComment(line.Comment, line.OrigCurrency, line.OrigCurrencyAmount, line.ShortComment, True, Left(theUser.FirstName, 1) & Left(theUser.LastName, 1), If(line.AP_Staff_RmbLineType.TypeName = "Mileage", line.Mileage, ""))
+                    Dim shortComment = GetLineComment(line.Comment, line.OrigCurrency, line.OrigCurrencyAmount, line.ShortComment, True, Left(theUser.FirstName, 1) & Left(theUser.LastName, 1), If(line.AP_Staff_RmbLineType.TypeName = "Mileage", GetMileageString(line.Mileage, line.MileageRate), ""))
                     rtn &= GetOrderedString(shortComment,
                                          Debit, Credit)
 
