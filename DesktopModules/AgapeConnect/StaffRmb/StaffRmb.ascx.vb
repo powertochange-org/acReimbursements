@@ -2408,6 +2408,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         End Function
 
+        Public Function GetSupplier(ByVal Supplier As String)
+            If (Supplier.Length > 0) Then
+                Return " (" & Supplier & ")"
+            End If
+            Return ""
+        End Function
+
         Public Function GetLineComment(ByVal comment As String, ByVal Currency As String, ByVal CurrencyValue As Double, ByVal ShortComment As String, Optional ByVal includeInitials As Boolean = True, Optional ByVal explicitStaffInitals As String = Nothing, Optional ByVal Mileage As String = "") As String
 
 
@@ -2545,7 +2552,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
 
             Dim RmbNo As Integer = hfRmbNo.Value
-      
+
             Try
                 Dim rmb_status = (From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo Select c.Status).First
                 Select Case rmb_status
