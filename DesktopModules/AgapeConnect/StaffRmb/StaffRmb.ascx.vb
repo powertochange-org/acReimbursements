@@ -2171,7 +2171,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
 
                     Try
-                        tbShortComment.Text = GetLineComment(theLine.First.Comment, theLine.First.OrigCurrency, If(theLine.First.OrigCurrencyAmount Is Nothing, 0, theLine.First.OrigCurrencyAmount), theLine.First.ShortComment, False, Nothing, IIf(theLine.First.AP_Staff_RmbLineType.TypeName = "Mileage", theLine.First.Mileage, ""))
+                        tbShortComment.Text = GetLineComment(theLine.First.Comment, theLine.First.OrigCurrency, If(theLine.First.OrigCurrencyAmount Is Nothing, 0, theLine.First.OrigCurrencyAmount), theLine.First.ShortComment, False, Nothing, If(theLine.First.AP_Staff_RmbLineType.TypeName = "Mileage", theLine.First.Mileage, ""))
                     Catch
                         tbShortComment.Text = ""
                     End Try
@@ -3300,7 +3300,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Else
                         Credit = -line.GrossAmount.ToString("0.00")
                     End If
-                    Dim shortComment = GetLineComment(line.Comment, line.OrigCurrency, line.OrigCurrencyAmount, line.ShortComment, True, Left(theUser.FirstName, 1) & Left(theUser.LastName, 1), IIf(line.AP_Staff_RmbLineType.TypeName = "Mileage", line.Mileage, ""))
+                    Dim shortComment = GetLineComment(line.Comment, line.OrigCurrency, line.OrigCurrencyAmount, line.ShortComment, True, Left(theUser.FirstName, 1) & Left(theUser.LastName, 1), If(line.AP_Staff_RmbLineType.TypeName = "Mileage", line.Mileage, ""))
                     rtn &= GetOrderedString(shortComment,
                                          Debit, Credit)
 
