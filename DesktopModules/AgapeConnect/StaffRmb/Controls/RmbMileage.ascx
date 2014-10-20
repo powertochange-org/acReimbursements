@@ -20,7 +20,7 @@
         </tr>
         <tr>
             <td ><b><dnn:label id="lblDesc"  runat="server" controlname="tbDesc" ResourceKey="lblDesc"  /></b></td>
-            <td colspan="2"><asp:TextBox ID="tbDesc" runat="server" Width="450px"></asp:TextBox></td>
+            <td colspan="2"><asp:TextBox ID="tbDesc" runat="server" MaxLength="27" CSSStyle="width:15em"></asp:TextBox></td>
         </tr>
         <tr>
             <td><b><dnn:label id="lblDate" runat="server" controlname="dtDate"  ResourceKey="lblDate" /></b></td>
