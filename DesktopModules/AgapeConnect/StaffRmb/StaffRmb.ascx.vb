@@ -2426,7 +2426,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim CurString = ""
             If Mileage <> "" Then
                 'this is a mileage expense item, so don't show currency - show milage instead.
-                CurString = "-" & Mileage & Left(Settings("DistanceUnit").ToString(), 2)
+                CurString = "-" & Mileage
 
 
             Else
