@@ -816,6 +816,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     tbChargeTo.Text = If(Rmb.CostCenter Is Nothing, "", Rmb.CostCenter)
                     tbChargeTo.Enabled = DRAFT Or MORE_INFO Or CANCELLED Or (SUBMITTED And (isOwner Or isSpouse))
                     tbChargeTo.Attributes.Add("placeholder", Translate("tbChargeToHint"))
+                    Dim accountName = (From c In d.AP_StaffBroker_CostCenters Where c.CostCentreCode = Rmb.CostCenter Select c.CostCentreName).SingleOrDefault()
+                    tbChargeTo.Attributes.Add("title", accountName)
                     lblStatus.Text = Translate(RmbStatus.StatusName(Rmb.Status))
                     If (Rmb.MoreInfoRequested) Then
                         lblStatus.Text = lblStatus.Text & " - " & Translate("StatusMoreInfo")
