@@ -117,31 +117,31 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="lblAmount.Text">
+  <data name="lblAmount.Text" xml:space="preserve">
     <value>Amount</value>
   </data>
-  <data name="Explanation.Text">
-    <value>...Costs related to ministry flights, car rental, tolls, parking</value>
+  <data name="Explanation.Text" xml:space="preserve">
+    <value>...Costs related to travel that don't fit into any other category (airfare, lodging, rental car)</value>
   </data>
-  <data name="lblDate.Help">
+  <data name="lblDate.Help" xml:space="preserve">
     <value>Enter your date of travel or the date of this expense. If this is a return ticket, enter the outbound date.</value>
   </data>
-  <data name="Standard.Text">
+  <data name="Standard.Text" xml:space="preserve">
     <value>Paper receipt (must be sent by mail)</value>
   </data>
-  <data name="Electronic.Text">
+  <data name="Electronic.Text" xml:space="preserve">
     <value>Electronic Receipt (attach an image file)</value>
   </data>
-  <data name="lblDesc.Text">
+  <data name="lblDesc.Text" xml:space="preserve">
     <value>Destination &amp; Min. Purpose</value>
   </data>
-  <data name="lblDesc.Help">
+  <data name="lblDesc.Help" xml:space="preserve">
     <value>Please enter your destination and a brief description of the ministry purpose for this trip</value>
   </data>
-  <data name="Description.Error">
+  <data name="Description.Error" xml:space="preserve">
     <value>* You must enter a (better) description</value>
   </data>
-  <data name="lblDate.Text">
+  <data name="lblDate.Text" xml:space="preserve">
     <value>Date of transaction</value>
   </data>
 </root>
