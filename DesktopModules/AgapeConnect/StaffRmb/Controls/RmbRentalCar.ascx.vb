@@ -1,5 +1,5 @@
 ﻿
-Partial Class controls_RmbStaffMtg
+Partial Class controls_RmbGeneric
     Inherits Entities.Modules.PortalModuleBase
     Protected Sub Page_Init(sender As Object, e As System.EventArgs) Handles Me.Init
         Dim FileName As String = System.IO.Path.GetFileNameWithoutExtension(Me.AppRelativeVirtualPath)
@@ -52,7 +52,7 @@ Partial Class controls_RmbStaffMtg
             ddlVATReceipt.Items(3).Enabled = True
         End If
 
-        tbConfName.Attributes.Add("placeholder", DotNetNuke.Services.Localization.Localization.GetString("DescriptionHint.Text", "/DesktopModules/AgapeConnect/StaffRmb/App_LocalResources/StaffRmb.ascx.resx"))
+        tbDesc.Attributes.Add("placeholder", DotNetNuke.Services.Localization.Localization.GetString("DescriptionHint.Text", "/DesktopModules/AgapeConnect/StaffRmb/App_LocalResources/StaffRmb.ascx.resx"))
         ddlVATReceipt.Items(0).Enabled = settings("VatAttrib")
         ddlVATReceipt.Items(2).Enabled = settings("ElectronicReceipts") Or ddlVATReceipt.SelectedValue = 2
     End Sub
@@ -74,21 +74,21 @@ Partial Class controls_RmbStaffMtg
     End Property
     Public Property Comment() As String
         Get
-            Return tbConfName.Text
+            Return tbDesc.Text
         End Get
         Set(ByVal value As String)
-            tbConfName.Text = value
+            tbDesc.Text = value
         End Set
     End Property
     Public Property theDate() As Date
         Get
-            Return CDate(dtConfDate.Text)
+            Return CDate(dtDate.Text)
         End Get
         Set(ByVal value As Date)
             If value = Nothing Then
-                dtConfDate.Text = Today.ToShortDateString
+                dtDate.Text = Today.ToShortDateString
             Else
-                dtConfDate.Text = value
+                dtDate.Text = value
             End If
         End Set
     End Property
@@ -115,6 +115,7 @@ Partial Class controls_RmbStaffMtg
             tbAmount.Text = value.ToString("n2", New CultureInfo("en-US"))
         End Set
     End Property
+
     Public Property Taxable() As Boolean
         Get
             Return False
@@ -125,18 +126,22 @@ Partial Class controls_RmbStaffMtg
     End Property
     Public Property Spare1() As String
         Get
-            Return CheckBox1.Checked
+            Return ddlProvince.SelectedValue
         End Get
         Set(ByVal value As String)
-            CheckBox1.Checked = value
+            Try
+                ddlProvince.SelectedValue = value
+            Catch
+                ddlProvince = Nothing
+            End Try
         End Set
     End Property
     Public Property Spare2() As String
         Get
-            Return TextBox1.Text
+            Return Nothing
         End Get
         Set(ByVal value As String)
-            TextBox1.Text = value
+
         End Set
     End Property
     Public Property Spare3() As String
@@ -163,6 +168,14 @@ Partial Class controls_RmbStaffMtg
 
         End Set
     End Property
+    Public Property ErrorText() As String
+        Get
+            Return ""
+        End Get
+        Set(ByVal value As String)
+            ErrorLbl.Text = value
+        End Set
+    End Property
     Public Property Receipt() As Boolean
         Get
             Return ddlVATReceipt.SelectedValue >= 0
@@ -173,14 +186,6 @@ Partial Class controls_RmbStaffMtg
             End If
         End Set
     End Property
-    Public Property ErrorText() As String
-        Get
-            Return ""
-        End Get
-        Set(ByVal value As String)
-            ErrorLbl.Text = value
-        End Set
-    End Property
     Public Property CADValue() As Double
         Get
             Return CDbl(hfCADValue.Value)
@@ -189,23 +194,18 @@ Partial Class controls_RmbStaffMtg
             hfCADValue.Value = value
         End Set
     End Property
+
     Public Function ValidateForm(ByVal userId As Integer) As Boolean
         If (tbSupplier.Text.Length = 0) Then
             ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Supplier.Error", LocalResourceFile)
             Return False
         End If
-        If tbConfName.Text = "" Then
+        If (tbDesc.Text.Length < 5) Then
             ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Description.Error", LocalResourceFile)
             Return False
         End If
-
-        If CheckBox1.Checked And TextBox1.Text = "" Then
-            ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Split.Error", LocalResourceFile)
-            Return False
-        End If
-
         Try
-            Dim theDate As Date = dtConfDate.Text
+            Dim theDate As Date = dtDate.Text
             If theDate > Today Then
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("OldDate.Error", LocalResourceFile)
                 Return False

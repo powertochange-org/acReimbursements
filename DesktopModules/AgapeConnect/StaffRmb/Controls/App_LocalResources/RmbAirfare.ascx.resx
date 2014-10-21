@@ -195,25 +195,25 @@
   <data name="Destinatino.Error" xml:space="preserve">
     <value>You must provide the ending point for this trip</value>
   </data>
-  <data name="Destinatinon.Help" xml:space="preserve">
+  <data name="lblDestinatinon.Help" xml:space="preserve">
     <value>Where did you go?</value>
   </data>
   <data name="Destination.Hint" xml:space="preserve">
     <value>destination</value>
   </data>
-  <data name="Destination.Text" xml:space="preserve">
+  <data name="lblDestination.Text" xml:space="preserve">
     <value>Destination:</value>
   </data>
   <data name="Origin.Error" xml:space="preserve">
     <value>You must provide the starting point of this trip</value>
   </data>
-  <data name="Origin.Help" xml:space="preserve">
-    <value>Where did this trip begin?</value>
+  <data name="lblOrigin.Help" xml:space="preserve">
+    <value>Where did this trip begin and end?</value>
   </data>
   <data name="Origin.Hint" xml:space="preserve">
     <value>origin</value>
   </data>
-  <data name="Origin.Text" xml:space="preserve">
+  <data name="lblOrigin.Text" xml:space="preserve">
     <value>Origin/Destination:</value>
   </data>
 </root>
