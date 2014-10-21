@@ -3265,6 +3265,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Return (typeName.IndexOf("mileage") > -1 Or typeName.IndexOf("airfare") > -1)
         End Function
 
+        Public Function IsMileageType(ByVal typeId As Integer) As Boolean
+            Return GetLocalTypeName(typeId).ToLower().IndexOf("mileage") > -1
+        End Function
+
         Public Function differentExchangeRate(xRate1 As Double, xRate2 As Double) As Boolean
             'determine whether the 2 exchange rates differ by more than the fudge factor
             Dim fudge_factor = 0.001
