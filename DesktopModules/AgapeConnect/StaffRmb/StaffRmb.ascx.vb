@@ -79,6 +79,17 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 TaskList.Add(LoadCompaniesAsync())
                 TaskList.Add(LoadMenuAsync())
                 TaskList.Add(LoadAddressAsync())
+
+                'Initialize US exchange rate from settings
+                Dim rateString As String = Settings("USExchangeRate")
+                Dim rate As Double
+                Try
+                    rate = CType(rateString, Double)
+                Catch ex As Exception
+                    rate = 0
+                End Try
+                StaffBrokerFunctions.setUsExchangeRate(rate)
+
                 If Request.QueryString("RmbNo") <> "" Then
                     hfRmbNo.Value = CInt(Request.QueryString("RmbNo"))
                 End If
@@ -204,7 +215,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     TaskList.Add(LoadRmbAsync(hfRmbNo.Value))
                 Else
                     ltSplash.Text = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbSplash", PortalId))
-            End If
+                End If
                 tbNewChargeTo.Attributes.Add("onkeypress", "return disableSubmitOnEnter();")
             End If
             Await Task.WhenAll(TaskList)
@@ -1032,7 +1043,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         insert.OrigCurrencyAmount = insert.GrossAmount
                     Else 'Foreign Currency
                         insert.GrossAmount = CDbl(ucType.GetProperty("CADValue").GetValue(theControl, Nothing))
-                        insert.ExchangeRate = StaffBrokerFunctions.GetExchangeRate(accounting_currency, hfOrigCurrency.Value)
+                        insert.ExchangeRate = StaffBrokerFunctions.GetExchangeRate(PortalId, accounting_currency, hfOrigCurrency.Value)
                         insert.OrigCurrency = hfOrigCurrency.Value
                         insert.OrigCurrencyAmount = CDbl(hfOrigCurrencyValue.Value)
                     End If
@@ -1205,7 +1216,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             line.First.GrossAmount = ucType.GetProperty("CADValue").GetValue(theControl, Nothing)
                             line.First.OrigCurrency = hfOrigCurrency.Value
                             line.First.OrigCurrencyAmount = hfOrigCurrencyValue.Value
-                            line.First.ExchangeRate = StaffBrokerFunctions.GetExchangeRate(accounting_currency, hfOrigCurrency.Value)
+                            line.First.ExchangeRate = StaffBrokerFunctions.GetExchangeRate(PortalId, accounting_currency, hfOrigCurrency.Value)
                         End If
 
                         Dim comment As String = CStr(ucType.GetProperty("Comment").GetValue(theControl, Nothing))
