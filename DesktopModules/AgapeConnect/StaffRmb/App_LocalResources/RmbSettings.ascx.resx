@@ -375,4 +375,10 @@
   <data name="lblProjectCodeGSTHSTPTC.Text" xml:space="preserve">
     <value>Project Code GST/HST PTC</value>
   </data>
+  <data name="lblMileageRates.Text" xml:space="preserve">
+    <value>Mileage Rates:</value>
+  </data>
+  <data name="lblUSExchangeRate.Text" xml:space="preserve">
+    <value>U.S. Exchange Rate</value>
+  </data>
 </root>

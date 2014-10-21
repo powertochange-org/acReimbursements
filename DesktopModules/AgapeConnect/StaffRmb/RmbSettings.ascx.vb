@@ -177,28 +177,9 @@ Namespace DotNetNuke.Modules.StaffRmb
                         tbPD6Value.Text = CType(TabModuleSettings("Sub6Value"), String)
                     End If
 
-
-                    If CType(TabModuleSettings("EntBreakfast"), String) <> "" Then
-                        tbEntBreakfast.Text = CType(TabModuleSettings("EntBreakfast"), String)
+                    If CType(TabModuleSettings("USExchangeRate"), String) <> "" Then
+                        tbUSExchangeRate.Text = CType(TabModuleSettings("USExchangeRate"), String)
                     End If
-                    If CType(TabModuleSettings("EntLunch"), String) <> "" Then
-                        tbEntLunch.Text = CType(TabModuleSettings("EntLunch"), String)
-                    End If
-                    If CType(TabModuleSettings("EntDinner"), String) <> "" Then
-                        tbEntDinner.Text = CType(TabModuleSettings("EntDinner"), String)
-                    End If
-                    If CType(TabModuleSettings("EntOvernight"), String) <> "" Then
-                        tbEntOvernight.Text = CType(TabModuleSettings("EntOvernight"), String)
-                    End If
-                    If CType(TabModuleSettings("EntDay"), String) <> "" Then
-                        tbEntDay.Text = CType(TabModuleSettings("EntDay"), String)
-                    End If
-                    If CType(TabModuleSettings("MenuSize"), String) <> "" Then
-                        tbMenuSize.Text = CType(TabModuleSettings("MenuSize"), String)
-                    End If
-                    'If CType(TabModuleSettings("UseDCode"), String) <> "" Then
-                    '    cbUseDCode.Checked = CType(TabModuleSettings("UseDCode"), Boolean)
-                    'End If
 
                     If CType(TabModuleSettings("ShowRemBal"), String) <> "" Then
                         cbRemBal.Checked = CType(TabModuleSettings("ShowRemBal"), Boolean)
@@ -421,11 +402,8 @@ Namespace DotNetNuke.Modules.StaffRmb
             objModules.UpdateTabModuleSetting(TabModuleId, "MRate3", SetIfNumber(tbMRate3.Text))
             objModules.UpdateTabModuleSetting(TabModuleId, "MRate4", SetIfNumber(tbMRate4.Text))
 
-            objModules.UpdateTabModuleSetting(TabModuleId, "EntBreakfast", tbEntBreakfast.Text)
-            objModules.UpdateTabModuleSetting(TabModuleId, "EntLunch", tbEntLunch.Text)
-            objModules.UpdateTabModuleSetting(TabModuleId, "EntDinner", tbEntDinner.Text)
-            objModules.UpdateTabModuleSetting(TabModuleId, "EntOvernight", tbEntOvernight.Text)
-            objModules.UpdateTabModuleSetting(TabModuleId, "EntDay", tbEntDay.Text)
+            objModules.UpdateTabModuleSetting(TabModuleId, "USExchangeRate", SetIfNumber(tbUSExchangeRate.Text))
+
             objModules.UpdateTabModuleSetting(TabModuleId, "MenuSize", tbMenuSize.Text)
             '  objModules.UpdateTabModuleSetting(TabModuleId, "UseDCode", cbUseDCode.Checked)
             objModules.UpdateTabModuleSetting(TabModuleId, "ControlAccount", ddlControlAccount.SelectedValue)
@@ -549,34 +527,6 @@ Namespace DotNetNuke.Modules.StaffRmb
             Response.Redirect(NavigateURL())
         End Sub
 
-        Protected Sub gvPerDiemMulti_RowCommand(sender As Object, e As GridViewCommandEventArgs) Handles gvPerDiemMulti.RowCommand
-            If e.CommandName = "myInsert" Then
-
-                Dim d As New StaffRmbDataContext
-                Dim insert = New AP_Staff_Rmb_PerDeimMuliType
-                insert.Name = CType(gvPerDiemMulti.FooterRow.Controls(0).FindControl("tbNameI"), TextBox).Text
-                insert.Value = CType(gvPerDiemMulti.FooterRow.Controls(0).FindControl("tbAmountI"), TextBox).Text
-                insert.Currency = CType(gvPerDiemMulti.FooterRow.Controls(0).FindControl("ddlCurrenciesI"), DropDownList).SelectedValue
-                insert.PortalId = PortalId
-
-
-                d.AP_Staff_Rmb_PerDeimMuliTypes.InsertOnSubmit(insert)
-                d.SubmitChanges()
-                gvPerDiemMulti.DataBind()
-            ElseIf e.CommandName = "myEInsert" Then
-                Dim d As New StaffRmbDataContext
-                Dim insert = New AP_Staff_Rmb_PerDeimMuliType
-
-                insert.Name = CType(gvPerDiemMulti.Controls(0).Controls(1).FindControl("tbNameE"), TextBox).Text
-                insert.Value = CType(gvPerDiemMulti.Controls(0).Controls(1).FindControl("tbValueE"), TextBox).Text
-                insert.Currency = CType(gvPerDiemMulti.Controls(0).Controls(1).FindControl("ddlCurrenciesE"), DropDownList).SelectedValue
-                insert.PortalId = PortalId
-
-                d.AP_Staff_Rmb_PerDeimMuliTypes.InsertOnSubmit(insert)
-                d.SubmitChanges()
-                gvPerDiemMulti.DataBind()
-            End If
-        End Sub
 
         Protected Sub btnDownload_Click(sender As Object, e As EventArgs) Handles btnDownload.Click
 
