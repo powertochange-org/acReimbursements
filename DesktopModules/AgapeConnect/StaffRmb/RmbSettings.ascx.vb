@@ -45,7 +45,9 @@ Namespace DotNetNuke.Modules.StaffRmb
                         ddlEDMS.SelectedValue = CType(TabModuleSettings("EDMSId"), Integer)
                     End If
 
-
+                    If CType(TabModuleSettings("MenuSize"), String) <> "" Then
+                        tbMenuSize.Text = CType(TabModuleSettings("MenuSize"), String)
+                    End If
 
 
 

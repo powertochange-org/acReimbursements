@@ -82,12 +82,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 'Initialize US exchange rate from settings
                 Dim rateString As String = Settings("USExchangeRate")
-                Dim rate As Double
-                Try
-                    rate = CType(rateString, Double)
-                Catch ex As Exception
-                    rate = 0
-                End Try
+                Dim rate As Double = 0
+                If (rateString IsNot Nothing) Then
+                    Try
+                        rate = CType(rateString, Double)
+                    Catch ex As Exception
+                        rate = 0
+                    End Try
+                End If
                 StaffBrokerFunctions.setUsExchangeRate(rate)
 
                 If Request.QueryString("RmbNo") <> "" Then
@@ -217,8 +219,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ltSplash.Text = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbSplash", PortalId))
                 End If
                 tbNewChargeTo.Attributes.Add("onkeypress", "return disableSubmitOnEnter();")
-            End If
-            Await Task.WhenAll(TaskList)
+                End If
+                Await Task.WhenAll(TaskList)
         End Sub
 
         Protected Sub UpdatePanel2_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles UpdatePanel2.Load
