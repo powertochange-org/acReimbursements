@@ -162,7 +162,8 @@
       <Column Name="ReceiptMode" Type="System.Byte" DbType="TinyInt" CanBeNull="true" />
       <Column Name="ReceiptImageId" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="ReceiptText" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
-      <Column Member="ExchangeRate" Type="System.Double" CanBeNull="true" />
+      <Column Name="ExchangeRate" Type="System.Double" CanBeNull="true" />
+      <Column Member="Supplier" Type="System.String" CanBeNull="false" />
       <Association Name="AP_Staff_Rmb_AP_Staff_RmbLine" Member="AP_Staff_Rmb" ThisKey="RmbNo" OtherKey="RMBNo" Type="AP_Staff_Rmb" IsForeignKey="true" />
       <Association Name="AP_Staff_RmbLineType_AP_Staff_RmbLine" Member="AP_Staff_RmbLineType" ThisKey="LineType" OtherKey="LineTypeId" Type="AP_Staff_RmbLineType" IsForeignKey="true" />
     </Type>

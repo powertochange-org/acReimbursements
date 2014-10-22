@@ -55,7 +55,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_Controls_Currency
     Public Sub Currency_Change(ByVal sender As Object, ByVal e As System.EventArgs) Handles ddlCurrencies.SelectedIndexChanged
         Dim accounting_currency = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)
         Dim foreign_currency = ddlCurrencies.SelectedValue
-        Dim exchangeRate = StaffBrokerFunctions.GetExchangeRate(accounting_currency, foreign_currency)
+        Dim exchangeRate = StaffBrokerFunctions.GetExchangeRate(PortalId, accounting_currency, foreign_currency)
         Dim script = "setXRate(" & exchangeRate & "); calculateEquivalentCAD();"
         ScriptManager.RegisterStartupScript(Page, Me.GetType(), "xrate", script, True)
     End Sub

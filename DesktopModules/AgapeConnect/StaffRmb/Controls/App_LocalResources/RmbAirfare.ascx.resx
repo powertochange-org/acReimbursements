@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Explanation.Text" xml:space="preserve">
-    <value>... for claiming expenses incurred in a meeting of Agap&amp;eacute; staff. (i.e. Food, Room Hire etc).</value>
+    <value>...for claiming expenses related to airfare for ministry trips.</value>
   </data>
   <data name="lblAmount.Help" xml:space="preserve">
     <value>Please enter the amount of this expense (including tax).</value>
@@ -127,16 +127,16 @@
     <value>Amount:</value>
   </data>
   <data name="lblDate.Help" xml:space="preserve">
-    <value>Enter the date of this transaction or the start date of the event.</value>
+    <value>Enter the date that you incurred this expense.</value>
   </data>
   <data name="lblDate.Text" xml:space="preserve">
     <value>Date:</value>
   </data>
   <data name="lblDesc.Help" xml:space="preserve">
-    <value>Please enter a brief description of this expense</value>
+    <value>Please enter the ministry purpose of this trip</value>
   </data>
   <data name="lblDesc.Text" xml:space="preserve">
-    <value>Description:</value>
+    <value>Ministry Purpose:</value>
   </data>
   <data name="lblReceipt.Help" xml:space="preserve">
     <value>Enter the type of receipt you will be sending.  If the expense is less than [LIMIT] a receipt is not required.</value>
@@ -152,21 +152,6 @@
   </data>
   <data name="VAT.Text" xml:space="preserve">
     <value>VAT Receipt</value>
-  </data>
-  <data name="lblSplit.Help" xml:space="preserve">
-    <value>If the cost of this meeting is to be shared between several accounts (i.e. a team retreat), please specify how this should be charged. List each ministry/staff account and how much should be charged to each cost centre.</value>
-  </data>
-  <data name="lblSplit.Text" xml:space="preserve">
-    <value>Split cost:</value>
-  </data>
-  <data name="Split.Text" xml:space="preserve">
-    <value>Split this cost accross the following Staff/Ministry Accounts*:</value>
-  </data>
-  <data name="SplitInfo.Text" xml:space="preserve">
-    <value>* Please specify each Staff Member / Ministry Account and how much should be charge to each. If everything is to be charged to one cost centre, uncheck this option and leave the text box empty.</value>
-  </data>
-  <data name="Split.Error" xml:space="preserve">
-    <value>* If you are splitting this cost, you must specify the accounts and amounts.</value>
   </data>
   <data name="Amount.Error" xml:space="preserve">
     <value>Invalid Amount...</value>
@@ -190,5 +175,45 @@
   </data>
   <data name="Electronic.Text" xml:space="preserve">
     <value>Electronic Receipt</value>
+  </data>
+  <data name="lblProvince.Help" xml:space="preserve">
+    <value>Please enter the province where this expense was incurred.</value>
+  </data>
+  <data name="lblProvince.Text" xml:space="preserve">
+    <value>Province:</value>
+  </data>
+  <data name="lblSupplier.Help" xml:space="preserve">
+    <value>Please enter the name of the shop, vendor or supplier</value>
+  </data>
+  <data name="lblSupplier.Text" xml:space="preserve">
+    <value>Airline:</value>
+  </data>
+  <data name="Supplier.Error" xml:space="preserve">
+    <value>You must provide the name of the supplier</value>
+    <comment>Error</comment>
+  </data>
+  <data name="Destinatino.Error" xml:space="preserve">
+    <value>You must provide the ending point for this trip</value>
+  </data>
+  <data name="lblDestinatinon.Help" xml:space="preserve">
+    <value>Where did you go?</value>
+  </data>
+  <data name="Destination.Hint" xml:space="preserve">
+    <value>destination</value>
+  </data>
+  <data name="lblDestination.Text" xml:space="preserve">
+    <value>Destination:</value>
+  </data>
+  <data name="Origin.Error" xml:space="preserve">
+    <value>You must provide the starting point of this trip</value>
+  </data>
+  <data name="lblOrigin.Help" xml:space="preserve">
+    <value>Where did this trip begin and end?</value>
+  </data>
+  <data name="Origin.Hint" xml:space="preserve">
+    <value>origin</value>
+  </data>
+  <data name="lblOrigin.Text" xml:space="preserve">
+    <value>Origin/Destination:</value>
   </data>
 </root>

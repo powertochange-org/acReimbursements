@@ -463,9 +463,6 @@
             );
         }
 
-        function tweakControl() {
-            $("#<%= UpdatePanel2.ClientID %> input[name$='tbDesc']").attr('maxlength', '27').attr('style', 'width:15em').attr('placeholder', '<%= Translate("DescriptionHint") %>');
-        }
 
         function setUpConfirms() {
             $('.confirm').click(function() {
@@ -492,7 +489,6 @@
                 setUpAutocomplete();
                 checkForMinistryAccount();
                 setUpReceiptPreviews();
-                tweakControl();
                 setUpConfirms();
             });
 
@@ -1364,8 +1360,10 @@
                                                         <asp:TextBox ID="TextBox1" runat="server" Text='<%# Bind("LineType") %>'></asp:TextBox>
                                                     </EditItemTemplate>
                                                     <ItemTemplate>
-                                                        <asp:Label ID="Label1" runat="server" CssClass='<%# IIF(IsWrongType(Eval("CostCenter"), Eval("LineType")), "ui-state-error ui-corner-all","") %>' ToolTip='<%# IIF(IsWrongType(Eval("CostCenter"), Eval("LineType")),Translate("lblWrongType"),"") %>' Text='<%# GetLocalTypeName(Eval("AP_Staff_RmbLineType.LineTypeId") )  & If(Eval("LineType")=31, " " & GetMileageString(If(Eval("Mileage"), 0), If(Eval("Spare3"), "0")) ,"") %>'></asp:Label>
-                                                        <asp:Label ID="lblToFrom" runat="server" Font-Size="XX-Small" ForeColor="#AAAAAA" Font-Names="Courier" Visible=<%# If(Eval("LineType")=31,"True","False") %> Text=<%# If(Eval("Spare4") IsNot Nothing And Eval("Spare5") IsNot Nothing, Left(Eval("Spare4"),9) & " - " & Left(Eval("Spare5"),9),"") %>></asp:Label>
+                                                        <asp:Label ID="Label1" runat="server" CssClass='<%# IIF(IsWrongType(Eval("CostCenter"), Eval("LineType")), "ui-state-error ui-corner-all","") %>' ToolTip='<%# IIF(IsWrongType(Eval("CostCenter"), Eval("LineType")),Translate("lblWrongType"),"") %>' Text='<%# GetLocalTypeName(Eval("AP_Staff_RmbLineType.LineTypeId") )  & If(IsMileageType(Eval("LineType")), " " & GetMileageString(If(Eval("Mileage"), 0), If(Eval("Spare3"), "0")) ,"") %>'></asp:Label>
+                                                        <asp:Panel runat="server">
+                                                            <asp:Label ID="lblToFrom" runat="server" Font-Size="XX-Small" ForeColor="#AAAAAA" Font-Names="Courier" Visible=<%# If(TypeHasOriginAndDestination(Eval("LineType")),"True","False") %> Text=<%# If(Eval("Spare4") IsNot Nothing And Eval("Spare5") IsNot Nothing, Left(Eval("Spare4"),9) & " - " & Left(Eval("Spare5"),9),"") %>></asp:Label>
+                                                        </asp:Panel>
                                                     </ItemTemplate>
                                                     <ItemStyle HorizontalAlign="Left" />
                                                 </asp:TemplateField>
@@ -1374,7 +1372,7 @@
                                                     <EditItemTemplate>
                                                     </EditItemTemplate>
                                                     <ItemTemplate>
-                                                        <asp:Label ID="lblComment" runat="server" Text='<%#  Eval("Comment")  %>'></asp:Label>
+                                                        <asp:Label ID="lblComment" runat="server" Text='<%#  Eval("Comment") & getSupplier(Eval("Supplier")) %>'></asp:Label>
                                                         <asp:Panel ID="pnlRemBal1" runat="server" Visible='<%# CanEdit(Eval("AP_Staff_Rmb.Status")) and IsAccounts()  %>'>
                                                             <asp:Label ID="lblTrimmedComment" runat="server" Font-Size="X-Small" ForeColor="#AAAAAA" Font-Names="Courier" Text='<%# GetLineComment(Eval("Comment"), Eval("OrigCurrency"), Eval("OrigCurrencyAmount"), Eval("ShortComment"))%>'></asp:Label>
                                                         </asp:Panel>

@@ -52,6 +52,7 @@ Partial Class controls_RmbConf
             ddlVATReceipt.Items(3).Enabled = True
         End If
 
+        tbDesc.Attributes.Add("placeholder", DotNetNuke.Services.Localization.Localization.GetString("DescriptionHint.Text", "/DesktopModules/AgapeConnect/StaffRmb/App_LocalResources/StaffRmb.ascx.resx"))
         ddlVATReceipt.Items(0).Enabled = settings("VatAttrib")
         ddlVATReceipt.Items(2).Enabled = settings("ElectronicReceipts") Or ddlVATReceipt.SelectedValue = 2
     End Sub
@@ -61,6 +62,14 @@ Partial Class controls_RmbConf
         End Get
         Set(ByVal value As Integer)
             ddlVATReceipt.SelectedValue = value
+        End Set
+    End Property
+    Public Property Supplier() As String
+        Get
+            Return tbSupplier.Text
+        End Get
+        Set(value As String)
+            tbSupplier.Text = value
         End Set
     End Property
     Public Property Comment() As String
@@ -181,13 +190,17 @@ Partial Class controls_RmbConf
         End Set
     End Property
     Public Function ValidateForm(ByVal userId As Integer) As Boolean
+        If (tbSupplier.Text.Length = 0) Then
+            ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Supplier.Error", LocalResourceFile)
+            Return False
+        End If
         If (tbDesc.Text.Length < 5) Then
             ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Description.Error", LocalResourceFile)
             Return False
         End If
         Try
             Dim theDate As Date = dtDate.Text
-           If theDate > Today Then
+            If theDate > Today Then
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("OldDate.Error", LocalResourceFile)
                 Return False
             End If

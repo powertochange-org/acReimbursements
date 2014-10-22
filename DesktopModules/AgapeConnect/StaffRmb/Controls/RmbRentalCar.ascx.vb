@@ -1,5 +1,5 @@
 ﻿
-Partial Class controls_RmbLit
+Partial Class controls_RmbGeneric
     Inherits Entities.Modules.PortalModuleBase
     Protected Sub Page_Init(sender As Object, e As System.EventArgs) Handles Me.Init
         Dim FileName As String = System.IO.Path.GetFileNameWithoutExtension(Me.AppRelativeVirtualPath)
@@ -52,6 +52,7 @@ Partial Class controls_RmbLit
             ddlVATReceipt.Items(3).Enabled = True
         End If
 
+        tbDesc.Attributes.Add("placeholder", DotNetNuke.Services.Localization.Localization.GetString("DescriptionHint.Text", "/DesktopModules/AgapeConnect/StaffRmb/App_LocalResources/StaffRmb.ascx.resx"))
         ddlVATReceipt.Items(0).Enabled = settings("VatAttrib")
         ddlVATReceipt.Items(2).Enabled = settings("ElectronicReceipts") Or ddlVATReceipt.SelectedValue = 2
     End Sub
@@ -61,6 +62,14 @@ Partial Class controls_RmbLit
         End Get
         Set(ByVal value As Integer)
             ddlVATReceipt.SelectedValue = value
+        End Set
+    End Property
+    Public Property Supplier() As String
+        Get
+            Return tbSupplier.Text
+        End Get
+        Set(value As String)
+            tbSupplier.Text = value
         End Set
     End Property
     Public Property Comment() As String
@@ -106,6 +115,7 @@ Partial Class controls_RmbLit
             tbAmount.Text = value.ToString("n2", New CultureInfo("en-US"))
         End Set
     End Property
+
     Public Property Taxable() As Boolean
         Get
             Return False
@@ -114,13 +124,16 @@ Partial Class controls_RmbLit
 
         End Set
     End Property
-
     Public Property Spare1() As String
         Get
-            Return Nothing
+            Return ddlProvince.SelectedValue
         End Get
         Set(ByVal value As String)
-
+            Try
+                ddlProvince.SelectedValue = value
+            Catch
+                ddlProvince = Nothing
+            End Try
         End Set
     End Property
     Public Property Spare2() As String
@@ -155,6 +168,14 @@ Partial Class controls_RmbLit
 
         End Set
     End Property
+    Public Property ErrorText() As String
+        Get
+            Return ""
+        End Get
+        Set(ByVal value As String)
+            ErrorLbl.Text = value
+        End Set
+    End Property
     Public Property Receipt() As Boolean
         Get
             Return ddlVATReceipt.SelectedValue >= 0
@@ -163,14 +184,6 @@ Partial Class controls_RmbLit
             If value = False Then
                 ddlVATReceipt.SelectedValue = -1
             End If
-        End Set
-    End Property
-    Public Property ErrorText() As String
-        Get
-            Return ""
-        End Get
-        Set(ByVal value As String)
-            ErrorLbl.Text = value
         End Set
     End Property
     Public Property CADValue() As Double
@@ -183,6 +196,10 @@ Partial Class controls_RmbLit
     End Property
 
     Public Function ValidateForm(ByVal userId As Integer) As Boolean
+        If (tbSupplier.Text.Length = 0) Then
+            ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Supplier.Error", LocalResourceFile)
+            Return False
+        End If
         If (tbDesc.Text.Length < 5) Then
             ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Description.Error", LocalResourceFile)
             Return False

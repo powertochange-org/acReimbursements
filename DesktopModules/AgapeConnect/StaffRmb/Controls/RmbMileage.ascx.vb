@@ -38,6 +38,13 @@ Partial Class controls_Mileage
     End Function
 
 
+    Public Property Supplier() As String
+        Get
+            Return ""
+        End Get
+        Set(value As String)
+        End Set
+    End Property
     Public Property Comment() As String
         Get
             Return tbDesc.Text
@@ -63,7 +70,7 @@ Partial Class controls_Mileage
         Get
             If tbAmount.Text <> "" Then
                 Try
-                    Return (CDbl(tbAmount.Text) * CDbl(ddlDistUnits.SelectedValue))
+                    Return Math.Round((CInt(tbAmount.Text) * CDbl(ddlDistUnits.SelectedValue)), 2)
                 Catch
                     Return 0
                 End Try
@@ -242,6 +249,7 @@ Partial Class controls_Mileage
         End If
         tbOrigin.Attributes.Add("placeholder", Translate("Origin.Hint"))
         tbDestination.Attributes.Add("placeholder", Translate("Destination.Hint"))
+        tbDesc.Attributes.Add("placeholder", DotNetNuke.Services.Localization.Localization.GetString("DescriptionHint.Text", "/DesktopModules/AgapeConnect/StaffRmb/App_LocalResources/StaffRmb.ascx.resx"))
         Session("RmbSettings") = Settings
     End Sub
 

@@ -79,6 +79,19 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 TaskList.Add(LoadCompaniesAsync())
                 TaskList.Add(LoadMenuAsync())
                 TaskList.Add(LoadAddressAsync())
+
+                'Initialize US exchange rate from settings
+                Dim rateString As String = Settings("USExchangeRate")
+                Dim rate As Double = 0
+                If (rateString IsNot Nothing) Then
+                    Try
+                        rate = CType(rateString, Double)
+                    Catch ex As Exception
+                        rate = 0
+                    End Try
+                End If
+                StaffBrokerFunctions.setUsExchangeRate(rate)
+
                 If Request.QueryString("RmbNo") <> "" Then
                     hfRmbNo.Value = CInt(Request.QueryString("RmbNo"))
                 End If
@@ -204,10 +217,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     TaskList.Add(LoadRmbAsync(hfRmbNo.Value))
                 Else
                     ltSplash.Text = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbSplash", PortalId))
-            End If
+                End If
                 tbNewChargeTo.Attributes.Add("onkeypress", "return disableSubmitOnEnter();")
-            End If
-            Await Task.WhenAll(TaskList)
+                End If
+                Await Task.WhenAll(TaskList)
         End Sub
 
         Protected Sub UpdatePanel2_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles UpdatePanel2.Load
@@ -281,6 +294,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 For Each row In MoreInfo
                     Dim hyp As New HyperLink()
                     hyp.CssClass = "ui-state-highlight ui-corner-all AgapeWarning"
+                    hyp.Attributes.Add("style", "padding:8px; margin-top:2px;")
                     hyp.Font.Size = FontUnit.Small
                     hyp.Font.Bold = True
                     hyp.Text = Translate("MoreInfo").Replace("[RMBNO]", row.RID).Replace("[USERREF]", row.UserRef)
@@ -815,6 +829,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     tbChargeTo.Text = If(Rmb.CostCenter Is Nothing, "", Rmb.CostCenter)
                     tbChargeTo.Enabled = DRAFT Or MORE_INFO Or CANCELLED Or (SUBMITTED And (isOwner Or isSpouse))
                     tbChargeTo.Attributes.Add("placeholder", Translate("tbChargeToHint"))
+                    Dim accountName = (From c In d.AP_StaffBroker_CostCenters Where c.CostCentreCode = Rmb.CostCenter Select c.CostCentreName).SingleOrDefault()
+                    tbChargeTo.Attributes.Add("title", accountName)
                     lblStatus.Text = Translate(RmbStatus.StatusName(Rmb.Status))
                     If (Rmb.MoreInfoRequested) Then
                         lblStatus.Text = lblStatus.Text & " - " & Translate("StatusMoreInfo")
@@ -1029,7 +1045,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         insert.OrigCurrencyAmount = insert.GrossAmount
                     Else 'Foreign Currency
                         insert.GrossAmount = CDbl(ucType.GetProperty("CADValue").GetValue(theControl, Nothing))
-                        insert.ExchangeRate = StaffBrokerFunctions.GetExchangeRate(accounting_currency, hfOrigCurrency.Value)
+                        insert.ExchangeRate = StaffBrokerFunctions.GetExchangeRate(PortalId, accounting_currency, hfOrigCurrency.Value)
                         insert.OrigCurrency = hfOrigCurrency.Value
                         insert.OrigCurrencyAmount = CDbl(hfOrigCurrencyValue.Value)
                     End If
@@ -1039,8 +1055,17 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         insert.LargeTransaction = False
                     End If
 
+                    insert.Supplier = CStr(ucType.GetProperty("Supplier").GetValue(theControl, Nothing))
                     insert.Comment = CStr(ucType.GetProperty("Comment").GetValue(theControl, Nothing))
-                    insert.ShortComment = GetLineComment(insert.Comment, insert.OrigCurrency, insert.OrigCurrencyAmount, tbShortComment.Text, False, Nothing, If(LineTypeName = "Mileage", CStr(ucType.GetProperty("Mileage").GetValue(theControl, Nothing)), ""))
+
+                    'mileage
+                    Dim mileageString As String = ""
+                    If (LineTypeName.Equals("Mileage")) Then
+                        insert.Mileage = CInt(ucType.GetProperty("Mileage").GetValue(theControl, Nothing))
+                        insert.MileageRate = ucType.GetProperty("MileageRate").GetValue(theControl, Nothing)
+                        mileageString = GetMileageString(insert.Mileage, insert.MileageRate)
+                    End If
+                    insert.ShortComment = GetLineComment(insert.Comment, insert.OrigCurrency, insert.OrigCurrencyAmount, tbShortComment.Text, False, Nothing, mileageString)
 
                     'Taxes
                     If ddlOverideTax.SelectedIndex > 0 Then
@@ -1137,11 +1162,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     End If
 
-                    'mileage
-                    If (LineTypeName.Equals("Mileage")) Then
-                        insert.Mileage = CInt(ucType.GetProperty("Mileage").GetValue(theControl, Nothing))
-                        insert.MileageRate = ucType.GetProperty("MileageRate").GetValue(theControl, Nothing)
-                    End If
 
                     insert.Spare1 = CStr(ucType.GetProperty("Spare1").GetValue(theControl, Nothing)) 'province
                     insert.Spare2 = CStr(ucType.GetProperty("Spare2").GetValue(theControl, Nothing))
@@ -1198,16 +1218,23 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             line.First.GrossAmount = ucType.GetProperty("CADValue").GetValue(theControl, Nothing)
                             line.First.OrigCurrency = hfOrigCurrency.Value
                             line.First.OrigCurrencyAmount = hfOrigCurrencyValue.Value
-                            line.First.ExchangeRate = StaffBrokerFunctions.GetExchangeRate(accounting_currency, hfOrigCurrency.Value)
+                            line.First.ExchangeRate = StaffBrokerFunctions.GetExchangeRate(PortalId, accounting_currency, hfOrigCurrency.Value)
                         End If
 
                         Dim comment As String = CStr(ucType.GetProperty("Comment").GetValue(theControl, Nothing))
                         Dim sc = tbShortComment.Text
+                        'mileage
+                        Dim mileageString As String = ""
+                        If (LineTypeName.Equals("Mileage")) Then
+                            line.First.Mileage = CInt(ucType.GetProperty("Mileage").GetValue(theControl, Nothing))
+                            line.First.MileageRate = ucType.GetProperty("MileageRate").GetValue(theControl, Nothing)
+                            mileageString = GetMileageString(line.First.Mileage, line.First.MileageRate)
+                        End If
                         If (sc <> line.First.ShortComment) Then
                             'the short comment was manully changed, so this should take precidence over anything else.
-                            line.First.ShortComment = GetLineComment(comment, line.First.OrigCurrency, line.First.OrigCurrencyAmount, tbShortComment.Text, False, Nothing, If(LineTypeName = "Mileage", CStr(ucType.GetProperty("Mileage").GetValue(theControl, Nothing)), ""))
+                            line.First.ShortComment = GetLineComment(comment, line.First.OrigCurrency, line.First.OrigCurrencyAmount, tbShortComment.Text, False, Nothing, mileageString)
                         Else
-                            line.First.ShortComment = GetLineComment(comment, line.First.OrigCurrency, line.First.OrigCurrencyAmount, "", False, Nothing, If(LineTypeName = "Mileage", CStr(ucType.GetProperty("Mileage").GetValue(theControl, Nothing)), ""))
+                            line.First.ShortComment = GetLineComment(comment, line.First.OrigCurrency, line.First.OrigCurrencyAmount, "", False, Nothing, mileageString)
                         End If
                         'If line.First.ShortComment <> comment Then
                         '    line.First.Comment = comment
@@ -1258,6 +1285,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         line.First.AccountCode = ddlAccountCode.SelectedValue
                         line.First.CostCenter = tbCostcenter.Text
                         line.First.LineType = CInt(ddlLineTypes.SelectedValue)
+                        line.First.Supplier = CStr(ucType.GetProperty("Supplier").GetValue(theControl, Nothing))
                         line.First.Comment = ucType.GetProperty("Comment").GetValue(theControl, Nothing)
                         line.First.TransDate = CDate(ucType.GetProperty("theDate").GetValue(theControl, Nothing))
                         Dim age = DateDiff(DateInterval.Month, line.First.TransDate, Today)
@@ -1334,12 +1362,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         '    ucType.GetProperty("ErrorText").SetValue(theControl, "*For transactions over " & Settings("NoReceipt") & ", a receipt must be supplied.", Nothing)
                         '    Return
                         'End If
-
-                        'mileage
-                        If (LineTypeName.Equals("Mileage")) Then
-                            line.First.Mileage = CInt(ucType.GetProperty("Mileage").GetValue(theControl, Nothing))
-                            line.First.MileageRate = ucType.GetProperty("MileageRate").GetValue(theControl, Nothing)
-                        End If
 
                         line.First.Spare1 = CStr(ucType.GetProperty("Spare1").GetValue(theControl, Nothing))
                         line.First.Spare2 = CStr(ucType.GetProperty("Spare2").GetValue(theControl, Nothing))
@@ -1801,6 +1823,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
                     Dim insert As New AP_Staff_RmbLine()
                     insert.AnalysisCode = theLine.First.AnalysisCode
+                    insert.Supplier = theLine.First.Supplier
                     insert.Comment = RowDesc
                     insert.GrossAmount = CDbl(RowAmount)
                     insert.LargeTransaction = RowAmount > CDbl(Settings("TeamLeaderLimit"))
@@ -2093,6 +2116,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
                     hfExchangeRate.Value = xRate.ToString(New CultureInfo(""))
 
+                    ucType.GetProperty("Supplier").SetValue(theControl, theLine.First.Supplier, Nothing)
                     ucType.GetProperty("Comment").SetValue(theControl, theLine.First.Comment, Nothing)
                     If (theLine.First.OrigCurrency = ac) Then
                         ucType.GetProperty("Amount").SetValue(theControl, CDbl(theLine.First.GrossAmount), Nothing)
@@ -2124,9 +2148,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ucType.GetProperty("Spare4").SetValue(theControl, theLine.First.Spare4, Nothing)
                     ucType.GetProperty("Spare5").SetValue(theControl, theLine.First.Spare5, Nothing)
 
+                    Dim mileageString As String = ""
                     If (ucType.GetProperty("Mileage") IsNot Nothing) Then
                         If (theLine.First.Mileage IsNot Nothing) Then
                             ucType.GetProperty("Mileage").SetValue(theControl, theLine.First.Mileage, Nothing)
+                            mileageString = GetMileageString(theLine.First.Mileage, theLine.First.MileageRate)
                         Else
                             ucType.GetProperty("Mileage").SetValue(theControl, 0, Nothing)
                         End If
@@ -2166,7 +2192,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
 
                     Try
-                        tbShortComment.Text = GetLineComment(theLine.First.Comment, theLine.First.OrigCurrency, If(theLine.First.OrigCurrencyAmount Is Nothing, 0, theLine.First.OrigCurrencyAmount), theLine.First.ShortComment, False, Nothing, IIf(theLine.First.AP_Staff_RmbLineType.TypeName = "Mileage", theLine.First.Mileage, ""))
+                        tbShortComment.Text = GetLineComment(theLine.First.Comment, theLine.First.OrigCurrency, If(theLine.First.OrigCurrencyAmount Is Nothing, 0, theLine.First.OrigCurrencyAmount), theLine.First.ShortComment, False, Nothing, mileageString)
                     Catch
                         tbShortComment.Text = ""
                     End Try
@@ -2397,6 +2423,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         End Function
 
+        Public Function GetSupplier(ByVal Supplier As String)
+            If (Supplier.Length > 0) Then
+                Return " (" & Supplier & ")"
+            End If
+            Return ""
+        End Function
+
         Public Function GetLineComment(ByVal comment As String, ByVal Currency As String, ByVal CurrencyValue As Double, ByVal ShortComment As String, Optional ByVal includeInitials As Boolean = True, Optional ByVal explicitStaffInitals As String = Nothing, Optional ByVal Mileage As String = "") As String
 
 
@@ -2421,7 +2454,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim CurString = ""
             If Mileage <> "" Then
                 'this is a mileage expense item, so don't show currency - show milage instead.
-                CurString = "-" & Mileage & Left(Settings("DistanceUnit").ToString(), 2)
+                CurString = "-" & Mileage
 
 
             Else
@@ -2534,7 +2567,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
 
             Dim RmbNo As Integer = hfRmbNo.Value
-      
+
             Try
                 Dim rmb_status = (From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo Select c.Status).First
                 Select Case rmb_status
@@ -3039,6 +3072,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Try
                 Dim lt = From c In d.AP_Staff_RmbLineTypes Where c.LineTypeId = ddlLineTypes.SelectedValue
                 If lt.Count > 0 Then
+                    Dim Supplier As String = ""
                     Dim Comment As String = ""
                     Dim Amount As Double = 0.0
                     Dim theDate As Date = Today
@@ -3057,6 +3091,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                     receiptMode = CInt(ucTypeOld.GetProperty("ReceiptType").GetValue(theControl, Nothing))
                                 Catch ex As Exception ' We couldn't get one; no big deal, but keep going with this block of code
                                 End Try
+                                Supplier = CStr(ucTypeOld.GetProperty("Supplier").GetValue(theControl, Nothing))
                                 Comment = CStr(ucTypeOld.GetProperty("Comment").GetValue(theControl, Nothing))
                                 theDate = CDate(ucTypeOld.GetProperty("theDate").GetValue(theControl, Nothing))
                                 Amount = CDbl(ucTypeOld.GetProperty("Amount").GetValue(theControl, Nothing))
@@ -3083,6 +3118,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     phLineDetail.Controls.Add(theControl)
 
                     Dim ucType As Type = theControl.GetType()
+                    ucType.GetProperty("Supplier").SetValue(theControl, Supplier, Nothing)
                     ucType.GetProperty("Comment").SetValue(theControl, Comment, Nothing)
                     ucType.GetProperty("Amount").SetValue(theControl, Amount, Nothing)
                     ucType.GetProperty("theDate").SetValue(theControl, theDate, Nothing)
@@ -3237,7 +3273,20 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Return result & ")"
         End Function
 
+<<<<<<< HEAD
         Public Function IsDifferentExchangeRate(xRate1 As Double, xRate2 As Double) As Boolean
+=======
+        Public Function TypeHasOriginAndDestination(ByVal typeId As Integer) As Boolean
+            Dim typeName As String = GetLocalTypeName(typeId).ToLower()
+            Return (typeName.IndexOf("mileage") > -1 Or typeName.IndexOf("airfare") > -1)
+        End Function
+
+        Public Function IsMileageType(ByVal typeId As Integer) As Boolean
+            Return GetLocalTypeName(typeId).ToLower().IndexOf("mileage") > -1
+        End Function
+
+        Public Function differentExchangeRate(xRate1 As Double, xRate2 As Double) As Boolean
+>>>>>>> development
             'determine whether the 2 exchange rates differ by more than the fudge factor
             Dim fudge_factor = 0.001
             Dim max_difference As Double = 0.0
@@ -3292,7 +3341,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Else
                         Credit = -line.GrossAmount.ToString("0.00")
                     End If
-                    Dim shortComment = GetLineComment(line.Comment, line.OrigCurrency, line.OrigCurrencyAmount, line.ShortComment, True, Left(theUser.FirstName, 1) & Left(theUser.LastName, 1), IIf(line.AP_Staff_RmbLineType.TypeName = "Mileage", line.Mileage, ""))
+                    Dim shortComment = GetLineComment(line.Comment, line.OrigCurrency, line.OrigCurrencyAmount, line.ShortComment, True, Left(theUser.FirstName, 1) & Left(theUser.LastName, 1), If(line.AP_Staff_RmbLineType.TypeName = "Mileage", GetMileageString(line.Mileage, line.MileageRate), ""))
                     rtn &= GetOrderedString(shortComment,
                                          Debit, Credit)
 

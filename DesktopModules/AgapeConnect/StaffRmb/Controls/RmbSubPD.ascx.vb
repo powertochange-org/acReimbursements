@@ -33,6 +33,13 @@ Partial Class controls_RmbSubPD
     End Sub
 
 
+    Public Property Supplier() As String
+        Get
+            Return ""
+        End Get
+        Set(value As String)
+        End Set
+    End Property
     Public Property Comment() As String
         Get
             Return tbDesc.Text
@@ -208,7 +215,7 @@ Partial Class controls_RmbSubPD
                 DropDownList2.Items.Add(New ListItem(Settings("Sub" & I & "Name") & " (" & StaffBrokerFunctions.GetSetting("Currency", PS.PortalId) & CDbl(value).ToString("0.00") & ")", CDbl(value)))
             End If
        Next I
-
+        tbDesc.Attributes.Add("placeholder", DotNetNuke.Services.Localization.Localization.GetString("DescriptionHint.Text", "/DesktopModules/AgapeConnect/StaffRmb/App_LocalResources/StaffRmb.ascx.resx"))
     End Sub
 
     Protected Sub UpdatePanel1_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles UpdatePanel1.PreRender
