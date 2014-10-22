@@ -5,11 +5,13 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_Mobile
 
     Dim d As New StaffRmbDataContext
     Private base As DotNetNuke.Entities.Modules.PortalModuleBase = New DotNetNuke.Entities.Modules.PortalModuleBase()
-    Dim UserId As Integer = base.UserId
+    'TODO:replace hardcoded userid
+    Dim UserId As Integer = 3
     Protected PortalId As Integer = base.PortalId
     Dim UserInfo As DotNetNuke.Entities.Users.UserInfo = base.UserInfo
     Protected Settings As Hashtable = base.Settings
 
+#Region "CopiedFromStaffRmb"
     Protected Function IsAccounts() As Boolean
         ' Does the logged in user have the "Accounts" role?
         Try
@@ -142,6 +144,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_Mobile
         End If
         Return result
     End Function
+#End Region
 
 #Region "Utilities"
     Public Function Translate(ByVal ResourceString As String) As String
@@ -149,6 +152,38 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_Mobile
         Return DotNetNuke.Services.Localization.Localization.GetString(ResourceString & ".Text", base.LocalResourceFile)
 
     End Function
+#End Region
+
+#Region "Events"
+    Protected Sub btnList_click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnList.Click
+        Try
+            Dim Rmbs = From c In d.AP_Staff_Rmbs
+                           Where c.UserId = UserId
+                           Order By c.RID Descending
+                           Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId
+            Dim count As Integer = Rmbs.Count()
+            dlActiveList.DataSource = Rmbs
+            dlActiveList.DataBind()
+            lblLoadingDetails.Visible = True
+        Catch ex As Exception
+            'TODO:error message
+        End Try
+    End Sub
+
+    Protected Sub btnDetails_click(ByVal sender As Object, ByVal e As RepeaterCommandEventArgs) Handles dlActiveList.ItemCommand
+        If (e.CommandName = "GoTo") Then
+            Dim rmbNo As String = e.CommandArgument
+            If (rmbNo.Length = 0) Then Return
+            hfRmbNo.Value = rmbNo
+            Dim q = From c In d.AP_Staff_Rmbs Where c.RMBNo = rmbNo
+            If q IsNot Nothing And q.Count > 0 Then
+                Dim Rmb = q.First
+                gvRmbLines.DataSource = Rmb.AP_Staff_RmbLines
+                gvRmbLines.DataBind()
+                lblLoadingDetails.Visible = False
+            End If
+        End If
+    End Sub
 #End Region
 
 End Class

@@ -219,8 +219,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ltSplash.Text = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbSplash", PortalId))
                 End If
                 tbNewChargeTo.Attributes.Add("onkeypress", "return disableSubmitOnEnter();")
-                End If
-                Await Task.WhenAll(TaskList)
+            End If
+            Await Task.WhenAll(TaskList)
         End Sub
 
         Protected Sub UpdatePanel2_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles UpdatePanel2.Load
@@ -2219,77 +2219,77 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     jscript.Append(" showNewLinePopup();")
                     ScriptManager.RegisterStartupScript(GridView1, t, "popupedit", jscript.ToString, True)
                 End If
-                ElseIf e.CommandName = "mySplit" Then
-                    hfRows.Value = 1
-                    hfSplitLineId.Value = CInt(e.CommandArgument)
-                    lblSplitError.Visible = False
-                    Dim theLine = From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(e.CommandArgument)
+            ElseIf e.CommandName = "mySplit" Then
+                hfRows.Value = 1
+                hfSplitLineId.Value = CInt(e.CommandArgument)
+                lblSplitError.Visible = False
+                Dim theLine = From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(e.CommandArgument)
 
-                    If theLine.Count > 0 Then
-                        lblOriginalDesc.Text = theLine.First.Comment
-                        lblOriginalAmt.Text = theLine.First.GrossAmount.ToString("0.00")
-                        tbSplitDesc.Text = lblOriginalDesc.Text
+                If theLine.Count > 0 Then
+                    lblOriginalDesc.Text = theLine.First.Comment
+                    lblOriginalAmt.Text = theLine.First.GrossAmount.ToString("0.00")
+                    tbSplitDesc.Text = lblOriginalDesc.Text
+                End If
+                tbSplitAmt.Attributes.Add("onblur", "calculateTotal();")
+                tbSplitAmt.Text = ""
+                tbSplitDesc.Text = ""
+
+                Dim t As Type = GridView1.GetType()
+                Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
+                sb.Append("<script language='javascript'>")
+                sb.Append("showPopupSplit();")
+                sb.Append("</script>")
+                ScriptManager.RegisterStartupScript(GridView1, t, "popupSplit", sb.ToString, False)
+
+            ElseIf e.CommandName = "myDefer" Then
+                'Try to find a deferred transactions pending reimbursement
+                Dim theLine = From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(e.CommandArgument)
+                If theLine.Count > 0 Then
+                    theLine.First.Spare5 = theLine.First.RmbNo
+                    Dim q = From c In d.AP_Staff_RmbLines Where c.Spare5 = theLine.First.RmbNo And c.AP_Staff_Rmb.Status = RmbStatus.Draft And c.AP_Staff_Rmb.UserId = theLine.First.AP_Staff_Rmb.UserId And c.AP_Staff_Rmb.PortalId = PortalId Select c.AP_Staff_Rmb
+                    If q.Count = 0 Then
+
+                        Dim insert As New AP_Staff_Rmb
+                        insert.UserRef = "Deferred"
+                        insert.AcctComment = "Contains transactions deferred from previous month"
+                        insert.RID = StaffRmbFunctions.GetNewRID(PortalId)
+                        insert.CostCenter = theLine.First.AP_Staff_Rmb.CostCenter
+
+                        insert.UserComment = ""
+                        insert.UserId = theLine.First.AP_Staff_Rmb.UserId
+                        ' insert.PersonalCC = ddlNewChargeTo.Items(0).Value
+
+                        insert.PortalId = PortalId
+
+                        insert.Status = RmbStatus.Draft
+
+                        insert.Locked = False
+                        insert.SupplierCode = theLine.First.AP_Staff_Rmb.SupplierCode
+
+                        insert.Department = theLine.First.AP_Staff_Rmb.Department
+
+                        d.AP_Staff_Rmbs.InsertOnSubmit(insert)
+                        d.SubmitChanges()
+                        theLine.First.AP_Staff_Rmb = insert
+
+                    Else
+                        theLine.First.AP_Staff_Rmb = q.First
                     End If
-                    tbSplitAmt.Attributes.Add("onblur", "calculateTotal();")
-                    tbSplitAmt.Text = ""
-                    tbSplitDesc.Text = ""
+                    Dim loadRmbTask = LoadRmbAsync(hfRmbNo.Value)
+                    SubmitChanges()
 
+                    Dim theUser = UserController.GetUserById(PortalId, theLine.First.AP_Staff_Rmb.UserId)
                     Dim t As Type = GridView1.GetType()
                     Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
                     sb.Append("<script language='javascript'>")
-                    sb.Append("showPopupSplit();")
+                    sb.Append("window.open('mailto:" & theUser.Email & "?subject=Reimbursment " & theLine.First.AP_Staff_Rmb.RID & ": Deferred Transactions');")
                     sb.Append("</script>")
-                    ScriptManager.RegisterStartupScript(GridView1, t, "popupSplit", sb.ToString, False)
+                    Await loadRmbTask
 
-                ElseIf e.CommandName = "myDefer" Then
-                    'Try to find a deferred transactions pending reimbursement
-                    Dim theLine = From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(e.CommandArgument)
-                    If theLine.Count > 0 Then
-                        theLine.First.Spare5 = theLine.First.RmbNo
-                        Dim q = From c In d.AP_Staff_RmbLines Where c.Spare5 = theLine.First.RmbNo And c.AP_Staff_Rmb.Status = RmbStatus.Draft And c.AP_Staff_Rmb.UserId = theLine.First.AP_Staff_Rmb.UserId And c.AP_Staff_Rmb.PortalId = PortalId Select c.AP_Staff_Rmb
-                        If q.Count = 0 Then
+                    ScriptManager.RegisterStartupScript(GridView1, t, "email", sb.ToString, False)
 
-                            Dim insert As New AP_Staff_Rmb
-                            insert.UserRef = "Deferred"
-                            insert.AcctComment = "Contains transactions deferred from previous month"
-                            insert.RID = StaffRmbFunctions.GetNewRID(PortalId)
-                            insert.CostCenter = theLine.First.AP_Staff_Rmb.CostCenter
-
-                            insert.UserComment = ""
-                            insert.UserId = theLine.First.AP_Staff_Rmb.UserId
-                            ' insert.PersonalCC = ddlNewChargeTo.Items(0).Value
-
-                            insert.PortalId = PortalId
-
-                            insert.Status = RmbStatus.Draft
-
-                            insert.Locked = False
-                            insert.SupplierCode = theLine.First.AP_Staff_Rmb.SupplierCode
-
-                            insert.Department = theLine.First.AP_Staff_Rmb.Department
-
-                            d.AP_Staff_Rmbs.InsertOnSubmit(insert)
-                            d.SubmitChanges()
-                            theLine.First.AP_Staff_Rmb = insert
-
-                        Else
-                            theLine.First.AP_Staff_Rmb = q.First
-                        End If
-                        Dim loadRmbTask = LoadRmbAsync(hfRmbNo.Value)
-                        SubmitChanges()
-
-                        Dim theUser = UserController.GetUserById(PortalId, theLine.First.AP_Staff_Rmb.UserId)
-                        Dim t As Type = GridView1.GetType()
-                        Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
-                        sb.Append("<script language='javascript'>")
-                        sb.Append("window.open('mailto:" & theUser.Email & "?subject=Reimbursment " & theLine.First.AP_Staff_Rmb.RID & ": Deferred Transactions');")
-                        sb.Append("</script>")
-                        Await loadRmbTask
-
-                        ScriptManager.RegisterStartupScript(GridView1, t, "email", sb.ToString, False)
-
-                    End If
                 End If
+            End If
 
         End Sub
 
@@ -3273,9 +3273,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Return result & ")"
         End Function
 
-<<<<<<< HEAD
-        Public Function IsDifferentExchangeRate(xRate1 As Double, xRate2 As Double) As Boolean
-=======
         Public Function TypeHasOriginAndDestination(ByVal typeId As Integer) As Boolean
             Dim typeName As String = GetLocalTypeName(typeId).ToLower()
             Return (typeName.IndexOf("mileage") > -1 Or typeName.IndexOf("airfare") > -1)
@@ -3285,8 +3282,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Return GetLocalTypeName(typeId).ToLower().IndexOf("mileage") > -1
         End Function
 
-        Public Function differentExchangeRate(xRate1 As Double, xRate2 As Double) As Boolean
->>>>>>> development
+        Public Function IsDifferentExchangeRate(xRate1 As Double, xRate2 As Double) As Boolean
             'determine whether the 2 exchange rates differ by more than the fudge factor
             Dim fudge_factor = 0.001
             Dim max_difference As Double = 0.0
