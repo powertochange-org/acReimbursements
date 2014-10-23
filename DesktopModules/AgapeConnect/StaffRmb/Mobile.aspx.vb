@@ -1,34 +1,16 @@
 ﻿Imports StaffRmb
 
 Partial Class DesktopModules_AgapeConnect_StaffRmb_Mobile
-    Inherits System.Web.UI.Page
+    Inherits DotNetNuke.Framework.PageBase
 
     Dim d As New StaffRmbDataContext
     Private base As DotNetNuke.Entities.Modules.PortalModuleBase = New DotNetNuke.Entities.Modules.PortalModuleBase()
-    'TODO:replace hardcoded userid
-    Dim UserId As Integer = 3
+    Dim UserId As Integer = base.UserId
     Protected PortalId As Integer = base.PortalId
     Dim UserInfo As DotNetNuke.Entities.Users.UserInfo = base.UserInfo
     Protected Settings As Hashtable = base.Settings
 
 #Region "CopiedFromStaffRmb"
-    Protected Function IsAccounts() As Boolean
-        ' Does the logged in user have the "Accounts" role?
-        Try
-            For Each role In CStr(Settings("AccountsRoles")).Split(";")
-                If (UserInfo.Roles().Contains(role)) Then
-                    Return True
-                End If
-            Next
-        Catch ex As Exception
-        End Try
-        Return False
-    End Function
-
-    Protected Function CanEdit(ByVal status As Integer) As Boolean
-        ' Can a reimbursement in the provided status be edited by the logged in user?
-        Return status <> RmbStatus.Paid And status <> RmbStatus.Processing And status <> RmbStatus.PendingDownload And status <> RmbStatus.DownloadFailed And (status <> RmbStatus.Approved Or IsAccounts())
-    End Function
 
     Public Function IsDifferentExchangeRate(xRate1 As Double, xRate2 As Double) As Boolean
         'determine whether the 2 exchange rates differ by more than the fudge factor
@@ -60,18 +42,6 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_Mobile
         End If
     End Function
 
-    Protected Function GetMileageString(ByVal mileage As Integer, unitIndex As String) As String
-        ' Mileage string in standard format
-        Dim result As String
-        If mileage = 0 Then
-            Return ""
-        End If
-        result = "(" & mileage
-        If unitIndex IsNot Nothing Then
-            result &= Settings("MRate" & (unitIndex + 1) & "Name")
-        End If
-        Return result & ")"
-    End Function
 
     Public Function GetLineComment(ByVal comment As String, ByVal Currency As String, ByVal CurrencyValue As Double, ByVal ShortComment As String, Optional ByVal includeInitials As Boolean = True, Optional ByVal explicitStaffInitals As String = Nothing, Optional ByVal Mileage As String = "") As String
         ' Line Comment in standard format
@@ -117,6 +87,10 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_Mobile
         Return result
     End Function
 
+
+#End Region
+
+
     Protected Function ElectronicReceiptTags(lineId As Integer) As String
         ' Format electronic receipt images
         Dim ERR = "<span color='red'>!</span>"
@@ -133,45 +107,43 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_Mobile
                 Else
                     extension = file.Extension.ToLower()
                     If extension = "pdf" Then
-                        result += "<a target='_Blank' href='" + receipt.URL + "' title = 'click to download'><img class='" & "' src='/Icons/Sigma/ExtPdf_32X32_Standard.png' width=20 alt='pdf' /></a>"
+                        result += "<a target='_Blank' data-transition='pop' href='" + receipt.URL + "' <img class='icon " & "' src='/Icons/Sigma/ExtPdf_32X32_Standard.png' width=20 alt='pdf' /></a>"
                     ElseIf {"jpg", "jpeg", "png", "gif", "bmp"}.Contains(extension) Then
-                        result += "<a target='_Blank' href=" + receipt.URL + "><img id='" + receipt.URL + "' class='viewReceipt" & "' src='/Icons/Sigma/ExtPng_32x32_Standard.png' width=20 alt='img' /></a>"
+                        result += "<a target='_Blank' data-transition='pop' href=" + receipt.URL + "><img id='" + receipt.URL + "' class='icon " & "' src='/Icons/Sigma/ExtPng_32x32_Standard.png' alt='img' /></a>"
                     Else
-                        result += "<img src='/Icons/Sigma/ErrorWarning_16X16_Standard.png' width=20 alt='missing' title='" & extension & "'/>"
+                        result += "<img class='icon' src='/Icons/Sigma/ErrorWarning_16X16_Standard.png' alt='missing' title='" & extension & "'/>"
                     End If
                 End If
             Next
         End If
         Return result
     End Function
-#End Region
 
 #Region "Utilities"
     Public Function Translate(ByVal ResourceString As String) As String
         ' Look up a resource string
         Return DotNetNuke.Services.Localization.Localization.GetString(ResourceString & ".Text", base.LocalResourceFile)
-
     End Function
+
 #End Region
 
 #Region "Events"
-    Protected Sub btnList_click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnList.Click
+    Protected Sub loadRmbList(ByVal sender As Object, ByVal e As EventArgs)
         Try
             Dim Rmbs = From c In d.AP_Staff_Rmbs
-                           Where c.UserId = UserId
-                           Order By c.RID Descending
-                           Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId
-            Dim count As Integer = Rmbs.Count()
+                           Where c.UserId = UserId And c.PortalId = PortalId And c.Status <> RmbStatus.Cancelled And c.Status <> RmbStatus.Paid
+                           Order By c.Status
+                           Select c.RMBNo, c.Status, c.RmbDate, Total = c.SpareField1, c.UserRef, c.RID, c.UserId
             dlActiveList.DataSource = Rmbs
             dlActiveList.DataBind()
-            lblLoadingDetails.Visible = True
+            pnlLoadingDetails.Visible = True
         Catch ex As Exception
             'TODO:error message
         End Try
     End Sub
 
     Protected Sub btnDetails_click(ByVal sender As Object, ByVal e As RepeaterCommandEventArgs) Handles dlActiveList.ItemCommand
-        If (e.CommandName = "GoTo") Then
+        If (e.CommandName = "LoadRMB") Then
             Dim rmbNo As String = e.CommandArgument
             If (rmbNo.Length = 0) Then Return
             hfRmbNo.Value = rmbNo
@@ -180,7 +152,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_Mobile
                 Dim Rmb = q.First
                 gvRmbLines.DataSource = Rmb.AP_Staff_RmbLines
                 gvRmbLines.DataBind()
-                lblLoadingDetails.Visible = False
+                pnlLoadingDetails.Attributes.Add("style", "display:none")
             End If
         End If
     End Sub
