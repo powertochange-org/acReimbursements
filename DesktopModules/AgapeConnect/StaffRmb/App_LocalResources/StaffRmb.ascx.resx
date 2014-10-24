@@ -368,7 +368,7 @@
   <data name="SubmittedOn.Text" xml:space="preserve">
     <value>Submitted on:</value>
   </data>
-  <data name="Taxable.Text" xml:space="preserve">
+  <data name="TaxableHint.Text" xml:space="preserve">
     <value>* - Items marked with a * will be taxed.</value>
   </data>
   <data name="TeamRmbs.Text" xml:space="preserve">
@@ -468,11 +468,8 @@
   <data name="DownloadFailed.Text" xml:space="preserve">
     <value>Download Failed</value>
   </data>
-  <data name="ForceNonTaxable.Text" xml:space="preserve">
-    <value>Force Non-Taxable</value>
-  </data>
-  <data name="ForceTaxable.Text" xml:space="preserve">
-    <value>Force Taxable</value>
+  <data name="NonTaxable.Text" xml:space="preserve">
+    <value>Non-Taxable</value>
   </data>
   <data name="LargeTransaction.Text" xml:space="preserve">
     <value>Large Transaction</value>
@@ -731,5 +728,8 @@
   </data>
   <data name="DuplicateError.Text" xml:space="preserve">
     <value>Duplicate Reimbursement could not be created. </value>
+  </data>
+  <data name="Taxable.Text" xml:space="preserve">
+    <value>Taxable</value>
   </data>
 </root>

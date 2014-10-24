@@ -1456,7 +1456,7 @@
 
                                         <asp:Panel ID="pnlTaxable" runat="server" Visible="false" >
                                             <div style="float:left">
-                                                <asp:Label ID="Label28" runat="server" Font-Italic="true" resourcekey="Taxable"></asp:Label>
+                                                <asp:Label ID="Label28" runat="server" Font-Italic="true" resourcekey="TaxableHint"></asp:Label>
                                             </div>
                                         </asp:Panel>
                                         <asp:LinkButton ID="btnDownload" runat="server">
@@ -1619,10 +1619,9 @@
                                         <asp:Label ID="Label43" runat="server" resourcekey="OverideTax"></asp:Label>
                                     </td>
                                     <td>
-                                        <asp:DropDownList ID="ddlOverideTax" runat="server">
-                                            <asp:ListItem Value="0" resourcekey="Default"></asp:ListItem>
-                                            <asp:ListItem Value="1" resourcekey="ForceTaxable"></asp:ListItem>
-                                            <asp:ListItem Value="2" resourcekey="ForceNonTaxable"></asp:ListItem>
+                                        <asp:DropDownList ID="ddlOverideTax" CssClass='ddlTaxable' runat="server">
+                                            <asp:ListItem Value="0" resourcekey="NonTaxable"></asp:ListItem>
+                                            <asp:ListItem Value="1" resourcekey="Taxable"></asp:ListItem>
                                         </asp:DropDownList>
                                     </td>
                                 </tr>
