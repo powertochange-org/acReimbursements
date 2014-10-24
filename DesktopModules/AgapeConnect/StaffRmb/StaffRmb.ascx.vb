@@ -1068,58 +1068,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     insert.ShortComment = GetLineComment(insert.Comment, insert.OrigCurrency, insert.OrigCurrencyAmount, tbShortComment.Text, False, Nothing, mileageString)
 
                     'Taxes
-                    If ddlOverideTax.SelectedIndex > 0 Then
-                        insert.Taxable = (ddlOverideTax.SelectedValue = 1)
-                        If (age > Settings("Expire")) Then
-                            insert.OutOfDate = True
-                            insert.ForceTaxOrig = True
-                        Else
-                            insert.OutOfDate = False
-                            insert.ForceTaxOrig = CBool(ucType.GetProperty("Taxable").GetValue(theControl, Nothing))
-                        End If
-                    Else
-                        insert.ForceTaxOrig = Nothing
-                        Dim theCC = From c In d.AP_StaffBroker_CostCenters Where c.CostCentreCode = tbCostcenter.Text And c.PortalId = PortalId And c.Type = CostCentreType.Department
+                    insert.Taxable = ddlOverideTax.SelectedIndex
 
-                        If age > Settings("Expire") Then
-                            Dim msg As String = ""
-                            If theCC.Count > 0 Then
-
-                                Dim staffMember = StaffBrokerFunctions.GetStaffMember(theUserId)
-
-                                If Not String.IsNullOrEmpty(staffMember.CostCenter) Then
-                                    insert.CostCenter = (staffMember.CostCenter)
-                                    msg = Translate("ExpireDept").Replace("[EXPIRE]", Settings("Expire"))
-                                Else
-                                    msg = Translate("ExpireImpossible").Replace("[EXPIRE]", Settings("Expire"))
-                                    SendMessage(msg)
-                                    Return
-                                End If
-
-                            Else
-                                msg = Translate("Expire").Replace("[EXPIRE]", Settings("Expire"))
-                            End If
-
-                            insert.OutOfDate = True
-                            insert.Taxable = True
-
-                            '-- Disabled, as we are already notifying of old transactions
-                            'Dim t1 As Type = Me.GetType()
-                            'Dim sb1 As System.Text.StringBuilder = New System.Text.StringBuilder()
-                            'sb1.Append("<script language='javascript'>")
-                            'sb1.Append("alert(""" & msg & """);")
-                            'sb1.Append("</script>")
-                            'ScriptManager.RegisterClientScriptBlock(Page, t1, "popup", sb1.ToString, False)
-                        Else
-                            insert.OutOfDate = False
-                            If theCC.Count > 0 Then
-                                insert.Taxable = False
-                            Else
-                                insert.Taxable = CBool(ucType.GetProperty("Taxable").GetValue(theControl, Nothing))
-                            End If
-
-                        End If
-                    End If
                     insert.VATReceipt = CBool(ucType.GetProperty("VAT").GetValue(theControl, Nothing))
                     Try
                         If cbRecoverVat.Checked And CDbl(tbVatRate.Text) > 0 Then
@@ -1288,62 +1238,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         line.First.Supplier = CStr(ucType.GetProperty("Supplier").GetValue(theControl, Nothing))
                         line.First.Comment = ucType.GetProperty("Comment").GetValue(theControl, Nothing)
                         line.First.TransDate = CDate(ucType.GetProperty("theDate").GetValue(theControl, Nothing))
-                        Dim age = DateDiff(DateInterval.Month, line.First.TransDate, Today)
-                        Dim theCC = From c In d.AP_StaffBroker_CostCenters Where c.CostCentreCode = tbCostcenter.Text And c.PortalId = PortalId And c.Type = CostCentreType.Department
-                        If ddlOverideTax.SelectedIndex > 0 And Not (theCC.Count > 0 And ddlOverideTax.SelectedValue = 1) Then
-                            line.First.Taxable = (ddlOverideTax.SelectedValue = 1)
-                            If (age > Settings("Expire")) Then
-                                line.First.OutOfDate = True
-                                line.First.ForceTaxOrig = True
-                            Else
-                                line.First.OutOfDate = False
-                                line.First.ForceTaxOrig = CBool(ucType.GetProperty("Taxable").GetValue(theControl, Nothing))
-                            End If
-
-                        Else
-                            line.First.ForceTaxOrig = Nothing
-                            If age > Settings("Expire") Then
-                                Dim msg As String = ""
-                                If theCC.Count > 0 Then
-
-                                    Dim staffMember = StaffBrokerFunctions.GetStaffMember(line.First.AP_Staff_Rmb.UserId)
-
-                                    If Not String.IsNullOrEmpty(staffMember.CostCenter) Then
-                                        line.First.CostCenter = (staffMember.CostCenter)
-                                        msg = Translate("ExpireDept").Replace("[EXPIRE]", Settings("Expire"))
-                                    Else
-                                        msg = Translate("ExpireImpossible").Replace("[EXPIRE]", Settings("Expire"))
-                                        SendMessage(msg)
-                                        Return
-                                    End If
-
-
-
-                                Else
-                                    msg = Translate("Expire").Replace("[EXPIRE]", Settings("Expire"))
-                                End If
-
-                                line.First.OutOfDate = True
-                                line.First.Taxable = True
-
-                                Dim t1 As Type = Me.GetType()
-                                Dim sb1 As System.Text.StringBuilder = New System.Text.StringBuilder()
-                                sb1.Append("<script language='javascript'>")
-                                sb1.Append("alert(""" & msg & """);")
-                                sb1.Append("</script>")
-                                ScriptManager.RegisterClientScriptBlock(Page, t1, "popup", sb1.ToString, False)
-                            Else
-                                line.First.OutOfDate = False
-
-                                If theCC.Count > 0 Then
-                                    line.First.Taxable = False
-                                Else
-                                    line.First.Taxable = CBool(ucType.GetProperty("Taxable").GetValue(theControl, Nothing))
-                                End If
-
-                            End If
-                        End If
-
+                        line.First.Taxable = ddlOverideTax.SelectedIndex
                         line.First.VATReceipt = CBool(ucType.GetProperty("VAT").GetValue(theControl, Nothing))
                         'Dim AccType = Right(ddlChargeTo.SelectedValue, 1)
 
@@ -2177,12 +2072,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     ucType.GetMethod("Initialize").Invoke(theControl, New Object() {Settings})
                     cbRecoverVat.Checked = False
-                    If theLine.First.ForceTaxOrig Is Nothing Then
-                        ddlOverideTax.SelectedIndex = 0
-                    Else
-                        ddlOverideTax.SelectedValue = IIf(theLine.First.Taxable, 1, 2)
-
-                    End If
+                    ddlOverideTax.SelectedIndex = theLine.First.Taxable
                     tbVatRate.Text = ""
                     If theLine.First.VATRate > 0 Then
                         If theLine.First.VATRate > 0 Then
@@ -3076,6 +2966,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim Comment As String = ""
                     Dim Amount As Double = 0.0
                     Dim theDate As Date = Today
+                    Dim taxable = 1
                     Dim VAT As Boolean = False
                     Dim Receipt As Boolean = True
                     Dim Province As String = Nothing
@@ -3098,6 +2989,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                 VAT = CStr(ucTypeOld.GetProperty("VAT").GetValue(theControl, Nothing))
                                 Receipt = CStr(ucTypeOld.GetProperty("Receipt").GetValue(theControl, Nothing))
                                 Province = CStr(ucTypeOld.GetProperty("Spare1").GetValue(theControl, Nothing))
+                                taxable = If(Province.Equals("--"), 0, 1) 'Default is taxable, unless outside canada
                                 currency = hfOrigCurrency.Value
                             End If
                         Catch ex As Exception
@@ -3108,7 +3000,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         Province = StaffRmbFunctions.GetDefaultProvince(UserId)
                     End If
                     phLineDetail.Controls.Clear()
-                    ddlOverideTax.SelectedIndex = 0
+                    ddlOverideTax.SelectedIndex = taxable
                     theControl = LoadControl(lt.First.ControlPath)
 
                     hfOrigCurrency.Value = currency
@@ -3132,7 +3024,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     If (ucType.GetProperty("Mileage") IsNot Nothing) Then
                         ucType.GetProperty("Mileage").SetValue(theControl, 0, Nothing)
                     End If
-                    ScriptManager.RegisterStartupScript(Page, Me.GetType(), "setCur", "currencyChange('" & currency & "');", True)
+                    Dim jscript As String = "currencyChange('" & currency & "');"
+                    jscript += "$('.ddlProvince').change(function() {$('.ddlTaxable').prop('selectedIndex', ($('.ddlProvince').val()!='--'));});"
+                    ScriptManager.RegisterStartupScript(Page, Me.GetType(), "setCur", jscript, True)
                     ' Attempt to set the receipttype
                     Try
                         ucType.GetProperty("ReceiptType").SetValue(theControl, receiptMode, Nothing)
