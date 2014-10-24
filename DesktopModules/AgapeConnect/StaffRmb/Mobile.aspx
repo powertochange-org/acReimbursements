@@ -18,7 +18,7 @@
 <div data-role="content">	
 		        <img class="feature_image" alt="P2C Reimbursements" src="/Portals/0/Images/reimbursement.jpg" />		
                 <div style="position:fixed; top:50%;left:30%;">
-                    <H2>Swipe Left <---</H2>
+                    <H2><%=Translate("SwipeLeft")%></H2>
                     <div class="hidden">
                         <asp:Button ID="btnList" runat="server" OnClick="loadRmbList" OnClientClick="showListPage();"  />
                     </div>
@@ -31,7 +31,7 @@
 
         <div ID="my_active_list" data-role="page">
 	        <div data-role="header">
-		        <h1><asp:Label runat="server" Text="Active Reimbursements" /></h1>
+		        <h1><asp:Label runat="server" ResourceKey="ActiveReimbursements" /></h1>
 	        </div><!-- /header -->
 
 	        <div data-role="content">	
@@ -59,9 +59,8 @@
 	        </div><!-- /header -->
 
 	        <div data-role="content">	
-                    <!--TODO: Remove Value here-->
                     <asp:HiddenField ID="hfRmbNo" runat="server" Value="" />
-                    <asp:HiddenField ID="hfStaffInitials" runat="server" Value="KFC" />
+                    <asp:HiddenField ID="hfStaffInitials" runat="server" Value="" />
                     <asp:UpdatePanel id="upDetails" runat="server">
                         <ContentTemplate>
                             <asp:panel id="pnlLoadingDetails" runat="server" CssClass="loading_spinner">
@@ -72,7 +71,7 @@
                                 <RowStyle CssClass="dnnGridItem" />
                                 <AlternatingRowStyle CssClass="dnnGridAltItem" />
                                 <Columns>
-                                    <asp:TemplateField HeaderText="Date" SortExpression="TransDate">
+                                    <asp:TemplateField HeaderText="Date" SortExpression="TransDate"  ItemStyle-Width="55px" ItemStyle-VerticalAlign="middle">
                                         <ItemTemplate>
                                             <div class="calendar">
                                                 <asp:Label ID="lblDate" runat="server" CssClass='<%# If(Eval("OutOfDate"), "highlight", "")%>' Text='<%# Bind("TransDate", "{0: d }")%>' />
@@ -81,14 +80,14 @@
                                         <ItemStyle HorizontalAlign="Left" />
                                     </asp:TemplateField>
 
-                                    <asp:TemplateField HeaderText="Type" SortExpression="LineType" ItemStyle-Width="48px" ItemStyle-VerticalAlign="middle">
+                                    <asp:TemplateField HeaderText="Type" SortExpression="LineType" ItemStyle-Width="55px" ItemStyle-VerticalAlign="middle">
                                         <ItemTemplate>
                                             <asp:Panel runat="server" CssClass='<%# GetLocalTypeName(Eval("AP_Staff_RmbLineType.LineTypeId")).ToLower()  & " icon expense_type"%>' />
                                         </ItemTemplate>
                                         <ItemStyle HorizontalAlign="Left" />
                                     </asp:TemplateField>
 
-                                    <asp:TemplateField HeaderText="Description" SortExpression="Comment">
+                                    <asp:TemplateField HeaderText="Description" SortExpression="Comment"  ItemStyle-VerticalAlign="middle">
                                         <EditItemTemplate>
                                         </EditItemTemplate>
                                         <ItemTemplate>
@@ -105,7 +104,7 @@
                                         <FooterStyle HorizontalAlign="Right" />
                                     </asp:TemplateField>
 
-                                    <asp:TemplateField HeaderText="Amount" SortExpression="GrossAmount" ItemStyle-Width="75px">
+                                    <asp:TemplateField HeaderText="Amount" SortExpression="GrossAmount" ItemStyle-Width="75px"  ItemStyle-VerticalAlign="middle">
                                         <EditItemTemplate>
                                         </EditItemTemplate>
                                         <ItemTemplate>
@@ -125,7 +124,7 @@
                                         <FooterStyle HorizontalAlign="Right" />
                                     </asp:TemplateField>
 
-                                    <asp:TemplateField HeaderText="Receipt" ItemStyle-Width="48px">
+                                    <asp:TemplateField HeaderText="Receipt" ItemStyle-Width="55px"  ItemStyle-VerticalAlign="middle">
                                         <ItemTemplate>
                                             <%# If(Not Eval("Receipt"), "<img class='icon' src='/Icons/Sigma/no_receipt_32x32.png' width=20 alt='none' title='no receipt' />",
                                                     If(Eval("ReceiptImageId") Is Nothing, "<img class='icon' src='/Icons/Sigma/BulkMail_32X32_Standard.png' width=20 alt='mail' title='receipt will be sent by mail'/>",
@@ -148,17 +147,53 @@
         </div><!-- /page -->
 
         <div id="reimbursement_details" data-role="popup" data-corners="false" data-theme="none" data-shadow="false" data-tolerance="0,0">
-	        <div data-role="header">
-		        <h1><asp:Label runat="server" Text="Reimbursement" /></h1>
-	        </div><!-- /header -->
+            <asp:UpdatePanel runat="server">
+                <ContentTemplate>
+	                <div data-role="header">
+                        <table width="100%">
+                            <tr>
+                                <td><asp:Image ID="imgAvatar" runat="server" cssClass="icon"/></td>
+        		                <td><span class="rmbno"><asp:Label id="lblRmbNo" runat="server" ResourceKey="ReimbursementNum" /></span><br />
+                                <span class="status"><asp:label id="lblStatus" runat="server"/></span></td>
+                            </tr>
+                        </table>
+	                </div><!-- /header -->
 
-	        <div data-role="content">	
+	                <div data-role="content" class="content">	
+                        <table>
+                            <tr class="submission">
+                                <th><%=Translate("Submission")%></th>
+                            </tr>
+                            <tr class="submission">
+                                <td><%=Translate("by")%> <asp:Label ID="lblSubmitter" runat="server" /> <%=Translate("on")%> <asp:Label ID="lblSubmittedDate" runat="server" /></td>
+                            </tr>
+                            <tr class="approval">
+                                <th><%=Translate("Approval")%></th>
+                            </tr>
+                            <tr class="approval">
+                                <td><%=Translate("by")%> <asp:Label ID="lblApprover" runat="server" /> <%=Translate("on")%> <asp:Label ID="lblApprovedDate" runat="server" /></td>
+                            </tr>
+                            <tr class="processing">
+                                <th><%=Translate("Processing")%></th>
+                            </tr>
+                            <tr class="processing">
+                                <td><%=Translate("by")%> <asp:Label ID="lblProcesser" runat="server" /> <%=Translate("on")%> <asp:Label ID="lblProcessedDate" runat="server" /></td>
+                            </tr>
 
-	        </div><!-- /content -->
+                        </table>
+                        <asp:Label runat="server" resourcekey="lblUserRef" />
+                        <asp:TextBox ID="tbUserRef" runat="server" />
+	                </div><!-- /content -->
+                </ContentTemplate>  
+                <Triggers>
+                    <asp:AsyncPostBackTrigger ControlID="dlActiveList" />
+                </Triggers>
+            </asp:UpdatePanel>
         </div><!-- /page -->
 
 
     </form>
+
 
     <script type="text/javascript">
         function showExpenses() {
@@ -189,7 +224,7 @@
             $("#expenses_header").click(function () {
                 showReimbursementHeader();
             })
-            $('#expenses_header').on("swipedown", function (event) {
+            $('#expenses').on("swipedown", function (event) {
                 showReimbursementHeader();
             })
             $('#expenses').on("swiperight", function (event) {
@@ -202,6 +237,8 @@
                 $.mobile.back();
             })
         })
+
     </script>
+
 </body>
 </html>

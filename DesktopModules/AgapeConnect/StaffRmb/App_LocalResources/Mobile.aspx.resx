@@ -117,6 +117,36 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ActiveReimbursements.Text" xml:space="preserve">
+    <value>Active Reimbursements</value>
+  </data>
+  <data name="Approval.Text" xml:space="preserve">
+    <value>Approval</value>
+  </data>
+  <data name="by.Text" xml:space="preserve">
+    <value>by</value>
+  </data>
+  <data name="lblUserRef.Text" xml:space="preserve">
+    <value>Reimbursement Name</value>
+  </data>
+  <data name="on.Text" xml:space="preserve">
+    <value>on</value>
+  </data>
+  <data name="Processing.Text" xml:space="preserve">
+    <value>Processing</value>
+  </data>
+  <data name="Reimbursement.Text" xml:space="preserve">
+    <value>Reimbursement</value>
+  </data>
+  <data name="ReimbursementNum.Text" xml:space="preserve">
+    <value>Reimbursement #</value>
+  </data>
+  <data name="Submission.Text" xml:space="preserve">
+    <value>Submission</value>
+  </data>
+  <data name="SwipeLeft.Text" xml:space="preserve">
+    <value>Swipe Left &lt;---</value>
+  </data>
   <data name="Title.Text" xml:space="preserve">
     <value>P2C Reimbursemetns</value>
   </data>

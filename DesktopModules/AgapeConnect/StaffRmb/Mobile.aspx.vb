@@ -12,9 +12,15 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_Mobile
     Protected PortalId As Integer = userInfo.PortalID
 
     Private base As DotNetNuke.Entities.Modules.PortalModuleBase = New DotNetNuke.Entities.Modules.PortalModuleBase()
-    Protected Settings As Hashtable = base.Settings
+    Protected settings As Hashtable = base.Settings
 
 #Region "CopiedFromStaffRmb"
+
+    Public Function GetProfileImage(ByVal UserId As Integer) As String
+        Dim username = UserController.GetUserById(PortalId, UserId).Username
+        username = Left(username, Len(username) - 1)
+        Return "https://staff.powertochange.org/custom-pages/webService.php?type=staff_photo&api_token=V7qVU7n59743KNVgPdDMr3T8&staff_username=" + username
+    End Function
 
     Public Function IsDifferentExchangeRate(xRate1 As Double, xRate2 As Double) As Boolean
         'determine whether the 2 exchange rates differ by more than the fudge factor
@@ -28,7 +34,17 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_Mobile
         Return Math.Abs(xRate1 - xRate2) > max_difference
     End Function
 
-
+    Protected Function ZeroFill(ByVal number As Integer, ByVal len As Integer) As String
+        If number.ToString.Length > len Then
+            Return Right(number.ToString, len)
+        Else
+            Dim Filler As String = ""
+            For i As Integer = 1 To len - number.ToString.Length
+                Filler &= "0"
+            Next
+            Return Filler & number.ToString
+        End If
+    End Function
 
     Protected Function GetLocalTypeName(ByVal LineTypeId As Integer) As String
         ' Look up the Name for a TypeID
@@ -64,7 +80,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_Mobile
         Dim CurString = ""
         If Mileage <> "" Then
             'this is a mileage expense item, so don't show currency - show milage instead.
-            CurString = "-" & Mileage & Left(Settings("DistanceUnit").ToString(), 2)
+            CurString = "-" & Mileage & Left(settings("DistanceUnit").ToString(), 2)
         Else
             If Not String.IsNullOrEmpty(Currency) Then
                 If Currency <> StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId) Then
@@ -126,7 +142,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_Mobile
 #Region "Utilities"
     Public Function Translate(ByVal ResourceString As String) As String
         ' Look up a resource string
-        Return DotNetNuke.Services.Localization.Localization.GetString(ResourceString & ".Text", base.LocalResourceFile)
+        Return DotNetNuke.Services.Localization.Localization.GetString(ResourceString & ".Text", LocalResourceFile)
     End Function
 
 #End Region
@@ -154,9 +170,26 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_Mobile
             Dim q = From c In d.AP_Staff_Rmbs Where c.RMBNo = rmbNo
             If q IsNot Nothing And q.Count > 0 Then
                 Dim Rmb = q.First
+                Dim user = UserController.GetUserById(PortalId, Rmb.UserId)
+                hfStaffInitials.Value = Left(user.FirstName, 1) + Left(user.LastName, 1)
+
+                lblRmbNo.Text += ZeroFill(Rmb.RID, 5)
+                imgAvatar.ImageUrl = GetProfileImage(Rmb.UserId)
+                lblStatus.Text = RmbStatus.StatusName(Rmb.Status)
+
+                lblSubmitter.Text = user.DisplayName
+                lblSubmittedDate.Text = If(Rmb.RmbDate Is Nothing, "", Rmb.RmbDate.Value.ToShortDateString)
+
+                lblApprover.Text = If(Rmb.ApprUserId Is Nothing Or Rmb.ApprUserId = -1, "", UserController.GetUserById(PortalId, Rmb.ApprUserId).DisplayName)
+                lblApprovedDate.Text = If(Rmb.ApprDate Is Nothing, "", Rmb.ApprDate.Value.ToShortDateString)
+
+                lblProcesser.Text = If(Rmb.ProcUserId Is Nothing, "", UserController.GetUserById(PortalId, Rmb.ProcUserId).DisplayName)
+                lblProcessedDate.Text = If(Rmb.ProcDate Is Nothing, "", Rmb.ProcDate.Value.ToShortDateString)
+
+                tbUserRef.Text = Rmb.UserRef
+
                 gvRmbLines.DataSource = Rmb.AP_Staff_RmbLines
                 gvRmbLines.DataBind()
-                pnlLoadingDetails.Attributes.Add("style", "display:none")
             End If
         End If
     End Sub
