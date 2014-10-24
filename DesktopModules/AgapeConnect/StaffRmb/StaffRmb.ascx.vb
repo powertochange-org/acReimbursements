@@ -1068,7 +1068,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     insert.ShortComment = GetLineComment(insert.Comment, insert.OrigCurrency, insert.OrigCurrencyAmount, tbShortComment.Text, False, Nothing, mileageString)
 
                     'Taxes
-                    insert.Taxable = ddlOverideTax.SelectedIndex
+                    insert.Taxable = (ddlOverideTax.SelectedIndex = 1)
 
                     insert.VATReceipt = CBool(ucType.GetProperty("VAT").GetValue(theControl, Nothing))
                     Try
@@ -1238,7 +1238,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         line.First.Supplier = CStr(ucType.GetProperty("Supplier").GetValue(theControl, Nothing))
                         line.First.Comment = ucType.GetProperty("Comment").GetValue(theControl, Nothing)
                         line.First.TransDate = CDate(ucType.GetProperty("theDate").GetValue(theControl, Nothing))
-                        line.First.Taxable = ddlOverideTax.SelectedIndex
+                        line.First.Taxable = (ddlOverideTax.SelectedIndex = 1)
                         line.First.VATReceipt = CBool(ucType.GetProperty("VAT").GetValue(theControl, Nothing))
                         'Dim AccType = Right(ddlChargeTo.SelectedValue, 1)
 
@@ -1735,7 +1735,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     insert.Spare4 = theLine.First.Spare4
                     insert.Spare5 = theLine.First.Spare5
                     insert.Split = True
-                    insert.Taxable = theLine.First.Taxable
+                    insert.Taxable = If(theLine.First.Taxable, 1, 0)
                     insert.TransDate = theLine.First.TransDate
                     insert.VATReceipt = theLine.First.VATReceipt
                     insert.CostCenter = theLine.First.CostCenter
@@ -2072,7 +2072,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     ucType.GetMethod("Initialize").Invoke(theControl, New Object() {Settings})
                     cbRecoverVat.Checked = False
-                    ddlOverideTax.SelectedIndex = theLine.First.Taxable
+                    ddlOverideTax.SelectedIndex = If(theLine.First.Taxable, 1, 0)
                     tbVatRate.Text = ""
                     If theLine.First.VATRate > 0 Then
                         If theLine.First.VATRate > 0 Then
