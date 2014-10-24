@@ -78,7 +78,7 @@
                                                 <asp:Label ID="lblDate" runat="server" CssClass='<%# If(Eval("OutOfDate"), "highlight", "")%>' Text='<%# Bind("TransDate", "{0: d }")%>' />
                                             </div>
                                         </ItemTemplate>
-                                        <ItemStyle HorizontalAlign="Left" Width="50px" />
+                                        <ItemStyle HorizontalAlign="Left" />
                                     </asp:TemplateField>
 
                                     <asp:TemplateField HeaderText="Type" SortExpression="LineType" ItemStyle-Width="48px" ItemStyle-VerticalAlign="middle">
@@ -191,6 +191,9 @@
             })
             $('#expenses_header').on("swipedown", function (event) {
                 showReimbursementHeader();
+            })
+            $('#expenses').on("swiperight", function (event) {
+                $.mobile.back();
             })
 
             //REIMBURSEMENT
