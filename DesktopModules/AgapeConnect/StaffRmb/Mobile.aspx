@@ -15,17 +15,15 @@
     <form runat="server">
         <asp:ScriptManager runat="server"></asp:ScriptManager>
         <div ID="home" data-role="page">
-	        <div data-role="header">
-		        <h1><asp:Label runat="server" Text="P2C Reimbursements" /></h1>
-	        </div><!-- /header -->
-
-	        <div data-role="content">	
-		        <img class="feature_image" alt="P2C Reimbursements" src="/Portals/_default/Skins/carmel/images/reimbursement_mobile.png" />		
-                <div class="feature_buttons">
-                    <asp:LinkButton ID="btnList" runat="server" OnClick="loadRmbList" OnClientClick="showListPage()">
-                        My Active Reimbursements
-                    </asp:LinkButton> 
+<div data-role="content">	
+		        <img class="feature_image" alt="P2C Reimbursements" src="/Portals/0/Images/reimbursement.jpg" />		
+                <div style="position:fixed; top:50%;left:30%;">
+                    <H2>Swipe Left <---</H2>
+                    <div class="hidden">
+                        <asp:Button ID="btnList" runat="server" OnClick="loadRmbList" OnClientClick="showListPage();"  />
+                    </div>
                 </div>
+                
 	        </div><!-- /content -->
         </div><!-- /page -->
 
@@ -47,7 +45,7 @@
                             </asp:Repeater>
                         </ContentTemplate>
                         <Triggers>
-                            <asp:AsyncPostBackTrigger ControlID="btnList" />
+                            <asp:AsyncPostBackTrigger ControlId="btnList" />
                         </Triggers>
                     </asp:UpdatePanel>
                 </div>
