@@ -1,13 +1,17 @@
 ﻿Imports StaffRmb
+Imports DotNetNuke.Common
+Imports DotNetNuke.Entities.Users
+
 
 Partial Class DesktopModules_AgapeConnect_StaffRmb_Mobile
     Inherits DotNetNuke.Framework.PageBase
 
     Dim d As New StaffRmbDataContext
+    Dim userInfo As UserInfo = UserController.GetCurrentUserInfo()
+    Protected UserId As Integer = userInfo.UserID
+    Protected PortalId As Integer = userInfo.PortalID
+
     Private base As DotNetNuke.Entities.Modules.PortalModuleBase = New DotNetNuke.Entities.Modules.PortalModuleBase()
-    Dim UserId As Integer = base.UserId
-    Protected PortalId As Integer = base.PortalId
-    Dim UserInfo As DotNetNuke.Entities.Users.UserInfo = base.UserInfo
     Protected Settings As Hashtable = base.Settings
 
 #Region "CopiedFromStaffRmb"

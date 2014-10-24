@@ -42,7 +42,7 @@
                         <ContentTemplate>
                             <asp:Repeater ID="dlActiveList" runat="server">
                                 <ItemTemplate>
-                                    <asp:Button runat="server" Text='<%# Eval("UserRef") + Environment.NewLine + Eval("Total")%>' CommandName="LoadRMB" CommandArgument='<%# Eval("RMBNo")%>' CssClass='<%# "round_button " & StaffRmb.RmbStatus.StatusName(Eval("Status")).ToLower()%>' OnClientClick="showDetailsPage();"/>
+                                    <asp:Button runat="server" Text='<%# Eval("UserRef") + Environment.NewLine + Eval("Total")%>' CommandName="LoadRMB" CommandArgument='<%# Eval("RMBNo")%>' CssClass='<%# "round_button " & StaffRmb.RmbStatus.StatusName(Eval("Status")).ToLower()%>' OnClientClick="showExpenses();"/>
                                 </ItemTemplate>
                             </asp:Repeater>
                         </ContentTemplate>
@@ -55,10 +55,9 @@
         </div><!-- /page -->
 
 
-
-        <div id="rmb_details" data-role="page">
-	        <div data-role="header">
-		        <h1><asp:Label runat="server" Text="Reimbursement" /></h1>
+        <div id="expenses" data-role="page">
+	        <div ID="expenses_header" data-role="header">
+		        <h1><asp:Label runat="server" Text="Expenses" /></h1>
 	        </div><!-- /header -->
 
 	        <div data-role="content">	
@@ -149,17 +148,59 @@
                     </asp:UpdatePanel>
 	        </div><!-- /content -->
         </div><!-- /page -->
+
+        <div id="reimbursement_details" data-role="popup" data-corners="false" data-theme="none" data-shadow="false" data-tolerance="0,0">
+	        <div data-role="header">
+		        <h1><asp:Label runat="server" Text="Reimbursement" /></h1>
+	        </div><!-- /header -->
+
+	        <div data-role="content">	
+
+	        </div><!-- /content -->
+        </div><!-- /page -->
+
+
     </form>
 
     <script type="text/javascript">
-        function showDetailsPage() {
+        function showExpenses() {
             $('#gvRmbLines tr').remove();
             $('#pnlLoadingDetails').show();
-            $.mobile.changePage("#rmb_details", { transition: "flip" });
+            $.mobile.changePage("#expenses", { transition: "flow" });
         }
         function showListPage() {
             $.mobile.changePage("#my_active_list", { transition: "slide" });
         }
+        function showReimbursementHeader() {
+            $('#reimbursement_details').popup("open", {transition: "slidedown", position:"window"});
+        }
+
+        $(document).ready(function () {
+            //HOME
+            $('#home').on("swipeleft", function (event) {
+                __doPostBack('btnList', '');
+                showListPage();
+            })
+
+            //ACTIVE LIST
+            $('#my_active_list').on("swiperight", function (event) {
+                $.mobile.back();
+            })
+
+            //EXPENSE DETAILS
+            $("#expenses_header").click(function () {
+                showReimbursementHeader();
+            })
+            $('#expenses_header').on("swipedown", function (event) {
+                showReimbursementHeader();
+            })
+
+            //REIMBURSEMENT
+            $('#reimbursement_details').popup();
+            $('#reimbursement_details').on("swipeup", function (event) {
+                $.mobile.back();
+            })
+        })
     </script>
 </body>
 </html>
