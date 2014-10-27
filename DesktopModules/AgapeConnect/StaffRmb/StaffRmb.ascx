@@ -840,11 +840,6 @@
         return true;
     }
 
-    function rejectRmb() {
-        $("#<%=cbApprMoreInfo.ClientID%>").prop('checked', true);
-        $("#<%=cbApprMoreInfo.ClientID%>").change();
-    }
-
     function showSaveButton() {
         $('#<%=btnSave.ClientId%>').prop('value', '<%=Translate("btnSave")%>');
         $('#<%=btnSave.ClientID%>').show();
@@ -1475,7 +1470,7 @@
                                     <div style="float:right; margin-right:20px">
                                         <asp:Button ID="btnPrint" runat="server" resourcekey="btnPrint" class="aButton" />
                                         <asp:Button ID="btnSubmit" runat="server" resourcekey="btnSubmit" class="aButton" visible="false"/>
-                                        <asp:Button ID="btnReject" runat="server" resourcekey="btnReject" class="aButton" OnClientClick="rejectRmb()" Visible="false" />
+                                        <asp:Button ID="btnReject" runat="server" resourcekey="btnReject" class="aButton" Visible="false" />
                                         <asp:Button ID="btnApprove" runat="server" resourcekey="btnApprove" class="aButton" visible="false"/>
                                         <asp:Button ID="btnProcess" runat="server" resourcekey="btnProcess" class="aButton" onClientClick="showPostDataDialog()" visible="false"/>
                                         <asp:Button ID="btnUnProcess" runat="server" resourcekey="btnUnProcess" class="aButton" visible="false"/>
@@ -1653,7 +1648,7 @@
                     <asp:AsyncPostBackTrigger ControlID="ddlLineTypes" EventName="SelectedIndexChanged" />
                     <asp:AsyncPostBackTrigger ControlID="btnSaveLine" EventName="Click" />
                     <%--  <asp:AsyncPostBackTrigger ControlID="btnPrint"  EventName="Click" />--%>
-                    <asp:PostBackTrigger ControlID="btnPrint" />
+                    <%--<asp:PostBackTrigger ControlID="btnPrint" />--%>
                     <%--  <asp:PostBackTrigger ControlID="btnDownloadBatch" />
                 <asp:PostBackTrigger ControlID="btnSuggestedPayments" />--%>
                     <%--  <asp:PostBackTrigger ControlID="btnSaveLine" />--%>

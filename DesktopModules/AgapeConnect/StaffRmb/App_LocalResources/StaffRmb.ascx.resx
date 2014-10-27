@@ -732,4 +732,13 @@
   <data name="Taxable.Text" xml:space="preserve">
     <value>Taxable</value>
   </data>
+  <data name="EmailRejectedSubject.Text" xml:space="preserve">
+    <value>Rmb#: [RMBNO] - [USERREF]  has been rejected</value>
+  </data>
+  <data name="btnRejectHelp.Text" xml:space="preserve">
+    <value>Please describe the issues with this reimbursement in the Approvers Comments section, to enable the Reject button.</value>
+  </data>
+  <data name="RejectorMessage.Text" xml:space="preserve">
+    <value>An email has been sent to notify [STAFFNAME] that their reimbursement has been rejected.  Please ensure that the Approvers Comments section has been filled out with a clear description of the reason you have rejected their reimbursement, and what changes are required before re-submitting it.</value>
+  </data>
 </root>

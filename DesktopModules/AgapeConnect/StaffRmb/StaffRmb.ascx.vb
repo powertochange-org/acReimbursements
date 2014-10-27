@@ -922,7 +922,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     btnTempAddressChange.OnClientClick = ""
                     btnPermAddressChange.OnClientClick = ""
                     btnReject.Visible = isApprover And SUBMITTED
-                    btnReject.Enabled = isApprover And SUBMITTED
+                    enableRejectButton(isApprover And SUBMITTED And tbApprComments.Text <> "")
                     btnApprove.Visible = isApprover And SUBMITTED
                     btnApprove.Enabled = isApprover And SUBMITTED
                     btnProcess.Visible = isFinance And APPROVED
@@ -1007,6 +1007,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 btnSubmit.OnClientClick = ""
                 btnSubmit.ToolTip = Translate("btnSubmitHelp")
             End If
+        End Sub
+
+        Private Sub enableRejectButton(enable As Boolean)
+            btnReject.Enabled = True
+            Dim classes = btnReject.Attributes("class").Replace("aspNetDisabled", "")
+            btnReject.Attributes("class") = If(enable, classes, classes & " aspNetDisabled")
+            btnReject.ToolTip = If(enable, "", Translate("btnRejectHelp"))
         End Sub
 #End Region
 
@@ -1340,6 +1347,35 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ' Hide it
                     pnlElecReceipts.Attributes("style") = "display: none"
                 End If
+            End If
+        End Sub
+
+        Protected Async Sub btnReject_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnReject.Click
+            If btnReject.Attributes("class").Contains("aspNetDisabled") Then
+                'show alert
+                Dim jscript As String = "alert('" & Translate("btnRejectHelp") & "');"
+                ScriptManager.RegisterClientScriptBlock(btnReject, btnReject.GetType(), "reject_alert", jscript, True)
+                Return
+            End If
+            Dim RmbNo = hfRmbNo.Value
+            Dim rmbs = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo
+            If (rmbs.Count > 0) Then
+                Dim rmb = rmbs.First
+                rmb.MoreInfoRequested = True
+                If rmb.Status = RmbStatus.Submitted Then
+                    rmb.Status = RmbStatus.Draft
+                End If
+                cbMoreInfo.Checked = True
+                d.SubmitChanges()
+                Dim taskList = New List(Of Task)
+                taskList.Add(loadBasicDraftPaneAsync())
+                taskList.Add(loadBasicApprovablePaneAsync())
+                taskList.Add(LoadRmbAsync(RmbNo))
+                SendRejectionLetter(rmb)
+                Await Task.WhenAll(taskList)
+                Dim staffname As String = UserController.GetUserById(rmb.PortalId, rmb.UserId).DisplayName
+                Dim message As String = Translate("RejectorMessage").Replace("[STAFFNAME]", staffname)
+                ScriptManager.RegisterClientScriptBlock(btnReject, btnReject.GetType(), "notify_reject", "alert('" + message + "');", True)
             End If
         End Sub
 
@@ -1898,16 +1934,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         'End Sub
 
-        Protected Sub btnPrint_Click(sender As Object, e As System.EventArgs) Handles btnPrint.Click
-            Dim theRmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value)
-            Dim t As Type = btnPrint.GetType()
-            Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
+        'Protected Sub btnPrint_Click(sender As Object, e As System.EventArgs) Handles btnPrint.Click
+        '    Dim theRmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value)
+        '    Dim t As Type = btnPrint.GetType()
+        '    Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
 
-            sb.Append("<script language='javascript'>")
-            sb.Append("window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & hfRmbNo.Value & "&UID=" & theRmb.First.UserId & "', '_blank'); ")
-            sb.Append("</script>")
-            ScriptManager.RegisterStartupScript(btnPrint, t, "printOut", sb.ToString, False)
-        End Sub
+        '    sb.Append("<script language='javascript'>")
+        '    sb.Append("window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & hfRmbNo.Value & "&UID=" & theRmb.First.UserId & "', '_blank'); ")
+        '    sb.Append("</script>")
+        '    ScriptManager.RegisterStartupScript(btnPrint, t, "printOut", sb.ToString, False)
+        'End Sub
 
         Protected Async Sub btnUnProcess_Click(sender As Object, e As System.EventArgs) Handles btnUnProcess.Click
             Dim theRmb = (From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value)).First
@@ -2794,6 +2830,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If (Rmb.ApprComment <> tbApprComments.Text) Then
                 save_necessary = True
                 Rmb.ApprComment = tbApprComments.Text
+                enableRejectButton(tbApprComments.Text <> "")
             End If
             If (Rmb.AcctComment <> tbAccComments.Text) Then
                 save_necessary = True
@@ -3128,6 +3165,17 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Emessage = Emessage.Replace("[CHANGES]", "")
             End If
             DotNetNuke.Services.Mail.Mail.SendMail("P2C Reimbursements <reimbursements@p2c.com>", theUser.Email, "", subject, Emessage, "", "HTML", "", "", "", "")
+        End Sub
+
+        Sub SendRejectionLetter(ByVal theRmb As AP_Staff_Rmb)
+            Dim staffname As String = UserController.GetUserById(PortalId, theRmb.UserId).DisplayName
+            Dim emailaddress As String = UserController.GetUserById(PortalId, theRmb.UserId).Email
+            Dim apprname As String = UserController.GetUserById(PortalId, Me.UserId).DisplayName
+            Dim subject As String = Translate("EmailRejectedSubject").Replace("[RMBNO]", theRmb.RID).Replace("[USERREF]", theRmb.UserRef)
+            Dim Emessage As String = StaffBrokerFunctions.GetTemplate("RmbRejectedEmail", PortalId)
+
+            Emessage = Emessage.Replace("[STAFFNAME]", staffname).Replace("[APPROVER]", apprname).Replace("[RMBNO]", theRmb.RID).Replace("[USERREF]", theRmb.UserRef)
+            DotNetNuke.Services.Mail.Mail.SendMail("P2C Reimbursements <reimbursements@p2c.com>", emailaddress, "", subject, Emessage, "", "HTML", "", "", "", "")
         End Sub
 
         Public Function Translate(ByVal ResourceString As String) As String
