@@ -1934,16 +1934,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         'End Sub
 
-        Protected Sub btnPrint_Click(sender As Object, e As System.EventArgs) Handles btnPrint.Click
-            Dim theRmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value)
-            Dim t As Type = btnPrint.GetType()
-            Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
+        'Protected Sub btnPrint_Click(sender As Object, e As System.EventArgs) Handles btnPrint.Click
+        '    Dim theRmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value)
+        '    Dim t As Type = btnPrint.GetType()
+        '    Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
 
-            sb.Append("<script language='javascript'>")
-            sb.Append("window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & hfRmbNo.Value & "&UID=" & theRmb.First.UserId & "', '_blank'); ")
-            sb.Append("</script>")
-            ScriptManager.RegisterStartupScript(btnPrint, t, "printOut", sb.ToString, False)
-        End Sub
+        '    sb.Append("<script language='javascript'>")
+        '    sb.Append("window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & hfRmbNo.Value & "&UID=" & theRmb.First.UserId & "', '_blank'); ")
+        '    sb.Append("</script>")
+        '    ScriptManager.RegisterStartupScript(btnPrint, t, "printOut", sb.ToString, False)
+        'End Sub
 
         Protected Async Sub btnUnProcess_Click(sender As Object, e As System.EventArgs) Handles btnUnProcess.Click
             Dim theRmb = (From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value)).First

@@ -1648,7 +1648,7 @@
                     <asp:AsyncPostBackTrigger ControlID="ddlLineTypes" EventName="SelectedIndexChanged" />
                     <asp:AsyncPostBackTrigger ControlID="btnSaveLine" EventName="Click" />
                     <%--  <asp:AsyncPostBackTrigger ControlID="btnPrint"  EventName="Click" />--%>
-                    <asp:PostBackTrigger ControlID="btnPrint" />
+                    <%--<asp:PostBackTrigger ControlID="btnPrint" />--%>
                     <%--  <asp:PostBackTrigger ControlID="btnDownloadBatch" />
                 <asp:PostBackTrigger ControlID="btnSuggestedPayments" />--%>
                     <%--  <asp:PostBackTrigger ControlID="btnSaveLine" />--%>
