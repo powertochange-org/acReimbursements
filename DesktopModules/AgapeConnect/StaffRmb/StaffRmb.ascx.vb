@@ -94,6 +94,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 If Request.QueryString("RmbNo") <> "" Then
                     hfRmbNo.Value = CInt(Request.QueryString("RmbNo"))
+                ElseIf Request.QueryString("RmbID") <> "" Then
+                    Dim rmbs = From c In d.AP_Staff_Rmbs Where c.RID = Request.QueryString("RmbID")
+                    If (rmbs IsNot Nothing) Then
+                        hfRmbNo.Value = rmbs.First.RMBNo
+                    End If
                 End If
                 If Settings("isLoaded") = "" Then
                     LoadDefaultSettings()
