@@ -141,43 +141,17 @@ Namespace DotNetNuke.Modules.StaffRmb
                         tbMRate4.Text = CType(TabModuleSettings("MRate4"), String)
                     End If
 
-                    
-                    If CType(TabModuleSettings("Sub1Name"), String) <> "" Then
-                        tbPD1Name.Text = CType(TabModuleSettings("Sub1Name"), String)
+
+                    If CType(TabModuleSettings("PDBreakfast"), String) <> "" Then
+                        tbBreakfast.Text = CType(TabModuleSettings("PDBreakfast"), String)
                     End If
-                    If CType(TabModuleSettings("Sub2Name"), String) <> "" Then
-                        tbPD2Name.Text = CType(TabModuleSettings("Sub2Name"), String)
+                    If CType(TabModuleSettings("PDLunch"), String) <> "" Then
+                        tbLunch.Text = CType(TabModuleSettings("PDLunch"), String)
                     End If
-                    If CType(TabModuleSettings("Sub3Name"), String) <> "" Then
-                        tbPD3Name.Text = CType(TabModuleSettings("Sub3Name"), String)
+                    If CType(TabModuleSettings("PDSupper"), String) <> "" Then
+                        tbSupper.Text = CType(TabModuleSettings("PDSupper"), String)
                     End If
-                    If CType(TabModuleSettings("Sub4Name"), String) <> "" Then
-                        tbPD4Name.Text = CType(TabModuleSettings("Sub4Name"), String)
-                    End If
-                    If CType(TabModuleSettings("Sub5Name"), String) <> "" Then
-                        tbPD5Name.Text = CType(TabModuleSettings("Sub5Name"), String)
-                    End If
-                    If CType(TabModuleSettings("Sub6Name"), String) <> "" Then
-                        tbPD6Name.Text = CType(TabModuleSettings("Sub6Name"), String)
-                    End If
-                    If CType(TabModuleSettings("Sub1Value"), String) <> "" Then
-                        tbPD1Value.Text = CType(TabModuleSettings("Sub1Value"), String)
-                    End If
-                    If CType(TabModuleSettings("Sub2Value"), String) <> "" Then
-                        tbPD2Value.Text = CType(TabModuleSettings("Sub2Value"), String)
-                    End If
-                    If CType(TabModuleSettings("Sub3Value"), String) <> "" Then
-                        tbPD3Value.Text = CType(TabModuleSettings("Sub3Value"), String)
-                    End If
-                    If CType(TabModuleSettings("Sub4Value"), String) <> "" Then
-                        tbPD4Value.Text = CType(TabModuleSettings("Sub4Value"), String)
-                    End If
-                    If CType(TabModuleSettings("Sub5Value"), String) <> "" Then
-                        tbPD5Value.Text = CType(TabModuleSettings("Sub5Value"), String)
-                    End If
-                    If CType(TabModuleSettings("Sub6Value"), String) <> "" Then
-                        tbPD6Value.Text = CType(TabModuleSettings("Sub6Value"), String)
-                    End If
+
 
                     If CType(TabModuleSettings("USExchangeRate"), String) <> "" Then
                         tbUSExchangeRate.Text = CType(TabModuleSettings("USExchangeRate"), String)
@@ -380,19 +354,9 @@ Namespace DotNetNuke.Modules.StaffRmb
             objModules.UpdateTabModuleSetting(TabModuleId, "AuthAuthUser", ddlAuthAuthUser.SelectedValue)
             objModules.UpdateTabModuleSetting(TabModuleId, "EDMSId", ddlEDMS.SelectedValue)
 
-            objModules.UpdateTabModuleSetting(TabModuleId, "Sub1Name", tbPD1Name.Text)
-            objModules.UpdateTabModuleSetting(TabModuleId, "Sub2Name", tbPD2Name.Text)
-            objModules.UpdateTabModuleSetting(TabModuleId, "Sub3Name", tbPD3Name.Text)
-            objModules.UpdateTabModuleSetting(TabModuleId, "Sub4Name", tbPD4Name.Text)
-            objModules.UpdateTabModuleSetting(TabModuleId, "Sub5Name", tbPD5Name.Text)
-            objModules.UpdateTabModuleSetting(TabModuleId, "Sub6Name", tbPD6Name.Text)
-            objModules.UpdateTabModuleSetting(TabModuleId, "Sub1Value", SetIfNumber(tbPD1Value.Text))
-            objModules.UpdateTabModuleSetting(TabModuleId, "Sub2Value", SetIfNumber(tbPD2Value.Text))
-            objModules.UpdateTabModuleSetting(TabModuleId, "Sub3Value", SetIfNumber(tbPD3Value.Text))
-            objModules.UpdateTabModuleSetting(TabModuleId, "Sub4Value", SetIfNumber(tbPD4Value.Text))
-            objModules.UpdateTabModuleSetting(TabModuleId, "Sub5Value", SetIfNumber(tbPD5Value.Text))
-            objModules.UpdateTabModuleSetting(TabModuleId, "Sub6Value", SetIfNumber(tbPD6Value.Text))
-
+            objModules.UpdateTabModuleSetting(TabModuleId, "PDBreakfast", SetIfNumber(tbBreakfast.Text))
+            objModules.UpdateTabModuleSetting(TabModuleId, "PDLunch", SetIfNumber(tbLunch.Text))
+            objModules.UpdateTabModuleSetting(TabModuleId, "PDSupper", SetIfNumber(tbSupper.Text))
 
             objModules.UpdateTabModuleSetting(TabModuleId, "MRate1Name", tbMRate1Name.Text)
             objModules.UpdateTabModuleSetting(TabModuleId, "MRate2Name", tbMRate2Name.Text)

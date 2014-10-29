@@ -122,6 +122,16 @@
         $("span[id$='GridView1_lblRemainingBalance']:last").text(result);
     }
 
+    function updatePerDiemTotal() {
+        var total=0.00;
+        $('.perdiem').each(function() {
+            if ($(this).children(':checked').size()>0) {
+                total += Number($(this).attr('title'));
+            }
+        })
+        $('.PDAmount').val(total);
+    }
+
     function disableSubmitOnEnter(e)
     {
         var key;      

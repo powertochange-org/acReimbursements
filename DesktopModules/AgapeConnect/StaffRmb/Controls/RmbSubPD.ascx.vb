@@ -1,6 +1,11 @@
 ﻿
 Partial Class controls_RmbSubPD
     Inherits Entities.Modules.PortalModuleBase
+
+    Protected breakfastValue As Double
+    Protected lunchValue As Double
+    Protected supperValue As Double
+
     Protected Sub Page_Init(sender As Object, e As System.EventArgs) Handles Me.Init
         Dim FileName As String = System.IO.Path.GetFileNameWithoutExtension(Me.AppRelativeVirtualPath)
         If Not (Me.ID Is Nothing) Then
@@ -42,10 +47,13 @@ Partial Class controls_RmbSubPD
     End Property
     Public Property Comment() As String
         Get
-            Return tbDesc.Text
+            Dim result = If(cbBreakfast.Checked, Translate("lblBreakfast") & " ", "") & If(cbLunch.Checked, Translate("lblLunch") & " ", "") & If(cbSupper.Checked, Translate("lblSupper") & " ", "")
+            Return result
         End Get
         Set(ByVal value As String)
-            tbDesc.Text = value
+            cbBreakfast.Checked = value.Contains(Translate("lblBreakfast") & " ")
+            cbLunch.Checked = value.Contains(Translate("lblLunch") & " ")
+            cbSupper.Checked = value.Contains(Translate("lblSupper") & " ")
         End Set
     End Property
     Public Property theDate() As Date
@@ -65,9 +73,6 @@ Partial Class controls_RmbSubPD
             Return False
         End Get
         Set(ByVal value As Boolean)
-
-
-
         End Set
     End Property
     Public Property Taxable() As Boolean
@@ -75,15 +80,21 @@ Partial Class controls_RmbSubPD
             Return False
         End Get
         Set(ByVal value As Boolean)
-
         End Set
     End Property
     Public Property Amount() As Double
         Get
-            Return IIf(tbAmount.Text = "", 0, tbAmount.Text)
+            Dim result As Double
+            Try
+                result = CDbl(tbAmount.Text)
+            Catch
+                Return 0
+            End Try
+            Return result
         End Get
         Set(ByVal value As Double)
-            tbAmount.Text = value.ToString("n2", New CultureInfo("en-US"))
+            'tbAmount.Text = value.ToString("n2", New CultureInfo("en-US"))
+            ScriptManager.RegisterClientScriptBlock(tbAmount, GetType(CheckBox), "calculate", "updatePerDiemTotal();", True)
         End Set
     End Property
     Public Property Spare1() As String
@@ -100,38 +111,23 @@ Partial Class controls_RmbSubPD
     End Property
     Public Property Spare2() As String
         Get
-            Return DropDownList1.SelectedValue
+            Return ""
         End Get
         Set(ByVal value As String)
-            If value = "" Then
-                DropDownList1.SelectedValue = 1
-            Else
-                DropDownList1.SelectedValue = value
-            End If
         End Set
     End Property
     Public Property Spare3() As String
         Get
-            Return DropDownList3.SelectedValue
+            Return ""
         End Get
         Set(ByVal value As String)
-            If value = "" Then
-                DropDownList3.SelectedValue = 1
-            Else
-                DropDownList3.SelectedValue = value
-            End If
         End Set
     End Property
     Public Property Spare4() As String
         Get
-            Return DropDownList2.SelectedValue
+            Return ""
         End Get
         Set(ByVal value As String)
-            If value = "" Then
-                DropDownList2.SelectedValue = 26.5
-            Else
-                DropDownList2.SelectedValue = value
-            End If
         End Set
     End Property
     Public Property Spare5() As String
@@ -147,7 +143,7 @@ Partial Class controls_RmbSubPD
             Return False
         End Get
         Set(ByVal value As Boolean)
-           
+
         End Set
     End Property
     Public Property ErrorText() As String
@@ -166,11 +162,26 @@ Partial Class controls_RmbSubPD
             hfCADValue.Value = value
         End Set
     End Property
+    Public Property Repeat() As Integer
+        Get
+            Try
+                Return CInt(tbRepeat.Text)
+            Catch
+                Return 1
+            End Try
+        End Get
+        Set(value As Integer)
+            tbRepeat.Text = CStr(value)
+            tbRepeat.Visible = True
+            lblRepeat.Visible = True
+        End Set
+    End Property
+
+    Protected Function Translate(Key As String) As String
+        Return DotNetNuke.Services.Localization.Localization.GetString(Key & ".Text", LocalResourceFile)
+    End Function
+
     Public Function ValidateForm(ByVal userId As Integer) As Boolean
-        If (tbDesc.Text.Length < 5) Then
-            ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Description.Error", LocalResourceFile)
-            Return False
-        End If
         Try
             Dim theDate As Date = dtDate.Text
             If theDate > Today Then
@@ -181,21 +192,24 @@ Partial Class controls_RmbSubPD
             ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Date.Error", LocalResourceFile)
             Return False
         End Try
-
+        Dim selections As Integer = 0
+        selections = If(cbBreakfast.Checked, 1, 0) + If(cbLunch.Checked, 1, 0) + If(cbSupper.Checked, 1, 0)
+        If (selections = 0) Then
+            ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Selection.Error", LocalResourceFile)
+            Return False
+        End If
         Try
-            Dim theAmount As Double = Double.Parse(tbAmount.Text, New CultureInfo("en-US").NumberFormat)
-            If theAmount > CDbl(lblMaxAmt.Text) Then
-                ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Limit.Error", LocalResourceFile)
+            Dim repeat As Integer = CInt(tbRepeat.Text)
+            If repeat < 1 Or repeat > 14 Then
+                ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Repeat.Error", LocalResourceFile)
                 Return False
             End If
-            If Amount <= 0.01 Then
-                ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Amount.Error", LocalResourceFile)
+            If theDate.AddDays(repeat - 1) > Today Then
+                ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("RepeatDate.Error", LocalResourceFile)
                 Return False
             End If
-
-
         Catch ex As Exception
-            ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Amount.Error", LocalResourceFile)
+            ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Repeat.Error", LocalResourceFile)
             Return False
         End Try
         ErrorLbl.Text = ""
@@ -203,26 +217,24 @@ Partial Class controls_RmbSubPD
     End Function
 
     Public Sub Initialize(ByVal Settings As Hashtable)
-        'DropDownList2.Items(0).Value = Settings("SubDay")
-        'DropDownList2.Items(1).Value = Settings("SubBreakfast")
-        'DropDownList2.Items(2).Value = Settings("SubLunch")
-        'DropDownList2.Items(3).Value = Settings("SubDinner")
-        Dim PS = CType(HttpContext.Current.Items("PortalSettings"), PortalSettings)
-
-        For I As Integer = 1 To 6
-            Dim value As String = Settings("Sub" & I & "Value")
-            If value <> "" Then
-                DropDownList2.Items.Add(New ListItem(Settings("Sub" & I & "Name") & " (" & StaffBrokerFunctions.GetSetting("Currency", PS.PortalId) & CDbl(value).ToString("0.00") & ")", CDbl(value)))
-            End If
-       Next I
-        tbDesc.Attributes.Add("placeholder", DotNetNuke.Services.Localization.Localization.GetString("DescriptionHint.Text", "/DesktopModules/AgapeConnect/StaffRmb/App_LocalResources/StaffRmb.ascx.resx"))
+        Try
+            breakfastValue = CDbl(Settings("PDBreakfast"))
+            cbBreakfast.Attributes.Add("title", Settings("PDBreakfast")) 'Store value in title attribute, for javascript to access
+            lunchValue = CDbl(Settings("PDLunch"))
+            cbLunch.Attributes.Add("title", Settings("PDLunch"))
+            supperValue = CDbl(Settings("PDSupper"))
+            cbSupper.Attributes.Add("title", Settings("PDSupper"))
+        Catch
+            breakfastValue = -1
+            lunchValue = -1
+            supperValue = -1
+        End Try
+        tbRepeat.Text = "1"
+        tbRepeat.Visible = False
+        lblRepeat.Visible = False
     End Sub
 
-    Protected Sub UpdatePanel1_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles UpdatePanel1.PreRender
-        lblMaxAmt.Text = (DropDownList1.SelectedValue * DropDownList2.SelectedValue * DropDownList3.SelectedValue).ToString("0.00")
 
-
-    End Sub
 End Class
 
 

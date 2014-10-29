@@ -183,9 +183,6 @@
   <data name="lblDay.Text" xml:space="preserve">
     <value>Whole Day:</value>
   </data>
-  <data name="lblDinner.Text" xml:space="preserve">
-    <value>Dinner:</value>
-  </data>
   <data name="lblDownloadFormat.Help" xml:space="preserve">
     <value>The format used for the download document</value>
   </data>
@@ -238,10 +235,10 @@
     <value>Overnight:</value>
   </data>
   <data name="lblPerDiem.Help" xml:space="preserve">
-    <value>Enter the current subsistence rates. If you leave a value blank (or zero), it will not be displayed to the user.</value>
+    <value>Enter the current per diem rates.</value>
   </data>
   <data name="lblPerDiem.Text" xml:space="preserve">
-    <value>Per Diem - Subsistence</value>
+    <value>Per Diem Rates</value>
   </data>
   <data name="lblRate1.Text" xml:space="preserve">
     <value>Rate1:</value>
@@ -380,5 +377,8 @@
   </data>
   <data name="lblUSExchangeRate.Text" xml:space="preserve">
     <value>U.S. Exchange Rate</value>
+  </data>
+  <data name="lblSupper.Text" xml:space="preserve">
+    <value>Supper:</value>
   </data>
 </root>

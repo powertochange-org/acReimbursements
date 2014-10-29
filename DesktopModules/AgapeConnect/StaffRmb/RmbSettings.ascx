@@ -429,68 +429,26 @@
                         <table style="font-size: 9pt">
                             <tr>
                                 <td>
-                                    <asp:Label ID="Label10" runat="server" resourcekey="lblRate1"></asp:Label>
+                                    <asp:Label ID="Label10" runat="server" resourcekey="lblBreakfast"></asp:Label>
                                 </td>
                                 <td>
-                                    <asp:TextBox ID="tbPD1Name" runat="server" Width="80px" CssClass="pdName"></asp:TextBox>
-                                </td>
-                                <td>
-                                    <asp:TextBox ID="tbPD1Value" runat="server" Width="80px" CssClass="numeric pdValue"></asp:TextBox>
+                                    <asp:TextBox ID="tbBreakfast" runat="server" Width="80px" CssClass="numeric pdValue"></asp:TextBox>
                                 </td>
                             </tr>
                             <tr>
                                 <td>
-                                    <asp:Label ID="Label11" runat="server" resourcekey="lblRate2"></asp:Label>
+                                    <asp:Label ID="Label11" runat="server" resourcekey="lblLunch"></asp:Label>
                                 </td>
                                 <td>
-                                    <asp:TextBox ID="tbPD2Name" runat="server" Width="80px" CssClass="pdName"></asp:TextBox>
-                                </td>
-                                <td>
-                                    <asp:TextBox ID="tbPD2Value" runat="server" Width="80px" CssClass="numeric pdValue"></asp:TextBox>
+                                    <asp:TextBox ID="tbLunch" runat="server" Width="80px" CssClass="numeric pdValue"></asp:TextBox>
                                 </td>
                             </tr>
                             <tr>
                                 <td>
-                                    <asp:Label ID="Label12" runat="server" resourcekey="lblRate3"></asp:Label>
+                                    <asp:Label ID="Label12" runat="server" resourcekey="lblSupper"></asp:Label>
                                 </td>
                                 <td>
-                                    <asp:TextBox ID="tbPD3Name" runat="server" Width="80px" CssClass="pdName"></asp:TextBox>
-                                </td>
-                                <td>
-                                    <asp:TextBox ID="tbPD3Value" runat="server" Width="80px" CssClass="numeric pdValue"></asp:TextBox>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <asp:Label ID="Label13" runat="server" resourcekey="lblRate4"></asp:Label>
-                                </td>
-                                <td>
-                                    <asp:TextBox ID="tbPD4Name" runat="server" Width="80px" CssClass="pdName"></asp:TextBox>
-                                </td>
-                                <td>
-                                    <asp:TextBox ID="tbPD4Value" runat="server" Width="80px" CssClass="numeric pdValue"></asp:TextBox>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <asp:Label ID="Label14" runat="server" resourcekey="lblRate5"></asp:Label>
-                                </td>
-                                <td>
-                                    <asp:TextBox ID="tbPD5Name" runat="server" Width="80px" CssClass="pdName"></asp:TextBox>
-                                </td>
-                                <td>
-                                    <asp:TextBox ID="tbPD5Value" runat="server" Width="80px" CssClass="numeric pdValue"></asp:TextBox>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <asp:Label ID="Label15" runat="server" resourcekey="lblRate6"></asp:Label>
-                                </td>
-                                <td>
-                                    <asp:TextBox ID="tbPD6Name" runat="server" Width="80px" CssClass="pdName"></asp:TextBox>
-                                </td>
-                                <td>
-                                    <asp:TextBox ID="tbPD6Value" runat="server" Width="80px" CssClass="numeric pdValue"></asp:TextBox>
+                                    <asp:TextBox ID="tbSupper" runat="server" Width="80px" CssClass="numeric pdValue"></asp:TextBox>
                                 </td>
                             </tr>
                         </table>

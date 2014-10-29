@@ -1038,120 +1038,133 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     Dim transactionDate = CDate(ucType.GetProperty("theDate").GetValue(theControl, Nothing))
                     Dim LineTypeName = d.AP_Staff_RmbLineTypes.Where(Function(c) c.LineTypeId = CInt(ddlLineTypes.SelectedValue)).First.TypeName.ToString()
-                    Dim age = DateDiff(DateInterval.Day, transactionDate, Today)
-
-                    '# Insert Main Database Data
-                    Dim insert As New AP_Staff_RmbLine
-
-                    insert.RmbNo = hfRmbNo.Value
-                    insert.TransDate = transactionDate
-                    insert.AccountCode = ddlAccountCode.SelectedValue
-                    insert.CostCenter = tbCostcenter.Text
-                    insert.LineType = CInt(ddlLineTypes.SelectedValue)
-
-                    'Amount (with or without currency conversion)
-                    Dim accounting_currency = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)
-                    If hfCurOpen.Value = "false" Or String.IsNullOrEmpty(hfOrigCurrency.Value) Or hfOrigCurrency.Value = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId) Then 'local currency
-                        insert.GrossAmount = CDbl(ucType.GetProperty("Amount").GetValue(theControl, Nothing))
-                        insert.OrigCurrency = accounting_currency
-                        insert.OrigCurrencyAmount = insert.GrossAmount
-                    Else 'Foreign Currency
-                        insert.GrossAmount = CDbl(ucType.GetProperty("CADValue").GetValue(theControl, Nothing))
-                        insert.ExchangeRate = StaffBrokerFunctions.GetExchangeRate(PortalId, accounting_currency, hfOrigCurrency.Value)
-                        insert.OrigCurrency = hfOrigCurrency.Value
-                        insert.OrigCurrencyAmount = CDbl(hfOrigCurrencyValue.Value)
-                    End If
-                    If insert.GrossAmount >= Settings("TeamLeaderLimit") Then
-                        insert.LargeTransaction = True
-                    Else
-                        insert.LargeTransaction = False
-                    End If
-
-                    insert.Supplier = CStr(ucType.GetProperty("Supplier").GetValue(theControl, Nothing))
-                    insert.Comment = CStr(ucType.GetProperty("Comment").GetValue(theControl, Nothing))
-
-                    'mileage
-                    Dim mileageString As String = ""
-                    If (LineTypeName.Equals("Mileage")) Then
-                        insert.Mileage = CInt(ucType.GetProperty("Mileage").GetValue(theControl, Nothing))
-                        insert.MileageRate = ucType.GetProperty("MileageRate").GetValue(theControl, Nothing)
-                        mileageString = GetMileageString(insert.Mileage, insert.MileageRate)
-                    End If
-                    insert.ShortComment = GetLineComment(insert.Comment, insert.OrigCurrency, insert.OrigCurrencyAmount, tbShortComment.Text, False, Nothing, mileageString)
-
-                    'Taxes
-                    insert.Taxable = (ddlOverideTax.SelectedIndex = 1)
-
-                    insert.VATReceipt = CBool(ucType.GetProperty("VAT").GetValue(theControl, Nothing))
+                    Dim repeat = 1
+                    ' get Repeat value from control if available
                     Try
-                        If cbRecoverVat.Checked And CDbl(tbVatRate.Text) > 0 Then
-                            insert.VATRate = CDbl(tbVatRate.Text)
+                        Dim prop As System.Reflection.PropertyInfo = theControl.GetType().GetProperty("Repeat")
+                        If prop IsNot Nothing Then
+                            repeat = prop.GetValue(theControl, Nothing)
+                        End If
+                    Catch ex As Exception
+                    End Try
+
+                    For I = 1 To repeat
+                        Dim age = DateDiff(DateInterval.Day, transactionDate, Today)
+
+                        '# Insert Main Database Data
+                        Dim insert As New AP_Staff_RmbLine
+
+                        insert.RmbNo = hfRmbNo.Value
+                        insert.TransDate = transactionDate
+                        insert.AccountCode = ddlAccountCode.SelectedValue
+                        insert.CostCenter = tbCostcenter.Text
+                        insert.LineType = CInt(ddlLineTypes.SelectedValue)
+
+                        'Amount (with or without currency conversion)
+                        Dim accounting_currency = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)
+                        If hfCurOpen.Value = "false" Or String.IsNullOrEmpty(hfOrigCurrency.Value) Or hfOrigCurrency.Value = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId) Then 'local currency
+                            insert.GrossAmount = CDbl(ucType.GetProperty("Amount").GetValue(theControl, Nothing))
+                            insert.OrigCurrency = accounting_currency
+                            insert.OrigCurrencyAmount = insert.GrossAmount
+                        Else 'Foreign Currency
+                            insert.GrossAmount = CDbl(ucType.GetProperty("CADValue").GetValue(theControl, Nothing))
+                            insert.ExchangeRate = StaffBrokerFunctions.GetExchangeRate(PortalId, accounting_currency, hfOrigCurrency.Value)
+                            insert.OrigCurrency = hfOrigCurrency.Value
+                            insert.OrigCurrencyAmount = CDbl(hfOrigCurrencyValue.Value)
+                        End If
+                        If insert.GrossAmount >= Settings("TeamLeaderLimit") Then
+                            insert.LargeTransaction = True
                         Else
+                            insert.LargeTransaction = False
+                        End If
+
+                        insert.Supplier = CStr(ucType.GetProperty("Supplier").GetValue(theControl, Nothing))
+                        insert.Comment = CStr(ucType.GetProperty("Comment").GetValue(theControl, Nothing))
+
+                        'mileage
+                        Dim mileageString As String = ""
+                        If (LineTypeName.Equals("Mileage")) Then
+                            insert.Mileage = CInt(ucType.GetProperty("Mileage").GetValue(theControl, Nothing))
+                            insert.MileageRate = ucType.GetProperty("MileageRate").GetValue(theControl, Nothing)
+                            mileageString = GetMileageString(insert.Mileage, insert.MileageRate)
+                        End If
+                        insert.ShortComment = GetLineComment(insert.Comment, insert.OrigCurrency, insert.OrigCurrencyAmount, tbShortComment.Text, False, Nothing, mileageString)
+
+                        'Taxes
+                        insert.Taxable = (ddlOverideTax.SelectedIndex = 1)
+
+                        insert.VATReceipt = CBool(ucType.GetProperty("VAT").GetValue(theControl, Nothing))
+                        Try
+                            If cbRecoverVat.Checked And CDbl(tbVatRate.Text) > 0 Then
+                                insert.VATRate = CDbl(tbVatRate.Text)
+                            Else
+                                insert.VATRate = Nothing
+                            End If
+                        Catch ex As Exception
                             insert.VATRate = Nothing
+                        End Try
+
+                        'receipts
+                        insert.Receipt = CBool(ucType.GetProperty("Receipt").GetValue(theControl, Nothing))
+                        Dim theFile As IFileInfo
+                        Dim ElectronicReceipt As Boolean = False
+                        ' Get each of the files from the line - file table
+                        Dim theFiles = (From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo Is Nothing And lf.RMBNo = insert.RmbNo)
+                        Try
+                            If (CInt(ucType.GetProperty("ReceiptType").GetValue(theControl, Nothing) = 2) And theFiles.Count > 0) Then
+
+                                ElectronicReceipt = True
+
+                                ' Set the receiptImageId to the first fileid that we get; this way, we know that it's at least got 
+                                ' something, even if it doesn't have all of the receipts assocaited with this line
+                                insert.ReceiptImageId = theFiles.First.FileId
+
+                            End If
+                        Catch ex As Exception
+                            StaffBrokerFunctions.EventLog("Rmb" & hfRmbNo.Value, "Failed to Add Electronic Receipt: " & ex.ToString, UserId)
+
+                        End Try
+                        If insert.Receipt Then
+                            If q.Count = 0 Then
+                                insert.ReceiptNo = 1
+                            ElseIf q.Max Is Nothing Then
+                                insert.ReceiptNo = 1
+                            Else
+                                insert.ReceiptNo = q.Max + 1
+                            End If
+
                         End If
-                    Catch ex As Exception
-                        insert.VATRate = Nothing
-                    End Try
 
-                    'receipts
-                    insert.Receipt = CBool(ucType.GetProperty("Receipt").GetValue(theControl, Nothing))
-                    Dim theFile As IFileInfo
-                    Dim ElectronicReceipt As Boolean = False
-                    ' Get each of the files from the line - file table
-                    Dim theFiles = (From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo Is Nothing And lf.RMBNo = insert.RmbNo)
-                    Try
-                        If (CInt(ucType.GetProperty("ReceiptType").GetValue(theControl, Nothing) = 2) And theFiles.Count > 0) Then
 
-                            ElectronicReceipt = True
+                        insert.Spare1 = CStr(ucType.GetProperty("Spare1").GetValue(theControl, Nothing)) 'province
+                        insert.Spare2 = CStr(ucType.GetProperty("Spare2").GetValue(theControl, Nothing))
+                        insert.Spare3 = CStr(ucType.GetProperty("Spare3").GetValue(theControl, Nothing)) 'mileageunitindex
+                        insert.Spare4 = CStr(ucType.GetProperty("Spare4").GetValue(theControl, Nothing)) 'mileageorigin
+                        insert.Spare5 = CStr(ucType.GetProperty("Spare5").GetValue(theControl, Nothing)) 'mileagedestination
+                        insert.Split = False
 
-                            ' Set the receiptImageId to the first fileid that we get; this way, we know that it's at least got 
-                            ' something, even if it doesn't have all of the receipts assocaited with this line
-                            insert.ReceiptImageId = theFiles.First.FileId
+                        d.AP_Staff_RmbLines.InsertOnSubmit(insert)
 
+                        If btnApprove.Visible Then
+                            'If this the Aprrover makes a change, the staff member must be notified upon submit
+                            Dim theRmb = (From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value)).First
+                            theRmb.Changed = True
                         End If
-                    Catch ex As Exception
-                        StaffBrokerFunctions.EventLog("Rmb" & hfRmbNo.Value, "Failed to Add Electronic Receipt: " & ex.ToString, UserId)
-
-                    End Try
-                    If insert.Receipt Then
-                        If q.Count = 0 Then
-                            insert.ReceiptNo = 1
-                        ElseIf q.Max Is Nothing Then
-                            insert.ReceiptNo = 1
-                        Else
-                            insert.ReceiptNo = q.Max + 1
-                        End If
-
-                    End If
-
-
-                    insert.Spare1 = CStr(ucType.GetProperty("Spare1").GetValue(theControl, Nothing)) 'province
-                    insert.Spare2 = CStr(ucType.GetProperty("Spare2").GetValue(theControl, Nothing))
-                    insert.Spare3 = CStr(ucType.GetProperty("Spare3").GetValue(theControl, Nothing)) 'mileageunitindex
-                    insert.Spare4 = CStr(ucType.GetProperty("Spare4").GetValue(theControl, Nothing)) 'mileageorigin
-                    insert.Spare5 = CStr(ucType.GetProperty("Spare5").GetValue(theControl, Nothing)) 'mileagedestination
-                    insert.Split = False
-
-                    d.AP_Staff_RmbLines.InsertOnSubmit(insert)
-
-                    If btnApprove.Visible Then
-                        'If this the Aprrover makes a change, the staff member must be notified upon submit
-                        Dim theRmb = (From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value)).First
-                        theRmb.Changed = True
-                    End If
-                    d.SubmitChanges()
-                    If ElectronicReceipt Then
-                        For Each file In theFiles
-                            ' Get the actual file item
-                            Dim thisFile = FileManager.Instance.GetFile(file.FileId)
-                            ' Rename it
-                            FileManager.Instance.RenameFile(thisFile, "R" & hfRmbNo.Value & "L" & insert.RmbLineNo & "Rec" & file.RecNum & "." & thisFile.Extension)
-                            ' Update the line number to match
-                            file.RmbLineNo = insert.RmbLineNo.ToString
-                        Next
-                        ' Submit all the changes to the files we made
                         d.SubmitChanges()
-                    End If
+                        If ElectronicReceipt Then
+                            For Each file In theFiles
+                                ' Get the actual file item
+                                Dim thisFile = FileManager.Instance.GetFile(file.FileId)
+                                ' Rename it
+                                FileManager.Instance.RenameFile(thisFile, "R" & hfRmbNo.Value & "L" & insert.RmbLineNo & "Rec" & file.RecNum & "." & thisFile.Extension)
+                                ' Update the line number to match
+                                file.RmbLineNo = insert.RmbLineNo.ToString
+                            Next
+                            ' Submit all the changes to the files we made
+                            d.SubmitChanges()
+                        End If
+                        transactionDate = transactionDate.AddDays(1) 'add a day for each iteration of repeat
+                    Next
 
                     Dim t As Type = Me.GetType()
                     Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
@@ -2259,6 +2272,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
 
             Await resetTask
+            If (btnSaveLine.CommandName.Equals("Save")) Then
+                ' reset and show repeat if available
+                Try
+                    Dim repeat As System.Reflection.PropertyInfo = theControl.GetType().GetProperty("Repeat")
+                    If repeat IsNot Nothing Then
+                        repeat.SetValue(theControl, 1, Nothing)
+                    End If
+                Catch ex As Exception
+                End Try
+            End If
         End Sub
 
         Protected Async Sub tbChargeTo_ValueChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles tbChargeTo.TextChanged

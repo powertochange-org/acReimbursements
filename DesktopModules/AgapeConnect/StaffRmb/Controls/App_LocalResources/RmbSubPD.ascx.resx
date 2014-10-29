@@ -127,7 +127,7 @@
     <value>Rate and Amount:</value>
   </data>
   <data name="lblDate.Help" xml:space="preserve">
-    <value>Enter the date of this expense.</value>
+    <value>Enter the date of this expense.  If this expense covers multiple days, enter the date of the first day.</value>
   </data>
   <data name="lblDate.Text" xml:space="preserve">
     <value>Date:</value>
@@ -186,5 +186,41 @@
   </data>
   <data name="lblProvince.Text" xml:space="preserve">
     <value>Province:</value>
+  </data>
+  <data name="lblRepeat.Help" xml:space="preserve">
+    <value>Selecting a number between 1 and 14 will generate that many per-diem entries in your reimbursement, one for each day, starting on the date selected above.</value>
+  </data>
+  <data name="lblRepeat.Text" xml:space="preserve">
+    <value>Number of lines to create</value>
+  </data>
+  <data name="lblTotal.Text" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="lblBreakfast.Text" xml:space="preserve">
+    <value>Breakfast</value>
+  </data>
+  <data name="lblLunch.Text" xml:space="preserve">
+    <value>Lunch</value>
+  </data>
+  <data name="lblMeals.Help" xml:space="preserve">
+    <value>Select the meals that qualify for per-diem reimbursement</value>
+  </data>
+  <data name="lblMeals.Text" xml:space="preserve">
+    <value>Meals</value>
+  </data>
+  <data name="lblSupper.Text" xml:space="preserve">
+    <value>Supper</value>
+  </data>
+  <data name="Repeat.Error" xml:space="preserve">
+    <value>You may only use the repeat button to create up to 14 entries.</value>
+    <comment>Error</comment>
+  </data>
+  <data name="Selection.Error" xml:space="preserve">
+    <value>You must select at least one checkbox</value>
+    <comment>Error</comment>
+  </data>
+  <data name="RepeatDate.Error" xml:space="preserve">
+    <value>Creating multiple entries will result in a date in the future.  Please select the date for the FIRST entry.  Multiple entries will be added on subsequent days.</value>
+    <comment>Error</comment>
   </data>
 </root>
