@@ -1799,7 +1799,7 @@
                     <tr><td><asp:Label ID="lblPostingDate" runat="server" resourcekey="PostingDate" /></td>
                         <td><asp:TextBox ID="dtPostingDate" runat="server" Width="90px" class="datepicker" /></td></tr>
                     <tr><td><asp:Label ID="lblBatchId" runat="server" resourcekey="BatchId" /></td>
-                        <td><asp:TextBox ID="tbBatchId" runat="server" /></td></tr>
+                        <td><asp:TextBox ID="tbBatchId" runat="server" AutoCompleteType="none"/></td></tr>
                     <tr><td><asp:Label ID="lblPostingReference" runat="server" resourcekey="PostingReference" /></td>
                         <td><asp:TextBox ID="tbPostingReference" runat="server" /></td></tr>
                     <tr><td><asp:Label ID="lblInvoiceNumber" runat="server" resourcekey="InvoiceNumber" /></td>
