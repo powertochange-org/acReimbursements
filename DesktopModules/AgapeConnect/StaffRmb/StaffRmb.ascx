@@ -326,7 +326,7 @@
             $("#divGetPostingData").dialog({
                 autoOpen: false,
                 position:['middle', 250],
-                height: 350,
+                //height: 350,
                 width: 500,
                 modal:true,
                 title: '<%= Translate("GetPostingDetails") %>',
