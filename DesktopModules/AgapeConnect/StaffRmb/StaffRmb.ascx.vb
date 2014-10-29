@@ -903,11 +903,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     '--buttons
                     btnSave.Text = Translate("btnSaved")
-                    btnSave.Style.Add(HtmlTextWriterStyle.Display, "none") '--hide, but still generate the button
+                    btnSave.Style.Add("display", "none") '--hide, but still generate the button
                     btnDelete.Visible = Not (PROCESSING Or PAID Or CANCELLED)
 
 
                     '*** REIMBURSEMENT DETAILS ***
+
                     pnlTaxable.Visible = (From c In Rmb.AP_Staff_RmbLines Where c.Taxable = True).Count > 0
 
                     '--grid
@@ -938,7 +939,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     tbCostcenter.Enabled = isFinance
                     ddlAccountCode.Enabled = isFinance
-                    pnlAccountsOptions.Visible = isFinance
+                    pnlAccountsOptions.Style.Add("display", If(isFinance, "block", "none"))
 
 
                     updateBalanceLabel(Await getAccountBalanceTask)
@@ -1137,7 +1138,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
 
                         insert.Spare1 = CStr(ucType.GetProperty("Spare1").GetValue(theControl, Nothing)) 'province
-                        insert.Spare2 = CStr(ucType.GetProperty("Spare2").GetValue(theControl, Nothing))
+                        insert.Spare2 = CStr(ucType.GetProperty("Spare2").GetValue(theControl, Nothing)) 'perdiem meals
                         insert.Spare3 = CStr(ucType.GetProperty("Spare3").GetValue(theControl, Nothing)) 'mileageunitindex
                         insert.Spare4 = CStr(ucType.GetProperty("Spare4").GetValue(theControl, Nothing)) 'mileageorigin
                         insert.Spare5 = CStr(ucType.GetProperty("Spare5").GetValue(theControl, Nothing)) 'mileagedestination
@@ -1366,6 +1367,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     pnlElecReceipts.Attributes("style") = "display: none"
                 End If
             End If
+            Try
+                Dim method As System.Reflection.MethodInfo = theControl.GetType().GetMethod("SetupView")
+                If method IsNot Nothing Then
+                    method.Invoke(theControl, New Object() {Settings})
+                End If
+            Catch ex As Exception
+
+            End Try
         End Sub
 
         Protected Async Sub btnReject_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnReject.Click
@@ -3252,6 +3261,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Return GetLocalTypeName(typeId).ToLower().IndexOf("mileage") > -1
         End Function
 
+        Public Function isPerDiemType(ByVal typeId As Integer) As Boolean
+            Return GetLocalTypeName(typeId).ToLower().IndexOf("per diem") > -1
+        End Function
         Public Function differentExchangeRate(xRate1 As Double, xRate2 As Double) As Boolean
             'determine whether the 2 exchange rates differ by more than the fudge factor
             Dim fudge_factor = 0.001

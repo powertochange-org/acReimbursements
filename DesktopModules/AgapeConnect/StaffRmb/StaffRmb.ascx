@@ -129,7 +129,7 @@
                 total += Number($(this).attr('title'));
             }
         })
-        $('.PDAmount').val(total);
+        $('.PDAmount').text(total);
     }
 
     function disableSubmitOnEnter(e)
@@ -1365,9 +1365,10 @@
                                                         <asp:TextBox ID="TextBox1" runat="server" Text='<%# Bind("LineType") %>'></asp:TextBox>
                                                     </EditItemTemplate>
                                                     <ItemTemplate>
-                                                        <asp:Label ID="Label1" runat="server" CssClass='<%# IIF(IsWrongType(Eval("CostCenter"), Eval("LineType")), "ui-state-error ui-corner-all","") %>' ToolTip='<%# IIF(IsWrongType(Eval("CostCenter"), Eval("LineType")),Translate("lblWrongType"),"") %>' Text='<%# GetLocalTypeName(Eval("AP_Staff_RmbLineType.LineTypeId") )  & If(IsMileageType(Eval("LineType")), " " & GetMileageString(If(Eval("Mileage"), 0), If(Eval("Spare3"), "0")) ,"") %>'></asp:Label>
+                                                        <asp:Label ID="Label1" runat="server" CssClass='<%# IIF(IsWrongType(Eval("CostCenter"), Eval("LineType")), "ui-state-error ui-corner-all","") %>' ToolTip='<%# IIF(IsWrongType(Eval("CostCenter"), Eval("LineType")),Translate("lblWrongType"),"") %>' Text='<%# GetLocalTypeName(Eval("AP_Staff_RmbLineType.LineTypeId") ) & If(IsMileageType(Eval("LineType")), " " & GetMileageString(If(Eval("Mileage"), 0), If(Eval("Spare3"), "0")) ,"") %>'></asp:Label>
                                                         <asp:Panel runat="server">
                                                             <asp:Label ID="lblToFrom" runat="server" Font-Size="XX-Small" ForeColor="#AAAAAA" Font-Names="Courier" Visible=<%# If(TypeHasOriginAndDestination(Eval("LineType")),"True","False") %> Text=<%# If(Eval("Spare4") IsNot Nothing And Eval("Spare5") IsNot Nothing, Left(Eval("Spare4"),9) & " - " & Left(Eval("Spare5"),9),"") %>></asp:Label>
+                                                            <asp:Label ID="lblPerDiemMeals" runat="server" Font-Size="XX-Small" ForeColor="#AAAAAA" Font-Names="Courier" Visible=<%# If(isPerDiemType(Eval("LineType")),"True","False") %> Text=<%# If(Eval("Spare2") IsNot Nothing , Eval("Spare2"),"") %>></asp:Label>
                                                         </asp:Panel>
                                                     </ItemTemplate>
                                                     <ItemStyle HorizontalAlign="Left" />

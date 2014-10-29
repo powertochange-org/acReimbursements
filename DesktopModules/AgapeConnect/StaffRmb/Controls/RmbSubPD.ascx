@@ -6,11 +6,17 @@
 <div class="Agape_SubTitle"> 
     <asp:HiddenField ID="hfNoReceiptLimit" runat="server" Value="0" />
     <asp:HiddenField ID="hfCADValue" runat="server" Value="" />
+    <asp:HiddenField ID="hfBreakfast" runat="server" />
+    <asp:HiddenField ID="hfLunch" runat="server" />
+    <asp:HiddenField ID="hfSupper" runat="server" />
     <asp:Label ID="Label3" runat="server" Font-Italic="true" ForeColor="Gray" CssClass="explanation" resourcekey="Explanation"></asp:Label>
 </div><br />
 
 <table   style="font-size:9pt; ">
-
+    <tr>
+        <td><b><dnn:Label runat="server" ControlName="tbDesc" ResourceKey="lblDesc" /></b></td>
+        <td colspan="2"><asp:TextBox ID="tbDesc" runat="server" /></td>
+    </tr>
     <tr>
          <td><b><dnn:label id="Label1"  runat="server" controlname="dtDate" ResourceKey="lblDate"  /></b></td>
         <td  colspan="2">
@@ -24,25 +30,30 @@
         <td colspan="2">
             <div>
                 <asp:CheckBox ID="cbBreakfast" runat="server" CssClass="perdiem" OnClick="updatePerDiemTotal();"/>
-                <b><%=Translate("lblBreakfast")%></b> (<%= FormatCurrency(breakfastValue)%>)
+                <b><%=Translate("lblBreakfast")%></b> (max: <%= FormatCurrency(hfBreakfast.Value)%>)
             </div>
             <div>
                 <asp:CheckBox ID="cbLunch" runat="server" CssClass="perdiem"  OnClick="updatePerDiemTotal();"/>
-                <b><%=Translate("lblLunch")%></b> (<%= FormatCurrency(lunchValue)%>)
+                <b><%=Translate("lblLunch")%></b> (max: <%= FormatCurrency(hfLunch.Value)%>)
             </div>
             <div>
                 <asp:CheckBox ID="cbSupper" runat="server" CssClass="perdiem"  OnClick="updatePerDiemTotal();"/>
-                <b><%=Translate("lblSupper")%></b> (<%= FormatCurrency(supperValue)%>)
+                <b><%=Translate("lblSupper")%></b> (max: <%= FormatCurrency(hfSupper.Value)%>)
             </div>
         </td>
     </tr>
     <tr>
         <td>
             <b><dnn:label id="lbl"  runat="server" controlname="tbAmount" ResourceKey="lblTotal" /></b>
+            
          </td>
         <td colspan="2">
-            <asp:TextBox id="tbAmount" runat="server" cssclass="PDAmount" Enabled="False" Width="40px" />
+            <asp:TextBox id="tbAmount" runat="server" Width="90px" /> (max: $<span class="PDAmount"></span>)
         </td>
+    </tr>
+    <tr>
+        <td><b><dnn:Label id="lblRepeat" runat="server" ControlName="tbRepeat" ResourceKey="lblRepeat" Visible="False" /></b></td>
+        <td colspan="2" style="text-align:left"><asp:TextBox id="tbRepeat" runat="server" Width="25px" Visible="false" /></td>
     </tr>
     <tr><td><b><dnn:Label ID="lblProvince" runat="server" controlname="ddlProvince" ResourceKey="lblProvince" /></b></td>
         <td ><asp:DropDownList ID="ddlProvince" CssClass="ddlProvince" runat="server">
@@ -61,10 +72,6 @@
                 <asp:ListItem Text="Northwest Terr." Value="NT" />
                 <asp:ListItem Text="Outside Canada" Value="--" />
             </asp:DropDownList></td>
-    </tr>
-    <tr>
-        <td><b><dnn:Label id="lblRepeat" runat="server" ControlName="tbRepeat" ResourceKey="lblRepeat" Visible="False" /></b></td>
-        <td colspan="2" style="text-align:left"><asp:TextBox id="tbRepeat" runat="server" Width="25px" Visible="false" /></td>
     </tr>
 </table>
 <asp:Label ID="ErrorLbl" runat="server" Font-Size="9pt" ForeColor="Red" />

@@ -186,4 +186,7 @@
     <value>You must provide the name of the supplier</value>
     <comment>Error</comment>
   </data>
+  <data name="lblProvince.Text" xml:space="preserve">
+    <value>Province</value>
+  </data>
 </root>

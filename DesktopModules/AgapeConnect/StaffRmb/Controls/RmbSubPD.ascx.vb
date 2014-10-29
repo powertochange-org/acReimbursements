@@ -2,10 +2,6 @@
 Partial Class controls_RmbSubPD
     Inherits Entities.Modules.PortalModuleBase
 
-    Protected breakfastValue As Double
-    Protected lunchValue As Double
-    Protected supperValue As Double
-
     Protected Sub Page_Init(sender As Object, e As System.EventArgs) Handles Me.Init
         Dim FileName As String = System.IO.Path.GetFileNameWithoutExtension(Me.AppRelativeVirtualPath)
         If Not (Me.ID Is Nothing) Then
@@ -47,13 +43,10 @@ Partial Class controls_RmbSubPD
     End Property
     Public Property Comment() As String
         Get
-            Dim result = If(cbBreakfast.Checked, Translate("lblBreakfast") & " ", "") & If(cbLunch.Checked, Translate("lblLunch") & " ", "") & If(cbSupper.Checked, Translate("lblSupper") & " ", "")
-            Return result
+            Return tbDesc.Text
         End Get
         Set(ByVal value As String)
-            cbBreakfast.Checked = value.Contains(Translate("lblBreakfast") & " ")
-            cbLunch.Checked = value.Contains(Translate("lblLunch") & " ")
-            cbSupper.Checked = value.Contains(Translate("lblSupper") & " ")
+            tbDesc.Text = value
         End Set
     End Property
     Public Property theDate() As Date
@@ -93,8 +86,7 @@ Partial Class controls_RmbSubPD
             Return result
         End Get
         Set(ByVal value As Double)
-            'tbAmount.Text = value.ToString("n2", New CultureInfo("en-US"))
-            ScriptManager.RegisterClientScriptBlock(tbAmount, GetType(CheckBox), "calculate", "updatePerDiemTotal();", True)
+            tbAmount.Text = value.ToString("n2")
         End Set
     End Property
     Public Property Spare1() As String
@@ -111,9 +103,13 @@ Partial Class controls_RmbSubPD
     End Property
     Public Property Spare2() As String
         Get
-            Return ""
+            Dim result = If(cbBreakfast.Checked, Translate("lblBreakfast") & " ", "") & If(cbLunch.Checked, Translate("lblLunch") & " ", "") & If(cbSupper.Checked, Translate("lblSupper") & " ", "")
+            Return result
         End Get
         Set(ByVal value As String)
+            cbBreakfast.Checked = value.Contains(Translate("lblBreakfast") & " ")
+            cbLunch.Checked = value.Contains(Translate("lblLunch") & " ")
+            cbSupper.Checked = value.Contains(Translate("lblSupper") & " ")
         End Set
     End Property
     Public Property Spare3() As String
@@ -182,6 +178,10 @@ Partial Class controls_RmbSubPD
     End Function
 
     Public Function ValidateForm(ByVal userId As Integer) As Boolean
+        If (tbDesc.Text.Length < 5) Then
+            ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Description.Error", LocalResourceFile)
+            Return False
+        End If
         Try
             Dim theDate As Date = dtDate.Text
             If theDate > Today Then
@@ -198,6 +198,21 @@ Partial Class controls_RmbSubPD
             ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Selection.Error", LocalResourceFile)
             Return False
         End If
+
+        Try
+            If CDbl(tbAmount.Text) = 0 Then
+                ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Amount.Error", LocalResourceFile)
+                Return False
+            End If
+            Dim maximum As Double = If(cbBreakfast.Checked, CDbl(hfBreakfast.Value), 0) + If(cbLunch.Checked, CDbl(hfLunch.Value), 0) + If(cbSupper.Checked, CDbl(hfSupper.Value), 0)
+            If (CDbl(tbAmount.Text) > maximum) Then
+                ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("MaxAmount.Error", LocalResourceFile)
+                Return False
+            End If
+        Catch
+            ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Amount.Error", LocalResourceFile)
+            Return False
+        End Try
         Try
             Dim repeat As Integer = CInt(tbRepeat.Text)
             If repeat < 1 Or repeat > 14 Then
@@ -216,22 +231,29 @@ Partial Class controls_RmbSubPD
         Return True
     End Function
 
-    Public Sub Initialize(ByVal Settings As Hashtable)
+    Public Sub SetupView(ByVal Settings As Hashtable)
+        'Things that need to be done to the control after REloading
         Try
-            breakfastValue = CDbl(Settings("PDBreakfast"))
+            hfBreakfast.Value = CDbl(Settings("PDBreakfast"))
             cbBreakfast.Attributes.Add("title", Settings("PDBreakfast")) 'Store value in title attribute, for javascript to access
-            lunchValue = CDbl(Settings("PDLunch"))
+            hfLunch.Value = CDbl(Settings("PDLunch"))
             cbLunch.Attributes.Add("title", Settings("PDLunch"))
-            supperValue = CDbl(Settings("PDSupper"))
+            hfSupper.Value = CDbl(Settings("PDSupper"))
             cbSupper.Attributes.Add("title", Settings("PDSupper"))
         Catch
-            breakfastValue = -1
-            lunchValue = -1
-            supperValue = -1
+            hfBreakfast.Value = -1
+            hfLunch.Value = -1
+            hfSupper.Value = -1
         End Try
-        tbRepeat.Text = "1"
+        tbDesc.Attributes.Add("placeholder", DotNetNuke.Services.Localization.Localization.GetString("DescriptionHint.Text", "/DesktopModules/AgapeConnect/StaffRmb/App_LocalResources/StaffRmb.ascx.resx"))
         tbRepeat.Visible = False
         lblRepeat.Visible = False
+        ScriptManager.RegisterClientScriptBlock(tbAmount, GetType(CheckBox), "calculate", "updatePerDiemTotal();", True)
+    End Sub
+
+    Public Sub Initialize(ByVal Settings As Hashtable)
+        SetupView(Settings)
+        tbRepeat.Text = "1"
     End Sub
 
 
