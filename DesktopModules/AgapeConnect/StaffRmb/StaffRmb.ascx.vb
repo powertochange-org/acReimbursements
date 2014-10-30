@@ -2235,7 +2235,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim t As Type = GridView1.GetType()
                     Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
                     sb.Append("<script language='javascript'>")
-                    sb.Append("window.open('mailto:" & theUser.Email & "?subject=Reimbursment " & theLine.First.AP_Staff_Rmb.RID & ": Deferred Transactions');")
+                    sb.Append("window.open('mailto:" & theUser.Email & "?subject=Reimbursement " & theLine.First.AP_Staff_Rmb.RID & ": Deferred Transactions');")
                     sb.Append("</script>")
                     Await loadRmbTask
 
@@ -3587,7 +3587,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 lblStatus.Text = Translate(RmbStatus.StatusName(theRmb.First.Status))
                 If cbMoreInfo.Checked Then
                     Dim theUser = UserController.GetUserById(PortalId, theRmb.First.UserId)
-                    SendMessage(Translate("MoreInfoMsg"), "window.open('mailto:" & theUser.Email & "?subject=Reimbursment " & theRmb.First.RID & ": More info requested');")
+                    SendMessage(Translate("MoreInfoMsg"), "window.open('mailto:" & theUser.Email & "?subject=Reimbursement " & theRmb.First.RID & ": More info requested');")
                     lblStatus.Text = lblStatus.Text & " - " & Translate("StatusMoreInfo")
                 End If
                 saveIfNecessary()
@@ -3601,7 +3601,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 lblStatus.Text = Translate(RmbStatus.StatusName(theRmb.First.Status))
                 If cbApprMoreInfo.Checked Then
                     Dim theUser = UserController.GetUserById(PortalId, theRmb.First.UserId)
-                    SendMessage(Translate("MoreInfoMsg"), "window.open('mailto:" & theUser.Email & "?subject=Reimbursment " & theRmb.First.RID & ": More info requested');")
+                    SendMessage(Translate("MoreInfoMsg"), "window.open('mailto:" & theUser.Email & "?subject=Reimbursement " & theRmb.First.RID & ": More info requested');")
                     lblStatus.Text = lblStatus.Text & " - " & Translate("StatusMoreInfo")
                 End If
                 saveIfNecessary()

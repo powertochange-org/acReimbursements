@@ -339,10 +339,10 @@
     <value>Reimbursement #[RMBNO] has been approved!</value>
   </data>
   <data name="RmbsToApprove.Text" xml:space="preserve">
-    <value>Reimbursments to approve:</value>
+    <value>Reimbursements to approve:</value>
   </data>
   <data name="RmbTitle.Text" xml:space="preserve">
-    <value>Reimbursments</value>
+    <value>Reimbursements</value>
   </data>
   <data name="Split.Text" xml:space="preserve">
     <value>Split</value>
@@ -490,7 +490,7 @@
     <value>More information is required in order to continue processing Reimbursement [RMBNO] - [USERREF].</value>
   </data>
   <data name="MoreInfoMsg.Text" xml:space="preserve">
-    <value>This reimbursment will be highlighted to the staff member when they log into this site; however, you should email them directly, to let him/her know that changes are required.</value>
+    <value>This reimbursement will be highlighted to the staff member when they log into this site; however, you should email them directly, to let him/her know that changes are required.</value>
   </data>
   <data name="AdvAmountSpecial.Text" xml:space="preserve">
     <value>Since you have a transaction over [TEAMLEADERLIMIT] in your advance, it must be approved by [AUTHUSER].</value>
