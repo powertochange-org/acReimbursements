@@ -1459,7 +1459,7 @@
                                             </div>
                                         </asp:LinkButton>
                                     </div>
-
+                                    <div style="clear:both;"></div>
                                     <div style="float:left; margin-left:20px">
                                         <asp:Button ID="addLinebtn2" runat="server" resourcekey="btnAddExpenseItem" class="aButton" />
                                     </div>
