@@ -297,19 +297,6 @@
             });
             $("#divInsufficientFunds").parent().appendTo($("form:first"));
 
-            $("#divDownload").dialog({
-                autoOpen: false,
-                position:['middle', 150],
-                height: 350,
-                width: 500,
-                modal: true,
-                title: '<%= Translate("BatchedRmbs") %>',
-                close: function () {
-                    //  allFields.val("").removeClass("ui-state-error");
-                }
-            });
-            $("#divDownload").parent().appendTo($("form:first"));
-
             $("#divAccountWarning").dialog({
                 autoOpen: false,
                 position:['middle', 150],
@@ -527,7 +514,6 @@
  function closePopupSplit() {$("#divSplitPopup").dialog("close"); $("#loading").hide();}
  function closeWarningDialog() {$("#divWarningDialog").dialog("close");}
  function closeAddressDialog() {$("#divAddressConfirmation").dialog("close"); $("#loading").hide();}
- function closePopupDownload() {$("#divDownload").dialog("close");}
  function closePopupAccountWarning() {$("#divAccountWarning").dialog("close");}
  function closeSuggestedPayments() {$("#divSuggestedPayments").dialog("close");}
  function closePostDataDialog() {$("#divGetPostingData").dialog("close"); $("#loading").hide();}
@@ -564,7 +550,6 @@
  function showPopupSplit() {resetSplitPopup(); $("#divSplitPopup").dialog("open"); return false; }
  function showWarningDialog() {$("#divWarningDialog").dialog("open"); return false; }
  function showAddressDialog() {$("#divAddressConfirmation").dialog("open"); return false; }
- function showDownload() { $("#divDownload").dialog("open"); return false; }
  function showAccountWarning() { $("#divAccountWarning").dialog("open"); return false; }
  function showPostDataDialog() { $("#divGetPostingData").dialog("open"); return false; }
 
@@ -1870,17 +1855,7 @@
             </Triggers>
         </asp:UpdatePanel>
     </div>
-    <div id="divDownload" class="ui-widget">
-        <asp:Label ID="Label37" runat="server" Font-Bold="true" resourcekey="MarkProcessed"></asp:Label><br />
-        <br />
-        <asp:Label ID="Label38" runat="server" Font-Italic="true" resourcekey="MarkProcessed"></asp:Label>
-        <br />
-        <br />
-        <div width="100%" style="text-align: center">
-            <asp:Button ID="btnMarkProcessed" runat="server" resourcekey="btnYes" class="aButton" />
-            <asp:Button ID="btnDontMarkProcessed" runat="server" resourcekey="btnNo" class="aButton" />
-        </div>
-    </div>
+
     <div id="divAccountWarning" class="ui-widget">
         <asp:Label ID="Label46" runat="server" Font-Bold="true" resourcekey="lblAccountWarning"></asp:Label>
         <br />

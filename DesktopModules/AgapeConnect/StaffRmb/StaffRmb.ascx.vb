@@ -933,8 +933,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     btnApprove.Enabled = isApprover And SUBMITTED
                     btnProcess.Visible = isFinance And APPROVED
                     btnProcess.Enabled = isFinance And APPROVED
-                    btnUnProcess.Visible = isFinance And (PROCESSING Or PAID)
-                    btnUnProcess.Enabled = isFinance And (PROCESSING Or PAID)
+                    btnUnProcess.Visible = isFinance And (PROCESSING)
+                    btnUnProcess.Enabled = isFinance And (PROCESSING)
                     btnDownload.Visible = (isFinance Or isOwner Or isSpouse) And FORM_HAS_ITEMS
 
                     tbCostcenter.Enabled = isFinance
@@ -1026,6 +1026,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 #Region "Button Events"
 
         Protected Async Sub btnSaveLine_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSaveLine.Click
+
+            'never allow changes to reimbursements after they have been processed
+            Dim State As Integer = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.Status).First
+            If State = RmbStatus.Paid Or State = RmbStatus.Processing Or State = RmbStatus.PendingDownload Or State = RmbStatus.DownloadFailed Then Return
 
             Dim ucType As Type = theControl.GetType()
 
@@ -1385,9 +1389,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Return
             End If
             Dim RmbNo = hfRmbNo.Value
-            Dim rmbs = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo
+            Dim rmbs = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo And (c.Status = RmbStatus.Submitted) Or (c.Status = RmbStatus.PendingDirectorApproval) Or (c.Status = RmbStatus.PendingEDMSApproval)
             If (rmbs.Count > 0) Then
                 Dim rmb = rmbs.First
+                'Ensure only authorized person can reject a form
+                If (rmb.Status = RmbStatus.Submitted) AndAlso (UserId <> rmb.ApprUserId) Then Return
+                If (rmb.Status = RmbStatus.PendingDirectorApproval) AndAlso (UserId <> StaffBrokerFunctions.getDirectorFor(rmb.CostCenter, CType(Settings("EDMSId"), Integer))) Then Return
+                If (rmb.Status = RmbStatus.PendingEDMSApproval) AndAlso (UserId <> CType(Settings("EDMSId"), Integer)) Then Return
+
                 rmb.MoreInfoRequested = True
                 If rmb.Status = RmbStatus.Submitted Then
                     rmb.Status = RmbStatus.Draft
@@ -1463,6 +1472,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Sub
 
         Protected Sub btnSubmit_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSubmit.Click
+
+            Dim State As Integer = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.Status).First
+            If Not (State = RmbStatus.Draft Or State = RmbStatus.Cancelled Or State = RmbStatus.Submitted) Then Return
+
             saveIfNecessary()
             If btnSubmit.Attributes("class").Contains("aspNetDisabled") Then
                 'show alert
@@ -1485,6 +1498,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Sub
 
         Protected Async Sub btnAddressOk_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnAddressOk.Click, btnTempAddressChange.Click, btnPermAddressChange.Click
+            Dim State As Integer = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.Status).First
+            If Not (State = RmbStatus.Draft Or State = RmbStatus.Cancelled Or State = RmbStatus.Submitted) Then Return
+
             If (CType(sender, Button).ID = "btnTempAddressChange") Or (CType(sender, Button).ID <> "btnPermAddressChange") Then
                 If addAddressToComments() Then
                     If CType(sender, Button).ID <> "btnTempAddressChange" Then
@@ -1557,6 +1573,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value
             If rmb.Count > 0 Then
+                Dim State As Integer = rmb.First.Status
+                If (State = RmbStatus.Processing Or State = RmbStatus.PendingDownload Or State = RmbStatus.DownloadFailed Or State = RmbStatus.Paid Or State = RmbStatus.Cancelled) Then Return
+
                 rmb.First.Status = RmbStatus.Cancelled
                 lblStatus.Text = Translate(RmbStatus.StatusName(RmbStatus.Cancelled))
                 btnApprove.Visible = False
@@ -1599,16 +1618,22 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             saveIfNecessary()
             Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value
             If rmb.Count > 0 Then
+                Dim State As Integer = rmb.First.Status
+                If Not (State = RmbStatus.Submitted Or State = RmbStatus.PendingDirectorApproval Or State = RmbStatus.PendingEDMSApproval) Then Return
+
+                Dim message As String = ""
                 Dim rmbTotal = CType((From a In d.AP_Staff_RmbLines Where a.RmbNo = rmb.First.RMBNo Select a.GrossAmount).Sum(), Decimal?).GetValueOrDefault(0)
                 rmb.First.SpareField1 = rmbTotal.ToString("C") ' currency formatted string
                 ' The following If statements are ordered to allow an approver who is also a director to not have to approve twice.
                 Dim shouldSendApprovalEmail = False
                 If rmb.First.Status = RmbStatus.Submitted Then
                     If UserId = rmb.First.ApprUserId Then
+                        message += Translate("RmbApproved").Replace("[RMBNO]", rmb.First.RID) + "\n"
                         If StaffBrokerFunctions.RequiresExtraApproval(rmb.First.CostCenter) Then
                             rmb.First.Status = RmbStatus.PendingDirectorApproval
                             rmb.First.SpareField2 = StaffBrokerFunctions.getDirectorFor(rmb.First.CostCenter, CType(Settings("EDMSId"), Integer))
-                            shouldSendApprovalEmail = True
+                            shouldSendApprovalEmail = True '
+                            message += Translate("ExtraApproval") + "\n"
                         Else
                             rmb.First.Status = RmbStatus.Approved
                             rmb.First.ApprDate = Now
@@ -1633,6 +1658,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             SendApprovedEmail(rmb.First)
                             Log(rmb.First.RMBNo, "Approved by " & UserController.GetCurrentUserInfo.DisplayName)
                         End If
+                        message += Translate("RmbApprovedDirector").Replace("[RMBNO]", rmb.First.RID) + "\n"
                     End If
                 End If
                 If rmb.First.Status = RmbStatus.PendingEDMSApproval Then
@@ -1642,6 +1668,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         rmb.First.Locked = True
                         shouldSendApprovalEmail = False
                         SendApprovedEmail(rmb.First)
+                        message += Translate("RmbApprovedEDMS").Replace("[RMBNO]", rmb.First.RID)
                         Log(rmb.First.RMBNo, "Approved by EDMS")
                     End If
                 End If
@@ -1661,26 +1688,26 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim allStaff = StaffBrokerFunctions.GetStaff()
                     refreshMenuTasks.Add(buildAllApprovedTreeAsync(allStaff))
                 End If
-
-                Dim message As String = Translate("RmbApproved").Replace("[RMBNO]", rmb.First.RID)
-                Dim t As Type = btnApprove.GetType()
-
+                If message.Length = 0 Then message += Translate("UnauthorizedApprover")
                 Await Task.WhenAll(refreshMenuTasks)
-
-                ScriptManager.RegisterStartupScript(btnApprove, t, "select2", "selectIndex(2); alert(""" & message & """);", True)
+                ScriptManager.RegisterStartupScript(btnApprove, btnApprove.GetType(), "select2", "selectIndex(2); alert(""" & message & """);", True)
                 btnApprove.Visible = False
                 pnlMain.Visible = False
                 ltSplash.Text = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbSplash", PortalId))
                 pnlSplash.Visible = True
-
             End If
         End Sub
 
         Protected Async Sub btnSave_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSave.Click
+            Dim State As Integer = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.Status).First()
+            If (State = RmbStatus.Processing Or State = RmbStatus.PendingDownload Or State = RmbStatus.DownloadFailed Or State = RmbStatus.Paid) Then Return
+
             saveIfNecessary()
         End Sub
 
         Protected Async Sub addLinebtn2_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles addLinebtn2.Click
+            Dim State As Integer = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.Status).First()
+            If (State = RmbStatus.Processing Or State = RmbStatus.PendingDownload Or State = RmbStatus.DownloadFailed Or State = RmbStatus.Paid Or State = RmbStatus.Cancelled) Then Return
 
             'ddlLineTypes_SelectedIndexChanged(Me, Nothing)
             'ddlCostcenter.SelectedValue = ddlChargeTo.SelectedValue
@@ -1718,6 +1745,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         'End Sub
 
         Protected Sub btnSplitAdd_Click(sender As Object, e As System.EventArgs) Handles btnSplitAdd.Click
+            Dim State As Integer = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.Status).First()
+            If (State = RmbStatus.Processing Or State = RmbStatus.PendingDownload Or State = RmbStatus.DownloadFailed Or State = RmbStatus.Paid Or State = RmbStatus.Cancelled) Then Return
+
             hfRows.Value += 1
             'tblSplit.Rows.Clear()
 
@@ -1745,13 +1775,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Sub
 
         Protected Async Sub tbYouRef_Change(sender As Object, e As System.EventArgs) Handles tbYouRef.TextChanged
+            Dim State As Integer = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.Status).First()
+            If (State = RmbStatus.Processing Or State = RmbStatus.PendingDownload Or State = RmbStatus.DownloadFailed Or State = RmbStatus.Paid Or State = RmbStatus.Cancelled) Then Return
+
             saveIfNecessary()
             Await LoadMenuAsync()
         End Sub
 
         Protected Async Sub ddlCompany_Change(sender As Object, e As System.EventArgs) Handles ddlCompany.SelectedIndexChanged
-            'Await LoadVendorsAsync()
-            'tbVendorId.Enabled = True
             ScriptManager.RegisterClientScriptBlock(ddlCompany, ddlCompany.GetType(), "loadVendors", "loadVendorIds();", True)
         End Sub
 
@@ -1766,7 +1797,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Sub
 
 
-        Protected Async Sub btnOK_Click(sender As Object, e As System.EventArgs) Handles btnOK.Click
+        Protected Async Sub btnOK_Click(sender As Object, e As System.EventArgs) Handles btnOK.Click 'this is the OK button on the Split dialog
+            Dim State As Integer = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.Status).First()
+            If State <> RmbStatus.Approved Then Return
+
             Dim theLine = From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(hfSplitLineId.Value)
             If theLine.Count > 0 Then
                 For Each row As TableRow In tblSplit.Rows
@@ -1825,6 +1859,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             'Mark as Pending Download in next batch.
             Dim TaskList = New List(Of Task)
             Dim theRmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value)
+            If theRmb.First.Status <> RmbStatus.Approved Then Return
+
             Dim Extra = From c In d.AP_Staff_Rmb_Post_Extras Where c.RMBNo = CInt(hfRmbNo.Value)
             Dim PostingData As AP_Staff_Rmb_Post_Extra
             Dim insert = True
@@ -1907,73 +1943,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             HttpContext.Current.Response.End()
         End Sub
 
-        Protected Sub btnMarkProcessed_Click(sender As Object, e As System.EventArgs) Handles btnMarkProcessed.Click
-            DownloadBatch(True)
-
-            'Dim RmbList As List(Of Integer) = Session("RmbList")
-            'If Not RmbList Is Nothing Then
-            '    Dim q = From c In d.AP_Staff_Rmbs Where RmbList.Contains(c.RMBNo) And c.PortalId = PortalId
-
-            '    For Each row In q
-            '        row.Status = RmbStatus.Processing
-            '        row.ProcDate = Now
-            '        Log(row.RMBNo, "Marked as Processed - after a manual download")
-            '    Next
-            'End If
-
-            'd.SubmitChanges()
-
-
-
-
-            'If hfRmbNo.Value <> "" Then
-            '        Await LoadRmbAsync(CInt(hfRmbNo.Value))
-
-
-            'End If
-
-            'Await LoadMenuAsync()
-
-
-            'Dim t As Type = Me.GetType()
-            'Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
-            'sb.Append("<script language='javascript'>")
-            'sb.Append("closePopupDownload();")
-            'sb.Append("</script>")
-            'ScriptManager.RegisterClientScriptBlock(Page, t, "popupDownload", sb.ToString, False)
-            'HttpContext.Current.Response.End()
-        End Sub
-
-        Protected Sub btnDontMarkProcessed_Click(sender As Object, e As System.EventArgs) Handles btnDontMarkProcessed.Click
-            DownloadBatch()
-
-            'Dim t As Type = Me.GetType()
-            'Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
-            'sb.Append("<script language='javascript'>")
-            'sb.Append("closePopupDownload();")
-            'sb.Append("</script>")
-            'ScriptManager.RegisterClientScriptBlock(Page, t, "popupDownload", sb.ToString, False)
-            'HttpContext.Current.Response.End()
-        End Sub
-
-        'Protected Sub btnDownloadBatch_Click(sender As Object, e As System.EventArgs) Handles btnDownloadBatch.Click
-        '    DownloadBatch()
-
-        'End Sub
-
-        'Protected Sub btnPrint_Click(sender As Object, e As System.EventArgs) Handles btnPrint.Click
-        '    Dim theRmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value)
-        '    Dim t As Type = btnPrint.GetType()
-        '    Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
-
-        '    sb.Append("<script language='javascript'>")
-        '    sb.Append("window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & hfRmbNo.Value & "&UID=" & theRmb.First.UserId & "', '_blank'); ")
-        '    sb.Append("</script>")
-        '    ScriptManager.RegisterStartupScript(btnPrint, t, "printOut", sb.ToString, False)
-        'End Sub
-
         Protected Async Sub btnUnProcess_Click(sender As Object, e As System.EventArgs) Handles btnUnProcess.Click
             Dim theRmb = (From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value)).First
+            If Not (theRmb.Status = RmbStatus.Processing Or theRmb.Status = RmbStatus.PendingDownload Or theRmb.Status = RmbStatus.DownloadFailed) Then Return
+
             Dim TaskList As New List(Of Task)
             If theRmb.Status = RmbStatus.Processing Then
                 'If the reimbursement has already been downloaded, a warning should be displayed - but hte reimbursement can be simply unprocessed
@@ -2019,6 +1992,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Sub
 
         Protected Async Sub GridView1_RowCommand(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.GridViewCommandEventArgs) Handles GridView1.RowCommand
+            Dim State As Integer = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.Status).First()
+            If (State = RmbStatus.Processing Or State = RmbStatus.PendingDownload Or State = RmbStatus.DownloadFailed Or State = RmbStatus.Paid Or State = RmbStatus.Cancelled) Then Return
+
             If e.CommandName = "myDelete" Then
                 ' d.AP_Staff_RmbLineAddStaffs.DeleteAllOnSubmit(From c In d.AP_Staff_RmbLineAddStaffs Where c.RmbLineId = CInt(e.CommandArgument))
                 d.AP_Staff_RmbLines.DeleteAllOnSubmit(From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(e.CommandArgument))

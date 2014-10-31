@@ -336,7 +336,7 @@
     <value>Reimbursement</value>
   </data>
   <data name="RmbApproved.Text" xml:space="preserve">
-    <value>Reimbursement #[RMBNO] has been approved!</value>
+    <value>Reimbursement #[RMBNO] is now approved.</value>
   </data>
   <data name="RmbsToApprove.Text" xml:space="preserve">
     <value>Reimbursements to approve:</value>
@@ -740,5 +740,14 @@
   </data>
   <data name="RejectorMessage.Text" xml:space="preserve">
     <value>An email has been sent to notify [STAFFNAME] that their reimbursement has been rejected.  Please ensure that the Approvers Comments section has been filled out with a clear description of the reason you have rejected their reimbursement, and what changes are required before re-submitting it.</value>
+  </data>
+  <data name="RmbApprovedDirector.Text" xml:space="preserve">
+    <value>Reimbursement #[RMBNO] has passed Director approval </value>
+  </data>
+  <data name="RmbApprovedEDMS.Text" xml:space="preserve">
+    <value>Reimbursement #[RMBNO] has passed EDMS approval</value>
+  </data>
+  <data name="UnauthorizedApprover.Text" xml:space="preserve">
+    <value>You are not authorized to approve this reimbursement</value>
   </data>
 </root>
