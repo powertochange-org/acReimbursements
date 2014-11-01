@@ -122,14 +122,23 @@
         $("span[id$='GridView1_lblRemainingBalance']:last").text(result);
     }
 
-    function updatePerDiemTotal() {
-        var total=0.00;
-        $('.perdiem').each(function() {
-            if ($(this).children(':checked').size()>0) {
-                total += Number($(this).attr('title'));
-            }
-        })
-        $('.PDAmount').text(total);
+    function updatePerDiem(control, enabled) {
+        control.attr('disabled', !enabled);
+        if (enabled) {
+            control.removeClass('aspNetDisabled');
+        } else {
+            control.addClass('aspNetDisabled');
+            control.text="0"
+        }
+        calculatePerDiemTotal();
+    }
+
+    function calculatePerDiemTotal() {
+        var total = 0;
+        if ($('.pdbreakfast').is(':enabled')) { total += parseFloat($('.pdbreakfast').val()) };
+        if ($('.pdlunch').is(':enabled')) { total += parseFloat($('.pdlunch').val()) };
+        if ($('.pdsupper').is(':enabled')) { total += parseFloat($('.pdsupper').val()) };
+        $('#tbAmount').text(total.toFixed(2));
     }
 
     function disableSubmitOnEnter(e)
@@ -1353,7 +1362,7 @@
                                                         <asp:Label ID="Label1" runat="server" CssClass='<%# IIF(IsWrongType(Eval("CostCenter"), Eval("LineType")), "ui-state-error ui-corner-all","") %>' ToolTip='<%# IIF(IsWrongType(Eval("CostCenter"), Eval("LineType")),Translate("lblWrongType"),"") %>' Text='<%# GetLocalTypeName(Eval("AP_Staff_RmbLineType.LineTypeId") ) & If(IsMileageType(Eval("LineType")), " " & GetMileageString(If(Eval("Mileage"), 0), If(Eval("Spare3"), "0")) ,"") %>'></asp:Label>
                                                         <asp:Panel runat="server">
                                                             <asp:Label ID="lblToFrom" runat="server" Font-Size="XX-Small" ForeColor="#AAAAAA" Font-Names="Courier" Visible=<%# If(TypeHasOriginAndDestination(Eval("LineType")),"True","False") %> Text=<%# If(Eval("Spare4") IsNot Nothing And Eval("Spare5") IsNot Nothing, Left(Eval("Spare4"),9) & " - " & Left(Eval("Spare5"),9),"") %>></asp:Label>
-                                                            <asp:Label ID="lblPerDiemMeals" runat="server" Font-Size="XX-Small" ForeColor="#AAAAAA" Font-Names="Courier" Visible=<%# If(isPerDiemType(Eval("LineType")),"True","False") %> Text=<%# If(Eval("Spare2") IsNot Nothing , Eval("Spare2"),"") %>></asp:Label>
+                                                            <asp:Label ID="lblPerDiemMeals" runat="server" Font-Size="XX-Small" ForeColor="#AAAAAA" Font-Names="Courier" Visible=<%# If(isPerDiemType(Eval("LineType")),"True","False") %> Text=<%# If(Eval("Spare5") IsNot Nothing , Eval("Spare5"),"") %>></asp:Label>
                                                         </asp:Panel>
                                                     </ItemTemplate>
                                                     <ItemStyle HorizontalAlign="Left" />

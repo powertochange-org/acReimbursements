@@ -79,14 +79,13 @@ Partial Class controls_RmbSubPD
         Get
             Dim result As Double
             Try
-                result = CDbl(tbAmount.Text)
+                result = If(cbBreakfast.Checked, CDbl(tbBreakfast.Text), 0) + If(cbLunch.Checked, CDbl(tbLunch.Text), 0) + If(cbSupper.Checked, CDbl(tbSupper.Text), 0)
             Catch
                 Return 0
             End Try
             Return result
         End Get
         Set(ByVal value As Double)
-            tbAmount.Text = value.ToString("n2")
         End Set
     End Property
     Public Property Spare1() As String
@@ -103,32 +102,73 @@ Partial Class controls_RmbSubPD
     End Property
     Public Property Spare2() As String
         Get
-            Dim result = If(cbBreakfast.Checked, Translate("lblBreakfast") & " ", "") & If(cbLunch.Checked, Translate("lblLunch") & " ", "") & If(cbSupper.Checked, Translate("lblSupper") & " ", "")
-            Return result
+            If cbBreakfast.Checked Then
+                Try
+                    Return CDbl(tbBreakfast.Text)
+                Catch ex As Exception
+                    Return 0
+                End Try
+            End If
+            Return 0
         End Get
         Set(ByVal value As String)
-            cbBreakfast.Checked = value.Contains(Translate("lblBreakfast") & " ")
-            cbLunch.Checked = value.Contains(Translate("lblLunch") & " ")
-            cbSupper.Checked = value.Contains(Translate("lblSupper") & " ")
+            Try
+                Dim amount = CDbl(value)
+                cbBreakfast.Checked = (amount > 0)
+                tbBreakfast.Text = amount
+            Catch ex As Exception
+                cbBreakfast.Checked = False
+                tbBreakfast.Text = "0"
+            End Try
         End Set
     End Property
     Public Property Spare3() As String
         Get
-            Return ""
+            If cbLunch.Checked Then
+                Try
+                    Return CDbl(tbLunch.Text)
+                Catch ex As Exception
+                    Return 0
+                End Try
+            End If
+            Return 0
         End Get
         Set(ByVal value As String)
+            Try
+                Dim amount = CDbl(value)
+                cbLunch.Checked = (amount > 0)
+                tbLunch.Text = amount
+            Catch ex As Exception
+                cbLunch.Checked = False
+                tbLunch.Text = "0"
+            End Try
         End Set
     End Property
     Public Property Spare4() As String
         Get
-            Return ""
+            If cbSupper.Checked Then
+                Try
+                    Return CDbl(tbSupper.Text)
+                Catch ex As Exception
+                    Return 0
+                End Try
+            End If
+            Return 0
         End Get
         Set(ByVal value As String)
+            Try
+                Dim amount = CDbl(value)
+                cbSupper.Checked = (amount > 0)
+                tbSupper.Text = amount
+            Catch ex As Exception
+                cbSupper.Checked = False
+                tbSupper.Text = "0"
+            End Try
         End Set
     End Property
     Public Property Spare5() As String
         Get
-            Return Nothing
+            Return If(cbBreakfast.Checked, "B)" + FormatNumber(tbBreakfast.Text, 2) + " ", "") & If(cbLunch.Checked, "L)" + FormatNumber(tbLunch.Text, 2) + " ", "") & If(cbSupper.Checked, "S)" + FormatNumber(tbSupper.Text, 2), "")
         End Get
         Set(ByVal value As String)
 
@@ -200,12 +240,11 @@ Partial Class controls_RmbSubPD
         End If
 
         Try
-            If CDbl(tbAmount.Text) = 0 Then
+            If (cbBreakfast.Checked And CDbl(tbBreakfast.Text) <= 0) Or (cbLunch.Checked And CDbl(tbLunch.Text) <= 0) Or (cbSupper.Checked And CDbl(tbSupper.Text) <= 0) Then
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Amount.Error", LocalResourceFile)
                 Return False
             End If
-            Dim maximum As Double = If(cbBreakfast.Checked, CDbl(hfBreakfast.Value), 0) + If(cbLunch.Checked, CDbl(hfLunch.Value), 0) + If(cbSupper.Checked, CDbl(hfSupper.Value), 0)
-            If (CDbl(tbAmount.Text) > maximum) Then
+            If (CDbl(tbBreakfast.Text) > CDbl(hfBreakfast.Value)) Or (CDbl(tbLunch.Text) > CDbl(hfLunch.Value)) Or (CDbl(tbSupper.Text) > CDbl(hfSupper.Value)) Then
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("MaxAmount.Error", LocalResourceFile)
                 Return False
             End If
@@ -235,25 +274,44 @@ Partial Class controls_RmbSubPD
         'Things that need to be done to the control after REloading
         Try
             hfBreakfast.Value = CDbl(Settings("PDBreakfast"))
-            cbBreakfast.Attributes.Add("title", Settings("PDBreakfast")) 'Store value in title attribute, for javascript to access
+
+            '            cbBreakfast.Attributes.Add("title", Settings("PDBreakfast")) 'Store value in title attribute, for javascript to access
             hfLunch.Value = CDbl(Settings("PDLunch"))
-            cbLunch.Attributes.Add("title", Settings("PDLunch"))
+            '            cbLunch.Attributes.Add("title", Settings("PDLunch"))
             hfSupper.Value = CDbl(Settings("PDSupper"))
-            cbSupper.Attributes.Add("title", Settings("PDSupper"))
+            '           cbSupper.Attributes.Add("title", Settings("PDSupper"))
         Catch
             hfBreakfast.Value = -1
             hfLunch.Value = -1
             hfSupper.Value = -1
         End Try
+        tbBreakfast.Enabled = cbBreakfast.Checked
+        tbLunch.Enabled = cbLunch.Checked
+        tbSupper.Enabled = cbSupper.Checked
         tbDesc.Attributes.Add("placeholder", DotNetNuke.Services.Localization.Localization.GetString("DescriptionHint.Text", "/DesktopModules/AgapeConnect/StaffRmb/App_LocalResources/StaffRmb.ascx.resx"))
         tbRepeat.Visible = False
         lblRepeat.Visible = False
-        ScriptManager.RegisterClientScriptBlock(tbAmount, GetType(CheckBox), "calculate", "updatePerDiemTotal();", True)
+        ScriptManager.RegisterClientScriptBlock(cbBreakfast, GetType(CheckBox), "calculate", "updatePerDiem($('.pdbreakfast'),$('.pdbreakfast').is(':enabled'));", True)
     End Sub
 
     Public Sub Initialize(ByVal Settings As Hashtable)
         SetupView(Settings)
         tbRepeat.Text = "1"
+        Try
+            If (tbBreakfast.Text = 0) Then tbBreakfast.Text = FormatNumber(CDbl(Settings("PDBreakfast")), 2)
+        Catch
+            tbBreakfast.Text = "0.00"
+        End Try
+        Try
+            If (tbLunch.Text = 0) Then tbLunch.Text = FormatNumber(CDbl(Settings("PDLunch")), 2)
+        Catch
+            tbLunch.Text = "0.00"
+        End Try
+        Try
+            If (tbSupper.Text = 0) Then tbSupper.Text = FormatNumber(CDbl(Settings("PDSupper")), 2)
+        Catch
+            tbSupper.Text = "0.00"
+        End Try
     End Sub
 
 

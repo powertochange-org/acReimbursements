@@ -11,14 +11,13 @@
     <asp:HiddenField ID="hfSupper" runat="server" />
     <asp:Label ID="Label3" runat="server" Font-Italic="true" ForeColor="Gray" CssClass="explanation" resourcekey="Explanation"></asp:Label>
 </div><br />
-
 <table   style="font-size:9pt; ">
     <tr>
         <td><b><dnn:Label runat="server" ControlName="tbDesc" ResourceKey="lblDesc" /></b></td>
         <td colspan="2"><asp:TextBox ID="tbDesc" runat="server" /></td>
     </tr>
     <tr>
-         <td><b><dnn:label id="Label1"  runat="server" controlname="dtDate" ResourceKey="lblDate"  /></b></td>
+            <td><b><dnn:label id="Label1"  runat="server" controlname="dtDate" ResourceKey="lblDate"  /></b></td>
         <td  colspan="2">
             <asp:TextBox ID="dtDate" runat="server" Width="90px" class="datepicker" onChange="check_expense_date();"></asp:TextBox>
             <span id="olddatetext"></span>       
@@ -28,27 +27,45 @@
     <tr>
         <td><b><dnn:Label runat="server" ControlName="phMeals" ResourceKey="lblMeals" /></b></td>
         <td colspan="2">
-            <div>
-                <asp:CheckBox ID="cbBreakfast" runat="server" CssClass="perdiem" OnClick="updatePerDiemTotal();"/>
-                <b><%=Translate("lblBreakfast")%></b> (max: <%= FormatCurrency(hfBreakfast.Value)%>)
-            </div>
-            <div>
-                <asp:CheckBox ID="cbLunch" runat="server" CssClass="perdiem"  OnClick="updatePerDiemTotal();"/>
-                <b><%=Translate("lblLunch")%></b> (max: <%= FormatCurrency(hfLunch.Value)%>)
-            </div>
-            <div>
-                <asp:CheckBox ID="cbSupper" runat="server" CssClass="perdiem"  OnClick="updatePerDiemTotal();"/>
-                <b><%=Translate("lblSupper")%></b> (max: <%= FormatCurrency(hfSupper.Value)%>)
-            </div>
+            <table style="font-size:9pt">
+                <tr>
+                    <td>
+                        <asp:CheckBox ID="cbBreakfast" runat="server" CssClass="perdiem" OnClick="updatePerDiem($('.pdbreakfast'),$(this).is(':checked'));"/>
+                        <b><%=Translate("lblBreakfast")%></b> 
+                    </td>
+                    <td>
+                        <asp:TextBox ID="tbBreakfast" runat="server" CssClass="number pdbreakfast" Width="50" Enabled="false" OnKeyup="calculatePerDiemTotal();" />
+                        (max: <%= FormatCurrency(hfBreakfast.Value)%>)
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <asp:CheckBox ID="cbLunch" runat="server" CssClass="perdiem"  OnClick="updatePerDiem($('.pdlunch'),$(this).is(':checked'));"/>
+                        <b><%=Translate("lblLunch")%></b>
+                    </td>
+                    <td>
+                        <asp:TextBox ID="tbLunch" runat="server" CssClass="number pdlunch" Width="50" enabled="false" OnKeyup="calculatePerDiemTotal();"/>
+                            (max: <%= FormatCurrency(hfLunch.Value)%>)
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <asp:CheckBox ID="cbSupper" runat="server" CssClass="perdiem"  OnClick="updatePerDiem($('.pdsupper'),$(this).is(':checked'));"/>
+                        <b><%=Translate("lblSupper")%></b>
+                    </td>
+                    <td>
+                        <asp:TextBox ID="tbSupper" runat="server" CssClass="number pdsupper" Width="50" enabled="false" OnKeyup="calculatePerDiemTotal();"/>
+                            (max: <%= FormatCurrency(hfSupper.Value)%>)
+                    </td>
+                </tr>
+            </table>
         </td>
     </tr>
     <tr>
+        <td></td>
         <td>
-            <b><dnn:label id="lbl"  runat="server" controlname="tbAmount" ResourceKey="lblTotal" /></b>
-            
-         </td>
-        <td colspan="2">
-            <asp:TextBox id="tbAmount" runat="server" Width="90px" /> (max: $<span class="PDAmount"></span>)
+            <b><dnn:label id="lbl"  runat="server"  ResourceKey="lblTotal" />:</b>
+            $<span id="tbAmount">0.00</span>
         </td>
     </tr>
     <tr>
