@@ -1361,8 +1361,8 @@
                                                     <ItemTemplate>
                                                         <asp:Label ID="Label1" runat="server" CssClass='<%# IIF(IsWrongType(Eval("CostCenter"), Eval("LineType")), "ui-state-error ui-corner-all","") %>' ToolTip='<%# IIF(IsWrongType(Eval("CostCenter"), Eval("LineType")),Translate("lblWrongType"),"") %>' Text='<%# GetLocalTypeName(Eval("AP_Staff_RmbLineType.LineTypeId") ) & If(IsMileageType(Eval("LineType")), " " & GetMileageString(If(Eval("Mileage"), 0), If(Eval("Spare3"), "0")) ,"") %>'></asp:Label>
                                                         <asp:Panel runat="server">
-                                                            <asp:Label ID="lblToFrom" runat="server" Font-Size="XX-Small" ForeColor="#AAAAAA" Font-Names="Courier" Visible=<%# If(TypeHasOriginAndDestination(Eval("LineType")),"True","False") %> Text=<%# If(Eval("Spare4") IsNot Nothing And Eval("Spare5") IsNot Nothing, Left(Eval("Spare4"),9) & " - " & Left(Eval("Spare5"),9),"") %>></asp:Label>
-                                                            <asp:Label ID="lblPerDiemMeals" runat="server" Font-Size="XX-Small" ForeColor="#AAAAAA" Font-Names="Courier" Visible=<%# If(isPerDiemType(Eval("LineType")),"True","False") %> Text=<%# If(Eval("Spare5") IsNot Nothing , Eval("Spare5"),"") %>></asp:Label>
+                                                            <asp:Label ID="lblToFrom" runat="server" CssClass=<%# "second_line " & if(IsAccounts(),"finance","") %>  Visible=<%# If(TypeHasOriginAndDestination(Eval("LineType")),"True","False") %> Text=<%# If(Eval("Spare4") IsNot Nothing And Eval("Spare5") IsNot Nothing, Left(Eval("Spare4"),9) & " - " & Left(Eval("Spare5"),9),"") %>></asp:Label>
+                                                            <asp:Label ID="lblPerDiemMeals" runat="server" CssClass=<%# "second_line " & if(IsAccounts(),"finance","") %> Visible=<%# If(isPerDiemType(Eval("LineType")),"True","False") and IsAccounts() %> Text=<%# If(Eval("Spare5") IsNot Nothing , Eval("Spare5"),"") %>></asp:Label>
                                                         </asp:Panel>
                                                     </ItemTemplate>
                                                     <ItemStyle HorizontalAlign="Left" />
@@ -1374,14 +1374,14 @@
                                                     <ItemTemplate>
                                                         <asp:Label ID="lblComment" runat="server" Text='<%#  Eval("Comment") & getSupplier(Eval("Supplier")) %>'></asp:Label>
                                                         <asp:Panel ID="pnlRemBal1" runat="server" Visible='<%# CanEdit(Eval("AP_Staff_Rmb.Status")) and IsAccounts()  %>'>
-                                                            <asp:Label ID="lblTrimmedComment" runat="server" Font-Size="X-Small" ForeColor="#AAAAAA" Font-Names="Courier" Text='<%# GetLineComment(Eval("Comment"), Eval("OrigCurrency"), Eval("OrigCurrencyAmount"), Eval("ShortComment"))%>'></asp:Label>
+                                                            <asp:Label ID="lblTrimmedComment" runat="server" CssClass=<%# "second_line " & if(IsAccounts(),"finance","") %> Text='<%# GetLineComment(Eval("Comment"), Eval("OrigCurrency"), Eval("OrigCurrencyAmount"), Eval("ShortComment"))%>'></asp:Label>
                                                         </asp:Panel>
 
                                                     </ItemTemplate>
                                                     <FooterTemplate>
                                                         <asp:Label ID="lblTotalAmount" runat="server" Font-Bold="True" Text="Total:"></asp:Label>
                                                         <asp:Panel ID="pnlRemBal1" runat="server" Visible='<%# Settings("ShowRemBal") = "True" %>'>
-                                                            <asp:Label ID="lblRemainingBalance" runat="server" Font-Size="XX-Small" ForeColor="#AAAAAA" Font-Italic="true" Text="Estimated Remaining Balance:"></asp:Label>
+                                                            <asp:Label ID="lblRemainingBalance" runat="server" CssClass=<%# "second_line " & if(IsAccounts(),"finance","") %> Font-Italic="true" Text="Estimated Remaining Balance:"></asp:Label>
                                                         </asp:Panel>
                                                     </FooterTemplate>
                                                     <ItemStyle HorizontalAlign="Left" />
@@ -1395,8 +1395,8 @@
                                                         <asp:Label ID="lblAmount" runat="server" CssClass='<%# IIF(Eval("LargeTransaction"), "ui-state-highlight ui-corner-all","") %>' ToolTip='<%# IIF(Eval("LargeTransaction"),Translate("LargeTransaction"),"") %>' Text='<%#  Eval("GrossAmount", "{0:F2}") & IIF(Eval("Taxable")=True, "*", "") %>'></asp:Label>
 
                                                         <asp:Panel ID="pnlCur" runat="server" Visible='<%# Not String.IsNullOrEmpty(Eval("OrigCurrency")) And Eval("OrigCurrency") <> StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)%>'>
-                                                            <asp:Label ID="lblCur" runat="server" Font-Size="XX-Small" ForeColor="#AAAAAA" Text='<%# Eval("OrigCurrency") & Eval("OrigCurrencyAmount", "{0:F2}")%>' 
-                                                                CssClass='<%# IF(Eval("ExchangeRate") isNot Nothing, If(differentExchangeRate(Eval("ExchangeRate"), Eval("OrigCurrencyAmount")/Eval("GrossAmount")), "highlight",""),"") %>' 
+                                                            <asp:Label ID="lblCur" runat="server" Text='<%# Eval("OrigCurrency") & Eval("OrigCurrencyAmount", "{0:F2}")%>' 
+                                                                CssClass='<%# "second_line " & if(IsAccounts(),"finance","") & IF(Eval("ExchangeRate") isNot Nothing, If(differentExchangeRate(Eval("ExchangeRate"), Eval("OrigCurrencyAmount")/Eval("GrossAmount")), "highlight",""),"") %>' 
                                                                 ToolTip='<%# If(Eval("ExchangeRate") isNot Nothing, If(differentExchangeRate(Eval("ExchangeRate"), Eval("OrigCurrencyAmount")/Eval("GrossAmount")), Translate("DifferentExchangeRate"), ""),"")%>'></asp:Label>
                                                         </asp:Panel>
                                                     </ItemTemplate>
