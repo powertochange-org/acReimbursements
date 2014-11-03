@@ -176,14 +176,19 @@ public class WebService : System.Web.Services.WebService {
         }
 
         public Item Needs(string match)
+        // Returns item if it exists, otherwise creates it (in alphabetical order) and returns it
         {
-            foreach (Item item in children)
+            int position=-1;
+            Item item;
+            for (int index=0; index<children.Count; index++)
             {
+                item = children.ElementAt(index);
                 if (item.label.Equals(match)) return item;
+                if (String.Compare(item.label, match, true) < 0) position = index;
             }
-            Item newItem = new Item(match);
-            children.Add(newItem);
-            return newItem;
+            item = new Item(match);
+            children.Insert(position+1, item); //insert after the last item that preceeds it
+            return item;
         }
     }
 
