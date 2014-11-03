@@ -642,19 +642,27 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim AllApproved = (From c In d.AP_Staff_Rmbs
                                    Where (c.Status = RmbStatus.Approved Or c.Status >= RmbStatus.PendingDownload) And c.PortalId = PortalId
                                    Order By c.ApprDate Ascending
-                                   Select c.RMBNo, c.RmbDate, c.ApprDate, c.UserRef, c.RID, c.UserId, c.Status, c.SpareField1, _
+                                   Select c.RMBNo, c.CostCenter, c.RmbDate, c.ApprDate, c.UserRef, c.RID, c.UserId, c.Status, c.SpareField1, _
                                        Receipts = ((c.AP_Staff_RmbLines.Where(Function(x) x.Receipt And (x.ReceiptImageId Is Nothing))).Count > 0))
                 Dim total = AllApproved.Count
 
-                Dim receiptsTask = buildRmbTreeAsync(Translate("Receipts"), finance_node, From c In AllApproved Where c.Status = RmbStatus.Approved And c.Receipts)
-                Dim no_receiptsTask = buildRmbTreeAsync(Translate("NoReceipts"), finance_node, From c In AllApproved Where c.Status = RmbStatus.Approved And Not c.Receipts)
+                ' NOTE: GAiN cost centers all start with '69' by convention
+                Dim PTCreceiptsTask = buildRmbTreeAsync(Translate("PTCReceipts"), finance_node, From c In AllApproved Where c.Status = RmbStatus.Approved And c.Receipts And Not c.CostCenter.StartsWith("69"))
+                Dim PTCno_receiptsTask = buildRmbTreeAsync(Translate("PTCNoReceipts"), finance_node, From c In AllApproved Where c.Status = RmbStatus.Approved And Not c.Receipts And Not c.CostCenter.StartsWith("69"))
+                Dim GAiNreceiptsTask = buildRmbTreeAsync(Translate("GAiNReceipts"), finance_node, From c In AllApproved Where c.Status = RmbStatus.Approved And c.Receipts And c.CostCenter.StartsWith("69"))
+                Dim GAiNno_receiptsTask = buildRmbTreeAsync(Translate("GAiNNoReceipts"), finance_node, From c In AllApproved Where c.Status = RmbStatus.Approved And Not c.Receipts And c.CostCenter.StartsWith("69"))
                 Dim pendingImportTask = buildRmbTreeAsync(Translate("PendingImport"), finance_node, From c In AllApproved Where c.Status >= RmbStatus.PendingDownload)
 
-                Dim no_receipts_node = Await no_receiptsTask
+                Dim PTCreceipts_node = Await PTCreceiptsTask
+                Dim PTCno_receipts_node = Await PTCno_receiptsTask
+                Dim GAiNreceipts_node = Await GAiNreceiptsTask
+                Dim GAiNno_receipts_node = Await GAiNno_receiptsTask
                 Dim pending_import_node = Await pendingImportTask
 
-                finance_node.ChildNodes.Add(Await receiptsTask)
-                finance_node.ChildNodes.Add(no_receipts_node)
+                finance_node.ChildNodes.Add(PTCreceipts_node)
+                finance_node.ChildNodes.Add(PTCno_receipts_node)
+                finance_node.ChildNodes.Add(GAiNreceipts_node)
+                finance_node.ChildNodes.Add(GAiNno_receipts_node)
                 finance_node.ChildNodes.Add(pending_import_node)
 
                 tvFinance.Nodes.Clear()

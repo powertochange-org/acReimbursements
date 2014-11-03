@@ -282,8 +282,8 @@
   <data name="NoPostReceipts.Text" xml:space="preserve">
     <value>There are no receipts required, so you do not need to send anything to the office. The attached form is for your reference only.</value>
   </data>
-  <data name="NoReceipts.Text" xml:space="preserve">
-    <value>No Receipts:</value>
+  <data name="PTCNoReceipts.Text" xml:space="preserve">
+    <value>No Receipts (PTC):</value>
   </data>
   <data name="OriginalTrans.Text" xml:space="preserve">
     <value>Original Transaction</value>
@@ -323,8 +323,8 @@
   <data name="ReceiptNo.Text" xml:space="preserve">
     <value>Receipt</value>
   </data>
-  <data name="Receipts.Text" xml:space="preserve">
-    <value>Receipts:</value>
+  <data name="PTCReceipts.Text" xml:space="preserve">
+    <value>Receipts (PTC):</value>
   </data>
   <data name="RecoverVAT.Text" xml:space="preserve">
     <value>Recover VAT?</value>
@@ -749,5 +749,11 @@
   </data>
   <data name="UnauthorizedApprover.Text" xml:space="preserve">
     <value>You are not authorized to approve this reimbursement</value>
+  </data>
+  <data name="GAiNNoReceipts.Text" xml:space="preserve">
+    <value>No Receipts (GAiN):</value>
+  </data>
+  <data name="GAiNReceipts.Text" xml:space="preserve">
+    <value>Receipts (GAiN):</value>
   </data>
 </root>
