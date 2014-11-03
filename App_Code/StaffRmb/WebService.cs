@@ -128,11 +128,11 @@ public class WebService : System.Web.Services.WebService {
                "<tr><td style='border:0;'>" + ABSENCE_TRACKER + "</td>" +
                "<td style='border:0;'>" + REPORTS + "</td>" +
                "<td style='border:0;'>" + STAFF_DIRECTORY + "</td>" +
-               //"<td style='border:0;'>" + REIMBURSEMENTS + "</td>" +
+               "<td style='border:0;'>" + REIMBURSEMENTS + "</td>" +
                "</tr><tr>" +
                "<td style='border:0;'>" + HELPDESK + "</td>" +
                "<td style='border:0;'>" + WIKI + "</td>" +
-               //"<td style='border:0;'></td>" +
+               "<td style='border:0;'></td>" +
                "<td style='border:0;'>" + SETTINGS + "</td>" +
                "</tr></tbody></table></ul></center></div>" +
                 STYLE + SCRIPT + "</div>";
