@@ -214,6 +214,12 @@ namespace StaffRmb
             return result;
         }
 
+        static private int[] combineArrays(int[] a1, int[] a2)
+        {
+            int[] result = a1.Concat(a2).Distinct().ToArray();
+            return result;
+        }
+
         static public string logonFromId(int portalId, int userId)
         {
             if (userId < 0) return "";
@@ -246,6 +252,24 @@ namespace StaffRmb
                 result = "[\"ERR\"]"; //this will not produce a visible error, just an empty dropdown
             }
             return JsonConvert.DeserializeObject<string[]>(result);
+        }
+
+        static public async Task<int[]> getSupervisors(int id, int levels, int presidentId)
+        // Returns the <levels># of upline supervisors ids for a staff member
+        {
+            if (id == 0 || levels == 0) return new int[0];
+            if (id == presidentId) return new int[1] { presidentId };
+            StaffBroker.StaffBrokerDataContext d = new StaffBroker.StaffBrokerDataContext();
+            int leaderId = (from l in d.AP_StaffBroker_LeaderMetas where l.UserId == id select l.LeaderId).Single();
+            int[] result = combineArrays(new int[1] { leaderId }, await getSupervisors(leaderId, (levels - 1), presidentId));
+            return result;
+        }
+
+        static public async Task<int[]> ELT(int presidentId)
+        // Returns a list of the members of the ELT (IDs)
+        {
+            StaffBroker.StaffBrokerDataContext d = new StaffBroker.StaffBrokerDataContext();
+            return (from l in d.AP_StaffBroker_LeaderMetas where l.LeaderId == presidentId select l.UserId).ToArray<int>();
         }
 
         static private async Task<string[]> staffWithSigningAuthorityAsync(string account, Decimal amount)

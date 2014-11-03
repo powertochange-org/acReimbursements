@@ -917,7 +917,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     '*** REIMBURSEMENT DETAILS ***
 
-                    pnlTaxable.Visible = (From c In Rmb.AP_Staff_RmbLines Where c.Taxable = True).Count > 0
+                    pnlTaxable.Visible = isFinance And (From c In Rmb.AP_Staff_RmbLines Where c.Taxable = True).Count > 0
 
                     '--grid
                     GridView1.DataSource = (From c In Rmb.AP_Staff_RmbLines Order By c.RmbLineNo)

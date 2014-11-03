@@ -524,6 +524,16 @@
                         </asp:DropDownList>
                     </td>
                 </tr>
+                <tr>
+                    <td>
+                        <b>
+                            <dnn:Label ID="lblPresident" runat="server" ControlName="ddlPresident" ResourceKey="lblPresident" />
+                        </b>
+                    </td>
+                    <td>
+                        <asp:DropDownList ID="ddlPresident" runat="server" />
+                    </td>
+                </tr>
             </table>
         </div>
         <div id='Tab4-tab'>

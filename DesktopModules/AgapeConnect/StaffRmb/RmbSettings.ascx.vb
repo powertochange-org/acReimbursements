@@ -26,12 +26,14 @@ Namespace DotNetNuke.Modules.StaffRmb
                     ddlAuthUser.Items.Clear()
                     ddlAuthAuthUser.Items.Clear()
                     ddlEDMS.Items.Clear()
+                    ddlPresident.Items.Clear()
                     ' Get the user list: it should only get active users that are in the staff table
                     Dim userList = (From u In d.Users Where (From p In d.UserPortals Select p.PortalId).Contains(PortalId) And ((From s In d.AP_StaffBroker_Staffs where s.Active Select s.UserId1).Contains(u.UserID) Or (From s In d.AP_StaffBroker_Staffs where s.Active Select s.UserId2).Contains(u.UserID)) Order By u.LastName, u.FirstName)
                     ' Iterate through our new list
                     For Each user In userList
                         ' Add each one as LASTNAME, FIRSTNAME, with the UserID as the value. To avoid conflicts, each list has to have a new ListItem
                         ddlEDMS.Items.Add(New ListItem(user.LastName & ", " & user.FirstName, user.UserID))
+                        ddlPresident.Items.Add(New ListItem(user.LastName & ", " & user.FirstName, user.UserID))
                         ddlAuthUser.Items.Add(New ListItem(user.LastName & ", " & user.FirstName, user.UserID))
                         ddlAuthAuthUser.Items.Add(New ListItem(user.LastName & ", " & user.FirstName, user.UserID))
                     Next
@@ -43,6 +45,9 @@ Namespace DotNetNuke.Modules.StaffRmb
                     End If
                     If CType(TabModuleSettings("EDMSId"), String) <> "" Then
                         ddlEDMS.SelectedValue = CType(TabModuleSettings("EDMSId"), Integer)
+                    End If
+                    If CType(TabModuleSettings("PresidentId"), String) <> "" Then
+                        ddlPresident.SelectedValue = CType(TabModuleSettings("PresidentId"), Integer)
                     End If
 
                     If CType(TabModuleSettings("MenuSize"), String) <> "" Then
@@ -353,6 +358,7 @@ Namespace DotNetNuke.Modules.StaffRmb
             objModules.UpdateTabModuleSetting(TabModuleId, "AuthUser", ddlAuthUser.SelectedValue)
             objModules.UpdateTabModuleSetting(TabModuleId, "AuthAuthUser", ddlAuthAuthUser.SelectedValue)
             objModules.UpdateTabModuleSetting(TabModuleId, "EDMSId", ddlEDMS.SelectedValue)
+            objModules.UpdateTabModuleSetting(TabModuleId, "PresidentId", ddlPresident.SelectedValue)
 
             objModules.UpdateTabModuleSetting(TabModuleId, "PDBreakfast", SetIfNumber(tbBreakfast.Text))
             objModules.UpdateTabModuleSetting(TabModuleId, "PDLunch", SetIfNumber(tbLunch.Text))
