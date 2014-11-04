@@ -143,8 +143,9 @@ namespace StaffRmb
             return "--";
         }
 
-        static public async Task<Approvers> getApproversAsync(AP_Staff_Rmb rmb, int presidentId)
+        static public async Task<Approvers> getApproversAsync(AP_Staff_Rmb rmb)
         {
+            int presidentId = getPresidentId();
             String staff_logon = logonFromId(rmb.PortalId, rmb.UserId);
             String spouse_logon = logonFromId(rmb.PortalId, StaffBrokerFunctions.GetSpouseId(rmb.UserId));
             int levels = 2; //the number of supervisor upline to include
@@ -179,7 +180,7 @@ namespace StaffRmb
                 }
                 foreach (int uid in combineArrays(userSupervisors, spouseSupervisors))
                 {
-                    //exclude user and spouse and president
+                    //exclude user and spouse 
                     if (!((uid == rmb.UserId) || (uid == StaffBrokerFunctions.GetSpouseId(rmb.UserId)) ))
                     {
                         result.UserIds.Add(UserController.GetUserById(rmb.PortalId, uid));
@@ -298,8 +299,8 @@ namespace StaffRmb
             int presidentId = getPresidentId();
             StaffBroker.StaffBrokerDataContext d = new StaffBroker.StaffBrokerDataContext();
             IQueryable<StaffBroker.AP_StaffBroker_LeaderMeta>  users = d.AP_StaffBroker_LeaderMetas.Where(a => a.LeaderId == presidentId && (d.AP_StaffBroker_LeaderMetas.Where(b => b.LeaderId == a.UserId).Count()>0));
-            int[] result = users.Select(a => a.UserId).ToArray<int>();
-            result = combineArrays(result, new int[1] { presidentId });
+            int[] memberids = users.Select(a => a.UserId).ToArray<int>();
+            int[] result = combineArrays(memberids, new int[1] { presidentId });
             return result;
         }
 

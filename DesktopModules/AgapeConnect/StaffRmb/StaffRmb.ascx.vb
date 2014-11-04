@@ -972,9 +972,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Private Async Function updateApproversListAsync(ByVal obj As Object) As Task
             Dim approvers As StaffRmbFunctions.Approvers
-            Dim president As Integer = Settings("PresidentId")
             Dim approverId = -1
-            approvers = Await StaffRmbFunctions.getApproversAsync(obj, president)
+            approvers = Await StaffRmbFunctions.getApproversAsync(obj)
             approverId = obj.ApprUserId
 
             ddlApprovedBy.Items.Clear()
