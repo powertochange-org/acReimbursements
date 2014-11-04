@@ -108,6 +108,7 @@ namespace StaffRmb
         private static EventLogController eventLog = new EventLogController();
         private static DotNetNuke.Entities.Portals.PortalSettings portalSettings = new DotNetNuke.Framework.UserControlBase().PortalSettings;
         private static int userId = new DotNetNuke.Entities.Modules.PortalModuleBase().UserId;
+        private static int PRESIDENTID = -1;
 
 
         public StaffRmbFunctions()
@@ -142,10 +143,11 @@ namespace StaffRmb
             return "--";
         }
 
-        static public async Task<Approvers> getApproversAsync(AP_Staff_Rmb rmb, DotNetNuke.Entities.Users.UserInfo authUser, DotNetNuke.Entities.Users.UserInfo authAuthUser)
+        static public async Task<Approvers> getApproversAsync(AP_Staff_Rmb rmb, int presidentId)
         {
             String staff_logon = logonFromId(rmb.PortalId, rmb.UserId);
             String spouse_logon = logonFromId(rmb.PortalId, StaffBrokerFunctions.GetSpouseId(rmb.UserId));
+            int levels = 2; //the number of supervisor upline to include
             // initialize the response
             Approvers result = new Approvers();
             result.CCMSpecial = false;
@@ -159,26 +161,49 @@ namespace StaffRmb
             string[] potential_approvers = null;
             if (isStaffAccount(rmb.CostCenter))
             {
-                Task<String[]> getStaffManagersTask = managersInDepartmentAsync(staff_logon);
-                Task<String[]> getSpouseManagersTask = managersInDepartmentAsync(spouse_logon);
-                potential_approvers = combineArrays(await getStaffManagersTask, await getSpouseManagersTask);
+                //Task<String[]> getStaffManagersTask = managersInDepartmentAsync(staff_logon);
+                //Task<String[]> getSpouseManagersTask = managersInDepartmentAsync(spouse_logon);
+                //potential_approvers = combineArrays(await getStaffManagersTask, await getSpouseManagersTask);
+                Task<int[]>  userSupervisorsTask = getSupervisors(rmb.UserId, levels);
+                Task<int[]> spouseSupervisorsTask = getSupervisors(StaffBrokerFunctions.GetSpouseId(rmb.UserId), levels);
+                Task<int[]> getELTTask = ELT();
+                int[] userSupervisors = await userSupervisorsTask;
+                if (userSupervisors.Contains(presidentId))
+                {
+                    userSupervisors = combineArrays(userSupervisors, await getELTTask);
+                }
+                int[] spouseSupervisors = await spouseSupervisorsTask;
+                if (spouseSupervisors.Contains(presidentId))
+                {
+                    spouseSupervisors = combineArrays(spouseSupervisors, await getELTTask);
+                }
+                foreach (int uid in combineArrays(userSupervisors, spouseSupervisors))
+                {
+                    //exclude user and spouse and president
+                    if (!((uid == rmb.UserId) || (uid == StaffBrokerFunctions.GetSpouseId(rmb.UserId)) ))
+                    {
+                        result.UserIds.Add(UserController.GetUserById(rmb.PortalId, uid));
+                    }
+                }
             }
             else //ministry account
             {
                 result.isDept = true;
                 Decimal amount = (from line in rmb.AP_Staff_RmbLines select line.GrossAmount).Sum();
                 potential_approvers = await staffWithSigningAuthorityAsync(rmb.CostCenter, amount);
-            }
-
-            foreach (String potential_approver in potential_approvers) {
-                if (! (potential_approver.Equals(staff_logon) || potential_approver.Equals(spouse_logon))) { //exclude rmb creator and spouse
-                    UserInfo user = UserController.GetUserByName(rmb.PortalId, potential_approver + rmb.PortalId.ToString());
-                    if (user != null)
-                    {
-                        result.UserIds.Add(user);
+                foreach (String potential_approver in potential_approvers)
+                {
+                    if (!(potential_approver.Equals(staff_logon) || potential_approver.Equals(spouse_logon)))
+                    { //exclude rmb creator and spouse
+                        UserInfo user = UserController.GetUserByName(rmb.PortalId, potential_approver + rmb.PortalId.ToString());
+                        if (user != null)
+                        {
+                            result.UserIds.Add(user);
+                        }
                     }
                 }
             }
+
             return result;
         }
 
@@ -254,22 +279,50 @@ namespace StaffRmb
             return JsonConvert.DeserializeObject<string[]>(result);
         }
 
-        static public async Task<int[]> getSupervisors(int id, int levels, int presidentId)
+        static public async Task<int[]> getSupervisors(int id, int levels)
         // Returns the <levels># of upline supervisors ids for a staff member
         {
-            if (id == 0 || levels == 0) return new int[0];
+            if (id < 0 || levels == 0) return new int[0];
+            int presidentId = getPresidentId();
             if (id == presidentId) return new int[1] { presidentId };
             StaffBroker.StaffBrokerDataContext d = new StaffBroker.StaffBrokerDataContext();
             int leaderId = (from l in d.AP_StaffBroker_LeaderMetas where l.UserId == id select l.LeaderId).Single();
-            int[] result = combineArrays(new int[1] { leaderId }, await getSupervisors(leaderId, (levels - 1), presidentId));
+            int[] result = combineArrays(new int[1] { leaderId }, await getSupervisors(leaderId, (levels - 1)));
             return result;
         }
 
-        static public async Task<int[]> ELT(int presidentId)
-        // Returns a list of the members of the ELT (IDs)
+        static public async Task<int[]> ELT()
+        // Returns a list of the members of the ELT (IDs), which are those who report directly to the president, and have themselves, people reporting to them
+        // It also includes the president himself
+        {
+            int presidentId = getPresidentId();
+            StaffBroker.StaffBrokerDataContext d = new StaffBroker.StaffBrokerDataContext();
+            IQueryable<StaffBroker.AP_StaffBroker_LeaderMeta>  users = d.AP_StaffBroker_LeaderMetas.Where(a => a.LeaderId == presidentId && (d.AP_StaffBroker_LeaderMetas.Where(b => b.LeaderId == a.UserId).Count()>0));
+            int[] result = users.Select(a => a.UserId).ToArray<int>();
+            result = combineArrays(result, new int[1] { presidentId });
+            return result;
+        }
+
+        static public int getPresidentId()
+        {
+            if (PRESIDENTID >= 0) return PRESIDENTID;
+            PRESIDENTID = discoverPresidentId();
+            return PRESIDENTID;
+        }
+
+        static public void setPresidentId(int presidentId)
+        {
+            PRESIDENTID = presidentId;
+        }
+
+        static public int discoverPresidentId()
+        // Determines the most likely person to be president based on supervisor information
         {
             StaffBroker.StaffBrokerDataContext d = new StaffBroker.StaffBrokerDataContext();
-            return (from l in d.AP_StaffBroker_LeaderMetas where l.LeaderId == presidentId select l.UserId).ToArray<int>();
+            // candidates are anybody who is a leader of others, but has no leader themselves
+            var candidates = d.AP_StaffBroker_LeaderMetas.Where(a => (d.AP_StaffBroker_LeaderMetas.Where(b => a.LeaderId == b.UserId).Count() == 0)).GroupBy(c => c.LeaderId)
+                .Select(s => new {id = s.Key, count= s.Count()}).OrderByDescending(o => o.count);
+            return candidates.First().id;
         }
 
         static private async Task<string[]> staffWithSigningAuthorityAsync(string account, Decimal amount)

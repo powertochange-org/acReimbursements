@@ -93,7 +93,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
         folderPermissions.Add(permission, True)
 
         ' Get all the possible approvers for this reimbursement
-        For Each approver In (Await StaffRmbFunctions.getApproversAsync(theRmb, Nothing, Nothing)).UserIds
+        For Each approver In (Await StaffRmbFunctions.getApproversAsync(theRmb, Nothing)).UserIds
             ' Create a new permission for this approver
             permission = New Permissions.FolderPermissionInfo()
             ' Initialize all the variables
@@ -103,7 +103,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
             ' Add permission for approver
             folderPermissions.Add(permission, True)
         Next
-        
+
         ' Get the supervisors for this staff member
         Await StaffRmbFunctions.managersInDepartmentAsync(StaffRmbFunctions.logonFromId(PortalId, theUserId))
         For Each leaderId In (StaffBrokerFunctions.GetLeaders(theUserId, False))

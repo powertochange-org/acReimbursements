@@ -61,6 +61,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 insert.Cells.Add(insertAmt)
                 tblSplit.Rows.Add(insert)
             Next
+            StaffRmbFunctions.setPresidentId(CInt(Settings("PresidentId")))
         End Sub
 
         Private Async Sub Page_Init(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Me.Init
@@ -971,8 +972,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Private Async Function updateApproversListAsync(ByVal obj As Object) As Task
             Dim approvers As StaffRmbFunctions.Approvers
+            Dim president As Integer = Settings("PresidentId")
             Dim approverId = -1
-            approvers = Await StaffRmbFunctions.getApproversAsync(obj, Nothing, Nothing)
+            approvers = Await StaffRmbFunctions.getApproversAsync(obj, president)
             approverId = obj.ApprUserId
 
             ddlApprovedBy.Items.Clear()
