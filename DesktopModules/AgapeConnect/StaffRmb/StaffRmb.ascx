@@ -1320,7 +1320,7 @@
                                     </tr>
                                     <tr valign="top">
                                         <td colspan="6">
-                                            <asp:Button ID="btnDelete" runat="server" resourcekey="btnDelete" class="aButton" OnClientClick='return window.confirm("Are you sure?");' style="float:left"/>
+                                            <asp:Button ID="btnDelete" runat="server" resourcekey="btnDelete" class="aButton" OnClientClick='if (! window.confirm("Are you sure?")) return;' OnClick="btnDelete_Click" style="float:left"/>
                                             <asp:Button ID="btnSave" runat="server" resourcekey="btnSaved" class="aButton" style="float:right"/>
                                         </td>
                                     </tr>
