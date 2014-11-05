@@ -295,7 +295,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Try
                 Dim MoreInfo As System.Linq.IQueryable
                 MoreInfo = From c In d.AP_Staff_Rmbs
-                                    Where c.MoreInfoRequested = True And c.Status <> RmbStatus.Processing And c.UserId = UserId And c.PortalId = PortalId
+                                    Where c.MoreInfoRequested = True And c.Status <> RmbStatus.Processing And c.Status <> RmbStatus.Cancelled And c.UserId = UserId And c.PortalId = PortalId
                                     Select c.UserRef, c.RID, c.RMBNo
                 For Each row In MoreInfo
                     Dim hyp As New HyperLink()
@@ -1587,7 +1587,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 If (State = RmbStatus.Processing Or State = RmbStatus.PendingDownload Or State = RmbStatus.DownloadFailed Or State = RmbStatus.Paid Or State = RmbStatus.Cancelled) Then Return
 
                 rmb.First.Status = RmbStatus.Cancelled
-                rmb.First.MoreInfoRequested = False
                 lblStatus.Text = Translate(RmbStatus.StatusName(RmbStatus.Cancelled))
                 btnApprove.Visible = False
                 btnDelete.Visible = False
