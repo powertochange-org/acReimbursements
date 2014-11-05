@@ -914,6 +914,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     btnSave.Text = Translate("btnSaved")
                     btnSave.Style.Add("display", "none") '--hide, but still generate the button
                     btnDelete.Visible = Not (PROCESSING Or PAID Or CANCELLED)
+                    btnDelete.ToolTip = Translate("btnDeleteHelp")
 
 
                     '*** REIMBURSEMENT DETAILS ***

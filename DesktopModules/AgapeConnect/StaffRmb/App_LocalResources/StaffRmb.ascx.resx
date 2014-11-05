@@ -579,11 +579,11 @@
   <data name="lblDistUnits.Text" xml:space="preserve">
     <value>Distance units:</value>
   </data>
-  <data name="btnDelete.Help" xml:space="preserve">
-    <value>Cancel this reimbursement, and move it to the "Deleted" section</value>
+  <data name="btnDeleteHelp.Text" xml:space="preserve">
+    <value>Mark this reimbursement as Deleted, and move it to the Deleted tab on the left</value>
   </data>
   <data name="btnDelete.Text" xml:space="preserve">
-    <value>Delete</value>
+    <value>Delete this reimbursement</value>
   </data>
   <data name="StatusMoreInfo.Text" xml:space="preserve">
     <value>More Information Requested</value>
