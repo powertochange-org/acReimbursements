@@ -1587,6 +1587,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 If (State = RmbStatus.Processing Or State = RmbStatus.PendingDownload Or State = RmbStatus.DownloadFailed Or State = RmbStatus.Paid Or State = RmbStatus.Cancelled) Then Return
 
                 rmb.First.Status = RmbStatus.Cancelled
+                rmb.First.MoreInfoRequested = False
                 lblStatus.Text = Translate(RmbStatus.StatusName(RmbStatus.Cancelled))
                 btnApprove.Visible = False
                 btnDelete.Visible = False
@@ -1600,7 +1601,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim StaffMbr = UserController.GetUserById(PortalId, rmb.First.UserId)
                     Dim comments As String = ""
                     If tbApprComments.Text.Trim().Length > 0 Then
-                        comments = Translate("CommentLeft").Replace("[FIRSTNAME]", UserInfo.FirstName).Replace("[COMMENT]", tbApprComments.Text)
+                        comments = Translate("CommentLeft").Replace("[FIRSTNAME]", UserInfo.FirstName).Replace("[COMMENT]", tbApprComments.Text & "  " * tbAccComments.Text)
                     End If
 
                     Message = Message.Replace("[STAFFNAME]", StaffMbr.FirstName)
@@ -1617,7 +1618,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Log(rmb.First.RMBNo, "DELETED")
                     ScriptManager.RegisterStartupScript(btnDelete, btnDelete.GetType(), "select0", "selectIndex(0)", True)
                 End If
-
                 SubmitChanges()
                 Await LoadMenuAsync()
             End If

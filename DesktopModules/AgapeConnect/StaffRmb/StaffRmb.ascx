@@ -1320,7 +1320,7 @@
                                     </tr>
                                     <tr valign="top">
                                         <td colspan="6">
-                                            <asp:Button ID="btnDelete" runat="server" resourcekey="btnDelete" class="aButton"  style="float:left"/>
+                                            <asp:Button ID="btnDelete" runat="server" resourcekey="btnDelete" class="aButton" OnClientClick='return window.confirm("Are you sure?");' style="float:left"/>
                                             <asp:Button ID="btnSave" runat="server" resourcekey="btnSaved" class="aButton" style="float:right"/>
                                         </td>
                                     </tr>
@@ -1485,16 +1485,15 @@
                                     </button>--%>
                                     <br />
                                     <br />
-                                    <div id="errorSection" style="margin-top:15px;">
+                                    <div id="errorSection" style="margin-top:15px;>
                                         <fieldset id="pnlError" runat="server" visible="false" style="margin-top: 15px;">
--                                            <legend>
--                                                <asp:Label ID="Label44" runat="server" CssClass="AgapeH4" ResourceKey="lblErrorMessage"></asp:Label>
--                                            </legend>
--                                            <asp:Label ID="lblWrongType" runat="server" class="ui-state-error ui-corner-all" Style="padding: 3px; margin-top: 5px; display: block;" resourceKey="lblWrongTypes"></asp:Label>
--                                            <asp:Label ID="lblErrorMessage" runat="server" class="ui-state-error ui-corner-all" Style="padding: 3px; margin-top: 5px; display: block;"></asp:Label>
--
--                                        </fieldset>
--                                        <div style="clear: both;" />
+                                            <legend>
+                                                <asp:Label ID="Label44" runat="server" CssClass="AgapeH4" ResourceKey="lblErrorMessage"></asp:Label>
+                                            </legend>
+                                            <asp:Label ID="lblWrongType" runat="server" class="ui-state-error ui-corner-all" Style="padding: 3px; margin-top: 5px; display: block;" resourceKey="lblWrongTypes"></asp:Label>
+                                            <asp:Label ID="lblErrorMessage" runat="server" class="ui-state-error ui-corner-all" Style="padding: 3px; margin-top: 5px; display: block;"></asp:Label>
+                                        </fieldset>
+                                        <div style="clear: both;" />
                                     </div>
                                 </div>
 
