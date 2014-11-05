@@ -3584,6 +3584,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim theUser = UserController.GetUserById(PortalId, theRmb.First.UserId)
                     SendMessage(Translate("MoreInfoMsg"), "window.open('mailto:" & theUser.Email & "?subject=Reimbursement " & theRmb.First.RID & ": More info requested');")
                     lblStatus.Text = lblStatus.Text & " - " & Translate("StatusMoreInfo")
+                    Log(theRmb.First.RID, "More info requested by Finance: " + theRmb.First.AcctComment)
                 End If
                 saveIfNecessary()
             End If
@@ -3598,6 +3599,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim theUser = UserController.GetUserById(PortalId, theRmb.First.UserId)
                     SendMessage(Translate("MoreInfoMsg"), "window.open('mailto:" & theUser.Email & "?subject=Reimbursement " & theRmb.First.RID & ": More info requested');")
                     lblStatus.Text = lblStatus.Text & " - " & Translate("StatusMoreInfo")
+                    Log(theRmb.First.RID, "More info requested by Approver: " + theRmb.First.ApprComment)
                 End If
                 saveIfNecessary()
             End If
