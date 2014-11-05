@@ -1184,7 +1184,7 @@
                                     <div style="float:left; width:54px;">&nbsp;</div>
                                     <asp:Label ID="Label17" runat="server" resourcekey="Reimbursement" Style="float: left; margin-right: 5px; margin-left:10px"></asp:Label>
                                     <asp:Label ID="lblRmbNo" runat="server" Style="float: left; margin-right: 5px;"></asp:Label>:
-                                    <asp:TextBox ID="tbChargeTo" runat="server" AutoPostBack="true" Style="float: right; font-size: small;">
+                                    <asp:TextBox ID="tbChargeTo" runat="server" AutoPostBack="true"  Style="float: right; font-size: small;">
                                     </asp:TextBox>
                                 </div>
                                 <div class="inverse" style="width:100%; margin-top:1px; padding-top:3px; padding-bottom:3px; float: left" >

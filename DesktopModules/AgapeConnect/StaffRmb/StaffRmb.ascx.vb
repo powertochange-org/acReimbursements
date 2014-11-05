@@ -853,6 +853,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     tbChargeTo.Attributes.Add("placeholder", Translate("tbChargeToHint"))
                     Dim accountName = (From c In d.AP_StaffBroker_CostCenters Where c.CostCentreCode = Rmb.CostCenter Select c.CostCentreName).SingleOrDefault()
                     tbChargeTo.Attributes.Add("title", accountName)
+                    tbChargeTo.CssClass = If(isFinance, "finance", "")
                     lblStatus.Text = Translate(RmbStatus.StatusName(Rmb.Status))
                     If (Rmb.MoreInfoRequested) Then
                         lblStatus.Text = lblStatus.Text & " - " & Translate("StatusMoreInfo")
