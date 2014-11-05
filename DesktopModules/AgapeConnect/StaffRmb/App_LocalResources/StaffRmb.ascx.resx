@@ -756,4 +756,7 @@
   <data name="GAiNReceipts.Text" xml:space="preserve">
     <value>Receipts (GAiN):</value>
   </data>
+  <data name="ErrorCompanies.Text" xml:space="preserve">
+    <value>Error: Company list could not be loaded</value>
+  </data>
 </root>

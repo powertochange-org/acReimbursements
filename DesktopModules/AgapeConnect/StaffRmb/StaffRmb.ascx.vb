@@ -732,6 +732,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Private Async Function ResetPostingDataAsync() As task
             Dim ExistingData = From c In d.AP_Staff_Rmb_Post_Extras Where c.RMBNo = CInt(hfRmbNo.Value)
             If (ExistingData.Count > 0) Then
+                If (ddlCompany.Items.Count = 0) Then
+                    Await LoadCompaniesAsync()
+                    If (ddlCompany.Items.Count = 0) Then
+                        lblErrorMessage.Text = Translate("ErrorCompanies")
+                        pnlError.Visible = IsAccounts()
+                        Return
+                    End If
+                End If
                 ddlCompany.SelectedValue = ExistingData.First.Company
                 dtPostingDate.Text = ExistingData.First.PostingDate
                 tbBatchId.Text = ExistingData.First.BatchId
