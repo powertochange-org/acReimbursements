@@ -1588,7 +1588,7 @@
                                     </b></td>
                                     <td>
                                   
-                                     <iframe id="ifReceipt" runat="server" src="" width="530" height="280" >
+                                     <iframe id="ifReceipt" class="ifreceipt" runat="server" src="" width="530" height="280" >
 
                                      </iframe>
                                     </td>
