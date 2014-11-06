@@ -1001,6 +1001,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         ddlApprovedBy.Style.Add("color", "gray")
                     End If
                 End If
+            Catch ex As Exception
+                lblErrorMessage.Text = Translate("UpdateApproversError")
+                pnlError.Visible = True
+                Log(lblRmbNo.Text, "ERROR   updating approvers list. " + ex.ToString)
+            End Try
+            Try
                 blank.Attributes.Add("disabled", "disabled")
                 blank.Attributes.Add("selected", "selected")
                 blank.Attributes.Add("style", "visibility:hidden") 'hide in dropdown list (display:none doesn't work in firefox)
