@@ -983,15 +983,17 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Private Async Function updateApproversListAsync(ByVal obj As Object) As Task
             Dim approvers As StaffRmbFunctions.Approvers
             Dim approverId = -1
+            Dim message = "ERROR: updating approvers list. "
             Try
                 ddlApprovedBy.Items.Clear()
                 approvers = Await StaffRmbFunctions.getApproversAsync(obj)
                 approverId = obj.ApprUserId
-
+                message += "1"
                 Dim blank As ListItem
                 If (tbChargeTo.Text.Length = 0) Then
                     blank = New ListItem(Translate("ddlApprovedByNoAccountHint"), "-1")
                     ddlApprovedBy.Style.Add("color", "gray")
+                    message += "2"
                 Else
                     If (approvers.UserIds IsNot Nothing And approvers.UserIds.Count > 0) Then
                         blank = New ListItem("", "-1")
@@ -1000,20 +1002,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         blank = New ListItem(Translate("ddlApprovedByNoApproversHint"), "-1")
                         ddlApprovedBy.Style.Add("color", "gray")
                     End If
+                    message += "3"
                 End If
-            Catch ex As Exception
-                lblErrorMessage.Text = Translate("UpdateApproversError")
-                pnlError.Visible = True
-                Log(lblRmbNo.Text, "ERROR   updating approvers list. " + ex.ToString)
-            End Try
-            Try
-                Dim blank As ListItem
                 blank.Attributes.Add("disabled", "disabled")
                 blank.Attributes.Add("selected", "selected")
                 blank.Attributes.Add("style", "visibility:hidden") 'hide in dropdown list (display:none doesn't work in firefox)
+                message += "4"
                 ddlApprovedBy.Items.Add(blank)
                 If (approvers.UserIds IsNot Nothing) Then
                     For Each row In approvers.UserIds
+                        message += "5"
                         If Not row Is Nothing Then
                             ddlApprovedBy.Items.Add(New ListItem(row.DisplayName, row.UserID))
                         End If
@@ -1022,7 +1020,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Catch ex As Exception
                 lblErrorMessage.Text = Translate("UpdateApproversError")
                 pnlError.Visible = True
-                Log(lblRmbNo.Text, "ERROR updating approvers list. " + ex.ToString)
+                Log(lblRmbNo.Text, message + ex.ToString)
             End Try
             Try
                 ddlApprovedBy.SelectedValue = approverId
