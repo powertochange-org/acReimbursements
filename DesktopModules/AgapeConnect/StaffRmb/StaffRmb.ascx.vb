@@ -983,15 +983,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Private Async Function updateApproversListAsync(ByVal obj As Object) As Task
             Dim approvers As StaffRmbFunctions.Approvers
             Dim approverId = -1
-            Dim message = "ERROR: updating approvers list. "
             Try
-                message += "0"
                 ddlApprovedBy.Items.Clear()
-                message += "1"
                 approvers = Await StaffRmbFunctions.getApproversAsync(obj)
-                message += "2"
                 approverId = obj.ApprUserId
-                message += "3"
                 Dim blank As ListItem
                 If (tbChargeTo.Text.Length = 0) Then
                     blank = New ListItem(Translate("ddlApprovedByNoAccountHint"), "-1")
@@ -1019,7 +1014,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Catch ex As Exception
                 lblErrorMessage.Text = Translate("UpdateApproversError")
                 pnlError.Visible = True
-                Log(lblRmbNo.Text, message + ex.ToString)
+                Log(lblRmbNo.Text, "ERROR: updating approvers list. " + ex.ToString)
             End Try
             Try
                 ddlApprovedBy.SelectedValue = approverId

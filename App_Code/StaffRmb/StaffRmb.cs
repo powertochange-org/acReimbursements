@@ -168,9 +168,6 @@ namespace StaffRmb
             string[] potential_approvers = null;
             if (isStaffAccount(rmb.CostCenter))
             {
-                //Task<String[]> getStaffManagersTask = managersInDepartmentAsync(staff_logon);
-                //Task<String[]> getSpouseManagersTask = managersInDepartmentAsync(spouse_logon);
-                //potential_approvers = combineArrays(await getStaffManagersTask, await getSpouseManagersTask);
                 Task<int[]>  userSupervisorsTask = getSupervisors(rmb.UserId, levels);
                 Task<int[]> spouseSupervisorTask = getSupervisors(spouseId, levels);
                 Task<int[]> getELTTask = ELT();
@@ -189,23 +186,19 @@ namespace StaffRmb
                 }
                 if (spouseId >= 0)
                 {
-                    try
+                    int[] spouseSupervisors = await spouseSupervisorTask;
+                    if (spouseSupervisors.Contains(presidentId))
                     {
-                        int[] spouseSupervisors = await spouseSupervisorTask;
-                        if (spouseSupervisors.Contains(presidentId))
+                        spouseSupervisors = combineArrays(spouseSupervisors, await getELTTask);
+                    }
+                    foreach (int uid in combineArrays(userSupervisors, spouseSupervisors))
+                    {
+                        //exclude user and spouse 
+                        if (!((uid == rmb.UserId) || (uid == spouseId)))
                         {
-                            spouseSupervisors = combineArrays(spouseSupervisors, await getELTTask);
-                        }
-                        foreach (int uid in combineArrays(userSupervisors, spouseSupervisors))
-                        {
-                            //exclude user and spouse 
-                            if (!((uid == rmb.UserId) || (uid == spouseId)))
-                            {
-                                result.UserIds.Add(UserController.GetUserById(rmb.PortalId, uid));
-                            }
+                            result.UserIds.Add(UserController.GetUserById(rmb.PortalId, uid));
                         }
                     }
-                    catch { }
                 }
             }
             else //ministry account
@@ -304,12 +297,17 @@ namespace StaffRmb
         static public async Task<int[]> getSupervisors(int id, int levels)
         // Returns the <levels># of upline supervisors ids for a staff member
         {
-            if (id < 0 || levels == 0) return new int[0];
-            int presidentId = getPresidentId();
-            if (id == presidentId) return new int[1] { presidentId };
-            StaffBroker.StaffBrokerDataContext d = new StaffBroker.StaffBrokerDataContext();
-            int leaderId = (from l in d.AP_StaffBroker_LeaderMetas where l.UserId == id select l.LeaderId).Single();
-            int[] result = combineArrays(new int[1] { leaderId }, await getSupervisors(leaderId, (levels - 1)));
+            int[] result = new int[0];
+            try
+            {
+                if (id < 0 || levels == 0) return new int[0];
+                int presidentId = getPresidentId();
+                if (id == presidentId) return new int[1] { presidentId };
+                StaffBroker.StaffBrokerDataContext d = new StaffBroker.StaffBrokerDataContext();
+                int leaderId = (from l in d.AP_StaffBroker_LeaderMetas where l.UserId == id select l.LeaderId).Single();
+                result = combineArrays(new int[1] { leaderId }, await getSupervisors(leaderId, (levels - 1)));
+            }
+            catch { }
             return result;
         }
 
