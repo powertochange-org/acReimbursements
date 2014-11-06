@@ -1007,6 +1007,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Log(lblRmbNo.Text, "ERROR   updating approvers list. " + ex.ToString)
             End Try
             Try
+                Dim blank As ListItem
                 blank.Attributes.Add("disabled", "disabled")
                 blank.Attributes.Add("selected", "selected")
                 blank.Attributes.Add("style", "visibility:hidden") 'hide in dropdown list (display:none doesn't work in firefox)
