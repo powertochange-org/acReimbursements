@@ -984,10 +984,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim approvers As StaffRmbFunctions.Approvers
             Dim approverId = -1
             Try
+                ddlApprovedBy.Items.Clear()
                 approvers = Await StaffRmbFunctions.getApproversAsync(obj)
                 approverId = obj.ApprUserId
 
-                ddlApprovedBy.Items.Clear()
                 Dim blank As ListItem
                 If (tbChargeTo.Text.Length = 0) Then
                     blank = New ListItem(Translate("ddlApprovedByNoAccountHint"), "-1")
@@ -1012,10 +1012,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         End If
                     Next
                 End If
-            Catch
+            Catch ex As Exception
                 lblErrorMessage.Text = Translate("UpdateApproversError")
                 pnlError.Visible = True
-                Log(lblRmbNo.Text, "ERROR updating approvers list")
+                Log(lblRmbNo.Text, "ERROR updating approvers list. " + ex.ToString)
             End Try
             Try
                 ddlApprovedBy.SelectedValue = approverId
@@ -1153,7 +1153,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                             End If
                         Catch ex As Exception
-                            Log(lblRmbNo.Text, "Failed to Add Electronic Receipt: " & ex.ToString)
+                            Log(lblRmbNo.Text, "WARNING: Failed to Add Electronic Receipt: " & ex.ToString)
                         End Try
                         If insert.Receipt Then
                             If q.Count = 0 Then
@@ -3121,7 +3121,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ddlAccountCode.SelectedValue = GetAccountCode(lt.First.LineTypeId, tbCostcenter.Text)
                 End If
             Catch ex As Exception
-                Log(lblRmbNo.Text, "Error Resetting Expense Popup. " + ex.ToString)
+                Log(lblRmbNo.Text, "ERROR Resetting Expense Popup. " + ex.ToString)
             End Try
         End Function
 

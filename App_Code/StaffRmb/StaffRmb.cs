@@ -146,8 +146,14 @@ namespace StaffRmb
         static public async Task<Approvers> getApproversAsync(AP_Staff_Rmb rmb)
         {
             int presidentId = getPresidentId();
+            int spouseId;
+            try {
+                spouseId = StaffBrokerFunctions.GetSpouseId(rmb.UserId);
+            } catch {
+                spouseId = -1;
+            }            
             String staff_logon = logonFromId(rmb.PortalId, rmb.UserId);
-            String spouse_logon = logonFromId(rmb.PortalId, StaffBrokerFunctions.GetSpouseId(rmb.UserId));
+            String spouse_logon = logonFromId(rmb.PortalId, spouseId);
             int levels = 2; //the number of supervisor upline to include
             // initialize the response
             Approvers result = new Approvers();
@@ -166,14 +172,15 @@ namespace StaffRmb
                 //Task<String[]> getSpouseManagersTask = managersInDepartmentAsync(spouse_logon);
                 //potential_approvers = combineArrays(await getStaffManagersTask, await getSpouseManagersTask);
                 Task<int[]>  userSupervisorsTask = getSupervisors(rmb.UserId, levels);
-                Task<int[]> spouseSupervisorsTask = getSupervisors(StaffBrokerFunctions.GetSpouseId(rmb.UserId), levels);
+                Task<int[]> spouseSupervisorTask = getSupervisors(spouseId, levels);
                 Task<int[]> getELTTask = ELT();
                 int[] userSupervisors = await userSupervisorsTask;
+                int[] spouseSupervisors = new int[0];
                 if (userSupervisors.Contains(presidentId))
                 {
                     userSupervisors = combineArrays(userSupervisors, await getELTTask);
                 }
-                int[] spouseSupervisors = await spouseSupervisorsTask;
+                spouseSupervisors = await spouseSupervisorTask;
                 if (spouseSupervisors.Contains(presidentId))
                 {
                     spouseSupervisors = combineArrays(spouseSupervisors, await getELTTask);
