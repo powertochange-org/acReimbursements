@@ -175,23 +175,37 @@ namespace StaffRmb
                 Task<int[]> spouseSupervisorTask = getSupervisors(spouseId, levels);
                 Task<int[]> getELTTask = ELT();
                 int[] userSupervisors = await userSupervisorsTask;
-                int[] spouseSupervisors = new int[0];
                 if (userSupervisors.Contains(presidentId))
                 {
                     userSupervisors = combineArrays(userSupervisors, await getELTTask);
                 }
-                spouseSupervisors = await spouseSupervisorTask;
-                if (spouseSupervisors.Contains(presidentId))
-                {
-                    spouseSupervisors = combineArrays(spouseSupervisors, await getELTTask);
-                }
-                foreach (int uid in combineArrays(userSupervisors, spouseSupervisors))
+                foreach (int uid in userSupervisors)
                 {
                     //exclude user and spouse 
-                    if (!((uid == rmb.UserId) || (uid == spouseId) ))
+                    if (!((uid == rmb.UserId) || (uid == spouseId)))
                     {
                         result.UserIds.Add(UserController.GetUserById(rmb.PortalId, uid));
                     }
+                }
+                if (spouseId >= 0)
+                {
+                    try
+                    {
+                        int[] spouseSupervisors = await spouseSupervisorTask;
+                        if (spouseSupervisors.Contains(presidentId))
+                        {
+                            spouseSupervisors = combineArrays(spouseSupervisors, await getELTTask);
+                        }
+                        foreach (int uid in combineArrays(userSupervisors, spouseSupervisors))
+                        {
+                            //exclude user and spouse 
+                            if (!((uid == rmb.UserId) || (uid == spouseId)))
+                            {
+                                result.UserIds.Add(UserController.GetUserById(rmb.PortalId, uid));
+                            }
+                        }
+                    }
+                    catch { }
                 }
             }
             else //ministry account
