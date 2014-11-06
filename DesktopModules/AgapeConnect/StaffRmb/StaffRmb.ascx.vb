@@ -985,7 +985,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim approverId = -1
             Dim message = "ERROR: updating approvers list. "
             Try
-                ddlApprovedBy.Items.Clear()
+                message += "0"
+                'ddlApprovedBy.Items.Clear()
                 approvers = Await StaffRmbFunctions.getApproversAsync(obj)
                 approverId = obj.ApprUserId
                 message += "1"
