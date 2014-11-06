@@ -983,32 +983,40 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Private Async Function updateApproversListAsync(ByVal obj As Object) As Task
             Dim approvers As StaffRmbFunctions.Approvers
             Dim approverId = -1
-            approvers = Await StaffRmbFunctions.getApproversAsync(obj)
-            approverId = obj.ApprUserId
+            Try
+                approvers = Await StaffRmbFunctions.getApproversAsync(obj)
+                approverId = obj.ApprUserId
 
-            ddlApprovedBy.Items.Clear()
-            Dim blank As ListItem
-            If (tbChargeTo.Text.Length = 0) Then
-                blank = New ListItem(Translate("ddlApprovedByNoAccountHint"), "-1")
-                ddlApprovedBy.Style.Add("color", "gray")
-            Else
-                If (approvers.UserIds.Count = 0) Then
-                    blank = New ListItem(Translate("ddlApprovedByNoApproversHint"), "-1")
+                ddlApprovedBy.Items.Clear()
+                Dim blank As ListItem
+                If (tbChargeTo.Text.Length = 0) Then
+                    blank = New ListItem(Translate("ddlApprovedByNoAccountHint"), "-1")
                     ddlApprovedBy.Style.Add("color", "gray")
                 Else
-                    blank = New ListItem("", "-1")
-                    ddlApprovedBy.Style.Add("color", "black")
+                    If (approvers.UserIds IsNot Nothing And approvers.UserIds.Count > 0) Then
+                        blank = New ListItem("", "-1")
+                        ddlApprovedBy.Style.Add("color", "black")
+                    Else
+                        blank = New ListItem(Translate("ddlApprovedByNoApproversHint"), "-1")
+                        ddlApprovedBy.Style.Add("color", "gray")
+                    End If
                 End If
-            End If
-            blank.Attributes.Add("disabled", "disabled")
-            blank.Attributes.Add("selected", "selected")
-            blank.Attributes.Add("style", "visibility:hidden") 'hide in dropdown list (display:none doesn't work in firefox)
-            ddlApprovedBy.Items.Add(blank)
-            For Each row In approvers.UserIds
-                If Not row Is Nothing Then
-                    ddlApprovedBy.Items.Add(New ListItem(row.DisplayName, row.UserID))
+                blank.Attributes.Add("disabled", "disabled")
+                blank.Attributes.Add("selected", "selected")
+                blank.Attributes.Add("style", "visibility:hidden") 'hide in dropdown list (display:none doesn't work in firefox)
+                ddlApprovedBy.Items.Add(blank)
+                If (approvers.UserIds IsNot Nothing) Then
+                    For Each row In approvers.UserIds
+                        If Not row Is Nothing Then
+                            ddlApprovedBy.Items.Add(New ListItem(row.DisplayName, row.UserID))
+                        End If
+                    Next
                 End If
-            Next
+            Catch
+                lblErrorMessage.Text = Translate("UpdateApproversError")
+                pnlError.Visible = True
+                Log(lblRmbNo.Text, "ERROR updating approvers list")
+            End Try
             Try
                 ddlApprovedBy.SelectedValue = approverId
                 enableSubmitButton(approverId >= 0)
@@ -1145,8 +1153,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                             End If
                         Catch ex As Exception
-                            StaffBrokerFunctions.EventLog("Rmb" & hfRmbNo.Value, "Failed to Add Electronic Receipt: " & ex.ToString, UserId)
-
+                            Log(lblRmbNo.Text, "Failed to Add Electronic Receipt: " & ex.ToString)
                         End Try
                         If insert.Receipt Then
                             If q.Count = 0 Then
@@ -3114,7 +3121,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ddlAccountCode.SelectedValue = GetAccountCode(lt.First.LineTypeId, tbCostcenter.Text)
                 End If
             Catch ex As Exception
-                StaffBrokerFunctions.EventLog("Error Resetting Expense Popup", ex.ToString, UserId)
+                Log(lblRmbNo.Text, "Error Resetting Expense Popup. " + ex.ToString)
             End Try
         End Function
 

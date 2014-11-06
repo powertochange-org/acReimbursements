@@ -759,4 +759,7 @@
   <data name="ErrorCompanies.Text" xml:space="preserve">
     <value>Error: Company list could not be loaded</value>
   </data>
+  <data name="UpdateApproversError.Text" xml:space="preserve">
+    <value>Error updating approvers list.  Try reloading the page.</value>
+  </data>
 </root>
