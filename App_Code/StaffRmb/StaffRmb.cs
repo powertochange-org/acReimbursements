@@ -150,7 +150,7 @@ namespace StaffRmb
             try {
                 spouseId = StaffBrokerFunctions.GetSpouseId(rmb.UserId);
             } catch {
-                spouseId = -1;
+                spouseId = -2;
             }            
             String staff_logon = logonFromId(rmb.PortalId, rmb.UserId);
             String spouse_logon = logonFromId(rmb.PortalId, spouseId);
@@ -188,7 +188,7 @@ namespace StaffRmb
                 foreach (int uid in combineArrays(userSupervisors, spouseSupervisors))
                 {
                     //exclude user and spouse 
-                    if (!((uid == rmb.UserId) || (uid == StaffBrokerFunctions.GetSpouseId(rmb.UserId)) ))
+                    if (!((uid == rmb.UserId) || (uid == spouseId) ))
                     {
                         result.UserIds.Add(UserController.GetUserById(rmb.PortalId, uid));
                     }
