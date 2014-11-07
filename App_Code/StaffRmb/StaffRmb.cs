@@ -163,11 +163,16 @@ namespace StaffRmb
             result.isDept = false;
             result.UserIds = new List<DotNetNuke.Entities.Users.UserInfo>();
 
-            if (rmb.CostCenter == null || rmb.CostCenter.Length == 0) return result;
+            if (rmb.CostCenter == null || rmb.CostCenter.Length == 0) return result; //empty result
 
-            string[] potential_approvers = null;
+            Decimal amount = (from line in rmb.AP_Staff_RmbLines select line.GrossAmount).Sum(); 
+            Task<String[]> signingAuthorityTask = staffWithSigningAuthorityAsync(rmb.CostCenter, amount);
             if (isStaffAccount(rmb.CostCenter))
             {
+                if (!accountBelongsToStaffMember(rmb.CostCenter, rmb.UserId))
+                {
+                    return result; //empty result
+                }
                 Task<int[]>  userSupervisorsTask = getSupervisors(rmb.UserId, levels);
                 Task<int[]> spouseSupervisorTask = getSupervisors(spouseId, levels);
                 Task<int[]> getELTTask = ELT();
@@ -193,49 +198,26 @@ namespace StaffRmb
             else //ministry account
             {
                 result.isDept = true;
-                Decimal amount = (from line in rmb.AP_Staff_RmbLines select line.GrossAmount).Sum();
-                potential_approvers = await staffWithSigningAuthorityAsync(rmb.CostCenter, amount);
-                foreach (String potential_approver in potential_approvers)
-                {
-                    if (!(potential_approver.Equals(staff_logon) || potential_approver.Equals(spouse_logon)))
-                    { //exclude rmb creator and spouse
-                        UserInfo user = UserController.GetUserByName(rmb.PortalId, potential_approver + rmb.PortalId.ToString());
-                        if (user != null)
-                        {
-                            result.UserIds.Add(user);
-                        }
+            }
+            String[] potential_approvers = await signingAuthorityTask;
+            foreach (String potential_approver in potential_approvers)
+            {
+                if (!(potential_approver.Equals(staff_logon) || potential_approver.Equals(spouse_logon)))
+                { //exclude rmb creator and spouse
+                    UserInfo user = UserController.GetUserByName(rmb.PortalId, potential_approver + rmb.PortalId.ToString());
+                    if (user != null)
+                    {
+                        result.UserIds.Add(user);
                     }
                 }
             }
-
             return result;
         }
 
-        //** ADV
-        //static public async Task<Approvers> getAdvApproversAsync(AP_Staff_AdvanceRequest adv, Double largeTransaction, DotNetNuke.Entities.Users.UserInfo authUser, DotNetNuke.Entities.Users.UserInfo authAuthUser)
-        //{
-        //    String staff_logon = logonFromId(adv.PortalId , (int)adv.UserId);
-        //    String spouse_logon = logonFromId(adv.PortalId, StaffBrokerFunctions.GetSpouseId((int)adv.UserId));
-        //    // initialize the response
-        //    Approvers result = new Approvers();
-        //    result.CCMSpecial = false;
-        //    result.SpouseSpecial = false;
-        //    result.AmountSpecial = false;
-        //    result.isDept = false;
-        //    result.UserIds = new List<DotNetNuke.Entities.Users.UserInfo>();
-
-        //    string[] potential_approvers = null;
-        //    Decimal amount = (Decimal)adv.RequestAmount;
-        //    potential_approvers = await staffWithSigningAuthorityAsync(personalCostCenter((int)adv.UserId), amount);
-        //    foreach (String potential_approver in potential_approvers)
-        //    {
-        //        if (!(potential_approver.Equals(staff_logon) || potential_approver.Equals(spouse_logon)))
-        //        { //exclude staff and spouse
-        //            result.UserIds.Add(UserController.GetUserByName(adv.PortalId, potential_approver + adv.PortalId.ToString()));
-        //        }
-        //    }
-        //    return result;
-        //}
+        static private bool accountBelongsToStaffMember(String costcenter, int userId)
+        {
+            return StaffBrokerFunctions.GetStaffMember(userId).CostCenter == costcenter;
+        }
 
         static private string[] combineArrays(string[] a1, string[] a2)
         {
