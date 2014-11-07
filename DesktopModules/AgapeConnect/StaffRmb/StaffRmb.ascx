@@ -321,11 +321,11 @@
 
             $("#divGetPostingData").dialog({
                 autoOpen: false,
-                position:['middle', 250],
-                //height: 350,
+                position:['middle', 375],
                 width: 500,
                 modal:true,
                 title: '<%= Translate("GetPostingDetails") %>',
+                dialogClass:'dragable',
                 close: function() {}
             });
             $("#divGetPostingData").parent().appendTo($("form:first"));
