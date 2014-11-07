@@ -176,28 +176,17 @@ namespace StaffRmb
                 {
                     userSupervisors = combineArrays(userSupervisors, await getELTTask);
                 }
-                foreach (int uid in userSupervisors)
+                int[] spouseSupervisors = await spouseSupervisorTask;
+                if (spouseSupervisors.Contains(presidentId))
+                {
+                    spouseSupervisors = combineArrays(spouseSupervisors, await getELTTask);
+                }
+                foreach (int uid in combineArrays(userSupervisors, spouseSupervisors))
                 {
                     //exclude user and spouse 
                     if (!((uid == rmb.UserId) || (uid == spouseId)))
                     {
                         result.UserIds.Add(UserController.GetUserById(rmb.PortalId, uid));
-                    }
-                }
-                if (spouseId >= 0)
-                {
-                    int[] spouseSupervisors = await spouseSupervisorTask;
-                    if (spouseSupervisors.Contains(presidentId))
-                    {
-                        spouseSupervisors = combineArrays(spouseSupervisors, await getELTTask);
-                    }
-                    foreach (int uid in combineArrays(userSupervisors, spouseSupervisors))
-                    {
-                        //exclude user and spouse 
-                        if (!((uid == rmb.UserId) || (uid == spouseId)))
-                        {
-                            result.UserIds.Add(UserController.GetUserById(rmb.PortalId, uid));
-                        }
                     }
                 }
             }
@@ -256,7 +245,7 @@ namespace StaffRmb
 
         static private int[] combineArrays(int[] a1, int[] a2)
         {
-            int[] result = a1.Concat(a2).Distinct().ToArray();
+            int[] result = a1.Union(a2).ToArray();
             return result;
         }
 
@@ -300,12 +289,15 @@ namespace StaffRmb
             int[] result = new int[0];
             try
             {
-                if (id < 0 || levels == 0) return new int[0];
+                if (id < 0 || levels <= 0) return new int[0];
                 int presidentId = getPresidentId();
                 if (id == presidentId) return new int[1] { presidentId };
                 StaffBroker.StaffBrokerDataContext d = new StaffBroker.StaffBrokerDataContext();
-                int leaderId = (from l in d.AP_StaffBroker_LeaderMetas where l.UserId == id select l.LeaderId).Single();
-                result = combineArrays(new int[1] { leaderId }, await getSupervisors(leaderId, (levels - 1)));
+                var leaderIds = from l in d.AP_StaffBroker_LeaderMetas where l.UserId == id select l.LeaderId;
+                foreach (int leaderId in leaderIds) {
+                    result = new int[1] { leaderId };
+                    result = combineArrays(result, await getSupervisors(leaderId, (levels - 1)));
+                }
             }
             catch { }
             return result;
