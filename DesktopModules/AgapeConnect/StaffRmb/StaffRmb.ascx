@@ -321,11 +321,12 @@
 
             $("#divGetPostingData").dialog({
                 autoOpen: false,
-                position:['middle', 375],
+                position:['middle', 275],
                 width: 500,
                 modal:true,
+                draggable:false,
                 title: '<%= Translate("GetPostingDetails") %>',
-                dialogClass:'dragable',
+                dialogClass:'draggable',
                 close: function() {}
             });
             $("#divGetPostingData").parent().appendTo($("form:first"));
@@ -469,6 +470,9 @@
             );
         }
 
+        function enableDraggable() {
+            $('.draggable').draggable({disabled:false});
+        }
 
         function setUpConfirms() {
             $('.confirm').click(function() {
@@ -495,6 +499,7 @@
                 setUpAutocomplete();
                 checkForMinistryAccount();
                 setUpReceiptPreviews();
+                enableDraggable();
                 setUpConfirms();
             });
 
