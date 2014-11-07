@@ -1486,7 +1486,7 @@
                                     <br />
                                     <br />
                                     <div id="errorSection" style="margin-top:15px;>
-                                        <fieldset id="pnlError" runat="server" visible="false" style="margin-top: 15px;color:darkred;">
+                                        <fieldset id="pnlError" runat="server" visible="false" style="margin: 15px;color:darkred;">
                                             <legend>
                                                 <asp:Label ID="Label44" runat="server" CssClass="AgapeH4" ResourceKey="lblErrorMessage"></asp:Label>
                                             </legend>

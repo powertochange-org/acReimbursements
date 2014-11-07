@@ -1751,12 +1751,21 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             ddlLineTypes.DataSource = lineTypes
             ddlLineTypes.DataBind()
 
-            Await ResetNewExpensePopupAsync(True)
+            Dim blank = New ListItem(Translate("ddlLineTypesHint"), String.Empty)
+            blank.Attributes.Add("disabled", "disabled")
+            blank.Attributes.Add("selected", "selected")
+            blank.Attributes.Add("style", "color:grey")
+            blank.Attributes.Add("style", "visibility:hidden") 'hide in dropdown list (display:none doesn't work in firefox)
+            ddlLineTypes.Items.Insert(0, blank)
+            ddlLineTypes.SelectedIndex = 0
+            phLineDetail.Controls.Clear()
+            btnSaveLine.Visible = False
+
+            'Await ResetNewExpensePopupAsync(True)
             cbRecoverVat.Checked = False
             tbVatRate.Text = ""
             tbShortComment.Text = ""
 
-            'PopupTitle.Text = "Add New Reimbursement Expense"
             btnSaveLine.CommandName = "Save"
 
             ifReceipt.Attributes("src") = Request.Url.Scheme & "://" & Request.Url.Authority & "/DesktopModules/AgapeConnect/StaffRmb/ReceiptEditor.aspx?RmbNo=" & hfRmbNo.Value & "&RmbLine=New"
@@ -2262,7 +2271,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 #End Region
 #Region "OnChange Events"
         Protected Async Sub ddlLineTypes_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles ddlLineTypes.SelectedIndexChanged
-            Dim resetTask = ResetNewExpensePopupAsync(False)
+            Dim resetTask = ResetNewExpensePopupAsync(Not btnSaveLine.Visible)
             If lblIncType.Visible And ddlLineTypes.SelectedIndex <> ddlLineTypes.Items.Count - 1 Then
                 Dim oldValue = ddlLineTypes.SelectedValue
                 ddlLineTypes.Items.Clear()
@@ -2281,6 +2290,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
 
             Await resetTask
+            btnSaveLine.Visible = True
+
             If (btnSaveLine.CommandName.Equals("Save")) Then
                 ' reset and show repeat if available
                 Try

@@ -762,4 +762,7 @@
   <data name="UpdateApproversError.Text" xml:space="preserve">
     <value>Error updating approvers list.  Try reloading the page.</value>
   </data>
+  <data name="ddlLineTypesHint.Text" xml:space="preserve">
+    <value>Select an expense type...</value>
+  </data>
 </root>
