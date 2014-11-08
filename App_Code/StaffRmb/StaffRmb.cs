@@ -214,9 +214,9 @@ namespace StaffRmb
             return result;
         }
 
-        static private bool accountBelongsToStaffMember(String costcenter, int userId)
+        static public bool accountBelongsToStaffMember(String costcenter, int userId)
         {
-            return StaffBrokerFunctions.GetStaffMember(userId).CostCenter == costcenter;
+            return StaffBrokerFunctions.GetStaffMember(userId).CostCenter.Equals(costcenter);
         }
 
         static private string[] combineArrays(string[] a1, string[] a2)

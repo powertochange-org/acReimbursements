@@ -765,4 +765,7 @@
   <data name="ddlLineTypesHint.Text" xml:space="preserve">
     <value>Select an expense type...</value>
   </data>
+  <data name="ddlApprovedByInvalidAccountHint.Text" xml:space="preserve">
+    <value>Invalid Account Selected</value>
+  </data>
 </root>

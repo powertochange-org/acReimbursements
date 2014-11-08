@@ -996,7 +996,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         blank = New ListItem("", "-1")
                         ddlApprovedBy.Style.Add("color", "black")
                     Else
-                        blank = New ListItem(Translate("ddlApprovedByNoApproversHint"), "-1")
+                        Try
+                            Dim account As Integer = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.UserId).Single()
+                            If (Not StaffRmbFunctions.accountBelongsToStaffMember(tbChargeTo.Text, account)) Then
+                                blank = New ListItem(Translate("ddlApprovedByInvalidAccountHint"), "-1")
+                            Else
+                                blank = New ListItem(Translate("ddlApprovedByNoApproversHint"), "-1")
+                            End If
+                        Catch
+                            blank = New ListItem(Translate("ddlApprovedByNoApproversHint"), "-1")
+                        End Try
                         ddlApprovedBy.Style.Add("color", "gray")
                     End If
                 End If
