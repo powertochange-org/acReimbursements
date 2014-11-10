@@ -913,7 +913,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     lblAccComments.Visible = Not isFinance
                     lblAccComments.Text = If(Rmb.AcctComment Is Nothing, "", Rmb.AcctComment)
                     tbAccComments.Visible = isFinance
-                    tbAccComments.Enabled = isFinance And Not (PROCESSING Or PAID)
+                    tbAccComments.Enabled = isFinance
                     tbAccComments.Text = If(Rmb.AcctComment Is Nothing, "", Rmb.AcctComment)
 
                     cbMoreInfo.Visible = (isFinance And APPROVED)
@@ -1632,7 +1632,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Message = Message.Replace("[APPRFIRSTNAME]", UserInfo.FirstName)
                     Message = Message.Replace("[COMMENTS]", comments)
 
-                    DotNetNuke.Services.Mail.Mail.SendMail("P2C Reimbursements <reimbursements@p2c.com>", StaffMbr.Email, "", Translate("EmailCancelledSubject").Replace("[RMBNO]", rmb.First.RID).Replace("[USERREF]", rmb.First.UserRef), Message, "", "HTML", "", "", "", "")
+                    SendEmail(StaffMbr.Email, Translate("EmailCancelledSubject").Replace("[RMBNO]", rmb.First.RID).Replace("[USERREF]", rmb.First.UserRef), Message)
 
                     pnlMain.Visible = False
                     ltSplash.Text = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbSplash", PortalId))
@@ -3144,6 +3144,25 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End Try
         End Function
 
+        Protected Sub SendEmail(sender As String, recipient As String, subject As String, body As String)
+            DotNetNuke.Services.Mail.Mail.SendMail(sender, recipient, "", subject, body, "", "HTML", "", "", "", "")
+        End Sub
+
+        Protected Sub SendEmail(address As String, subject As String, body As String)
+            Dim sender = "P2C Reimbursements <reimbursements@p2c.com>"
+            SendEmail(sender, address, subject, body)
+        End Sub
+
+        Protected Sub SendMoreinfoEmail(sender As String, comments As String, ByRef Rmb As AP_Staff_Rmb)
+            Dim theUser = UserController.GetUserById(PortalId, Rmb.UserId)
+            Dim address = theUser.Email
+            Dim rmbno = If(Not Rmb.UserRef.Equals(String.Empty), Rmb.UserRef, "#" & Rmb.RID)
+            Dim rmblink = "<a href='" & NavigateURL() & "?RmbId=" & Rmb.RID & "'>(" & rmbno & ")</a>"
+            Dim subject = Translate("MoreInfoSubject").Replace("[RMBNO]", rmbno)
+            Dim body = Translate("MoreInfoBody").Replace("[WHO]", sender).Replace("[RMBLINK]", rmblink).Replace("[COMMENTS]", comments)
+            SendEmail(address, subject, body)
+        End Sub
+
         Protected Sub SendApprovalEmail(ByVal theRmb As AP_Staff_Rmb)
             'Sends an email to the creator, indicating who the form has been submitted to
             'AND sends an email to the approver, alerting him to the awaiting form.
@@ -3178,7 +3197,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 ownerMessage = ownerMessage.Replace("[STAFFNAME]", owner.FirstName).Replace("[RMBNO]", theRmb.RID).Replace("[USERREF]", theRmb.UserRef)
                 ownerMessage = ownerMessage.Replace("[PRINTOUT]", "<a href='" & Request.Url.Scheme & "://" & Request.Url.Authority & Request.ApplicationPath & "DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & theRmb.RMBNo & "&UID=" & theRmb.UserId & "' target-'_blank' style='width: 134px; display:block;)'><div style='text-align: center; width: 122px; margin: 10px;'><img src='" _
                     & Request.Url.Scheme & "://" & Request.Url.Authority & Request.ApplicationPath & "DesktopModules/AgapeConnect/StaffRmb/Images/PrintoutIcon.jpg' /><br />Printout</div></a><style> a div:hover{border: solid 1px blue;}</style>")
-                DotNetNuke.Services.Mail.Mail.SendMail("P2C Reimbursements <reimbursements@p2c.com>", owner.Email, "", Translate("EmailSubmittedSubject").Replace("[RMBNO]", theRmb.RID), ownerMessage, "", "HTML", "", "", "", "")
+                SendEmail(owner.Email, Translate("EmailSubmittedSubject").Replace("[RMBNO]", theRmb.RID), ownerMessage)
 
                 'Send Approvers Instructions Here
                 If toEmail.Length > 0 Then
@@ -3197,7 +3216,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         approverMessage = approverMessage.Replace("[LOWBALANCE]", If(isLowBalance(), low_balance, ""))
                     End If
                     '-- Send FROM owner, so that bounces or out-of-office replies come back to owner.
-                    DotNetNuke.Services.Mail.Mail.SendMail("P2C Reimbursements <" & owner.Email & ">", toEmail, "", subject, approverMessage, "", "HTML", "", "", "", "")
+                    SendEmail("P2C Reimbursements <" & owner.Email & ">", toEmail, subject, approverMessage)
                 End If
 
             Catch ex As Exception
@@ -3223,7 +3242,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Else
                 Emessage = Emessage.Replace("[CHANGES]", "")
             End If
-            DotNetNuke.Services.Mail.Mail.SendMail("P2C Reimbursements <reimbursements@p2c.com>", theUser.Email, "", subject, Emessage, "", "HTML", "", "", "", "")
+            SendEmail(theUser.Email, subject, Emessage)
         End Sub
 
         Sub SendRejectionLetter(ByVal theRmb As AP_Staff_Rmb)
@@ -3234,7 +3253,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim Emessage As String = StaffBrokerFunctions.GetTemplate("RmbRejectedEmail", PortalId)
 
             Emessage = Emessage.Replace("[STAFFNAME]", staffname).Replace("[APPROVER]", apprname).Replace("[RMBNO]", theRmb.RID).Replace("[USERREF]", theRmb.UserRef)
-            DotNetNuke.Services.Mail.Mail.SendMail("P2C Reimbursements <reimbursements@p2c.com>", emailaddress, "", subject, Emessage, "", "HTML", "", "", "", "")
+            SendEmail(emailaddress, subject, Emessage)
         End Sub
 
         Public Function Translate(ByVal ResourceString As String) As String
@@ -3608,8 +3627,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If theRmb.Count > 0 Then
                 lblStatus.Text = Translate(RmbStatus.StatusName(theRmb.First.Status))
                 If cbMoreInfo.Checked Then
-                    Dim theUser = UserController.GetUserById(PortalId, theRmb.First.UserId)
-                    SendMessage(Translate("MoreInfoMsg"), "window.open('mailto:" & theUser.Email & "?subject=Reimbursement " & theRmb.First.RID & ": More info requested');")
+                    SendMoreinfoEmail(Translate("Accounts"), theRmb.First.AcctComment, theRmb.First)
+                    ScriptManager.RegisterClientScriptBlock(cbMoreInfo, cbMoreInfo.GetType(), "moreinfo", "alert('" + Translate("MoreInfoMsg") + "');", True)
                     lblStatus.Text = lblStatus.Text & " - " & Translate("StatusMoreInfo")
                     Log(theRmb.First.RID, "More info requested by Finance: " + theRmb.First.AcctComment)
                 End If
@@ -3623,14 +3642,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If theRmb.Count > 0 Then
                 lblStatus.Text = Translate(RmbStatus.StatusName(theRmb.First.Status))
                 If cbApprMoreInfo.Checked Then
-                    Dim theUser = UserController.GetUserById(PortalId, theRmb.First.UserId)
-                    SendMessage(Translate("MoreInfoMsg"), "window.open('mailto:" & theUser.Email & "?subject=Reimbursement " & theRmb.First.RID & ": More info requested');")
+                    Dim approver = UserController.GetUserById(PortalId, UserId).DisplayName
+                    SendMoreinfoEmail(approver, theRmb.First.ApprComment, theRmb.First)
+                    ScriptManager.RegisterClientScriptBlock(cbApprMoreInfo, cbApprMoreInfo.GetType(), "apprmoreinfo", "alert('" + Translate("MoreInfoMsg") + "');", True)
                     lblStatus.Text = lblStatus.Text & " - " & Translate("StatusMoreInfo")
-                    Log(theRmb.First.RID, "More info requested by Approver: " + theRmb.First.ApprComment)
+                    Log(theRmb.First.RID, "More info requested by Approver(" + approver + "): " + theRmb.First.ApprComment)
                 End If
                 saveIfNecessary()
             End If
-
         End Sub
 
         Public Function GetLocalStaffProfileName(ByVal StaffProfileName As String) As String

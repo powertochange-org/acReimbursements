@@ -118,10 +118,10 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AccountsComments.Text" xml:space="preserve">
-    <value>Accounts Comments</value>
+    <value>Finance Comments</value>
   </data>
   <data name="AccountsOnly.Text" xml:space="preserve">
-    <value>Accounts use only</value>
+    <value>Finance use only</value>
   </data>
   <data name="AdvanceError.Text" xml:space="preserve">
     <value>You have entered an invalid amount. Your settings have not been saved.</value>
@@ -490,7 +490,7 @@
     <value>More information is required in order to continue processing Reimbursement [RMBNO] - [USERREF].</value>
   </data>
   <data name="MoreInfoMsg.Text" xml:space="preserve">
-    <value>This reimbursement will be highlighted to the staff member when they log into this site; however, you should email them directly, to let him/her know that changes are required.</value>
+    <value>An email has been sent to alert the user of your request.</value>
   </data>
   <data name="AdvAmountSpecial.Text" xml:space="preserve">
     <value>Since you have a transaction over [TEAMLEADERLIMIT] in your advance, it must be approved by [AUTHUSER].</value>
@@ -767,5 +767,14 @@
   </data>
   <data name="ddlApprovedByInvalidAccountHint.Text" xml:space="preserve">
     <value>Invalid Account Selected</value>
+  </data>
+  <data name="Accounts.Text" xml:space="preserve">
+    <value>The Finance Department</value>
+  </data>
+  <data name="MoreInfoBody.Text" xml:space="preserve">
+    <value>[WHO] has requested that you make changes to your reimbursement ([RMBLINK]) before processing can continue.  &lt;br/&gt;&lt;br/&gt; Here are their comments: [COMMENTS]</value>
+  </data>
+  <data name="MoreInfoSubject.Text" xml:space="preserve">
+    <value>More info is required to process your reimbursement ([USERREF])</value>
   </data>
 </root>
