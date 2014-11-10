@@ -772,7 +772,7 @@
     <value>The Finance Department</value>
   </data>
   <data name="MoreInfoBody.Text" xml:space="preserve">
-    <value>[WHO] has requested that you make changes to your reimbursement ([RMBLINK]) before processing can continue.  &lt;br/&gt;&lt;br/&gt; Here are their comments: [COMMENTS]</value>
+    <value>[WHO] has requested that you make changes to your reimbursement ([USERREF]) before processing can continue.  &lt;br/&gt;&lt;br/&gt; Here are their comments: [COMMENTS]&lt;br/&gt;&lt;br/&gt;Click here to access your reimbursement: [RMBLINK]</value>
   </data>
   <data name="MoreInfoSubject.Text" xml:space="preserve">
     <value>More info is required to process your reimbursement ([USERREF])</value>

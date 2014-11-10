@@ -3157,9 +3157,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim theUser = UserController.GetUserById(PortalId, Rmb.UserId)
             Dim address = theUser.Email
             Dim rmbno = If(Not Rmb.UserRef.Equals(String.Empty), Rmb.UserRef, "#" & Rmb.RID)
-            Dim rmblink = "<a href='" & NavigateURL() & "?RmbId=" & Rmb.RID & "'>(" & rmbno & ")</a>"
-            Dim subject = Translate("MoreInfoSubject").Replace("[RMBNO]", rmbno)
-            Dim body = Translate("MoreInfoBody").Replace("[WHO]", sender).Replace("[RMBLINK]", rmblink).Replace("[COMMENTS]", comments)
+            Dim link = NavigateURL() & "?RmbId=" & Rmb.RID
+            Dim rmblink = "<a href='" & link & "'>" & link & "</a>"
+            Dim subject = Translate("MoreInfoSubject").Replace("[USERREF]", rmbno)
+            Dim body = Translate("MoreInfoBody").Replace("[WHO]", sender).Replace("[USERREF]", rmbno).Replace("[RMBLINK]", rmblink).Replace("[COMMENTS]", comments)
             SendEmail(address, subject, body)
         End Sub
 
