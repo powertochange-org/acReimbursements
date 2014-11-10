@@ -1,4 +1,18 @@
-﻿Imports System
+﻿' AP_Rmb
+'--------
+' SpareField1: total for the reimbursement
+' SpareField2: Submitter's Director's id - in case of special approval
+' SpareField3: DelegateId, when filling out a form on behalf of someone else
+
+' AP_Rmb_Line
+'-------------
+' Spare1: Province
+' Spare2: PerDiem meals
+' Spare3: Mileage unit index
+' Spare4: Mileage origin
+' Spare5: Mileage destination
+
+Imports System
 Imports System.Collections
 Imports System.Configuration
 Imports System.Data
