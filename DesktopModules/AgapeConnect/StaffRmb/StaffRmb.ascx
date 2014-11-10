@@ -549,7 +549,7 @@
      $('#<%= tbNewChargeTo.ClientID%>').val(''); 
      $('#<%= tbNewYourRef.ClientID%>').val('');
      $('#<%= tbNewComments.ClientID%>').val('');
-     $('#<%= tbOnBehalfOf.ClientID%>').val('');
+     $('#<%= tbNewOnBehalfOf.ClientID%>').val('');
      $('#<%= hfOnBehalfOf.ClientID%>').val('');
  }
 
@@ -843,7 +843,7 @@
             },
             minLength: 2
         });
-        $("#<%= tbOnBehalfOf.ClientID%>").autocomplete({
+        $("#<%= tbNewOnBehalfOf.ClientID%>").autocomplete({
             source:  function(request, response) {
                 var term = request.term;
                 if (term in usercache) {
@@ -868,14 +868,15 @@
             },
             select: function(event, ui) {
                 console.debug("SELECT: "+ui.item.value)
+                event.preventDefault();
                 $('#<%= hfOnBehalfOf.ClientID%>').val(ui.item.value);
-                $('#<%= tbOnBehalfOf.ClientID%>').val(ui.item.label).change();
+                $('#<%= tbNewOnBehalfOf.ClientID%>').val(ui.item.label).change();
             },
             change: function(event, ui) {
                 if (!ui.item) {
                     console.debug("CHANGE: -null-")
                     $('#<%= hfOnBehalfOf.ClientID%>').val('');
-                    $('#<%= tbOnBehalfOf.ClientID%>').val('');
+                    $('#<%= tbNewOnBehalfOf.ClientID%>').val('');
                     alert("Please select the staff member again.  You must click on a name in the list, rather than just typing it.");
                 }
             },
@@ -1270,10 +1271,12 @@
                                     </tr>
                                     <tr class="Agape_SubTitle">
                                         <td class="hdrTitle" width="10%">
-                                            <asp:Label ID="Label21" runat="server" resourcekey="SubmittedBy"></asp:Label>
+                                            <asp:Label ID="Label21" runat="server" resourcekey="SubmittedBy"></asp:Label><br />
+                                            <asp:Label id="lblOnBehalfOf" runat="server" resourcekey="lblOnBehalfOf" Visible="false" />
                                         </td>
                                         <td class="hdrValue">
-                                            <asp:Label ID="lblSubBy" runat="server"></asp:Label>
+                                            <asp:Label ID="lblSubBy" runat="server"></asp:Label><br />
+                                            <asp:Label ID="lblBehalf" runat="server" visible="false"/>
                                         </td>
                                         <td style="color: Gray;" width="10%">
                                             <asp:Label ID="ttlWaitingApp" runat="server" resourcekey="AwaitingApproval"></asp:Label>
@@ -1742,7 +1745,7 @@
                             </td>
                             <td colspan="2">
                                 <asp:HiddenField ID="hfOnBehalfOf" runat="server" Value="" />
-                                <asp:textbox ID="tbOnBehalfOf" runat="server"></asp:textbox>
+                                <asp:textbox ID="tbNewOnBehalfOf" runat="server"></asp:textbox>
                             </td>
                         </tr>
                     </table>

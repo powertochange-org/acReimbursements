@@ -328,8 +328,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Private Async Function loadBasicDraftPaneAsync() As Task
             Try
+                Dim userstr = CStr(UserId)
                 Dim Pending = (From c In d.AP_Staff_Rmbs
-                               Where c.Status = RmbStatus.Draft And c.PortalId = PortalId And (c.UserId = UserId)
+                               Where c.Status = RmbStatus.Draft And c.PortalId = PortalId And ((c.UserId = UserId) Or c.SpareField3.Equals(userstr))
                                Order By c.RID Descending
                                Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
                 dlPending.DataSource = Pending
@@ -828,21 +829,42 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim FORM_HAS_ITEMS = Rmb.AP_Staff_RmbLines.Count > 0
 
                     Dim user = UserController.GetUserById(PortalId, Rmb.UserId)
+                    Dim delegateId As Integer
+                    Dim directorId As Integer
+                    Dim EDMSId As Integer
+                    Try
+                        delegateId = CInt(Rmb.SpareField3)
+                    Catch
+                        delegateId = -1
+                    End Try
+                    Try
+                        directorId = CInt(Rmb.SpareField2)
+                    Catch ex As Exception
+                        directorId = -1
+                    End Try
+                    Try
+                        EDMSId = CInt(Settings("EDMSId"))
+                    Catch ex As Exception
+                        EDMSId = -1
+                    End Try
+
+                    Dim delegateName = If(delegateId >= 0, UserController.GetUserById(PortalId, delegateId).DisplayName, "")
                     Dim staff_member = StaffBrokerFunctions.GetStaffMember(Rmb.UserId)
                     Dim PACMode = (String.IsNullOrEmpty(staff_member.CostCenter) And StaffBrokerFunctions.GetStaffProfileProperty(staff_member.StaffId, "PersonalAccountCode") <> "")
 
-                    Dim isOwner = (UserId = Rmb.UserId)
+                    Dim isDelegate = (UserId = delegateId)
+                    Dim isOwner = (UserId = Rmb.UserId) Or (isDelegate And DRAFT)
                     Dim isSpouse = (StaffBrokerFunctions.GetSpouseId(UserId) = Rmb.UserId)
-                    Dim isApprover = ((UserId = Rmb.ApprUserId) And Not (isOwner Or isSpouse)) _
-                                    Or ((Rmb.Status = RmbStatus.PendingDirectorApproval) And (UserId = CType(Rmb.SpareField2, Integer))) _
-                                    Or ((Rmb.Status = RmbStatus.PendingEDMSApproval) And (UserId = CType(Settings("EDMSId"), Integer)))
+                    Dim isApprover = ((UserId = Rmb.ApprUserId) And Not (isOwner Or isSpouse Or isDelegate)) _
+                                    Or ((Rmb.Status = RmbStatus.PendingDirectorApproval) And (UserId = directorId)) _
+                                    Or ((Rmb.Status = RmbStatus.PendingEDMSApproval) And (UserId = EDMSId))
                     Dim isSupervisor = (Not isOwner) And StaffBrokerFunctions.isLeaderOf(UserId, Rmb.UserId)
                     Dim isFinance = IsAccounts() And Not (isOwner Or isSpouse) And Not DRAFT
 
                     '--Ensure the user is authorized to view this reimbursement
                     Dim RmbRel As Integer
                     RmbRel = StaffRmbFunctions.Authenticate(UserId, RmbNo, PortalId)
-                    If RmbRel = RmbAccess.Denied And Not (isApprover Or isFinance) Then
+                    If RmbRel = RmbAccess.Denied And Not (isApprover Or isFinance Or (isDelegate And DRAFT)) Then
                         ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "accessDenied", "alert('" + Translate("AccessDenied") + "');", True)
                         pnlMain.Visible = False
                         ltSplash.Text = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbSplash", PortalId))
@@ -876,7 +898,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     '*** FORM HEADER ***
                     '--dates
                     lblSubmittedDate.Text = If(Rmb.RmbDate Is Nothing, "", Rmb.RmbDate.Value.ToShortDateString)
-                    lblSubBy.Text = user.DisplayName
+                    lblSubBy.Text = If(delegateName Is Nothing, user.DisplayName, delegateName)
+                    lblBehalf.Text = user.DisplayName
+                    lblOnBehalfOf.Visible = (delegateName IsNot Nothing)
+                    lblBehalf.Visible = (delegateName IsNot Nothing)
 
                     lblApprovedDate.Text = If(Rmb.ApprDate Is Nothing, "", Rmb.ApprDate.Value.ToShortDateString)
                     ttlWaitingApp.Visible = Rmb.ApprDate Is Nothing
@@ -1474,7 +1499,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             insert.RID = StaffRmbFunctions.GetNewRID(PortalId)
             insert.CostCenter = hfNewChargeTo.Value
             insert.UserComment = tbNewComments.Text
-            insert.UserId = UserId
+            If (hfOnBehalfOf.Value.Equals(String.Empty)) Then
+                insert.UserId = UserId
+            Else
+                insert.UserId = hfOnBehalfOf.Value
+                insert.SpareField3 = CStr(UserId)  'This is the delegate, filling out the form on behalf of the user.
+            End If
 
             insert.PortalId = PortalId
 
