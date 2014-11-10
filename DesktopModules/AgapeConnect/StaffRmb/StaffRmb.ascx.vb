@@ -1471,19 +1471,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 insert.UserRef = tbNewYourRef.Text
             End If
 
-            ''prevent inserting duplicate new reimbursements (especially on resubmitting post data)
-            'If (From r In d.AP_Staff_Rmbs Where r.UserId = UserId And r.Status = RmbStatus.Draft And r.UserRef = insert.UserRef And r.CostCenter = hfNewChargeTo.Value And r.UserComment = tbNewComments.Text).Count > 0 Then
-            '    pnlMain.Visible = False
-            '    pnlSplash.Visible = True
-            '    ScriptManager.RegisterClientScriptBlock(Me, Me.GetType(), "duplicate", "$('#loading').hide(); alert('" + Translate("DuplicateError") + "');", True)
-            '    Return
-            'End If
-
             insert.RID = StaffRmbFunctions.GetNewRID(PortalId)
             insert.CostCenter = hfNewChargeTo.Value
             insert.UserComment = tbNewComments.Text
             insert.UserId = UserId
-            ' insert.PersonalCC = ddlNewChargeTo.Items(0).Value
 
             insert.PortalId = PortalId
 

@@ -284,7 +284,6 @@
             $("#divNewRmb").dialog({
                 autoOpen: false,
                 position:['middle', 150],
-                height: 250,
                 width: 500,
                 modal: true,
                 title: '<%= Translate("CreateRmb") %>',
@@ -550,6 +549,8 @@
      $('#<%= tbNewChargeTo.ClientID%>').val(''); 
      $('#<%= tbNewYourRef.ClientID%>').val('');
      $('#<%= tbNewComments.ClientID%>').val('');
+     $('#<%= tbOnBehalfOf.ClientID%>').val('');
+     $('#<%= hfOnBehalfOf.ClientID%>').val('');
  }
 
     function resetSplitPopup() {
@@ -737,6 +738,7 @@
 
     function setUpAutocomplete() {
         var cache = {};
+        var usercache = {};
         $("#<%= tbChargeTo.ClientID%>").autocomplete({
             source:  function(request, response) {
                 var term = request.term;
@@ -837,6 +839,44 @@
                     console.debug("CHANGE: -null-")
                     $('#<%= tbCostCenter.ClientID%>').val('');
                     alert("Please select an account again.  You must click on an item in the list, rather than just typing it.");
+                }
+            },
+            minLength: 2
+        });
+        $("#<%= tbOnBehalfOf.ClientID%>").autocomplete({
+            source:  function(request, response) {
+                var term = request.term;
+                if (term in usercache) {
+                    console.info('users from cache');
+                    response(cache[term]);
+                    return;
+                }
+                console.info('looking up users');
+                $.ajax({
+                    url:"/DesktopModules/AgapeConnect/StaffRmb/WebService.asmx/GetStaffNames",
+                    dataType: "json",
+                    data: {portalid:<%=PortalId%>, term: term},
+                    type: "POST",
+                    success: function(data) {
+                        usercache[term] = data;
+                        response(data);
+                    },
+                    error: function(a, b, c) {
+                        console.error('failure :'+b);
+                    }
+                });
+            },
+            select: function(event, ui) {
+                console.debug("SELECT: "+ui.item.value)
+                $('#<%= hfOnBehalfOf.ClientID%>').val(ui.item.value);
+                $('#<%= tbOnBehalfOf.ClientID%>').val(ui.item.label).change();
+            },
+            change: function(event, ui) {
+                if (!ui.item) {
+                    console.debug("CHANGE: -null-")
+                    $('#<%= hfOnBehalfOf.ClientID%>').val('');
+                    $('#<%= tbOnBehalfOf.ClientID%>').val('');
+                    alert("Please select the staff member again.  You must click on a name in the list, rather than just typing it.");
                 }
             },
             minLength: 2
@@ -1694,6 +1734,15 @@
                                 <asp:HiddenField ID="hfNewChargeTo" runat="server" value=""></asp:HiddenField>
                                 <asp:TextBox ID="tbNewChargeTo" runat="server" title="What account would you like to be reimbursed from?">
                                 </asp:TextBox>
+                            </td>
+                        </tr>
+                        <tr class="Agape_SubTitle">
+                            <td width="80px" >
+                                <dnn:Label id="lblNewOnBehalfOf" runat="server" controlName="tbNewOnBehalfOf" resourceKey="lblOnBehalfOf"></dnn:Label>
+                            </td>
+                            <td colspan="2">
+                                <asp:HiddenField ID="hfOnBehalfOf" runat="server" Value="" />
+                                <asp:textbox ID="tbOnBehalfOf" runat="server"></asp:textbox>
                             </td>
                         </tr>
                     </table>

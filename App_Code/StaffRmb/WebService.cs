@@ -35,7 +35,20 @@ public class WebService : System.Web.Services.WebService {
         HttpContext.Current.Response.ContentType = "application/json";
         HttpContext.Current.Response.Write(json);
     }
-    
+
+    [WebMethod]
+    public void GetStaffNames(int portalid, string term)
+    {
+        term = term.ToLower();
+        var result = new DotNetNuke.Security.Roles.RoleController().GetUsersByRole(portalid, "Staff")
+            .Where(w => w.DisplayName.ToLower().Contains(term))
+            .Select(s => new { label = s.DisplayName, value = s.UserID })
+            .OrderBy(o => o.label);            
+        string json = JsonConvert.SerializeObject(result);
+        HttpContext.Current.Response.ContentType = "application/json";
+        HttpContext.Current.Response.Write(json);
+    }
+
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
     public string[] GetVendorIds(string company)

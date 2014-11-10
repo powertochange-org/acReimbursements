@@ -777,4 +777,10 @@
   <data name="MoreInfoSubject.Text" xml:space="preserve">
     <value>More info is required to process your reimbursement ([USERREF])</value>
   </data>
+  <data name="lblOnBehalfOf.Help" xml:space="preserve">
+    <value>If you are filling out this form on behalf of another staff member, select that person here.</value>
+  </data>
+  <data name="lblOnBehalfOf.Text" xml:space="preserve">
+    <value>On behalf of:</value>
+  </data>
 </root>
