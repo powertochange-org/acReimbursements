@@ -783,4 +783,7 @@
   <data name="lblOnBehalfOf.Text" xml:space="preserve">
     <value>On behalf of:</value>
   </data>
+  <data name="OnBehalfOf.Text" xml:space="preserve">
+    <value>on behalf of</value>
+  </data>
 </root>
