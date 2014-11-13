@@ -307,8 +307,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             '--Highlight reimbursements that need more information in a bar at the top
             Try
                 Dim MoreInfo As System.Linq.IQueryable
+                Dim userstr = CStr(UserId)
                 MoreInfo = From c In d.AP_Staff_Rmbs
-                                    Where c.MoreInfoRequested = True And c.Status <> RmbStatus.Processing And c.Status <> RmbStatus.Cancelled And c.UserId = UserId And c.PortalId = PortalId
+                                    Where c.MoreInfoRequested = True And c.Status <> RmbStatus.Processing And c.Status <> RmbStatus.Cancelled And ((c.UserId = UserId) Or c.SpareField3.Equals(userstr)) And c.PortalId = PortalId
                                     Select c.UserRef, c.RID, c.RMBNo
                 For Each row In MoreInfo
                     Dim hyp As New HyperLink()
@@ -343,8 +344,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Private Async Function loadBasicSubmittedPaneAsync() As Task
             'This panel lists reimbursements in the Submitted, PendingDirectorApproval, or PendingEDMSApproval statuses
             Try
+                Dim userstr = CStr(UserId)
                 Dim Submitted = (From c In d.AP_Staff_Rmbs
-                                 Where (c.Status = RmbStatus.Submitted Or c.Status = RmbStatus.PendingDirectorApproval Or c.Status = RmbStatus.PendingEDMSApproval) And c.UserId = UserId And c.PortalId = PortalId
+                                 Where (c.Status = RmbStatus.Submitted Or c.Status = RmbStatus.PendingDirectorApproval Or c.Status = RmbStatus.PendingEDMSApproval) And ((c.UserId = UserId) Or c.SpareField3.Equals(userstr)) And c.PortalId = PortalId
                                  Order By c.RID Descending
                                  Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
                 dlSubmitted.DataSource = Submitted
@@ -401,9 +403,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Private Async Function loadBasicApprovedPaneAsync() As Task
             Try
+                Dim userstr = CStr(UserId)
                 Dim Approved = (From c In d.AP_Staff_Rmbs
                                 Where (c.Status = RmbStatus.Approved Or c.Status = RmbStatus.PendingDownload Or c.Status = RmbStatus.DownloadFailed) _
-                                    And c.UserId = UserId And c.PortalId = PortalId
+                                    And ((c.UserId = UserId) Or c.SpareField3.Equals(userstr)) And c.PortalId = PortalId
                                 Order By c.RID Descending
                                 Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
                 dlApproved.DataSource = Approved
@@ -417,8 +420,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Private Async Function loadBasicProcessingPaneAsync() As Task
             Try
+                Dim userstr = CStr(UserId)
                 Dim Complete = (From c In d.AP_Staff_Rmbs
-                                Where c.Status = RmbStatus.Processing And c.UserId = UserId And c.PortalId = PortalId
+                                Where c.Status = RmbStatus.Processing And ((c.UserId = UserId) Or c.SpareField3.Equals(userstr)) And c.PortalId = PortalId
                                 Order By c.RID Descending
                                 Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
                 dlProcessing.DataSource = Complete
@@ -431,8 +435,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Private Async Function loadBasicPaidPaneAsync() As Task
             Try
+                Dim userstr = CStr(UserId)
                 Dim Complete = (From c In d.AP_Staff_Rmbs
-                                Where c.Status = RmbStatus.Paid And c.UserId = UserId And c.PortalId = PortalId
+                                Where c.Status = RmbStatus.Paid And ((c.UserId = UserId) Or c.SpareField3.Equals(userstr)) And c.PortalId = PortalId
                                 Order By c.RID Descending
                                 Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
                 dlPaid.DataSource = Complete
@@ -445,8 +450,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Private Async Function loadBasicCancelledTaskAsync() As Task
             Try
+                Dim userstr = CStr(UserId)
                 Dim Cancelled = (From c In d.AP_Staff_Rmbs
-                                 Where c.Status = RmbStatus.Cancelled And c.UserId = UserId And c.PortalId = PortalId
+                                 Where c.Status = RmbStatus.Cancelled And ((c.UserId = UserId) Or c.SpareField3.Equals(userstr)) And c.PortalId = PortalId
                                  Order By c.RID Descending
                                  Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
                 dlCancelled.DataSource = Cancelled
@@ -867,7 +873,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     '--Ensure the user is authorized to view this reimbursement
                     Dim RmbRel As Integer
                     RmbRel = StaffRmbFunctions.Authenticate(UserId, RmbNo, PortalId)
-                    If RmbRel = RmbAccess.Denied And Not (isApprover Or isFinance Or (isDelegate And DRAFT)) Then
+                    If RmbRel = RmbAccess.Denied And Not (isApprover Or isFinance Or isDelegate) Then
                         ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "accessDenied", "alert('" + Translate("AccessDenied") + "');", True)
                         pnlMain.Visible = False
                         ltSplash.Text = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbSplash", PortalId))
