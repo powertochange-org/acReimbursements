@@ -93,8 +93,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Else
                 TaskList.Add(LoadCompaniesAsync())
                 TaskList.Add(LoadMenuAsync())
-                TaskList.Add(LoadAddressAsync())
-
+                
                 'Initialize US exchange rate from settings
                 Dim rateString As String = Settings("USExchangeRate")
                 Dim rate As Double = 0
@@ -833,7 +832,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim directorId As Integer
                     Dim EDMSId As Integer
                     Try
-                        delegateId = CInt(Rmb.SpareField3)
+                        If Rmb.SpareField3 IsNot Nothing Then
+                            delegateId = CInt(Rmb.SpareField3)
+                        Else
+                            delegateId = -1
+                        End If
                     Catch
                         delegateId = -1
                     End Try
@@ -982,9 +985,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     btnSubmit.Visible = (isOwner Or isSpouse) And (DRAFT Or MORE_INFO Or CANCELLED) And FORM_HAS_ITEMS
                     btnSubmit.Text = If(DRAFT, Translate("btnSubmit"), Translate("btnResubmit"))
                     enableSubmitButton(btnSubmit.Visible And Rmb.CostCenter IsNot Nothing And Rmb.ApprUserId IsNot Nothing AndAlso (Rmb.CostCenter.Length = 6) And (Rmb.ApprUserId >= 0))
-                    btnAddressOk.OnClientClick = ""
-                    btnTempAddressChange.OnClientClick = ""
-                    btnPermAddressChange.OnClientClick = ""
                     btnReject.Visible = isApprover And SUBMITTED
                     enableRejectButton(isApprover And SUBMITTED And tbApprComments.Text <> "")
                     btnApprove.Visible = isApprover And SUBMITTED
@@ -1540,8 +1540,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "hide_loading_spinner", "$('#loading').hide();", True)
         End Sub
 
-        Protected Sub btnSubmit_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSubmit.Click
-
+        Protected Async Sub btnSubmit_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSubmit.Click
             Dim State As Integer = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.Status).First
             If Not (State = RmbStatus.Draft Or State = RmbStatus.Cancelled Or State = RmbStatus.Submitted) Then Return
 
@@ -1551,41 +1550,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 ScriptManager.RegisterClientScriptBlock(btnSubmit, btnSubmit.GetType, "submitAlert", "alert('" & Translate("btnSubmitHelp") & "');", True)
                 Return
             End If
-            'This function simply kicks off the address confirmation dialogue.
-            'the submission functionality can be found in btnAddressOk_Click
-            Dim RmbNo = hfRmbNo.Value
-            Dim rmbs = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo
-            If (rmbs.Count > 0) Then
-                Dim rmb = rmbs.First
-                Dim receipts = From b In rmb.AP_Staff_RmbLines Where b.Receipt = True And b.ReceiptImageId Is Nothing
-                If (receipts.Count > 0) Then
-                    btnAddressOk.OnClientClick = "window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & RmbNo & "&UID=" & rmb.UserId & "&mode=1', '_blank'); "
-                    btnTempAddressChange.OnClientClick = "window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & RmbNo & "&UID=" & rmb.UserId & "&mode=1', '_blank'); "
-                    btnPermAddressChange.OnClientClick = "window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & RmbNo & "&UID=" & rmb.UserId & "&mode=1', '_blank'); "
-                End If
-            End If
-        End Sub
 
-        Protected Async Sub btnAddressOk_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnAddressOk.Click, btnTempAddressChange.Click, btnPermAddressChange.Click
-            Dim State As Integer = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.Status).First
-            If Not (State = RmbStatus.Draft Or State = RmbStatus.Cancelled Or State = RmbStatus.Submitted) Then Return
-
-            If (CType(sender, Button).ID = "btnTempAddressChange") Or (CType(sender, Button).ID <> "btnPermAddressChange") Then
-                If addAddressToComments() Then
-                    If CType(sender, Button).ID <> "btnTempAddressChange" Then
-                        tbComments.Text += "**only for this reimbursement**"
-                    Else
-                        tbComments.Text += "**PLEASE UPDATE my address**"
-                    End If
-                End If
-            End If
-            saveIfNecessary()
             Dim rmbs = From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value
             If rmbs.Count > 0 Then
                 Dim rmb = rmbs.First
                 Dim NewStatus As Integer = rmb.Status
                 Dim rmbTotal = CType((From t In d.AP_Staff_RmbLines Where t.RmbNo = rmb.RMBNo Select t.GrossAmount).Sum(), Decimal?).GetValueOrDefault(0)
-                Dim requires_receipts = (btnAddressOk.OnClientClick.Length > 0) ' this will contain code to open printable form, if receipts are required
+                Dim requires_receipts = ((From b In rmb.AP_Staff_RmbLines Where b.Receipt = True And b.ReceiptImageId Is Nothing).Count > 0)
+                Dim printable = ""
+                If (requires_receipts) Then printable = "window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & rmb.RMBNo & "&UID=" & rmb.UserId & "&mode=1', '_blank'); "
                 Dim message As String
                 If requires_receipts Then
                     message = Translate("Printout")
@@ -1631,7 +1604,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Log(rmb.RID, "SUBMITTED")
 
                 'use an alert to switch back to the main window from the printout window
-                ScriptManager.RegisterStartupScript(Page, Me.GetType(), "popup_and_select", "closeAddressDialog(); alert(""" & message & """); selectIndex(1)", True)
+                ScriptManager.RegisterStartupScript(Page, Me.GetType(), printable & "popup_and_select", "closeAddressDialog(); alert(""" & message & """); selectIndex(1)", True)
                 Await Task.WhenAll(refreshMenuTasks)
 
             End If
@@ -4322,41 +4295,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Catch
             End Try
             Return ""
-        End Function
-
-        Private Async Function LoadAddressAsync() As Task
-            Dim User = StaffBrokerFunctions.GetStaffMember(UserId)
-            tbAddressLine1.Text = StaffBrokerFunctions.GetStaffProfileProperty(User, "Address1")
-            tbAddressLine2.Text = StaffBrokerFunctions.GetStaffProfileProperty(User, "Address2")
-            tbCity.Text = StaffBrokerFunctions.GetStaffProfileProperty(User, "City")
-            tbProvince.Text = StaffBrokerFunctions.GetStaffProfileProperty(User, "Province")
-            tbCountry.Text = StaffBrokerFunctions.GetStaffProfileProperty(User, "Country")
-            tbPostalCode.Text = StaffBrokerFunctions.GetStaffProfileProperty(User, "PostalCode")
-        End Function
-
-        Private Function addAddressToComments() As Boolean
-            Dim User = StaffBrokerFunctions.GetStaffMember(UserId)
-            Dim Address1 = StaffBrokerFunctions.GetStaffProfileProperty(User, "Address1")
-            Dim Address2 = StaffBrokerFunctions.GetStaffProfileProperty(User, "Address2")
-            Dim City = StaffBrokerFunctions.GetStaffProfileProperty(User, "City")
-            Dim Province = StaffBrokerFunctions.GetStaffProfileProperty(User, "Province")
-            Dim Country = StaffBrokerFunctions.GetStaffProfileProperty(User, "Country")
-            Dim PC = StaffBrokerFunctions.GetStaffProfileProperty(User, "PostalCode")
-
-            If (tbAddressLine1.Text = Address1) _
-                And (tbAddressLine2.Text = Address2) _
-                And (tbCity.Text = City) _
-                And (tbProvince.Text = Province) _
-                And (tbCountry.Text = Country) _
-                And (tbPostalCode.Text = PC) Then
-                Return False
-            End If
-            Dim new_address = tbAddressLine1.Text & Environment.NewLine & tbAddressLine2.Text & Environment.NewLine & tbCity.Text _
-                              & Environment.NewLine & tbProvince.Text & Environment.NewLine & tbCountry.Text & Environment.NewLine & tbPostalCode.Text & Environment.NewLine
-            '(remove blank lines)
-            new_address = new_address.Replace(Environment.NewLine & Environment.NewLine, Environment.NewLine)
-            tbComments.Text += Environment.NewLine & "**Use the following address:" & Environment.NewLine & new_address
-            Return True
         End Function
 
         Private Function hasOldExpenses() As Boolean
