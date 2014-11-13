@@ -857,17 +857,17 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         EDMSId = -1
                     End Try
 
-                    Dim delegateName = If(delegateId >= 0, UserController.GetUserById(PortalId, delegateId).DisplayName, "")
+                    Dim hasDelegate = (delegateId >= 0)
+                    Dim delegateName = If(hasDelegate, UserController.GetUserById(PortalId, delegateId).DisplayName, "")
                     Dim staff_member = StaffBrokerFunctions.GetStaffMember(Rmb.UserId)
                     Dim PACMode = (String.IsNullOrEmpty(staff_member.CostCenter) And StaffBrokerFunctions.GetStaffProfileProperty(staff_member.StaffId, "PersonalAccountCode") <> "")
 
                     Dim isDelegate = (UserId = delegateId)
-                    Dim isOwner = (UserId = Rmb.UserId) Or (isDelegate And DRAFT)
+                    Dim isOwner = (UserId = Rmb.UserId) Or isDelegate
                     Dim isSpouse = (StaffBrokerFunctions.GetSpouseId(UserId) = Rmb.UserId)
-                    Dim isApprover = ((UserId = Rmb.ApprUserId) And Not (isOwner Or isSpouse Or isDelegate)) _
+                    Dim isApprover = ((UserId = Rmb.ApprUserId) And Not (isOwner Or isSpouse)) _
                                     Or ((Rmb.Status = RmbStatus.PendingDirectorApproval) And (UserId = directorId)) _
                                     Or ((Rmb.Status = RmbStatus.PendingEDMSApproval) And (UserId = EDMSId))
-                    Dim isSupervisor = (Not isOwner) And StaffBrokerFunctions.isLeaderOf(UserId, Rmb.UserId)
                     Dim isFinance = IsAccounts() And Not (isOwner Or isSpouse) And Not DRAFT
 
                     '--Ensure the user is authorized to view this reimbursement
@@ -907,10 +907,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     '*** FORM HEADER ***
                     '--dates
                     lblSubmittedDate.Text = If(Rmb.RmbDate Is Nothing, "", Rmb.RmbDate.Value.ToShortDateString)
-                    lblSubBy.Text = If(delegateName Is Nothing, user.DisplayName, delegateName)
-                    lblBehalf.Text = user.DisplayName
-                    lblOnBehalfOf.Visible = (delegateName IsNot Nothing)
-                    lblBehalf.Visible = (delegateName IsNot Nothing)
+                    lblSubBy.Text = If(hasDelegate, delegateName, user.DisplayName)
+                    lblBehalf.Text = If(hasDelegate, user.DisplayName, "")
+                    lblOnBehalfOf.Visible = (hasDelegate)
+                    lblBehalf.Visible = (hasDelegate)
 
                     lblApprovedDate.Text = If(Rmb.ApprDate Is Nothing, "", Rmb.ApprDate.Value.ToShortDateString)
                     ttlWaitingApp.Visible = Rmb.ApprDate Is Nothing
