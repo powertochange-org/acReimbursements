@@ -1489,7 +1489,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Try
                         Staffname = Staffname & " and " & UserController.GetUserById(rmb.PortalId, rmb.SpareField3).DisplayName
                     Catch ex As Exception
-                        Staffname = "(" & ex.Message & ")"
+                        Staffname = "(" & Staffname & ")"
                     End Try
                 End If
                 Dim message As String = Translate("RejectorMessage").Replace("[STAFFNAME]", Staffname)
