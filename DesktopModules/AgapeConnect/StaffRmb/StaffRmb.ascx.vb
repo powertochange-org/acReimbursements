@@ -1486,15 +1486,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Await Task.WhenAll(taskList)
                 Dim Staffname As String = UserController.GetUserById(rmb.PortalId, rmb.UserId).DisplayName
                 If (rmb.SpareField3 IsNot Nothing) Then
-                    Dim delegateId = -1
                     Try
-                        delegateId = CInt(rmb.SpareField3)
-                        If (delegateId >= 0) Then
-                            Dim delegateName = UserController.GetUserById(PortalId, delegateId).DisplayName
-                            Staffname = Staffname & " and " & delegateName
-                        End If
+                        Staffname = Staffname & " and " & UserController.GetUserById(rmb.PortalId, rmb.SpareField3).DisplayName
                     Catch ex As Exception
-                        delegateId = -1
+                        Staffname = "(" & ex.Message & ")"
                     End Try
                 End If
                 Dim message As String = Translate("RejectorMessage").Replace("[STAFFNAME]", Staffname)
