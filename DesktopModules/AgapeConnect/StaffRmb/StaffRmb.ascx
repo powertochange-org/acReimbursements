@@ -1333,7 +1333,7 @@
                                                     <asp:Label ID="Label26" runat="server" CssClass="hdrTitle" resourcekey="ApproversComments"></asp:Label></legend>
                                                 <asp:Label ID="lblApprComments" runat="server" Height="60px"></asp:Label>
                                                 <asp:TextBox ID="tbApprComments" runat="server" Height="35px" TextMode="MultiLine"
-                                                    Width="100%" Visible="false"  onChange="showSaveButton();"></asp:TextBox>
+                                                    Width="100%" Visible="false"  onKeyPress="showSaveButton();"></asp:TextBox>
                                                 <asp:CheckBox ID="cbApprMoreInfo" runat="server" AutoPostBack="true" resourcekey="btnMoreInfo" />
                                             </fieldset>
                                         </td>
