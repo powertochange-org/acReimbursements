@@ -664,7 +664,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                    Where (c.Status = RmbStatus.Approved Or c.Status >= RmbStatus.PendingDownload) And c.PortalId = PortalId
                                    Order By c.ApprDate Ascending
                                    Select c.RMBNo, c.CostCenter, c.RmbDate, c.ApprDate, c.UserRef, c.RID, c.UserId, c.Status, c.SpareField1, _
-                                       Receipts = ((c.AP_Staff_RmbLines.Where(Function(x) x.Receipt And (x.ReceiptImageId Is Nothing))).Count > 0))
+                                       Receipts = ((c.AP_Staff_RmbLines.Where(Function(x) x.Receipt And ((From f In d.AP_Staff_RmbLine_Files Where f.RmbLineNo = x.RmbLineNo).Count = 0))).Count > 0))
                 Dim total = AllApproved.Count
 
                 ' NOTE: GAiN cost centers all start with '69' by convention
