@@ -3271,8 +3271,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Sub
 
         Sub SendApprovedEmail(ByVal theRmb As AP_Staff_Rmb)
-            Dim ObjAppr As UserInfo = UserController.GetUserById(PortalId, Me.UserId)
-            Dim theUser As UserInfo = UserController.GetUserById(PortalId, theRmb.UserId)
+            Dim apprname As String = UserController.GetUserById(PortalId, Me.UserId).DisplayName
+            Dim staffname As String = UserController.GetUserById(PortalId, theRmb.UserId).DisplayName
+            Dim emailaddress As String = UserController.GetUserById(PortalId, theRmb.UserId).Email
             Dim delegateId As Integer = -1
             Try
                 If (theRmb.SpareField3 IsNot Nothing) Then delegateId = CInt(theRmb.SpareField3)
@@ -3285,9 +3286,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim Emessage = ""
 
             Emessage = StaffBrokerFunctions.GetTemplate("RmbApprovedEmail", PortalId)
-            Emessage = Emessage.Replace("[STAFFNAME]", If(delegateId >= 0, DelegateName & " (" & Translate("OnBehalfOf") & " " & theUser.DisplayName & ")", theUser.DisplayName))
+            Emessage = Emessage.Replace("[STAFFNAME]", If(delegateId >= 0, DelegateName & " (" & Translate("OnBehalfOf") & " " & staffname & ")", staffname))
             Emessage = Emessage.Replace("[RMBNO]", theRmb.RID).Replace("[USERREF]", IIf(theRmb.UserRef <> "", theRmb.UserRef, "None"))
-            Emessage = Emessage.Replace("[APPROVER]", ObjAppr.DisplayName)
+            Emessage = Emessage.Replace("[APPROVER]", apprname)
             If theRmb.Changed = True Then
                 Emessage = Emessage.Replace("[CHANGES]", ". " & Translate("EmailApproverChanged"))
                 theRmb.Changed = False
@@ -3295,7 +3296,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Else
                 Emessage = Emessage.Replace("[CHANGES]", "")
             End If
-            SendEmail(theUser.Email, DelegateEmail, subject, Emessage)
+            SendEmail(emailaddress, DelegateEmail, subject, Emessage)
         End Sub
 
         Sub SendRejectionLetter(theRmb As AP_Staff_Rmb)
@@ -3307,12 +3308,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Catch ex As Exception
                 delegateId = -1
             End Try
+            Dim DelegateName = If(delegateId >= 0, UserController.GetUserById(PortalId, delegateId).DisplayName, "")
             Dim DelegateEmail = If(delegateId >= 0, UserController.GetUserById(PortalId, delegateId).Email, "")
             Dim apprname As String = UserController.GetUserById(PortalId, Me.UserId).DisplayName
             Dim subject As String = Translate("EmailRejectedSubject").Replace("[RMBNO]", theRmb.RID).Replace("[USERREF]", theRmb.UserRef)
             Dim Emessage As String = StaffBrokerFunctions.GetTemplate("RmbRejectedEmail", PortalId)
 
-            Emessage = Emessage.Replace("[STAFFNAME]", staffname).Replace("[APPROVER]", apprname).Replace("[RMBNO]", theRmb.RID).Replace("[USERREF]", theRmb.UserRef)
+            Emessage = Emessage.Replace("[STAFFNAME]", If(delegateId >= 0, DelegateName & " (" & Translate("OnBehalfOf") & " " & staffname & ")", staffname))
+            Emessage = Emessage.Replace("[APPROVER]", apprname).Replace("[RMBNO]", theRmb.RID).Replace("[USERREF]", theRmb.UserRef)
             SendEmail(emailaddress, DelegateEmail, subject, Emessage)
         End Sub
 
