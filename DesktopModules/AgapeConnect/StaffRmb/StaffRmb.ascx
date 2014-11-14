@@ -918,7 +918,7 @@
         </ContentTemplate>
     </asp:UpdatePanel>
 </div>
-<asp:Panel ID="pnlEverything" runat="server" >
+<asp:Panel ID="pnlEverything" runat="server" style="position:relative;">
 
 
     <div style="padding-bottom: 5px;">
@@ -934,7 +934,7 @@
     <asp:HiddenField ID="hfCurOpen" runat="server" Value="false" />
     <asp:HiddenField ID="hfChargeToValue" runat="server"  />
     <asp:HiddenField ID="hfTabModuleId" runat="server" Value="-1" />
-
+	<a target="_blank" style="position: relative; float: right; right: 50px; top: -50px;" href="https://wiki.powertochange.org/help/index.php/Online_Reimbursements">Help</a>
 
     <table width="100%">
         <tr valign="top">
