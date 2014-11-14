@@ -3188,7 +3188,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim rmblink = "<a href='" & link & "'>" & link & "</a>"
             Dim subject = Translate("MoreInfoSubject").Replace("[USERREF]", rmbno)
             Dim body = Translate("MoreInfoBody").Replace("[WHO]", sender).Replace("[USERREF]", rmbno).Replace("[RMBLINK]", rmblink).Replace("[COMMENTS]", comments)
-            SendEmail(address, delegateId, subject, body)
+            SendEmail(address, delegateEmail, subject, body)
         End Sub
 
         Protected Sub SendApprovalEmail(ByVal theRmb As AP_Staff_Rmb)
