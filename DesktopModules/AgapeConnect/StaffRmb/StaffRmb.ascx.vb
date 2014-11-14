@@ -1466,7 +1466,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Return
             End If
             Dim RmbNo = hfRmbNo.Value
-            Dim rmbs = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo And (c.Status = RmbStatus.Submitted) Or (c.Status = RmbStatus.PendingDirectorApproval) Or (c.Status = RmbStatus.PendingEDMSApproval)
+            Dim rmbs = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo And ((c.Status = RmbStatus.Submitted) Or (c.Status = RmbStatus.PendingDirectorApproval) Or (c.Status = RmbStatus.PendingEDMSApproval))
             If (rmbs.Count > 0) Then
                 Dim rmb = rmbs.First
                 'Ensure only authorized person can reject a form
@@ -1474,10 +1474,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 If (rmb.Status = RmbStatus.PendingDirectorApproval) AndAlso (UserId <> StaffBrokerFunctions.getDirectorFor(rmb.CostCenter, CType(Settings("EDMSId"), Integer))) Then Return
                 If (rmb.Status = RmbStatus.PendingEDMSApproval) AndAlso (UserId <> CType(Settings("EDMSId"), Integer)) Then Return
 
+                rmb.Status = RmbStatus.Draft
                 rmb.MoreInfoRequested = True
-                If rmb.Status = RmbStatus.Submitted Then
-                    rmb.Status = RmbStatus.Draft
-                End If
                 cbMoreInfo.Checked = True
                 d.SubmitChanges()
                 Dim taskList = New List(Of Task)
@@ -1499,7 +1497,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         Staffname += " and " & delegateName
                     End If
                 End If
-                Dim message As String = Translate("RejectorMessage").Replace("[STAFFNAME]", staffname)
+                Dim message As String = Translate("RejectorMessage").Replace("[STAFFNAME]", Staffname)
                 ScriptManager.RegisterClientScriptBlock(btnReject, btnReject.GetType(), "notify_reject", "alert('" + message + "');", True)
             End If
         End Sub
@@ -3305,7 +3303,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             SendEmail(theUser.Email, DelegateEmail, subject, Emessage)
         End Sub
 
-        Sub SendRejectionLetter(ByVal theRmb As AP_Staff_Rmb)
+        Sub SendRejectionLetter(theRmb As AP_Staff_Rmb)
             Dim staffname As String = UserController.GetUserById(PortalId, theRmb.UserId).DisplayName
             Dim emailaddress As String = UserController.GetUserById(PortalId, theRmb.UserId).Email
             Dim delegateId As Integer = -1
