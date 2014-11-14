@@ -1486,7 +1486,19 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 taskList.Add(LoadRmbAsync(RmbNo))
                 SendRejectionLetter(rmb)
                 Await Task.WhenAll(taskList)
-                Dim staffname As String = UserController.GetUserById(rmb.PortalId, rmb.UserId).DisplayName
+                Dim Staffname As String = UserController.GetUserById(rmb.PortalId, rmb.UserId).DisplayName
+                If (rmb.SpareField3 IsNot Nothing) Then
+                    Dim delegateId = -1
+                    Try
+                        delegateId = CInt(rmb.SpareField3)
+                    Catch ex As Exception
+                        delegateId = -1
+                    End Try
+                    If (delegateId >= 0) Then
+                        Dim delegateName = UserController.GetUserById(PortalId, delegateId).DisplayName
+                        Staffname += " and " & delegateName
+                    End If
+                End If
                 Dim message As String = Translate("RejectorMessage").Replace("[STAFFNAME]", staffname)
                 ScriptManager.RegisterClientScriptBlock(btnReject, btnReject.GetType(), "notify_reject", "alert('" + message + "');", True)
             End If
@@ -3680,6 +3692,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             cbApprMoreInfo.Checked = cbMoreInfo.Checked
             Dim theRmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value) And c.PortalId = PortalId
             If theRmb.Count > 0 Then
+                saveIfNecessary()
                 lblStatus.Text = Translate(RmbStatus.StatusName(theRmb.First.Status))
                 If cbMoreInfo.Checked Then
                     SendMoreinfoEmail(Translate("Accounts"), theRmb.First.AcctComment, theRmb.First)
@@ -3687,7 +3700,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     lblStatus.Text = lblStatus.Text & " - " & Translate("StatusMoreInfo")
                     Log(theRmb.First.RID, "More info requested by Finance: " + theRmb.First.AcctComment)
                 End If
-                saveIfNecessary()
             End If
         End Sub
 
@@ -3695,6 +3707,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             cbMoreInfo.Checked = cbApprMoreInfo.Checked
             Dim theRmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value) And c.PortalId = PortalId
             If theRmb.Count > 0 Then
+                saveIfNecessary()
                 lblStatus.Text = Translate(RmbStatus.StatusName(theRmb.First.Status))
                 If cbApprMoreInfo.Checked Then
                     Dim approver = UserController.GetUserById(PortalId, UserId).DisplayName
@@ -3703,7 +3716,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     lblStatus.Text = lblStatus.Text & " - " & Translate("StatusMoreInfo")
                     Log(theRmb.First.RID, "More info requested by Approver(" + approver + "): " + theRmb.First.ApprComment)
                 End If
-                saveIfNecessary()
             End If
         End Sub
 
