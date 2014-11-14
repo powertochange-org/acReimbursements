@@ -151,7 +151,17 @@ namespace StaffRmb
                 spouseId = StaffBrokerFunctions.GetSpouseId(rmb.UserId);
             } catch {
                 spouseId = -2;
-            }            
+            }
+            int delegateId = -1;
+            String delegate_logon = "";
+            if (rmb.SpareField3 != null) {
+                try {
+                    delegateId = int.Parse(rmb.SpareField3);
+                    delegate_logon = logonFromId(rmb.PortalId, delegateId);
+                } catch {
+                    delegateId=-1;
+                }
+            }
             String staff_logon = logonFromId(rmb.PortalId, rmb.UserId);
             String spouse_logon = logonFromId(rmb.PortalId, spouseId);
             int levels = 2; //the number of supervisor upline to include
@@ -188,8 +198,8 @@ namespace StaffRmb
                 }
                 foreach (int uid in combineArrays(userSupervisors, spouseSupervisors))
                 {
-                    //exclude user and spouse 
-                    if (!((uid == rmb.UserId) || (uid == spouseId)))
+                    //exclude user and spouse and delegate
+                    if (!((uid == rmb.UserId) || (uid == spouseId) || (uid==delegateId)))
                     {
                         result.UserIds.Add(UserController.GetUserById(rmb.PortalId, uid));
                     }
@@ -202,8 +212,8 @@ namespace StaffRmb
             String[] potential_approvers = await signingAuthorityTask;
             foreach (String potential_approver in potential_approvers)
             {
-                if (!(potential_approver.Equals(staff_logon) || potential_approver.Equals(spouse_logon)))
-                { //exclude rmb creator and spouse
+                if (!(potential_approver.Equals(staff_logon) || potential_approver.Equals(spouse_logon) || potential_approver.Equals(delegate_logon)))
+                { //exclude rmb creator and spouse and delegate
                     UserInfo user = UserController.GetUserByName(rmb.PortalId, potential_approver + rmb.PortalId.ToString());
                     if (user != null)
                     {

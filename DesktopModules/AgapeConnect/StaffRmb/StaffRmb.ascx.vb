@@ -2936,6 +2936,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             objEventLog.AddLog("Rmb: " & RID, Message, PortalSettings, UserId, Services.Log.EventLog.EventLogController.EventLogType.ADMIN_ALERT)
         End Sub
 
+        Private Function hasElectronicReceipts(lineNo As Integer) As Boolean
+            Return (From c In d.AP_Staff_RmbLine_Files Where c.RmbLineNo = lineNo).Count > 0
+        End Function
+
         Protected Function GetAccountCode(ByVal LineTypeId As Integer, ByVal CostCenter As String) As String
 
             Dim q = From c In d.AP_StaffRmb_PortalLineTypes Where c.LineTypeId = LineTypeId And c.PortalId = PortalId
@@ -3218,7 +3222,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim extra = If(StaffBrokerFunctions.RequiresExtraApproval(theRmb.RMBNo), Translate("ExtraApproval"), "")
                 Dim toEmail = approver.Email
                 Dim toName = approver.FirstName
-                Dim hasReceipts = (From c In theRmb.AP_Staff_RmbLines Where c.Receipt = True And (c.ReceiptImageId Is Nothing)).Count > 0
+                Dim hasReceipts = (From c In theRmb.AP_Staff_RmbLines
+                                   Where c.Receipt = True And ((From f In d.AP_Staff_RmbLine_Files Where f.RmbLineNo = c.RmbLineNo).Count = 0)).Count > 0
 
                 If theRmb.Status = RmbStatus.Submitted Then
                     ownerMessage = ownerMessage.Replace("[APPROVER]", approver.DisplayName).Replace("[EXTRA]", extra)
