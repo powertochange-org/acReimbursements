@@ -1489,13 +1489,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim delegateId = -1
                     Try
                         delegateId = CInt(rmb.SpareField3)
+                        If (delegateId >= 0) Then
+                            Dim delegateName = UserController.GetUserById(PortalId, delegateId).DisplayName
+                            Staffname = Staffname & " and " & delegateName
+                        End If
                     Catch ex As Exception
                         delegateId = -1
                     End Try
-                    If (delegateId >= 0) Then
-                        Dim delegateName = UserController.GetUserById(PortalId, delegateId).DisplayName
-                        Staffname += " and " & delegateName
-                    End If
                 End If
                 Dim message As String = Translate("RejectorMessage").Replace("[STAFFNAME]", Staffname)
                 ScriptManager.RegisterClientScriptBlock(btnReject, btnReject.GetType(), "notify_reject", "alert('" + message + "');", True)
