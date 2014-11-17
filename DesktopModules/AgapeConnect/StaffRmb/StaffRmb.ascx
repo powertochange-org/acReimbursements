@@ -1442,10 +1442,7 @@
 
                                                 <asp:TemplateField HeaderText="Receipt" ItemStyle-Width="20px">
                                                     <ItemTemplate>
-                                                        <%# If(Not Eval("Receipt"), "<img src='/Icons/Sigma/no_receipt_32x32.png' width=20 alt='none' title='no receipt' />",
-                                                              If(Eval("ReceiptImageId") is Nothing,  "<img src='/Icons/Sigma/BulkMail_32X32_Standard.png' width=20 alt='mail' title='receipt will be sent by mail'/>",
-                                                                ElectronicReceiptTags(Eval("RmbLineNo"))))
-                                                        %>
+                                                        <%# If(Not Eval("Receipt"), "<img src='/Icons/Sigma/no_receipt_32x32.png' width=20 alt='none' title='no receipt' />", ElectronicReceiptTags(Eval("RmbLineNo"))) %>
                                                     </ItemTemplate>
                                                     <ItemStyle HorizontalAlign="Center" />
                                                 </asp:TemplateField>

@@ -86,6 +86,7 @@ Partial Class controls_RmbSubPD
             Return result
         End Get
         Set(ByVal value As Double)
+            tbAmount.Text = value.ToString("n2", New CultureInfo("en-US"))
         End Set
     End Property
     Public Property Spare1() As String

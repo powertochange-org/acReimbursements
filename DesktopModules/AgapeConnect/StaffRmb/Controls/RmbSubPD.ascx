@@ -30,6 +30,7 @@
             <table style="font-size:9pt">
                 <tr>
                     <td>
+                        <asp:TextBox ID="tbAmount" runat="server" Visible="false" />
                         <asp:CheckBox ID="cbBreakfast" runat="server" CssClass="perdiem" OnClick="updatePerDiem($('.pdbreakfast'),$(this).is(':checked'));"/>
                         <b><%=Translate("lblBreakfast")%></b> 
                     </td>

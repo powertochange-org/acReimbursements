@@ -790,7 +790,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim initials = Left(user.FirstName, 1) + Left(user.LastName, 1)
                 ddlCompany.SelectedIndex = -1
                 dtPostingDate.Text = Today.ToString("MM/dd/yyyy")
-                tbBatchId.Text = Today.ToString("yyMMdd") & initials
+                Dim batchIds = From c In d.AP_Staff_Rmb_Post_Extras Order By c.PostingDate Descending Select c.BatchId
+                If (batchIds.Count() > 0) Then
+                    tbBatchId.Text = batchIds.First()
+                End If
                 tbPostingReference.Text = ""
                 tbInvoiceNumber.Text = "REIMB" & lblRmbNo.Text
                 tbVendorId.Text = ""
@@ -1007,7 +1010,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     tbCostcenter.Enabled = isFinance
                     ddlAccountCode.Enabled = isFinance
                     pnlAccountsOptions.Style.Add("display", If(isFinance, "block", "none"))
-
 
                     updateBalanceLabel(Await getAccountBalanceTask)
                     If (isApprover) Then
@@ -2627,7 +2629,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim result = ""
             Dim receipts = From e In d.AP_Staff_RmbLine_Files Where e.RmbLineNo = lineId Order By e.RecNum Select e.URL, e.FileId
             If (receipts.Count < 1) Then
-                result = ERR
+                result = "<img src='/Icons/Sigma/BulkMail_32X32_Standard.png' width=20 alt='mail' title='receipt will be sent by mail'/>"
             Else
                 For Each receipt In receipts
                     Dim extension = "NONE"
@@ -2655,7 +2657,23 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Function
 
         Protected Function CanEdit(ByVal status As Integer) As Boolean
-            Return status <> RmbStatus.Paid And status <> RmbStatus.Processing And status <> RmbStatus.PendingDownload And status <> RmbStatus.DownloadFailed And (status <> RmbStatus.Approved Or IsAccounts())
+            'nobody can edit in these states
+            If (status = RmbStatus.Paid) Then Return False
+            If (status = RmbStatus.Processing) Then Return False
+            If (status = RmbStatus.PendingDownload Or status = RmbStatus.DownloadFailed) Then Return False
+
+            'always editable in these states
+            If (status = RmbStatus.Draft) Then Return True
+            If (status = RmbStatus.Submitted Or status = RmbStatus.PendingDirectorApproval Or status = RmbStatus.PendingEDMSApproval) Then Return True
+            'accounts can always edit
+            If (IsAccounts()) Then Return True
+
+            'owner or delegate can edit if we've gotten this far, and the moreinfo flag is set
+            Dim rmbs = From c In d.AP_Staff_Rmbs Where (c.RMBNo = hfRmbNo.Value)
+            If (rmbs.Count > 0) Then
+                If rmbs.First.MoreInfoRequested Then Return True
+            End If
+            Return False
         End Function
 
         Protected Function isStaffAccount() As Boolean

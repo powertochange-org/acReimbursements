@@ -109,7 +109,11 @@ Partial Class controls_RmbGeneric
 
     Public Property Amount() As Double
         Get
-            Return Double.Parse(tbAmount.Text, New CultureInfo("en-US").NumberFormat)
+            Try
+                Return Double.Parse(tbAmount.Text, New CultureInfo("en-US").NumberFormat)
+            Catch
+                Return 0
+            End Try
         End Get
         Set(ByVal value As Double)
             tbAmount.Text = value.ToString("n2", New CultureInfo("en-US"))
