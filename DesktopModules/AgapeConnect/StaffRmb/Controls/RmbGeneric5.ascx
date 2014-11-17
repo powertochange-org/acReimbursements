@@ -45,7 +45,7 @@
             <asp:ListItem Text="Saskatchewan" Value="SK" />
             <asp:ListItem Text="Manitoba" Value="MB" />
             <asp:ListItem Text="Ontario" Value="ON" />
-            <asp:ListItem Text="Quebec" Value="PQ" />
+            <asp:ListItem Text="Quebec" Value="QC" />
             <asp:ListItem Text="Newfoundland" Value="NL" />
             <asp:ListItem Text="Nova Scotia" Value="NS" />
             <asp:ListItem Text="New Brunswick" Value="NB" />

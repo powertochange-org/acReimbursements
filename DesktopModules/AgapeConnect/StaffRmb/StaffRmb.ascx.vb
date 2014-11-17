@@ -1200,7 +1200,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                                 ' Set the receiptImageId to the first fileid that we get; this way, we know that it's at least got 
                                 ' something, even if it doesn't have all of the receipts assocaited with this line
-                                insert.ReceiptImageId = theFiles.First.FileId
+                                'insert.ReceiptImageId = theFiles.First.FileId
 
                             End If
                         Catch ex As Exception
@@ -1322,10 +1322,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         'look for electronic receipt
                         If (Not receiptType Is Nothing AndAlso (CInt(receiptType.GetValue(theControl, Nothing) = 2) AndAlso line_files.Count > 0)) Then
                             ' Set the ImageReceiptId to the first file
-                            line.First.ReceiptImageId = line_files.First.FileId
+                            'line.First.ReceiptImageId = line_files.First.FileId
                         Else
                             ' Unset the receipt
-                            line.First.ReceiptImageId = Nothing
+                            'line.First.ReceiptImageId = Nothing
                             ' Since we aren't supposed to have any receipts with
                             ' this, we should forcefully remove any receipts that
                             ' are already associated with this line
@@ -1565,7 +1565,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim rmb = rmbs.First
                 Dim NewStatus As Integer = rmb.Status
                 Dim rmbTotal = CType((From t In d.AP_Staff_RmbLines Where t.RmbNo = rmb.RMBNo Select t.GrossAmount).Sum(), Decimal?).GetValueOrDefault(0)
-                Dim requires_receipts = ((From b In rmb.AP_Staff_RmbLines Where b.Receipt = True And b.ReceiptImageId Is Nothing).Count > 0)
+                Dim requires_receipts = ((From b In rmb.AP_Staff_RmbLines Where b.Receipt = True And ((From f In d.AP_Staff_RmbLine_Files Where f.RmbLineNo = b.RmbLineNo).Count = 0)).Count > 0)
                 Dim printable = ""
                 If (requires_receipts) Then printable = "window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & rmb.RMBNo & "&UID=" & rmb.UserId & "&mode=1', '_blank'); "
                 Dim message As String
@@ -1613,7 +1613,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Log(rmb.RID, "SUBMITTED")
 
                 'use an alert to switch back to the main window from the printout window
-                ScriptManager.RegisterStartupScript(Page, Me.GetType(), printable & "popup_and_select", "closeAddressDialog(); alert(""" & message & """); selectIndex(1)", True)
+                ScriptManager.RegisterStartupScript(Page, Me.GetType(), "popup_and_select", printable & " alert(""" & message & """); selectIndex(1)", True)
                 Await Task.WhenAll(refreshMenuTasks)
 
             End If
@@ -2163,8 +2163,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     If theLine.First.VATReceipt Then
                         receiptMode = 0
                         ' If we have any files matching this line, or our receiptImageId is valid
-                    ElseIf (From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo = theLine.First.RmbLineNo And lf.RMBNo = theLine.First.RmbNo).Count > 0 Or
-                        (Not theLine.First.ReceiptImageId Is Nothing And theLine.First.ReceiptImageId > 0) Then
+                    ElseIf (From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo = theLine.First.RmbLineNo And lf.RMBNo = theLine.First.RmbNo).Count > 0 Then
                         receiptMode = 2
                         ' If we don't have a receipt
                     ElseIf Not theLine.First.Receipt Then

@@ -90,6 +90,8 @@
                     <td>
                         <uc1:Currency ID="Currency1" runat="server" />
                     </td>
+                    <asp:ListItem Text="Quebec" Value="PQ">
+                    </asp:ListItem>
                 </tr>
             </table></td>
 </tr>
@@ -100,7 +102,7 @@
                     <asp:ListItem Text="Saskatchewan" Value="SK" />
                     <asp:ListItem Text="Manitoba" Value="MB" />
                     <asp:ListItem Text="Ontario" Value="ON" />
-                    <asp:ListItem Text="Quebec" Value="PQ" />
+                    <asp:ListItem Text="Quebec" Value="QC" />
                     <asp:ListItem Text="Newfoundland" Value="NL" />
                     <asp:ListItem Text="Nova Scotia" Value="NS" />
                     <asp:ListItem Text="New Brunswick" Value="NB" />
