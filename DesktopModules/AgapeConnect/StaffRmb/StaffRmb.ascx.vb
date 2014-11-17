@@ -1981,19 +1981,21 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             PostingData.InvoiceNo = tbInvoiceNumber.Text
             PostingData.VendorId = tbVendorId.Text
             PostingData.RemitToAddress = ddlRemitTo.SelectedValue
-            Log(theRmb.First.RID, "Processed - this reimbursement will be added to the next download batch")
 
             'TaskList.Add(LoadRmbAsync(hfRmbNo.Value))
             If (insert) Then
                 d.AP_Staff_Rmb_Post_Extras.InsertOnSubmit(PostingData)
             End If
             SubmitChanges()
-            pnlSplash.Visible = True
+            Log(theRmb.First.RID, "Processed - this reimbursement will be added to the next download batch")
             pnlMain.Visible = False
             Await Task.WhenAll(TaskList)
-            If (tvFinance.Nodes.Count = 1 And tvFinance.Nodes.Item(0).ChildNodes.Count = 3) Then
+            '
+            If (tvFinance.Nodes.Count = 1 And tvFinance.Nodes.Item(0).ChildNodes.Count = 5) Then
                 tvFinance.Nodes.Item(0).ChildNodes.Item(0).Expand()
                 tvFinance.Nodes.Item(0).ChildNodes.Item(1).Expand()
+                tvFinance.Nodes.Item(0).ChildNodes.Item(2).Expand()
+                tvFinance.Nodes.Item(0).ChildNodes.Item(3).Expand()
             End If
             Dim message = Translate("NextBatch")
             ScriptManager.RegisterStartupScript(Page, Me.GetType(), "closePostData", "closePostDataDialog(); alert(""" & message & """);", True)
