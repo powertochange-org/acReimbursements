@@ -1617,6 +1617,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 'use an alert to switch back to the main window from the printout window
                 ScriptManager.RegisterStartupScript(Page, Me.GetType(), "popup_and_select", printable & " alert(""" & message & """); selectIndex(1)", True)
+
                 Await Task.WhenAll(refreshMenuTasks)
 
             End If

@@ -1504,7 +1504,7 @@
                                     </div>
                                     <div style="float:right; margin-right:20px">
                                         <asp:Button ID="btnPrint" runat="server" resourcekey="btnPrint" class="aButton" />
-                                        <asp:Button ID="btnSubmit" runat="server" resourcekey="btnSubmit" class="aButton" visible="false" OnClick="btnSubmit_Click"/>
+                                        <asp:Button ID="btnSubmit" runat="server" resourcekey="btnSubmit" class="aButton" visible="false"/>
                                         <asp:Button ID="btnReject" runat="server" resourcekey="btnReject" class="aButton" Visible="false" />
                                         <asp:Button ID="btnApprove" runat="server" resourcekey="btnApprove" class="aButton" visible="false"/>
                                         <asp:Button ID="btnProcess" runat="server" resourcekey="btnProcess" class="aButton" onClientClick="showPostDataDialog()" visible="false"/>
