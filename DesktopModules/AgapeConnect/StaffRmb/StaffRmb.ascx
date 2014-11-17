@@ -1254,11 +1254,11 @@
                                     <tr class="Agape_SubTitle">
                                         <td class="hdrTitle" width="10%">
                                             <asp:Label ID="Label21" runat="server" resourcekey="SubmittedBy"></asp:Label><br />
-                                            <asp:Label id="lblOnBehalfOf" runat="server" resourcekey="lblOnBehalfOf" Visible="false" />
+                                            <b><asp:Label id="lblOnBehalfOf" runat="server" resourcekey="lblOnBehalfOf" Visible="false" /></b>
                                         </td>
                                         <td class="hdrValue">
                                             <asp:Label ID="lblSubBy" runat="server"></asp:Label><br />
-                                            <asp:Label ID="lblBehalf" runat="server" visible="false"/>
+                                            <b><asp:Label ID="lblBehalf" runat="server" visible="false"/></b>
                                         </td>
                                         <td style="color: Gray;" width="10%">
                                             <asp:Label ID="ttlWaitingApp" runat="server" resourcekey="AwaitingApproval"></asp:Label>

@@ -911,6 +911,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     lblBehalf.Text = If(hasDelegate, user.DisplayName, "")
                     lblOnBehalfOf.Visible = (hasDelegate)
                     lblBehalf.Visible = (hasDelegate)
+                    If (isFinance) Then
+                        lblBehalf.CssClass = "highlight"
+                    End If
 
                     lblApprovedDate.Text = If(Rmb.ApprDate Is Nothing, "", Rmb.ApprDate.Value.ToShortDateString)
                     ttlWaitingApp.Visible = Rmb.ApprDate Is Nothing
