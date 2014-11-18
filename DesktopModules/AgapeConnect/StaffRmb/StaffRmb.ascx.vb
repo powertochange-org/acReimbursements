@@ -1256,13 +1256,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         transactionDate = transactionDate.AddDays(1) 'add a day for each iteration of repeat
                     Next
 
-                    Dim t As Type = Me.GetType()
-                    Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
-                    sb.Append("<script language='javascript'>")
-                    sb.Append("closeNewItemPopup();")
-                    sb.Append("</script>")
                     Await LoadRmbAsync(hfRmbNo.Value)
-                    ScriptManager.RegisterClientScriptBlock(Page, t, "", sb.ToString, False)
+                    ScriptManager.RegisterClientScriptBlock(Page, Me.GetType(), "hide_expense_popup", "$('#loading').hide();", True)
                 Else ' The form was not valid
                     ReloadInvalidForm()
                 End If
@@ -1426,13 +1421,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         btnSaveLine.CommandName = "Save"
 
                     End If
-                    Dim t As Type = Me.GetType()
-                    Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
-                    sb.Append("<script language='javascript'>")
-                    sb.Append("closeNewItemPopup();")
-                    sb.Append("</script>")
                     Await LoadRmbAsync(hfRmbNo.Value)
-                    ScriptManager.RegisterClientScriptBlock(Page, t, "", sb.ToString, False)
+                    ScriptManager.RegisterClientScriptBlock(Page, Me.GetType(), "hide_expense_popup", "$('#loading').hide();", True)
                 Else ' The form was not valid
                     ReloadInvalidForm()
                 End If

@@ -1625,7 +1625,7 @@
                             </asp:Panel>
                             <div style="width:100%;text-align:right; margin-top:10px;">
                                 <input type="button" value='<%= Translate("btnCancel") %>' onclick="closeNewItemPopup();" class="aButton" />
-                                <asp:Button ID="btnSaveLine" runat="server" resourcekey="btnEnter" CommandName="Save"  class="aButton" />
+                                <asp:Button ID="btnSaveLine" runat="server" resourcekey="btnEnter" onclientclick="closeNewItemPopup(); show_loading_spinner();" CommandName="Save"  class="aButton" />
                             </div>
                             </div>
                         <fieldset id="pnlAccountsOptions" runat="server" class="accounts_options">
