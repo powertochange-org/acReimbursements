@@ -1219,7 +1219,6 @@
                                     <asp:Label ID="lblStatus" runat="server" Style="float: left; font-style: italic; font-size:13px; padding-left:70px"></asp:Label>
                                     <div style="float: right; padding-right:10px; margin-right: 3px;">
                                         <div id="accountBalanceDiv">
-                                            <asp:Label ID="ttlAccountBalance" runat="server" Style="margin-right: 3px; font-style: italic;  font-size:13px;" resourceKey="AccountBalance"></asp:Label>
                                             <asp:Label ID="lblAccountBalance" runat="server" Style="font-style: italic; font-size:13px;"></asp:Label>
                                             <asp:HiddenField ID="hfAccountBalance" runat="server" />
                                         </div>

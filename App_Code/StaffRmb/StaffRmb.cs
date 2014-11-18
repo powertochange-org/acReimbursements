@@ -383,8 +383,10 @@ namespace StaffRmb
         //}
 
         static public async Task<string> getAccountBalanceAsync(string account, string user_logon)
-        // Returns the balance of the account, or "" if the specified user does not have View Finanicals access to the account
+        // Returns the balance of the account for staff accounts, or the budget:actual amounts for ministry accounts
+        //, or PERMISSION_DENIED_ERROR if the specified user does not have View Finanicals access to the account
         {
+            if (account.Equals(string.Empty) || user_logon.Equals(string.Empty)) return WEB_SERVICE_ERROR;
             string postData = string.Format("_reportPath=/General/Account%20Balance&_renderFormat=XML&_apiToken={0}&ProjectCodeSearch={1}&ExecuteAsUser={2}", Constants.getApiToken(), account, user_logon);
             string url = "https://1chronicles/CallRptServicesTest/CallRpt.aspx";
             string response = await getResultFromWebServiceAsync(url, postData);
@@ -394,12 +396,25 @@ namespace StaffRmb
             {
                 XmlDocument xDoc = new XmlDocument();
                 xDoc.LoadXml(response);
-                Double balance = Double.Parse(xDoc.GetElementsByTagName("Detail")[0].Attributes["Balance"].Value);
                 if (xDoc.GetElementsByTagName("Detail")[0].Attributes["AccountDescription"].Value.Contains("YOU DON'T HAVE ACCESS TO THIS ACCOUNT")) {
                     return PERMISSION_DENIED_ERROR;
                 }
-                result = Math.Round(balance, 2).ToString("0.00");
-            } catch (Exception e) {
+                System.Globalization.NumberFormatInfo currencyFormat = new System.Globalization.CultureInfo(System.Globalization.CultureInfo.CurrentCulture.ToString()).NumberFormat;
+                currencyFormat.CurrencyNegativePattern = 1;
+                if (isStaffAccount(account))
+                {
+                    Double balance = Double.Parse(xDoc.GetElementsByTagName("Detail")[0].Attributes["Balance"].Value);
+                    result = Math.Round(balance, 2).ToString("C", currencyFormat);
+                }
+                else
+                {
+                    Double budget = Double.Parse(xDoc.GetElementsByTagName("Detail")[0].Attributes["Budget"].Value);
+                    Double actual = Double.Parse(xDoc.GetElementsByTagName("Detail")[0].Attributes["Actual"].Value);
+                    result = Math.Round(budget, 2).ToString("C", currencyFormat) + ":" + Math.Round(actual, 2).ToString("C", currencyFormat);
+                }
+            }
+            catch (Exception e)
+            {
                 eventLog.AddLog("getAccountBalanceAsync()", e.Message, portalSettings, userId, EventLogController.EventLogType.ADMIN_ALERT);
                 return WEB_SERVICE_ERROR;
             }

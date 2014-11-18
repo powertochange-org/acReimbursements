@@ -4301,24 +4301,36 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Function
 
         Private Async Function getAccountBalanceAsync(account As String, logon As String) As Task(Of String)
-            If account = "" Then
-                Return "<span title='Error: no account number'>" + BALANCE_INCONCLUSIVE + "</span>"
-            End If
-            Dim accountBalance = ""
-            accountBalance = Await StaffRmbFunctions.getAccountBalanceAsync(account, logon)
-            If accountBalance = StaffRmbFunctions.PERMISSION_DENIED_ERROR Then
-                Return BALANCE_PERMISSION_DENIED
-            End If
-            If (accountBalance = StaffRmbFunctions.WEB_SERVICE_ERROR) Then
-                Return "<span title='" + accountBalance + "'>Error</span>"
-            End If
+            'Returns entire text for the "balance" area of the form
+            ' account balance for personal accounts or budget numbers for ministry accounts
+            If (account.Equals(String.Empty)) Then Return Translate("AccountBalance") & "<span title='Error: no account number provided'>" + BALANCE_INCONCLUSIVE + "</span>"
+            If (logon.Equals(String.Empty)) Then Return Translate("AccountBalance") & "<span title='Error: no logon provided'>" + BALANCE_INCONCLUSIVE + "</span>"
+
+            Dim service_result = Await StaffRmbFunctions.getAccountBalanceAsync(account, logon)
+            If service_result.Equals(StaffRmbFunctions.PERMISSION_DENIED_ERROR) Then Return Translate("AccountBalance") & BALANCE_PERMISSION_DENIED
+            If service_result.Equals(StaffRmbFunctions.WEB_SERVICE_ERROR) Then Return Translate("AccountBalance") & "<span title='" & service_result & "'>Error</span>"
             Try
-                Double.Parse(accountBalance)
-                Return accountBalance
+                If (StaffRmbFunctions.isStaffAccount(account)) Then
+                    Dim bal = Double.Parse(service_result, NumberStyles.Currency)
+                    valueOrNull(hfAccountBalance, bal)
+                    Dim neg = If(bal < 0, "NormalRed", "")
+                    Return Translate("AccountBalance") & "<span class='" & neg & "'>" & service_result & "</span>"
+                Else
+                    Dim budget_string = service_result.Split(":")(0)
+                    Dim actual_string = service_result.Split(":")(1)
+                    Dim bud = Double.Parse(budget_string, NumberStyles.Currency)
+                    Dim act = Double.Parse(actual_string, NumberStyles.Currency)
+                    valueOrNull(hfAccountBalance, act - bud)
+                    Dim negb = If(bud < 0, "NormalRed", "")
+                    Dim nega = If(act < 0, "NormalRed", "")
+                    Return Translate("BudgetBalance") & "<span class='" & negb & "'>" & budget_string & "</span>&nbsp;&nbsp;&nbsp;&nbsp;" _
+                        & Translate("ActualBalance") & "<span class='" & nega & "'>" & actual_string & "</span>"
+                End If
             Catch e As Exception
-                Return "<span title='Error:" + e.Message + " accountBalance result:" + accountBalance + "'>" + BALANCE_INCONCLUSIVE + "</span>"
+                Return Translate("AccountBalance") & "<span title='Error:" + e.Message + " accountBalance result:" + service_result + "'>" + BALANCE_INCONCLUSIVE + "</span>"
             End Try
         End Function
+
 
         'Private Async Function getBudgetBalanceAsync(account As String, logon As String) As Task(Of String)
         '    If account = "" Then
@@ -4346,7 +4358,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Sub
 
         Private Function isLowBalance() As Boolean
-            If isStaffAccount() Or (lblAccountBalance.Text = "") Or (lblAccountBalance.Text = BALANCE_PERMISSION_DENIED) Or (lblAccountBalance.Text = BALANCE_INCONCLUSIVE) Then
+            If isStaffAccount() Or (lblAccountBalance.Text.Equals(String.Empty)) Or (lblAccountBalance.Text.Equals(BALANCE_PERMISSION_DENIED)) Or (lblAccountBalance.Text.Equals(BALANCE_INCONCLUSIVE)) Then
                 Return False
             End If
             Return (GetTotal(hfRmbNo.Value) > hfAccountBalance.Value)
@@ -4354,8 +4366,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Private Sub updateBalanceLabel(accountBalance As String)
             lblAccountBalance.Text = accountBalance
-            valueOrNull(hfAccountBalance, accountBalance)
-            lblAccountBalance.Attributes.Add("class", redIfNegative(hfAccountBalance.Value))
         End Sub
 
         Private Sub valueOrNull(hf As HiddenField, s As String)
