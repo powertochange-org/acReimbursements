@@ -919,6 +919,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     If (isFinance) Then
                         lblBehalf.CssClass = "highlight"
                     End If
+                    Dim loadAddressTask = LoadAddressAsync(Rmb.UserId)
 
                     lblApprovedDate.Text = If(Rmb.ApprDate Is Nothing, "", Rmb.ApprDate.Value.ToShortDateString)
                     ttlWaitingApp.Visible = Rmb.ApprDate Is Nothing
@@ -1018,7 +1019,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         checkLowBalance()
                     End If
                     ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "calculate_remaining_balance", "calculate_remaining_balance()", True)
-                    Await Task.WhenAll(updateApproverListTask, resetPostingDataTask)
+                    Await Task.WhenAll(loadAddressTask, updateApproverListTask, resetPostingDataTask)
                 Else
                     pnlMain.Visible = False
                     ltSplash.Text = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbSplash", PortalId))
@@ -4386,6 +4387,30 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim oldest_allowable_date = Today.AddDays(-Settings("Expire"))
             Dim old_lines = (From c In d.AP_Staff_RmbLines Where c.RmbNo = hfRmbNo.Value And c.TransDate < oldest_allowable_date Select c.TransDate).Count()
             Return old_lines > 0
+        End Function
+
+        Private Async Function LoadAddressAsync(UserId As Integer) As Task
+
+            Dim User = StaffBrokerFunctions.GetStaffMember(UserId)
+            Dim tooltip = Translate("AddressOnFile") & " " & User.DisplayName + Environment.NewLine
+            lblAddressName.Text = User.DisplayName
+            lblAddressLine1.Text = StaffBrokerFunctions.GetStaffProfileProperty(User, "Address1")
+            tooltip += lblAddressLine1.Text & Environment.NewLine
+            lblAddressLine2.Text = StaffBrokerFunctions.GetStaffProfileProperty(User, "Address2")
+            tooltip += lblAddressLine2.Text & Environment.NewLine
+            lblCity.Text = StaffBrokerFunctions.GetStaffProfileProperty(User, "City")
+            tooltip += lblCity.Text & ", "
+            lblProvince.Text = StaffBrokerFunctions.GetStaffProfileProperty(User, "Province")
+            tooltip += lblProvince.Text & ", "
+            lblCountry.Text = StaffBrokerFunctions.GetStaffProfileProperty(User, "Country")
+            tooltip += lblCountry.Text & Environment.NewLine
+            lblPostalCode.Text = StaffBrokerFunctions.GetStaffProfileProperty(User, "PostalCode")
+            tooltip += lblPostalCode.Text
+            If (lblBehalf.Visible) Then
+                lblBehalf.ToolTip = tooltip
+            Else
+                lblSubBy.ToolTip = tooltip
+            End If
         End Function
 
     End Class

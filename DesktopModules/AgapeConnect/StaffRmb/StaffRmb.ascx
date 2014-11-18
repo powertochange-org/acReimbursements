@@ -1805,6 +1805,16 @@
                     <tr><td><asp:Label ID="lblRemitTo" runat="server" resourcekey="RemitTo" /></td>
                         <td><asp:DropDownList ID="ddlRemitTo" runat="server" AutoPostBack="True" /></td></tr>
                 </table>
+                <table style="background-color:lightyellow; font-size:smaller; border:1px solid; box-shadow:3px 3px rgba(0,0,0,0.3); margin:20px; padding:10px;">
+                    <tr><td><b><asp:Label runat="server" resourceKey="AddressOnFile" /></b> <asp:Label ID="lblAddressName" runat="server" Font-Italic="true"/></td></tr>
+                    <tr><td>
+                        <asp:Label id="lblAddressLine1" runat="server" /><br />
+                        <asp:Label ID="lblAddressLine2" runat="server" /><br />
+                        <asp:Label ID="lblCity" runat="server" />,&nbsp;<asp:Label ID="lblProvince" runat="server" />, 
+                        <asp:Label ID="lblCountry" runat="server" /><br />
+                        <asp:Label ID="lblPostalCode" runat="server" />
+                        </td></tr>
+                </table>
                 <table style="width:100%">
                     <tr><td><input id="btnCancelPost" type="button" class="aButton" onclick="closePostDataDialog();" value="<%= Translate("btnCancel") %>" /></td>
                         <td><asp:button ID="btnSubmitPostingData" runat="server" resourcekey="btnOK" cssclass="aButton right" OnClientClick="show_loading_spinner()" AutoPostBack="True"/></td></tr>
