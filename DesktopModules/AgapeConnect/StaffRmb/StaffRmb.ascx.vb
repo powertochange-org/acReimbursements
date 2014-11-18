@@ -451,8 +451,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Private Async Function loadBasicCancelledTaskAsync() As Task
             Try
                 Dim userstr = CStr(UserId)
+                Dim days = 30
+                Dim expiryDate = Today - New TimeSpan(days, 0, 0, 0) 'only show deleted items for 30 days
                 Dim Cancelled = (From c In d.AP_Staff_Rmbs
-                                 Where c.Status = RmbStatus.Cancelled And ((c.UserId = UserId) Or c.SpareField3.Equals(userstr)) And c.PortalId = PortalId
+                                 Where c.Status = RmbStatus.Cancelled And ((c.UserId = UserId) Or c.SpareField3.Equals(userstr)) And ((c.RmbDate Is Nothing) Or (c.RmbDate > expiryDate)) And c.PortalId = PortalId
                                  Order By c.RID Descending
                                  Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
                 dlCancelled.DataSource = Cancelled
@@ -1634,6 +1636,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 If (State = RmbStatus.Processing Or State = RmbStatus.PendingDownload Or State = RmbStatus.DownloadFailed Or State = RmbStatus.Paid Or State = RmbStatus.Cancelled) Then Return
 
                 rmb.First.Status = RmbStatus.Cancelled
+                rmb.First.RmbDate = Today
                 lblStatus.Text = Translate(RmbStatus.StatusName(RmbStatus.Cancelled))
                 btnApprove.Visible = False
                 btnDelete.Visible = False
