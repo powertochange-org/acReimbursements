@@ -999,7 +999,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     btnPrint.OnClientClick = "window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & RmbNo & "&UID=" & Rmb.UserId & "', '_blank'); "
                     btnSubmit.Visible = (isOwner Or isSpouse) And (DRAFT Or MORE_INFO Or CANCELLED) And FORM_HAS_ITEMS
                     btnSubmit.Text = If(DRAFT, Translate("btnSubmit"), Translate("btnResubmit"))
-                    enableSubmitButton(btnSubmit.Visible And Rmb.CostCenter IsNot Nothing And Rmb.ApprUserId IsNot Nothing AndAlso (Rmb.CostCenter.Length = 6) And (Rmb.ApprUserId >= 0))
+                    enableSubmitButton(btnSubmit.Visible And tbChargeTo.Text.Length = 6 And ddlApprovedBy.SelectedValue >= 0)
                     btnReject.Visible = isApprover And SUBMITTED
                     enableRejectButton(isApprover And SUBMITTED And tbApprComments.Text <> "")
                     btnApprove.Visible = isApprover And SUBMITTED
@@ -1637,8 +1637,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 If (State = RmbStatus.Processing Or State = RmbStatus.PendingDownload Or State = RmbStatus.DownloadFailed Or State = RmbStatus.Paid Or State = RmbStatus.Cancelled) Then Return
 
                 rmb.First.Status = RmbStatus.Cancelled
-                rmb.First.RmbDate = Today
+                rmb.First.MoreInfoRequested = False
                 lblStatus.Text = Translate(RmbStatus.StatusName(RmbStatus.Cancelled))
+                rmb.First.RmbDate = Today
+                lblSubmittedDate.Text = Today
+                rmb.First.ApprDate = Nothing
+                lblApprovedDate.Text = ""
                 btnApprove.Visible = False
                 btnDelete.Visible = False
 
