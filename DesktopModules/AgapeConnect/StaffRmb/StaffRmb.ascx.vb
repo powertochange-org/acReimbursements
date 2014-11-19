@@ -3279,7 +3279,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     approverMessage = approverMessage.Replace("[COMMENTS]", If(theRmb.UserComment <> "", Translate("EmailComments") & "<br />" & theRmb.UserComment, ""))
                     If StaffRmbFunctions.isStaffAccount(theRmb.CostCenter) Then
                         'Personal Reimbursement
-                        approverMessage = approverMessage.Replace("[LOWBALANCE]", If((hfAccountBalance.Value <> String.Empty) AndAlso (hfAccountBalance.Value < GetTotal(hfRmbNo.Value)), Translate("WarningLowBalanceStaffAccount"), ""))
+                        Try
+                            approverMessage = approverMessage.Replace("[LOWBALANCE]", If(hfAccountBalance.Value < GetTotal(hfRmbNo.Value), Translate("WarningLowBalanceStaffAccount"), ""))
+                        Catch
+                            approverMessage = approverMessage.Replace("[LOWBALANCE]", "")
+                        End Try
                     Else
                         Dim low_balance = Translate("WarningLowBalance").Replace("[ACCTBAL]", hfAccountBalance.Value).Replace("[ACCT]", tbChargeTo.Text)
                         approverMessage = approverMessage.Replace("[LOWBALANCE]", If(isLowBalance(), low_balance, ""))
@@ -4303,12 +4307,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Private Async Function getAccountBalanceAsync(account As String, logon As String) As Task(Of String)
             'Returns entire text for the "balance" area of the form
             ' account balance for personal accounts or budget numbers for ministry accounts
+            hfAccountBalance.Value = Nothing
             If (account.Equals(String.Empty)) Then Return Translate("AccountBalance") & "<span title='Error: no account number provided'>" + BALANCE_INCONCLUSIVE + "</span>"
             If (logon.Equals(String.Empty)) Then Return Translate("AccountBalance") & "<span title='Error: no logon provided'>" + BALANCE_INCONCLUSIVE + "</span>"
 
             Dim service_result = Await StaffRmbFunctions.getAccountBalanceAsync(account, logon)
             If service_result.Equals(StaffRmbFunctions.PERMISSION_DENIED_ERROR) Then Return Translate("AccountBalance") & BALANCE_PERMISSION_DENIED
-            If service_result.Equals(StaffRmbFunctions.WEB_SERVICE_ERROR) Then Return Translate("AccountBalance") & "<span title='" & service_result & "'>Error</span>"
+            If service_result.Equals(StaffRmbFunctions.WEB_SERVICE_ERROR) Then Return Translate("AccountBalance") & "<span title='" & service_result & " Try re-loading.'>Error</span>"
             Try
                 If (StaffRmbFunctions.isStaffAccount(account)) Then
                     Dim bal = Double.Parse(service_result, NumberStyles.Currency)
@@ -4350,18 +4355,25 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Private Sub checkLowBalance()
             If (lblStatus.Text = RmbStatus.StatusName(RmbStatus.Submitted) Or lblStatus.Text = RmbStatus.StatusName(RmbStatus.PendingDirectorApproval) Or lblStatus.Text = RmbStatus.StatusName(RmbStatus.PendingEDMSApproval)) AndAlso isLowBalance() Then
-                Dim accountBalance = hfAccountBalance.Value - GetTotal(hfRmbNo.Value)
-                lblWarningLabel.Text = Translate("WarningLowBalance").Replace("[ACCTBAL]", Format(accountBalance, "Currency")).Replace("[ACCT]", tbChargeTo.Text)
-                Dim t As Type = Me.GetType()
-                ScriptManager.RegisterClientScriptBlock(Page, t, "", "showWarningDialog();", True)
+                Try
+                    Dim accountBalance = hfAccountBalance.Value - GetTotal(hfRmbNo.Value)
+                    lblWarningLabel.Text = Translate("WarningLowBalance").Replace("[ACCTBAL]", Format(accountBalance, "Currency")).Replace("[ACCT]", tbChargeTo.Text)
+                    Dim t As Type = Me.GetType()
+                    ScriptManager.RegisterClientScriptBlock(Page, t, "", "showWarningDialog();", True)
+                Catch
+                End Try
             End If
         End Sub
 
         Private Function isLowBalance() As Boolean
-            If isStaffAccount() Or (lblAccountBalance.Text.Equals(String.Empty)) Or (lblAccountBalance.Text.Equals(BALANCE_PERMISSION_DENIED)) Or (lblAccountBalance.Text.Equals(BALANCE_INCONCLUSIVE)) Then
+            If isStaffAccount() Or (hfAccountBalance.Value.Equals(String.Empty)) Or (lblAccountBalance.Text.Equals(String.Empty)) Or (lblAccountBalance.Text.Equals(BALANCE_PERMISSION_DENIED)) Or (lblAccountBalance.Text.Equals(BALANCE_INCONCLUSIVE)) Then
                 Return False
             End If
-            Return (GetTotal(hfRmbNo.Value) > hfAccountBalance.Value)
+            Try
+                Return (GetTotal(hfRmbNo.Value) > hfAccountBalance.Value)
+            Catch
+                Return False
+            End Try
         End Function
 
         Private Sub updateBalanceLabel(accountBalance As String)
