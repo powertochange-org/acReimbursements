@@ -1257,7 +1257,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Next
 
                     Await LoadRmbAsync(hfRmbNo.Value)
-                    ScriptManager.RegisterClientScriptBlock(Page, Me.GetType(), "hide_expense_popup", "$('#loading').hide();", True)
+                    ScriptManager.RegisterClientScriptBlock(Page, Me.GetType(), "hide_expense_popup", "closeNewItemPopup();", True)
                 Else ' The form was not valid
                     ReloadInvalidForm()
                 End If
@@ -1422,7 +1422,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     End If
                     Await LoadRmbAsync(hfRmbNo.Value)
-                    ScriptManager.RegisterClientScriptBlock(Page, Me.GetType(), "hide_expense_popup", "$('#loading').hide();", True)
+                    ScriptManager.RegisterClientScriptBlock(Page, Me.GetType(), "hide_expense_popup", "closeNewItemPopup();", True)
                 Else ' The form was not valid
                     ReloadInvalidForm()
                 End If
