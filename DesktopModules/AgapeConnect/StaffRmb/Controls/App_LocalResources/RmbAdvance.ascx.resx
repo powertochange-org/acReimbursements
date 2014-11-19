@@ -117,7 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="lblAdvanceDesc.Text" xml:space="preserve">
+  <data name="Explanation.Text" xml:space="preserve">
     <value>This is a system for you to request a cash advance to buy something. If you foresee
     a big expense that you will be reimbursing and you would like to request the money for it 
     before buying it then enter the amount and a description of what you are using it for in the
@@ -129,31 +129,41 @@
   <data name="lblAmount.Text" xml:space="preserve">
     <value>Amount:</value>
   </data>
-  <data name="lblNotes.Text" xml:space="preserve">
-    <value>Notes:</value>
-  </data>
-  <data name="lblNotes1.Text" xml:space="preserve">
-    <value>This will get sent to your team leader for their approval. You will be notified
-                        when it has been approved and when accounts has paid it into your account.</value>
-  </data>
-  <data name="lblNotes2.Text" xml:space="preserve">
-    <value>If this is a request for more than [TEAMLEADERLIMIT] then
-                        it will be sent to [AUTHUSER] for
-                        approval.</value>
-  </data>
-  <data name="lblNotes3.Text" xml:space="preserve">
-    <value>To pay off the advance, when you&amp;#39;re making a reimbursement there is a section
-                        below the list of expense items called &amp;#39;Pay Off Advance&amp;#39;. You can use this
-                        to pay off any advances you have (they will automatically be registered in the reimbursement
-                        system).</value>
-  </data>
-  <data name="lblShowDetails.Text" xml:space="preserve">
-    <value>(Click to show details...)</value>
-  </data>
   <data name="tbAdvReason.ToolTip" xml:space="preserve">
     <value>Enter your advance request here</value>
   </data>
   <data name="lblAdvRequestForm.Text" xml:space="preserve">
     <value>Advance Request Form</value>
+  </data>
+  <data name="Amount.Error" xml:space="preserve">
+    <value>Invalid amount </value>
+    <comment>Error</comment>
+  </data>
+  <data name="Date.Error" xml:space="preserve">
+    <value>Invalid date.</value>
+    <comment>Error</comment>
+  </data>
+  <data name="Description.Error" xml:space="preserve">
+    <value>Please enter a (better) description</value>
+    <comment>Error</comment>
+  </data>
+  <data name="lblAmount.Help" xml:space="preserve">
+    <value>Enter the dollar value of the advance you are requesting.</value>
+  </data>
+  <data name="lblDate.Help" xml:space="preserve">
+    <value>Select the date you expect to have this advance repaid in full.</value>
+  </data>
+  <data name="lblDate.Text" xml:space="preserve">
+    <value>Date to be cleared</value>
+  </data>
+  <data name="lblDesc.Help" xml:space="preserve">
+    <value>What will this advance be used for?</value>
+  </data>
+  <data name="lblDesc.Text" xml:space="preserve">
+    <value>Description &amp; Min. Purpose</value>
+  </data>
+  <data name="OldDate.Error" xml:space="preserve">
+    <value>The clearing date cannot be in the past</value>
+    <comment>Error</comment>
   </data>
 </root>
