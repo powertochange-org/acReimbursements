@@ -135,7 +135,7 @@ Partial Class RmbAdvance
     End Property
     Public Property Spare3() As String
         Get
-            Return Nothing
+            Return "0.00"
         End Get
         Set(ByVal value As String)
 
@@ -193,7 +193,7 @@ Partial Class RmbAdvance
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("FutureDate.Error", LocalResourceFile)
                 Return False
             End If
-            If theDate < Today Then
+            If theDate <= Today Then
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("OldDate.Error", LocalResourceFile)
                 Return False
             End If

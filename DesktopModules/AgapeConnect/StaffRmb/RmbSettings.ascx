@@ -604,7 +604,7 @@
                         </asp:LinqDataSource>
                     </td>
                 </tr>
-                <tr>
+                <tr style="padding-top:15px;">
                     <td>
                         <b><dnn:Label runat="server" ControlName="ddlAdvanceLineType" resourcekey="AdvanceLineType" /></b>
                     </td>

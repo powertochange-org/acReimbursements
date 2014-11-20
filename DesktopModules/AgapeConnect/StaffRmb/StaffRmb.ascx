@@ -116,6 +116,14 @@
         $("span[id$='GridView1_lblRemainingBalance']:last").text(result);
     }
 
+    function updateClearingTotal() {
+        var total=0;
+        $('.clearAdvance').each(function() {
+            total+=Number($(this).val());
+        })
+        $("span[id$='gvUnclearedAdvances_lblClearAdvanceTotal']").text(total);
+    }
+
     function updatePerDiem(control, enabled) {
         control.attr('disabled', !enabled);
         if (enabled) {
@@ -241,7 +249,7 @@
 
             $("#divClearAdvancePopup").dialog({
                 autoOpen: false,
-                width: 500,
+                width: 600,
                 position: ['middle', 230],
                 modal: true,
                 title: '<%= Translate("ClearAdvance") %>',
@@ -1512,7 +1520,7 @@
                                     <div style="float:left; margin-left:20px">
                                         <asp:Button ID="addLinebtn2" runat="server" resourcekey="btnAddExpenseItem" class="aButton" />
                                         <asp:Panel ID="pnlAdvance" runat="server" Visible="false" style="display:inline-block" >
-                                            <asp:Button ID="btnClearAdvance" runat="server" resourcekey="btnClearAdvance" class="aButton" OnClientClick="showClearAdvancePopup();"  />
+                                            <input type="button" ID="btnClearAdvance" value='<%=Translate("btnClearAdvance") %>' class="aButton" onclick="showClearAdvancePopup();" />
                                             (<asp:Label runat="server" resourcekey="lblOutstandingAdvances" font-size="Smaller" font-weight="bold"/>
                                             <asp:Label ID="lblOutstandingAdvanceAmount" runat="server" font-size="Smaller" font-weight="bold" value="$0.00"/>)
                                         </asp:Panel>
@@ -1844,7 +1852,7 @@
     </div>
 
     <div id="divClearAdvancePopup" class="ui-widget">
-        <asp:updatepanel runat="server">
+        <asp:updatepanel ID="upClearAdvance" runat="server">
             <ContentTemplate>
                 <fieldset>
                     <legend class="AgapeH4">
@@ -1853,16 +1861,51 @@
                     <table width="100%">
                         <tr>
                             <td>
-                                <asp:GridView ID="gvUnclearedAdvances" runat="server" >
+                                <asp:GridView ID="gvUnclearedAdvances" runat="server" AutoGenerateColumns="False"
+                                            CellPadding="4" ForeColor="#333333" GridLines="Horizontal" Width="100%" showFooter="true">
                                     <Columns>
-                                        
+                                        <asp:TemplateField HeaderText="Advance Purpose">
+                                            <ItemTemplate>
+                                                <asp:Label ID="lblAdvanceComment" runat="server" Text='<%# Bind("Comment") %>'></asp:Label>
+                                            </ItemTemplate>
+                                            <ItemStyle HorizontalAlign="Left" width="150px" />
+                                        </asp:TemplateField>
+                                        <asp:TemplateField HeaderText="Clearing Date" SortExpression="TransDate">
+                                                <ItemTemplate>
+                                                    <asp:Label ID="lblAdvanceDate" runat="server" CssClass='<%# If( Eval("TransDate")<Today,"NormalRed","") %>' Text='<%# Bind("TransDate", "{0:d}") %>'></asp:Label>
+                                                </ItemTemplate>
+                                                <ItemStyle HorizontalAlign="Center" Width="50px" />
+                                        </asp:TemplateField>
+                                        <asp:TemplateField HeaderText="Outstanding Amount">
+                                            <ItemTemplate>
+                                                <asp:Label ID="lblAdvanceBalance" runat="server" Text='<%# Bind("Spare2", "{0:C2}") %>'></asp:Label>
+                                            </ItemTemplate>
+                                            <ItemStyle HorizontalAlign="Right" Width="50px"  />
+                                        </asp:TemplateField>
+                                        <asp:TemplateField HeaderText="Amount to clear">
+                                            <ItemTemplate>
+                                                <asp:TextBox ID="tbAdvanceClearing" runat="server" Text='<%# Bind("Spare3") %>' CssClass="clearAdvance numeric" Style="text-align:right" onkeyup="updateClearingTotal();" value="0"></asp:TextBox>
+                                            </ItemTemplate>
+                                            <ItemStyle HorizontalAlign="Right" Width="50px"  />
+                                            <FooterTemplate>
+                                                <asp:Label ID="lblTotalAmount" runat="server" Font-Bold="True" Text="Total:"></asp:Label>
+                                                <asp:Label ID="lblClearAdvanceTotal" runat="server" Text="0.00" ></asp:Label>
+                                            </FooterTemplate>
+                                            <FooterStyle HorizontalAlign="Right" Width="50px"  />
+                                        </asp:TemplateField>
                                     </Columns>
                                 </asp:GridView>
                             </td>
                         </tr>
+                        <tr>
+                            <td>
+                                <asp:Label ID="lblAdvanceClearError" runat="server" Font-Size="9pt" ForeColor="Red" />
+                            </td>
+                        </tr>
                     </table>
+                    <br />
                     <asp:Button ID="btnAddClearingItem" runat="server" resourcekey="btnAddClearingItem" class="aButton right" />
-                    <input id="btnCancelClearAdvance" type="button" value='<%= Translate("btnCancel") %>' onclick="closeClearAdvancePopup();" class="aButton right" />
+                    <input id="btnCancelClearAdvance" type="button" value='<%= Translate("btnCancel") %>' onclick="closeClearAdvancePopup();" class="aButton" />
                 </fieldset>
             </ContentTemplate>
         </asp:updatepanel>

@@ -163,7 +163,7 @@
     <value>Description &amp; Min. Purpose</value>
   </data>
   <data name="OldDate.Error" xml:space="preserve">
-    <value>The clearing date cannot be in the past</value>
+    <value>Your clearing date must be in the future</value>
     <comment>Error</comment>
   </data>
   <data name="FutureDate.Error" xml:space="preserve">

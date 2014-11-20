@@ -828,6 +828,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     lblAccountBalance.Text = "not loaded"
 
                     Dim getAccountBalanceTask = getAccountBalanceAsync(Rmb.CostCenter, StaffRmbFunctions.logonFromId(PortalId, UserId))
+                    Dim getUnclearedAdvancesTask = getUnclearedAdvances(Rmb.UserId)
 
                     Dim DRAFT = Rmb.Status = RmbStatus.Draft
                     Dim MORE_INFO = (Rmb.MoreInfoRequested IsNot Nothing AndAlso Rmb.MoreInfoRequested = True)
@@ -837,21 +838,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim PAID = Rmb.Status = RmbStatus.Paid
                     Dim CANCELLED = Rmb.Status = RmbStatus.Cancelled
                     Dim FORM_HAS_ITEMS = Rmb.AP_Staff_RmbLines.Count > 0
-                    Dim advance_line_type As Integer  = Settings("AdvanceLineType")
-                    Dim uncleared_advances As Double = 0
-                    Try
-                        uncleared_advances = (From c In d.AP_Staff_RmbLines
-                                                           Join b In d.AP_Staff_Rmbs On c.RmbNo Equals b.RMBNo
-                                                           Where b.UserId = Rmb.UserId And c.LineType = advance_line_type And (Not c.Spare2.Equals("CLEARED")) And b.PortalId = PortalId
-                                                           Select Convert.ToDouble(c.Spare2)).Sum()
-                    Catch
-                        'if the above fails, it is likely due to null values in the spare2 (uncleared_amount) field, so fix this
-                        Dim lines = From c In d.AP_Staff_RmbLines Where c.LineType = advance_line_type And c.Spare2 Is Nothing
-                        For Each line In lines
-                            line.Spare2 = Convert.ToString(line.GrossAmount)
-                        Next
-                        d.SubmitChanges()
-                    End Try
 
                     Dim user = UserController.GetUserById(PortalId, Rmb.UserId)
                     Dim delegateId As Integer
@@ -1009,8 +995,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     '--buttons
                     btnSaveLine.Visible = ((isOwner Or isSpouse) And Not (PROCESSING Or PAID Or APPROVED)) Or (APPROVED And isFinance)
                     addLinebtn2.Visible = (isOwner Or isSpouse) And Not (PROCESSING Or PAID Or APPROVED)
-                    pnlAdvance.Visible = (uncleared_advances > 0) And (isOwner Or isSpouse) And Not (PROCESSING Or PAID Or APPROVED)
-                    lblOutstandingAdvanceAmount.Text = uncleared_advances.ToString("C")
 
                     btnPrint.Visible = FORM_HAS_ITEMS
                     btnPrint.OnClientClick = "window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & RmbNo & "&UID=" & Rmb.UserId & "', '_blank'); "
@@ -1030,6 +1014,22 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     tbCostcenter.Enabled = isFinance
                     ddlAccountCode.Enabled = isFinance
                     pnlAccountsOptions.Style.Add("display", If(isFinance, "block", "none"))
+
+                    '--advances
+                    Dim uncleared_advances = Await getUnclearedAdvancesTask
+                    Dim uncleared_amount As Double
+                    Try
+                        uncleared_amount = (From a In uncleared_advances Select Convert.ToDouble(a.Spare2)).Sum()
+                    Catch
+                        uncleared_amount = 0
+                    End Try
+                    pnlAdvance.Visible = (uncleared_amount > 0) And (isOwner Or isSpouse) And Not (PROCESSING Or PAID Or APPROVED)
+                    lblOutstandingAdvanceAmount.Text = uncleared_amount.ToString("C")
+                    If (uncleared_amount > 0) Then
+                        gvUnclearedAdvances.DataSource = (From c In uncleared_advances Order By c.TransDate)
+                        gvUnclearedAdvances.DataBind()
+                    End If
+                    lblAdvanceClearError.Visible = False
 
                     updateBalanceLabel(Await getAccountBalanceTask)
                     If (isApprover) Then
@@ -1472,6 +1472,86 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             End Try
         End Sub
+
+        Protected Async Sub btnAddClearingItem_click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnAddClearingItem.Click
+            If validateClearingItem() Then
+                For Each line As AP_Staff_RmbLine In gvUnclearedAdvances.DataSource
+                    If line.Spare2 Is Nothing Or line.Spare3 Is Nothing Then
+                        lblAdvanceClearError.Text = Translate("ErrorClearAdvance")
+                        lblAdvanceClearError.Visible = True
+                        Return
+                    End If
+                    Dim outstanding As Double = 0
+                    Dim payable As Double = 0
+                    Try
+                        outstanding = Convert.ToDouble(line.Spare2)
+                        payable = Convert.ToDouble(line.Spare3)
+                    Catch
+                        lblAdvanceClearError.Text = Translate("ErrorClearAdvance")
+                        lblAdvanceClearError.Visible = True
+                        Return
+                    End Try
+                    'add line(s) to form
+                    Dim insert As New AP_Staff_RmbLine()
+                    insert.RmbNo = hfRmbNo.Value
+                    insert.LineType = Settings("AdvanceLineType")
+                    insert.GrossAmount = 0 - payable
+                    insert.TransDate = Today
+                    insert.Comment = "Clear Advance:" & line.Comment
+                    insert.Taxable = False
+                    insert.Receipt = False
+                    insert.VATReceipt = False
+                    insert.Split = False
+                    insert.LargeTransaction = False
+                    insert.OutOfDate = False
+                    insert.Department = line.Department
+                    insert.Spare2 = "0" 'Outstanding balance
+                    insert.Spare4 = line.RmbNo ' original reimbursement number
+                    insert.Spare5 = line.RmbLineNo ' original line number
+                    insert.AccountCode = line.AccountCode
+                    insert.CostCenter = line.CostCenter
+                    insert.Supplier = ""
+                    d.AP_Staff_RmbLines.InsertOnSubmit(insert)
+                    'update outstanding balance(s)
+                    line.Spare2 = (outstanding - payable).ToString()
+                    d.SubmitChanges()
+                Next
+            Else
+                lblAdvanceClearError.Visible = True
+            End If
+        End Sub
+
+        Private Function validateClearingItem() As Boolean
+            Dim total As Double = 0
+            For Each line As AP_Staff_RmbLine In gvUnclearedAdvances.DataSource
+                If line.Spare2 Is Nothing Or line.Spare3 Is Nothing Then Return False
+                Dim outstanding As Double = 0
+                Dim payable As Double = 0
+                Try
+                    outstanding = Convert.ToDouble(line.Spare2)
+                    payable = Convert.ToDouble(line.Spare3)
+                Catch
+                    lblAdvanceClearError.Text = Translate("ErrorClearAdvance")
+                    Return False
+                End Try
+                total += payable
+                'ensure no amount is < 0 or > outstanding balance
+                If (payable < 0 Or payable > outstanding) Then
+                    lblAdvanceClearError.Text = Translate("ErrorClearAdvanceAmount")
+                    Return False
+                End If
+                If (Convert.ToDouble(line.Spare3) > Convert.ToDouble(line.Spare2)) Then
+                    lblAdvanceClearError.Text = Translate("ErrorClearAdvanceAmount")
+                    Return False
+                End If
+            Next
+            'ensure total is < rmb total
+            If (total > GetTotal(hfRmbNo.Value)) Then
+                lblAdvanceClearError.Text = Translate("ErrorClearAdvanceTotal")
+                Return False
+            End If
+            Return True
+        End Function
 
         Protected Async Sub btnReject_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnReject.Click
             If btnReject.Attributes("class").Contains("aspNetDisabled") Then
@@ -4319,6 +4399,23 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Next
             mainTree.ChildNodes.Add(newChild)
             Return newChild
+        End Function
+
+        Private Async Function getUnclearedAdvances(ByVal userid As Integer) As Task(Of IQueryable(Of AP_Staff_RmbLine))
+            Dim advance_line_type As Integer = Settings("AdvanceLineType")
+            ' ensure that all advance lines have Spare2 (uncleared amount) filled out.  If not, fill it with the grossAmount
+            Dim update = False
+            For Each line In (From c In d.AP_Staff_RmbLines Where c.LineType = advance_line_type And c.Spare2 Is Nothing)
+                line.Spare2 = line.GrossAmount.ToString()
+                update = True
+            Next
+            If update Then d.SubmitChanges()
+            Dim result = From line In d.AP_Staff_RmbLines Join rmb In d.AP_Staff_Rmbs On rmb.RMBNo Equals line.RmbNo
+                            Where line.LineType = advance_line_type And (Not line.Spare2.Equals("0")) _
+                            And (rmb.Status <> RmbStatus.Draft) And (rmb.Status <> RmbStatus.Submitted) And (rmb.Status <> RmbStatus.Cancelled) _
+                            And rmb.UserId = userid And rmb.PortalId = PortalId
+                            Select line
+            Return result
         End Function
 
         Private Async Function getAccountBalanceAsync(account As String, logon As String) As Task(Of String)

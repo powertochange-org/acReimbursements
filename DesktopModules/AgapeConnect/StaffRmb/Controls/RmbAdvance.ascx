@@ -2,8 +2,10 @@
 <%@ Register assembly="DotNetNuke" namespace="DotNetNuke.UI.WebControls" tagprefix="cc1" %>
 <%@ Register TagPrefix="dnn" TagName="Label" Src="~/controls/LabelControl.ascx" %>
 
-<div class="Agape_SubTitle"> 
-    <asp:HiddenField ID="hfUnclearedAmount" runat="server" Value="" />
+<div class="Agape_SubTitle">
+    <div id="uncleared"> 
+        <asp:HiddenField ID="hfUnclearedAmount" runat="server" Value="" />
+    </div>
     <asp:Label ID="Label5" runat="server" Font-Italic="true" ForeColor="Gray" CssClass="explanation" resourcekey="Explanation"></asp:Label>
 </div><br />
 <table   style="font-size:9pt; ">
@@ -24,7 +26,7 @@
        <td><table>
                     <tr>
                         <td>
-                            <asp:TextBox ID="tbAmount" runat="server" Width="90px" class="numeric rmbAmount" onkeypress="$('#<%=hfUnclearedAmount.ClientId %>').val($(this).val());"></asp:TextBox>
+                            <asp:TextBox ID="tbAmount" runat="server" Width="90px" class="numeric rmbAmount" onkeyup="$('#uncleared>input').val($(this).val());"></asp:TextBox>
                         </td>
 
                     </tr>

@@ -804,4 +804,16 @@
   <data name="lblOutstandingAdvances.Text" xml:space="preserve">
     <value>Outstanding Advances:</value>
   </data>
+  <data name="ErrorClearAdvance.Text" xml:space="preserve">
+    <value>There was an error clearing the advance</value>
+    <comment>Error</comment>
+  </data>
+  <data name="ErrorClearAdvanceAmount.Text" xml:space="preserve">
+    <value>You may not clear an amount more than the Outstanding Balance of an advance</value>
+    <comment>Error</comment>
+  </data>
+  <data name="ErrorClearAdvanceTotal.Text" xml:space="preserve">
+    <value>You may not clear more than the Reimbursement total.</value>
+    <comment>Error</comment>
+  </data>
 </root>
