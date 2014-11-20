@@ -7,7 +7,7 @@
 ' AP_Rmb_Line
 '-------------
 ' Spare1: Province
-' Spare2: PerDiem meals
+' Spare2: PerDiem meals Advance UnclearedAmount
 ' Spare3: Mileage unit index
 ' Spare4: Mileage origin
 ' Spare5: Mileage destination
@@ -837,6 +837,21 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim PAID = Rmb.Status = RmbStatus.Paid
                     Dim CANCELLED = Rmb.Status = RmbStatus.Cancelled
                     Dim FORM_HAS_ITEMS = Rmb.AP_Staff_RmbLines.Count > 0
+                    Dim advance_line_type As Integer  = Settings("AdvanceLineType")
+                    Dim uncleared_advances As Double = 0
+                    Try
+                        uncleared_advances = (From c In d.AP_Staff_RmbLines
+                                                           Join b In d.AP_Staff_Rmbs On c.RmbNo Equals b.RMBNo
+                                                           Where b.UserId = Rmb.UserId And c.LineType = advance_line_type And (Not c.Spare2.Equals("CLEARED")) And b.PortalId = PortalId
+                                                           Select Convert.ToDouble(c.Spare2)).Sum()
+                    Catch
+                        'if the above fails, it is likely due to null values in the spare2 (uncleared_amount) field, so fix this
+                        Dim lines = From c In d.AP_Staff_RmbLines Where c.LineType = advance_line_type And c.Spare2 Is Nothing
+                        For Each line In lines
+                            line.Spare2 = Convert.ToString(line.GrossAmount)
+                        Next
+                        d.SubmitChanges()
+                    End Try
 
                     Dim user = UserController.GetUserById(PortalId, Rmb.UserId)
                     Dim delegateId As Integer
@@ -994,6 +1009,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     '--buttons
                     btnSaveLine.Visible = ((isOwner Or isSpouse) And Not (PROCESSING Or PAID Or APPROVED)) Or (APPROVED And isFinance)
                     addLinebtn2.Visible = (isOwner Or isSpouse) And Not (PROCESSING Or PAID Or APPROVED)
+                    pnlAdvance.Visible = (uncleared_advances > 0) And (isOwner Or isSpouse) And Not (PROCESSING Or PAID Or APPROVED)
+                    lblOutstandingAdvanceAmount.Text = uncleared_advances.ToString("C")
 
                     btnPrint.Visible = FORM_HAS_ITEMS
                     btnPrint.OnClientClick = "window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & RmbNo & "&UID=" & Rmb.UserId & "', '_blank'); "

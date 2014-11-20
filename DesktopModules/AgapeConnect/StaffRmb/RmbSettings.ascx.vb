@@ -170,6 +170,10 @@ Namespace DotNetNuke.Modules.StaffRmb
                         cbWarnIfNegative.Checked = CType(TabModuleSettings("WarnIfNegative"), Boolean)
                     End If
 
+                    If CType(TabModuleSettings("AdvanceLineType"), String) <> "" Then
+                        ddlAdvanceLineType.SelectedValue = CType(TabModuleSettings("AdvanceLineType"), Integer)
+                    End If
+
                     'If CType(TabModuleSettings("CurConverter"), String) <> "" Then
                     '    cbCurConverter.Checked = CType(TabModuleSettings("CurConverter"), Boolean)
                     'End If
@@ -406,6 +410,7 @@ Namespace DotNetNuke.Modules.StaffRmb
             objModules.UpdateTabModuleSetting(TabModuleId, "PerDiemGSTOnlyNumerator", tbPerDiemGSTOnlyNumerator.Text)
             objModules.UpdateTabModuleSetting(TabModuleId, "PerDiemGSTOnlyDenominator", tbPerDiemGSTOnlyDenominator.Text)
 
+            objModules.UpdateTabModuleSetting(TabModuleId, "AdvanceLineType", ddlAdvanceLineType.SelectedValue)
 
             objModules.UpdateTabModuleSetting(TabModuleId, "isLoaded", "Yes")
             Dim d As New StaffRmbDataContext
@@ -438,6 +443,8 @@ Namespace DotNetNuke.Modules.StaffRmb
                     d.AP_StaffRmb_PortalLineTypes.DeleteAllOnSubmit(q)
                 End If
             Next
+
+
 
             d.SubmitChanges()
             StaffBrokerFunctions.SetSetting("RmbTabModuleId", TabModuleId, PortalId)

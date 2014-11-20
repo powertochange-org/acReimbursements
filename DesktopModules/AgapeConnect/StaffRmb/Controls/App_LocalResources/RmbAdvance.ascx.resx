@@ -166,4 +166,8 @@
     <value>The clearing date cannot be in the past</value>
     <comment>Error</comment>
   </data>
+  <data name="FutureDate.Error" xml:space="preserve">
+    <value>Please select a clearing date within the next year.</value>
+    <comment>Error</comment>
+  </data>
 </root>

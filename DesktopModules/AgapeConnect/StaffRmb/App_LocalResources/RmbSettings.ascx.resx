@@ -384,4 +384,10 @@
   <data name="lblPresident.Text" xml:space="preserve">
     <value>President:</value>
   </data>
+  <data name="AdvanceLineType.Help" xml:space="preserve">
+    <value>Select the line type for Advance Requests</value>
+  </data>
+  <data name="AdvanceLineType.Text" xml:space="preserve">
+    <value>Advance Line Type</value>
+  </data>
 </root>

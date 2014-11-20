@@ -239,6 +239,18 @@
             });
             $("#divWarningDialog").parent().appendTo($("form:first"));
 
+            $("#divClearAdvancePopup").dialog({
+                autoOpen: false,
+                width: 500,
+                position: ['middle', 230],
+                modal: true,
+                title: '<%= Translate("ClearAdvance") %>',
+                close: function () {
+                    // allFields.val("").removeClass("ui-state-error");
+                }
+            });
+            $("#divClearAdvancePopup").parent().appendTo($("form:first"));
+            
             $("#divSplitPopup").dialog({
                 autoOpen: false,
                 height: 400,
@@ -508,6 +520,7 @@
  function closeNewItemPopup()  {$("#divNewItem").dialog("close");}
  function closeNewRmbPopup() {$("#divNewRmb").dialog("close");}
  function closeNSFPopup() {$("#divInsufficientFunds").dialog("close");}
+ function closeClearAdvancePopup() {$("#divClearAdvancePopup").dialog("close");}
  function closePopupSplit() {$("#divSplitPopup").dialog("close"); $("#loading").hide();}
  function closeWarningDialog() {$("#divWarningDialog").dialog("close");}
  function closePopupAccountWarning() {$("#divAccountWarning").dialog("close");}
@@ -545,6 +558,7 @@
  function showNewLinePopup()  {$("#divNewItem").dialog("open"); checkCur(); return false;}
  function showNewRmbPopup() {resetNewRmbPopup(); $("#divNewRmb").dialog("open"); return false; }
  function showNSFPopup() {$("#divInsufficientFunds").dialog("open"); return false; }
+ function showClearAdvancePopup() { $("#divClearAdvancePopup").dialog("open"); return false; }
  function showPopupSplit() {resetSplitPopup(); $("#divSplitPopup").dialog("open"); return false; }
  function showWarningDialog() {$("#divWarningDialog").dialog("open"); return false; }
  function showAccountWarning() { $("#divAccountWarning").dialog("open"); return false; }
@@ -1497,6 +1511,11 @@
                                     <div style="clear:both;"></div>
                                     <div style="float:left; margin-left:20px">
                                         <asp:Button ID="addLinebtn2" runat="server" resourcekey="btnAddExpenseItem" class="aButton" />
+                                        <asp:Panel ID="pnlAdvance" runat="server" Visible="false" style="display:inline-block" >
+                                            <asp:Button ID="btnClearAdvance" runat="server" resourcekey="btnClearAdvance" class="aButton" OnClientClick="showClearAdvancePopup();"  />
+                                            (<asp:Label runat="server" resourcekey="lblOutstandingAdvances" font-size="Smaller" font-weight="bold"/>
+                                            <asp:Label ID="lblOutstandingAdvanceAmount" runat="server" font-size="Smaller" font-weight="bold" value="$0.00"/>)
+                                        </asp:Panel>
                                     </div>
                                     <div style="float:right; margin-right:20px">
                                         <asp:Button ID="btnPrint" runat="server" resourcekey="btnPrint" class="aButton" />
@@ -1748,6 +1767,7 @@
         </div>
 
     </div>
+
     <div id="divInsufficientFunds" class="ui-widget">
         <%--Not Used?--%>
         <div>
@@ -1821,6 +1841,31 @@
 
             </ContentTemplate>
         </asp:UpdatePanel>
+    </div>
+
+    <div id="divClearAdvancePopup" class="ui-widget">
+        <asp:updatepanel runat="server">
+            <ContentTemplate>
+                <fieldset>
+                    <legend class="AgapeH4">
+                        <asp:Label runat="server" resourcekey="lblClearAdvance" />
+                    </legend>
+                    <table width="100%">
+                        <tr>
+                            <td>
+                                <asp:GridView ID="gvUnclearedAdvances" runat="server" >
+                                    <Columns>
+                                        
+                                    </Columns>
+                                </asp:GridView>
+                            </td>
+                        </tr>
+                    </table>
+                    <asp:Button ID="btnAddClearingItem" runat="server" resourcekey="btnAddClearingItem" class="aButton right" />
+                    <input id="btnCancelClearAdvance" type="button" value='<%= Translate("btnCancel") %>' onclick="closeClearAdvancePopup();" class="aButton right" />
+                </fieldset>
+            </ContentTemplate>
+        </asp:updatepanel>
     </div>
 
     <div id="divSplitPopup" class="ui-widget">

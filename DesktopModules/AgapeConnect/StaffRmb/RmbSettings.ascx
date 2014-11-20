@@ -604,6 +604,16 @@
                         </asp:LinqDataSource>
                     </td>
                 </tr>
+                <tr>
+                    <td>
+                        <b><dnn:Label runat="server" ControlName="ddlAdvanceLineType" resourcekey="AdvanceLineType" /></b>
+                    </td>
+                    <td>
+                        <asp:DropDownList ID="ddlAdvanceLineType" runat="server" dataSourceId="rmbLineTypes" DataTextField="TypeName" DataValueField="LineTypeId"/>
+                        <asp:LinqDataSource ID="rmbLineTypes" runat="server" ContextTypeName="StaffRmb.StaffRmbDataContext" EntityTypeName="" 
+                            TableName="AP_Staff_RmbLineTypes" Select="new (LineTypeId, TypeName)" />
+                    </td>
+                </tr>
             </table>
         </div>
         <div id='Tab5-tab'>

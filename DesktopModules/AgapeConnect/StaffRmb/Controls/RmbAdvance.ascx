@@ -3,7 +3,7 @@
 <%@ Register TagPrefix="dnn" TagName="Label" Src="~/controls/LabelControl.ascx" %>
 
 <div class="Agape_SubTitle"> 
-    <asp:HiddenField ID="hfCADValue" runat="server" Value="" />
+    <asp:HiddenField ID="hfUnclearedAmount" runat="server" Value="" />
     <asp:Label ID="Label5" runat="server" Font-Italic="true" ForeColor="Gray" CssClass="explanation" resourcekey="Explanation"></asp:Label>
 </div><br />
 <table   style="font-size:9pt; ">
@@ -24,7 +24,7 @@
        <td><table>
                     <tr>
                         <td>
-                            <asp:TextBox ID="tbAmount" runat="server" Width="90px" class="numeric rmbAmount"></asp:TextBox>
+                            <asp:TextBox ID="tbAmount" runat="server" Width="90px" class="numeric rmbAmount" onkeypress="$('#<%=hfUnclearedAmount.ClientId %>').val($(this).val());"></asp:TextBox>
                         </td>
 
                     </tr>

@@ -20,6 +20,9 @@ Imports StaffBrokerFunctions
 
 Partial Class RmbAdvance
     Inherits Entities.Modules.PortalModuleBase
+
+    Dim MAX_DAYS = 365 'Maximum number of days before clearing an advance
+
     Protected Sub Page_Init(sender As Object, e As System.EventArgs) Handles Me.Init
         Dim FileName As String = System.IO.Path.GetFileNameWithoutExtension(Me.AppRelativeVirtualPath)
         If Not (Me.ID Is Nothing) Then
@@ -62,7 +65,7 @@ Partial Class RmbAdvance
     End Property
     Public Property Supplier() As String
         Get
-            Return Nothing
+            Return ""
         End Get
         Set(value As String)
         End Set
@@ -124,10 +127,10 @@ Partial Class RmbAdvance
     End Property
     Public Property Spare2() As String
         Get
-            Return Nothing
+            Return hfUnclearedAmount.value
         End Get
         Set(ByVal value As String)
-
+            hfUnclearedAmount.Value = value
         End Set
     End Property
     Public Property Spare3() As String
@@ -172,10 +175,9 @@ Partial Class RmbAdvance
     End Property
     Public Property CADValue() As Double
         Get
-            Return CDbl(hfCADValue.Value)
+            Return Amount
         End Get
         Set(value As Double)
-            hfCADValue.Value = value
         End Set
     End Property
 
@@ -187,6 +189,10 @@ Partial Class RmbAdvance
         End If
         Try
             Dim theDate As Date = dtDate.Text
+            If theDate > Today.AddDays(MAX_DAYS) Then
+                ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("FutureDate.Error", LocalResourceFile)
+                Return False
+            End If
             If theDate < Today Then
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("OldDate.Error", LocalResourceFile)
                 Return False

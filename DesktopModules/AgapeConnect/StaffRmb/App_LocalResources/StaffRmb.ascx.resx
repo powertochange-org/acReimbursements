@@ -792,4 +792,16 @@
   <data name="ActualBalance.Text" xml:space="preserve">
     <value>Actual surplus/deficit: </value>
   </data>
+  <data name="btnClearAdvance.Text" xml:space="preserve">
+    <value>Clear Advance</value>
+  </data>
+  <data name="btnAddClearingItem.Text" xml:space="preserve">
+    <value>Clear Advance</value>
+  </data>
+  <data name="lblClearAdvance.Text" xml:space="preserve">
+    <value>Clear Advance</value>
+  </data>
+  <data name="lblOutstandingAdvances.Text" xml:space="preserve">
+    <value>Outstanding Advances:</value>
+  </data>
 </root>
