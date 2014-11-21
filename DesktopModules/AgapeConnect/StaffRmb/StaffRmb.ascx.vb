@@ -7,10 +7,10 @@
 ' AP_Rmb_Line
 '-------------
 ' Spare1: Province
-' Spare2: PerDiem meals Advance UnclearedAmount
+' Spare2: PerDiem meals, Advance UnclearedAmount
 ' Spare3: Mileage unit index
-' Spare4: Mileage origin
-' Spare5: Mileage destination
+' Spare4: Mileage origin, ClearingAdvance RmbNo
+' Spare5: Mileage destination, ClearingAdvance RmbLineNo
 
 Imports System
 Imports System.Collections
@@ -39,6 +39,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Implements Entities.Modules.IActionable
         Dim BALANCE_INCONCLUSIVE As String = "unknown"
         Dim BALANCE_PERMISSION_DENIED As String = "**hidden**"
+        Dim CLEARED As String = "CLEARED"
 
 #Region "Properties"
         Dim d As New StaffRmbDataContext
@@ -1509,6 +1510,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         insert.GrossAmount = 0 - payable
                         insert.TransDate = Today
                         insert.Comment = "Clear Advance:" & comment
+                        insert.ShortComment = insert.Comment
                         insert.Taxable = False
                         insert.Receipt = False
                         insert.VATReceipt = False
@@ -2043,6 +2045,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim theRmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value)
             If theRmb.First.Status <> RmbStatus.Approved Then Return
 
+            Dim advancelines As IQueryable(Of AP_Staff_RmbLine) = From r In d.AP_Staff_RmbLines Where r.RmbNo = hfRmbNo.Value And r.GrossAmount < 0
+            Dim clearAdvanceBalancesTask = updateAdvanceBalances(advancelines)
             Dim Extra = From c In d.AP_Staff_Rmb_Post_Extras Where c.RMBNo = CInt(hfRmbNo.Value)
             Dim PostingData As AP_Staff_Rmb_Post_Extra
             Dim insert = True
@@ -2095,6 +2099,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If (insert) Then
                 d.AP_Staff_Rmb_Post_Extras.InsertOnSubmit(PostingData)
             End If
+            Await clearAdvanceBalancesTask
             SubmitChanges()
             Log(theRmb.First.RID, "Processed - this reimbursement will be added to the next download batch")
             pnlMain.Visible = False
@@ -4424,12 +4429,37 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 update = True
             Next
             If update Then d.SubmitChanges()
-            Dim result = From line In d.AP_Staff_RmbLines Join rmb In d.AP_Staff_Rmbs On rmb.RMBNo Equals line.RmbNo
-                            Where line.LineType = advance_line_type And (Not line.Spare2.Equals("0")) _
-                            And (rmb.Status <> RmbStatus.Draft) And (rmb.Status <> RmbStatus.Submitted) And (rmb.Status <> RmbStatus.Cancelled) _
+            Dim result = From line In d.AP_Staff_RmbLines
+                         Join rmb In d.AP_Staff_Rmbs On line.RmbNo Equals rmb.RMBNo
+                            Where line.LineType = advance_line_type And (line.Spare2 <> CLEARED) And line.Spare2 <> "0" _
+                            And rmb.Status <> RmbStatus.Draft And rmb.Status <> RmbStatus.Submitted And rmb.Status <> RmbStatus.PendingDirectorApproval And rmb.Status <> RmbStatus.PendingEDMSApproval And rmb.Status <> RmbStatus.Cancelled _
                             And rmb.UserId = userid And rmb.PortalId = PortalId
                             Select line
             Return result
+        End Function
+
+        Private Async Function updateAdvanceBalances(lines As IQueryable(Of AP_Staff_RmbLine)) As Task
+            If lines Is Nothing Then Return
+            For Each line In lines
+                Dim ID = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.RID).Single()
+                Try
+                    Dim advanceLineNo = Integer.Parse(line.Spare5) 'this is the lineid of the original advance
+                    Dim clearingAmount As Double = 0 - line.GrossAmount 'this is the amount to clear (which is saved as a negative number)
+                    Dim advanceLine = (From c In d.AP_Staff_RmbLines Where c.RmbLineNo = advanceLineNo).Single()
+                    Dim currentBalance = Double.Parse(advanceLine.Spare2) 'this is the outstanding balance
+                    Dim newBalance = currentBalance - clearingAmount
+
+                    If (newBalance = 0) Then
+                        advanceLine.Spare2 = CLEARED
+                        Log(ID, "Advance cleared")
+                    Else
+                        advanceLine.Spare2 = newBalance.ToString()
+                        Log(ID, "Advance reduced by " & clearingAmount)
+                    End If
+                Catch ex As Exception
+                    Log(ID, "Error updating clearing balance: " & ex.Message)
+                End Try
+            Next
         End Function
 
         Private Async Function getAccountBalanceAsync(account As String, logon As String) As Task(Of String)
