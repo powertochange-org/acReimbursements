@@ -528,7 +528,7 @@
  function closeNewItemPopup()  {$("#divNewItem").dialog("close");}
  function closeNewRmbPopup() {$("#divNewRmb").dialog("close");}
  function closeNSFPopup() {$("#divInsufficientFunds").dialog("close");}
- function closeClearAdvancePopup() {$("#divClearAdvancePopup").dialog("close");}
+ function closeClearAdvancePopup() {$("#divClearAdvancePopup").dialog("close"); $('#loading').hide();}
  function closePopupSplit() {$("#divSplitPopup").dialog("close"); $("#loading").hide();}
  function closeWarningDialog() {$("#divWarningDialog").dialog("close");}
  function closePopupAccountWarning() {$("#divAccountWarning").dialog("close");}
@@ -1472,7 +1472,7 @@
                                                     <EditItemTemplate>
                                                     </EditItemTemplate>
                                                     <ItemTemplate>
-                                                        <asp:LinkButton ID="LinkButton5" runat="server" CommandName="myEdit" Visible='<%# CanEdit(Eval("AP_Staff_Rmb.Status"))  %>'
+                                                        <asp:LinkButton ID="LinkButton5" runat="server" CommandName="myEdit" Visible='<%# (Eval("GrossAmount")>0) and CanEdit(Eval("AP_Staff_Rmb.Status"))  %>'
                                                             CommandArgument='<%# Eval("RmbLineNo") %>' resourcekey="Edit"></asp:LinkButton>
                                                         <asp:LinkButton ID="LinkButton4" runat="server" CommandName="myDelete" Visible='<%# CanEdit(Eval("AP_Staff_Rmb.Status")) %>' CssClass="confirm"
                                                             CommandArgument='<%# Eval("RmbLineNo") %>' resourcekey="Delete"></asp:LinkButton>
@@ -1575,6 +1575,7 @@
                     <Triggers>
                         <asp:PostBackTrigger ControlID="btnDownload" />
                         <asp:AsyncPostBackTrigger ControlID="btnCreate" />
+                        <asp:AsyncPostBackTrigger ControlID="btnAddClearingItem" />
                     </Triggers>
                 </asp:UpdatePanel>
             </td>
@@ -1864,27 +1865,44 @@
                                 <asp:GridView ID="gvUnclearedAdvances" runat="server" AutoGenerateColumns="False"
                                             CellPadding="4" ForeColor="#333333" GridLines="Horizontal" Width="100%" showFooter="true">
                                     <Columns>
+                                        <asp:TemplateField >
+                                            <ItemTemplate>
+                                                <asp:HiddenField ID="hfRmbNo" runat="server" Value='<%# Eval("RmbNo") %>'></asp:HiddenField>
+                                            </ItemTemplate>
+                                        </asp:TemplateField>
+                                        <asp:TemplateField>
+                                            <ItemTemplate>
+                                                <asp:HiddenField ID="hfRmbLineNo" runat="server" Value='<%# Eval("RmbLineNo") %>'></asp:HiddenField>
+                                            </ItemTemplate>
+                                        </asp:TemplateField>
+                                        <asp:TemplateField HeaderText="Cost Center">
+                                            <ItemTemplate>
+                                                <asp:Label ID="lblCostCenter" runat="server" Text='<%# Eval("CostCenter") %>'></asp:Label>
+                                            </ItemTemplate>
+                                            <ItemStyle HorizontalAlign="Center" width="50px" />
+                                        </asp:TemplateField>
                                         <asp:TemplateField HeaderText="Advance Purpose">
                                             <ItemTemplate>
-                                                <asp:Label ID="lblAdvanceComment" runat="server" Text='<%# Bind("Comment") %>'></asp:Label>
+                                                <asp:Label ID="lblAdvanceComment" runat="server" Text='<%# Eval("Comment") %>'></asp:Label>
                                             </ItemTemplate>
                                             <ItemStyle HorizontalAlign="Left" width="150px" />
                                         </asp:TemplateField>
                                         <asp:TemplateField HeaderText="Clearing Date" SortExpression="TransDate">
                                                 <ItemTemplate>
-                                                    <asp:Label ID="lblAdvanceDate" runat="server" CssClass='<%# If( Eval("TransDate")<Today,"NormalRed","") %>' Text='<%# Bind("TransDate", "{0:d}") %>'></asp:Label>
+                                                    <asp:Label ID="lblAdvanceDate" runat="server" CssClass='<%# If( Eval("TransDate")<Today,"NormalRed","") %>' Text='<%# Eval("TransDate", "{0:d}") %>'></asp:Label>
                                                 </ItemTemplate>
                                                 <ItemStyle HorizontalAlign="Center" Width="50px" />
                                         </asp:TemplateField>
                                         <asp:TemplateField HeaderText="Outstanding Amount">
                                             <ItemTemplate>
-                                                <asp:Label ID="lblAdvanceBalance" runat="server" Text='<%# Bind("Spare2", "{0:C2}") %>'></asp:Label>
+                                                <asp:Label ID="lblAdvanceBalance" runat="server" Text=<%# FormatCurrency((Eval("Spare2"))) %>></asp:Label>
                                             </ItemTemplate>
                                             <ItemStyle HorizontalAlign="Right" Width="50px"  />
                                         </asp:TemplateField>
                                         <asp:TemplateField HeaderText="Amount to clear">
                                             <ItemTemplate>
-                                                <asp:TextBox ID="tbAdvanceClearing" runat="server" Text='<%# Bind("Spare3") %>' CssClass="clearAdvance numeric" Style="text-align:right" onkeyup="updateClearingTotal();" value="0"></asp:TextBox>
+                                                <asp:TextBox ID="tbAdvanceClearing" runat="server" Text='<%# Bind("Spare3") %>' CssClass="clearAdvance numeric" Style="text-align:right" value="0.00" 
+                                                     onkeyup="updateClearingTotal();" onfocus="$(this).select();"></asp:TextBox>
                                             </ItemTemplate>
                                             <ItemStyle HorizontalAlign="Right" Width="50px"  />
                                             <FooterTemplate>
@@ -1904,7 +1922,7 @@
                         </tr>
                     </table>
                     <br />
-                    <asp:Button ID="btnAddClearingItem" runat="server" resourcekey="btnAddClearingItem" class="aButton right" />
+                    <asp:Button ID="btnAddClearingItem" runat="server" resourcekey="btnAddClearingItem" onClientClick="$(this).prop('disabled', true).addClass('aspNetDisabled'); show_loading_spinner();" class="aButton right" />
                     <input id="btnCancelClearAdvance" type="button" value='<%= Translate("btnCancel") %>' onclick="closeClearAdvancePopup();" class="aButton" />
                 </fieldset>
             </ContentTemplate>

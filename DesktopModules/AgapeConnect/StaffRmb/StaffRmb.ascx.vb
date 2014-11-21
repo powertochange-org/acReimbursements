@@ -1475,63 +1475,77 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Protected Async Sub btnAddClearingItem_click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnAddClearingItem.Click
             If validateClearingItem() Then
-                For Each line As AP_Staff_RmbLine In gvUnclearedAdvances.DataSource
-                    If line.Spare2 Is Nothing Or line.Spare3 Is Nothing Then
-                        lblAdvanceClearError.Text = Translate("ErrorClearAdvance")
-                        lblAdvanceClearError.Visible = True
-                        Return
-                    End If
+                For Each row In gvUnclearedAdvances.Rows
+                    Dim rmblineno As Integer
+                    Dim comment As String = ""
                     Dim outstanding As Double = 0
                     Dim payable As Double = 0
                     Try
-                        outstanding = Convert.ToDouble(line.Spare2)
-                        payable = Convert.ToDouble(line.Spare3)
-                    Catch
-                        lblAdvanceClearError.Text = Translate("ErrorClearAdvance")
+                        rmblineno = row.FindControl("hfRmbLineNo").Value
+                        comment = row.FindControl("lblAdvanceComment").Text
+                        Dim advance_balance = row.FindControl("lblAdvanceBalance").Text
+                        Dim advance_clearing = row.FindControl("tbAdvanceClearing").Text
+                        outstanding = Double.Parse(advance_balance, NumberStyles.Currency)
+                        payable = Double.Parse(advance_clearing, NumberStyles.Currency)
+                    Catch ex As Exception
+                        lblAdvanceClearError.Text = Translate("ErrorClearAdvance") & ": " & ex.Message
                         lblAdvanceClearError.Visible = True
                         Return
                     End Try
-                    'add line(s) to form
-                    Dim insert As New AP_Staff_RmbLine()
-                    insert.RmbNo = hfRmbNo.Value
-                    insert.LineType = Settings("AdvanceLineType")
-                    insert.GrossAmount = 0 - payable
-                    insert.TransDate = Today
-                    insert.Comment = "Clear Advance:" & line.Comment
-                    insert.Taxable = False
-                    insert.Receipt = False
-                    insert.VATReceipt = False
-                    insert.Split = False
-                    insert.LargeTransaction = False
-                    insert.OutOfDate = False
-                    insert.Department = line.Department
-                    insert.Spare2 = "0" 'Outstanding balance
-                    insert.Spare4 = line.RmbNo ' original reimbursement number
-                    insert.Spare5 = line.RmbLineNo ' original line number
-                    insert.AccountCode = line.AccountCode
-                    insert.CostCenter = line.CostCenter
-                    insert.Supplier = ""
-                    d.AP_Staff_RmbLines.InsertOnSubmit(insert)
-                    'update outstanding balance(s)
-                    line.Spare2 = (outstanding - payable).ToString()
-                    d.SubmitChanges()
+                    'lookup original line item
+                    Dim line As AP_Staff_RmbLine
+                    Try
+                        line = (From c In d.AP_Staff_RmbLines Where c.RmbLineNo = rmblineno).Single()
+                    Catch ex As Exception
+                        lblAdvanceClearError.Text = ex.Message
+                        lblAdvanceClearError.Visible = True
+                        Return
+                    End Try
+                    If (payable > 0) Then
+                        'add line(s) to form
+                        Dim insert As New AP_Staff_RmbLine()
+                        insert.RmbNo = hfRmbNo.Value
+                        insert.LineType = line.LineType
+                        insert.GrossAmount = 0 - payable
+                        insert.TransDate = Today
+                        insert.Comment = "Clear Advance:" & comment
+                        insert.Taxable = False
+                        insert.Receipt = False
+                        insert.VATReceipt = False
+                        insert.Split = False
+                        insert.LargeTransaction = False
+                        insert.OutOfDate = False
+                        insert.Department = line.Department
+                        insert.Spare2 = "0" 'Outstanding balance
+                        insert.Spare4 = line.RmbNo ' original reimbursement number
+                        insert.Spare5 = line.RmbLineNo ' original line number
+                        insert.AccountCode = Settings("AdvanceLineType")
+                        insert.CostCenter = line.CostCenter
+                        insert.Supplier = ""
+                        d.AP_Staff_RmbLines.InsertOnSubmit(insert)
+                    End If
                 Next
+                d.SubmitChanges()
+                Await LoadRmbAsync(hfRmbNo.Value)
+                ScriptManager.RegisterClientScriptBlock(btnAddClearingItem, btnAddClearingItem.GetType(), "close_advance_clearing_popup", "closeClearAdvancePopup();", True)
             Else
                 lblAdvanceClearError.Visible = True
+                btnAddClearingItem.Enabled = True
             End If
         End Sub
 
         Private Function validateClearingItem() As Boolean
             Dim total As Double = 0
-            For Each line As AP_Staff_RmbLine In gvUnclearedAdvances.DataSource
-                If line.Spare2 Is Nothing Or line.Spare3 Is Nothing Then Return False
+            For Each row In gvUnclearedAdvances.Rows
                 Dim outstanding As Double = 0
                 Dim payable As Double = 0
                 Try
-                    outstanding = Convert.ToDouble(line.Spare2)
-                    payable = Convert.ToDouble(line.Spare3)
-                Catch
-                    lblAdvanceClearError.Text = Translate("ErrorClearAdvance")
+                    Dim advance_balance = row.FindControl("lblAdvanceBalance").Text
+                    Dim advance_clearing = row.FindControl("tbAdvanceClearing").Text
+                    outstanding = Double.Parse(advance_balance, NumberStyles.Currency)
+                    payable = Double.Parse(advance_clearing, NumberStyles.Currency)
+                Catch ex As Exception
+                    lblAdvanceClearError.Text = Translate("ErrorClearAdvance") & ": " & ex.Message
                     Return False
                 End Try
                 total += payable
@@ -1540,7 +1554,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     lblAdvanceClearError.Text = Translate("ErrorClearAdvanceAmount")
                     Return False
                 End If
-                If (Convert.ToDouble(line.Spare3) > Convert.ToDouble(line.Spare2)) Then
+                If (payable > outstanding) Then
                     lblAdvanceClearError.Text = Translate("ErrorClearAdvanceAmount")
                     Return False
                 End If
