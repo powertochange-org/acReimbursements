@@ -275,7 +275,6 @@
             $("#divNewItem").dialog({
                 autoOpen: false,
                 position:['middle', 120],
-                //height: '<%= If(isAccounts(),760,700)%>',
                 width: 780,
                 modal: true,
                 title: '<%= Translate("AddEditRmb") %>',
@@ -1589,7 +1588,7 @@
                     <div align="left">
                         <asp:Label ID="PopupTitle" runat="server" resourcekey="NewLineTitle" CssClass="AgapeH2"></asp:Label><br />
                         <br />
-                        <div style="max-height:450px; overflow-y:auto; overflow-x:hidden;">
+                        <div style="max-height:550px; overflow-y:auto; overflow-x:hidden;">
                             <table style="font-size: 9pt" width="100%">
                                 <tr valign="top">
                                     <td style="white-space: nowrap; min-width:194px;">
@@ -1641,7 +1640,7 @@
                                     </b></td>
                                     <td>
                                   
-                                     <iframe id="ifReceipt" class="ifreceipt" runat="server" src="" width="530" height="280" >
+                                     <iframe id="ifReceipt" class="ifreceipt" runat="server" src="" width="530"  >
 
                                      </iframe>
                                     </td>

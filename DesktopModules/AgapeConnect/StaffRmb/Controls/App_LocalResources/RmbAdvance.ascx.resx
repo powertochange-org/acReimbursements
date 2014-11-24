@@ -167,7 +167,7 @@
     <comment>Error</comment>
   </data>
   <data name="FutureDate.Error" xml:space="preserve">
-    <value>Please select a clearing date within the next year.</value>
+    <value>Advances must be cleared within 60 days, except in special cases.</value>
     <comment>Error</comment>
   </data>
 </root>

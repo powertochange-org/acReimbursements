@@ -875,7 +875,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim isApprover = ((UserId = Rmb.ApprUserId) And Not (isOwner Or isSpouse)) _
                                     Or ((Rmb.Status = RmbStatus.PendingDirectorApproval) And (UserId = directorId)) _
                                     Or ((Rmb.Status = RmbStatus.PendingEDMSApproval) And (UserId = EDMSId))
-                    Dim isFinance = IsAccounts() And Not (isOwner Or isSpouse) And Not DRAFT
+                    Dim isFinance = IsAccounts() And Not (isOwner Or isSpouse Or isApprover) And Not DRAFT
 
                     '--Ensure the user is authorized to view this reimbursement
                     Dim RmbRel As Integer
