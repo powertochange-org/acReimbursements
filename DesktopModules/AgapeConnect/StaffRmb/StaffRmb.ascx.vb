@@ -1652,8 +1652,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim DelegateName = If(delegateId >= 0, UserController.GetUserById(PortalId, delegateId).DisplayName, "")
                     Dim DelegateEmail = If(delegateId >= 0, UserController.GetUserById(PortalId, delegateId).Email, "")
                     Dim comments As String = ""
-                    If tbApprComments.Text.Trim().Length > 0 Then
-                        comments = Translate("CommentLeft").Replace("[FIRSTNAME]", UserInfo.FirstName).Replace("[COMMENT]", tbApprComments.Text & "  " * tbAccComments.Text)
+                    If (UserInfo.UserID = rmb.First.ApprUserId) And (tbApprComments.Text.Trim().Length > 0) Then
+                        comments = Translate("CommentLeft").Replace("[FIRSTNAME]", UserInfo.FirstName).Replace("[COMMENT]", tbApprComments.Text)
+                    ElseIf IsAccounts() And (tbAccComments.Text.Trim().Length > 0) Then
+                        comments = Translate("CommentLeft").Replace("[FIRSTNAME]", UserInfo.FirstName).Replace("[COMMENT]", tbAccComments.Text)
                     End If
 
                     Message = Message.Replace("[STAFFNAME]", If(delegateId >= 0, DelegateName & " (" & Translate("OnBehalfOf") & StaffMbr.DisplayName & ")", StaffMbr.FirstName))
