@@ -31,7 +31,7 @@
    <td><table>
                 <tr>
                     <td>
-                        <asp:TextBox ID="tbAmount" runat="server" Width="90px" class="numeric rmbAmount" onfocus="$(this).select();"></asp:TextBox>
+                        <asp:TextBox ID="tbAmount" runat="server" Width="90px" class="numeric rmbAmount"></asp:TextBox>
                     </td>
                     <td>
                         <uc1:Currency ID="Currency1" runat="server" />

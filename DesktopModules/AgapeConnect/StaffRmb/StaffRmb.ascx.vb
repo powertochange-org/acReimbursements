@@ -3091,12 +3091,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             d.SubmitChanges()
         End Sub
 
-        'Protected Sub Log(ByVal RID As Integer, ByVal Message As String)
-        '    'Assumes a logLevel of INFO if not provided
-        '    'objEventLog.AddLog("Rmb: " & RID, Message, PortalSettings, UserId, Services.Log.EventLog.EventLogController.EventLogType.ADMIN_ALERT)
-        '    Log(RID, LOG_LEVEL_INFO, Message)
-        'End Sub
-
         Private Function hasElectronicReceipts(lineNo As Integer) As Boolean
             Return (From c In d.AP_Staff_RmbLine_Files Where c.RmbLineNo = lineNo).Count > 0
         End Function
