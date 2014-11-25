@@ -63,6 +63,9 @@ namespace StaffRmb
     partial void InsertAP_Staff_RmbLine_File(AP_Staff_RmbLine_File instance);
     partial void UpdateAP_Staff_RmbLine_File(AP_Staff_RmbLine_File instance);
     partial void DeleteAP_Staff_RmbLine_File(AP_Staff_RmbLine_File instance);
+    partial void InsertAP_Staff_Rmb_Log(AP_Staff_Rmb_Log instance);
+    partial void UpdateAP_Staff_Rmb_Log(AP_Staff_Rmb_Log instance);
+    partial void DeleteAP_Staff_Rmb_Log(AP_Staff_Rmb_Log instance);
     #endregion
 		
 		public StaffRmbDataContext() : 
@@ -180,6 +183,14 @@ namespace StaffRmb
 			get
 			{
 				return this.GetTable<AP_Staff_RmbLine_File>();
+			}
+		}
+		
+		public System.Data.Linq.Table<AP_Staff_Rmb_Log> AP_Staff_Rmb_Logs
+		{
+			get
+			{
+				return this.GetTable<AP_Staff_Rmb_Log>();
 			}
 		}
 	}
@@ -4210,6 +4221,188 @@ namespace StaffRmb
 						this._RMBNo = default(long);
 					}
 					this.SendPropertyChanged("AP_Staff_Rmb");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.AP_Staff_Rmb_Log")]
+	public partial class AP_Staff_Rmb_Log : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _LogEntryId;
+		
+		private System.DateTime _Timestamp;
+		
+		private short _LogType;
+		
+		private int _RID;
+		
+		private string _Username;
+		
+		private string _Message;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnLogEntryIdChanging(int value);
+    partial void OnLogEntryIdChanged();
+    partial void OnTimestampChanging(System.DateTime value);
+    partial void OnTimestampChanged();
+    partial void OnLogTypeChanging(short value);
+    partial void OnLogTypeChanged();
+    partial void OnRIDChanging(int value);
+    partial void OnRIDChanged();
+    partial void OnUsernameChanging(string value);
+    partial void OnUsernameChanged();
+    partial void OnMessageChanging(string value);
+    partial void OnMessageChanged();
+    #endregion
+		
+		public AP_Staff_Rmb_Log()
+		{
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LogEntryId", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int LogEntryId
+		{
+			get
+			{
+				return this._LogEntryId;
+			}
+			set
+			{
+				if ((this._LogEntryId != value))
+				{
+					this.OnLogEntryIdChanging(value);
+					this.SendPropertyChanging();
+					this._LogEntryId = value;
+					this.SendPropertyChanged("LogEntryId");
+					this.OnLogEntryIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Timestamp")]
+		public System.DateTime Timestamp
+		{
+			get
+			{
+				return this._Timestamp;
+			}
+			set
+			{
+				if ((this._Timestamp != value))
+				{
+					this.OnTimestampChanging(value);
+					this.SendPropertyChanging();
+					this._Timestamp = value;
+					this.SendPropertyChanged("Timestamp");
+					this.OnTimestampChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_LogType")]
+		public short LogType
+		{
+			get
+			{
+				return this._LogType;
+			}
+			set
+			{
+				if ((this._LogType != value))
+				{
+					this.OnLogTypeChanging(value);
+					this.SendPropertyChanging();
+					this._LogType = value;
+					this.SendPropertyChanged("LogType");
+					this.OnLogTypeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_RID")]
+		public int RID
+		{
+			get
+			{
+				return this._RID;
+			}
+			set
+			{
+				if ((this._RID != value))
+				{
+					this.OnRIDChanging(value);
+					this.SendPropertyChanging();
+					this._RID = value;
+					this.SendPropertyChanged("RID");
+					this.OnRIDChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Username")]
+		public string Username
+		{
+			get
+			{
+				return this._Username;
+			}
+			set
+			{
+				if ((this._Username != value))
+				{
+					this.OnUsernameChanging(value);
+					this.SendPropertyChanging();
+					this._Username = value;
+					this.SendPropertyChanged("Username");
+					this.OnUsernameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Message")]
+		public string Message
+		{
+			get
+			{
+				return this._Message;
+			}
+			set
+			{
+				if ((this._Message != value))
+				{
+					this.OnMessageChanging(value);
+					this.SendPropertyChanging();
+					this._Message = value;
+					this.SendPropertyChanged("Message");
+					this.OnMessageChanged();
 				}
 			}
 		}
