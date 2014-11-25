@@ -1513,9 +1513,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             insert.UserComment = tbNewComments.Text
             If (hfOnBehalfOf.Value.Equals(String.Empty)) Then
                 insert.UserId = UserId
+                Log(insert.RID, LOG_LEVEL_INFO, "New Reimbursement CREATED")
             Else
                 insert.UserId = hfOnBehalfOf.Value
                 insert.SpareField3 = CStr(UserId)  'This is the delegate, filling out the form on behalf of the user.
+                Log(insert.RID, LOG_LEVEL_INFO, "New Reimbursement CREATED on behalf of " & tbNewOnBehalfOf.Text)
             End If
 
             insert.PortalId = PortalId
