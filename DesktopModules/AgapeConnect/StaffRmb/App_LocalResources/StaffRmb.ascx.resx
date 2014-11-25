@@ -816,4 +816,10 @@
     <value>You may not clear more than the amount you are reimbursing ([TOTAL]).</value>
     <comment>Error</comment>
   </data>
+  <data name="lblRemainingBalance.Text" xml:space="preserve">
+    <value>Estimated Remaining Balance:</value>
+  </data>
+  <data name="lblRemainingBudget.Text" xml:space="preserve">
+    <value>Estimated Remaining Budget:</value>
+  </data>
 </root>

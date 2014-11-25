@@ -4554,6 +4554,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Private Sub updateBalanceLabel(accountBalance As String)
             lblAccountBalance.Text = accountBalance
+            DirectCast(GridView1.FooterRow.FindControl("lblRemainingBalance"), Label).Text = If(isStaffAccount(), Translate("lblRemainingBalance"), Translate("lblRemainingBudget"))
         End Sub
 
         Private Sub valueOrNull(hf As HiddenField, s As String)

@@ -113,7 +113,7 @@
         } else {
             result = format_money(accBal - formTot);
         }
-        $("span[id$='GridView1_lblRemainingBalance']:last").text(result);
+        $("span[id$='GridView1_lblRemainingBalanceAmount']").text(result);
     }
 
     function updateClearingTotal() {
@@ -1432,9 +1432,9 @@
 
                                                     </ItemTemplate>
                                                     <FooterTemplate>
-                                                        <asp:Label ID="lblTotalAmount" runat="server" Font-Bold="True" Text="Total:"></asp:Label>
+                                                        <asp:Label ID="lblTotal" runat="server" Font-Bold="True" Text="Total:"></asp:Label>
                                                         <asp:Panel ID="pnlRemBal1" runat="server" Visible='<%# Settings("ShowRemBal") = "True" %>'>
-                                                            <asp:Label ID="lblRemainingBalance" runat="server" CssClass=<%# "second_line " & if(IsAccounts(),"finance","") %> Font-Italic="true" Text="Estimated Remaining Balance:"></asp:Label>
+                                                            <asp:Label ID="lblRemainingBalance" runat="server" CssClass=<%# "second_line " & if(IsAccounts(),"finance","") %> Font-Italic="true" ></asp:Label>
                                                         </asp:Panel>
                                                     </FooterTemplate>
                                                     <ItemStyle HorizontalAlign="Left" />
@@ -1456,7 +1456,7 @@
                                                     <FooterTemplate>
                                                         <asp:Label ID="lblTotalAmount" runat="server" Text='<%# StaffBrokerFunctions.GetSetting("Currency", PortalId) & GetTotal(-1).ToString("F2") %>'></asp:Label>
                                                         <asp:Panel ID="pnlRemBal2" runat="server" Visible='<%# Settings("ShowRemBal") = "True"%>'>
-                                                            <asp:Label ID="lblRemainingBalance" runat="server" Font-Size="xx-small" Text=''></asp:Label>
+                                                            <asp:Label ID="lblRemainingBalanceAmount" runat="server" Font-Size="xx-small" Text=''></asp:Label>
                                                         </asp:Panel>
                                                     </FooterTemplate>
                                                     <ItemStyle HorizontalAlign="Right" />
