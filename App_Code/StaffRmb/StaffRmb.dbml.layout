@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 12.25, 15.75" name="StaffRmb">
+<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 12.625, 15.75" name="StaffRmb">
   <DataContextMoniker Name="/StaffRmbDataContext" />
   <nestedChildShapes>
     <classShape Id="24f330c8-7b6e-4904-a68d-179ca62539dd" absoluteBounds="6.625, 3.75, 2, 1.7708968098958327">
@@ -63,14 +63,14 @@
         <elementListCompartment Id="0f1f339a-acbf-4f94-a573-5a1f6c37a9ab" absoluteBounds="4.265, 3.835, 1.9700000000000002, 6.979939778645833" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <associationConnector edgePoints="[(3.25 : 5.70266845703125); (4.25 : 5.70266845703125)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(3.25 : 5.70266845703125); (4.25 : 5.70266845703125)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/StaffRmbDataContext/AP_Staff_Rmb/AP_Staff_Rmb_AP_Staff_RmbLine" />
       <nodes>
         <classShapeMoniker Id="04cf3e34-0cde-4d87-b8b3-dcae1502bbc1" />
         <classShapeMoniker Id="82a8ae9d-f06f-4cf6-955e-76ead972823b" />
       </nodes>
     </associationConnector>
-    <associationConnector edgePoints="[(6.625 : 4.63544840494792); (6.45833333333333 : 4.63544840494792 : JumpStart); (6.29166666666667 : 4.63544840494792 : JumpEnd); (6.25 : 4.63544840494792)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(6.625 : 4.63544840494792); (6.45833333333333 : 4.63544840494792 : JumpStart); (6.29166666666667 : 4.63544840494792 : JumpEnd); (6.25 : 4.63544840494792)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/StaffRmbDataContext/AP_Staff_RmbLineType/AP_Staff_RmbLineType_AP_Staff_RmbLine" />
       <nodes>
         <classShapeMoniker Id="24f330c8-7b6e-4904-a68d-179ca62539dd" />
@@ -96,12 +96,18 @@
         <elementListCompartment Id="44d6dcec-d32e-4179-a4a3-5a025d551f36" absoluteBounds="6.64, 6.585, 1.9700000000000002, 1.2108968098958333" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <associationConnector edgePoints="[(3.25 : 3.25758222851563); (4 : 3.25758222851563); (4 : 3.125); (7.625 : 3.125); (7.625 : 3.5); (6.375 : 3.5); (6.375 : 5.75); (7.625 : 5.75); (7.625 : 6.125)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(3.25 : 3.25758222851563); (4 : 3.25758222851563); (4 : 3.125); (7.625 : 3.125); (7.625 : 3.5); (6.375 : 3.5); (6.375 : 5.75); (7.625 : 5.75); (7.625 : 6.125)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/StaffRmbDataContext/AP_Staff_Rmb/AP_Staff_Rmb_AP_Staff_RmbLine_File" />
       <nodes>
         <classShapeMoniker Id="04cf3e34-0cde-4d87-b8b3-dcae1502bbc1" />
         <classShapeMoniker Id="9743f7b8-a529-48d1-8093-25c433ddfaf1" />
       </nodes>
     </associationConnector>
+    <classShape Id="69dcdf43-83b1-4fb3-8d7b-9c2fc9ff5112" absoluteBounds="10.375, 7.75, 2, 1.9631982421874996">
+      <DataClassMoniker Name="/StaffRmbDataContext/AP_Staff_Rmb_Log" />
+      <nestedChildShapes>
+        <elementListCompartment Id="755bae2d-f790-4e1b-a175-aaf673b637fc" absoluteBounds="10.39, 8.21, 1.9700000000000002, 1.4031982421875" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
   </nestedChildShapes>
 </ordesignerObjectsDiagram>

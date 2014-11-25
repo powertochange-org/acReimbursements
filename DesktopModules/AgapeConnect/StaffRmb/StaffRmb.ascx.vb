@@ -40,6 +40,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Dim BALANCE_INCONCLUSIVE As String = "unknown"
         Dim BALANCE_PERMISSION_DENIED As String = "**hidden**"
         Dim CLEARED As String = "CLEARED"
+        Dim LOG_LEVEL_DEBUG As Integer = 1
+        Dim LOG_LEVEL_INFO As Integer = 2
+        Dim LOG_LEVEL_WARNING As Integer = 3
+        Dim LOG_LEVEL_ERROR As Integer = 4
+        Dim LOG_LEVEL_CRITICAL As Integer = 5
 
 #Region "Properties"
         Dim d As New StaffRmbDataContext
@@ -1094,7 +1099,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Catch ex As Exception
                 lblErrorMessage.Text = Translate("UpdateApproversError")
                 pnlError.Visible = True
-                Log(lblRmbNo.Text, "ERROR: updating approvers list. " + ex.ToString)
+                Log(lblRmbNo.Text, LOG_LEVEL_ERROR, "ERROR: updating approvers list. " + ex.ToString)
             End Try
             Try
                 ddlApprovedBy.SelectedValue = approverId
@@ -1230,7 +1235,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                             End If
                         Catch ex As Exception
-                            Log(lblRmbNo.Text, "WARNING: Failed to Add Electronic Receipt: " & ex.ToString)
+                            Log(lblRmbNo.Text, LOG_LEVEL_WARNING, "WARNING: Failed to Add Electronic Receipt: " & ex.ToString)
                         End Try
                         If insert.Receipt Then
                             If q.Count = 0 Then
@@ -1621,9 +1626,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             insert.UserComment = tbNewComments.Text
             If (hfOnBehalfOf.Value.Equals(String.Empty)) Then
                 insert.UserId = UserId
+                Log(insert.RID, LOG_LEVEL_INFO, "New Reimbursement CREATED")
             Else
                 insert.UserId = hfOnBehalfOf.Value
                 insert.SpareField3 = CStr(UserId)  'This is the delegate, filling out the form on behalf of the user.
+                Log(insert.RID, LOG_LEVEL_INFO, "New Reimbursement CREATED on behalf of " & tbNewOnBehalfOf.Text)
             End If
 
             insert.PortalId = PortalId
@@ -1721,7 +1728,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 If NewStatus = RmbStatus.Submitted Then
                     SendApprovalEmail(rmb)
                 End If
-                Log(rmb.RID, "SUBMITTED")
+                Log(rmb.RID, LOG_LEVEL_INFO, "SUBMITTED")
 
                 'use an alert to switch back to the main window from the printout window
                 ScriptManager.RegisterStartupScript(Page, Me.GetType(), "popup_and_select", printable & " alert(""" & message & """); selectIndex(1)", True)
@@ -1750,7 +1757,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 btnDelete.Visible = False
 
                 If rmb.First.UserId = UserId Then
-                    Log(rmb.First.RID, "DELETED by owner")
+                    Log(rmb.First.RID, LOG_LEVEL_INFO, "DELETED by owner")
                     ScriptManager.RegisterStartupScript(btnDelete, btnDelete.GetType(), "select5", "selectIndex(5)", True)
                 Else
                     'Send an email to the end user
@@ -1782,7 +1789,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ltSplash.Text = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbSplash", PortalId))
                     pnlSplash.Visible = True
 
-                    Log(rmb.First.RID, "DELETED")
+                    Log(rmb.First.RID, LOG_LEVEL_INFO, "DELETED")
                     ScriptManager.RegisterStartupScript(btnDelete, btnDelete.GetType(), "select0", "selectIndex(0)", True)
                 End If
                 SubmitChanges()
@@ -1817,7 +1824,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             rmb.First.Locked = True
                             SendApprovedEmail(rmb.First)
                         End If
-                        Log(rmb.First.RID, "Approved")
+                        Log(rmb.First.RID, LOG_LEVEL_INFO, "Approved")
                     End If
                 End If
                 If rmb.First.Status = RmbStatus.PendingDirectorApproval Then
@@ -1833,7 +1840,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             rmb.First.Locked = True
                             shouldSendApprovalEmail = False
                             SendApprovedEmail(rmb.First)
-                            Log(rmb.First.RID, "Approved by " & UserController.GetCurrentUserInfo.DisplayName)
+                            Log(rmb.First.RID, LOG_LEVEL_INFO, "Approved by " & UserController.GetCurrentUserInfo.DisplayName)
                         End If
                         message += Translate("RmbApprovedDirector").Replace("[RMBNO]", rmb.First.RID) + "\n"
                     End If
@@ -1846,7 +1853,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         shouldSendApprovalEmail = False
                         SendApprovedEmail(rmb.First)
                         message += Translate("RmbApprovedEDMS").Replace("[RMBNO]", rmb.First.RID)
-                        Log(rmb.First.RID, "Approved by EDMS")
+                        Log(rmb.First.RID, LOG_LEVEL_INFO, "Approved by EDMS")
                     End If
                 End If
                 If shouldSendApprovalEmail Then SendApprovalEmail(rmb.First)
@@ -2103,7 +2110,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
             Await clearAdvanceBalancesTask
             SubmitChanges()
-            Log(theRmb.First.RID, "Processed - this reimbursement will be added to the next download batch")
+            Log(theRmb.First.RID, LOG_LEVEL_INFO, "Processed - this reimbursement will be added to the next download batch")
             pnlMain.Visible = False
             Await Task.WhenAll(TaskList)
             '
@@ -2143,7 +2150,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 'If the reimbursement has already been downloaded, a warning should be displayed - but hte reimbursement can be simply unprocessed
                 theRmb.Status = RmbStatus.Approved
                 SubmitChanges()
-                Log(theRmb.RID, "UNPROCESSED, after it had been fully processed")
+                Log(theRmb.RID, LOG_LEVEL_WARNING, "UNPROCESSED, after it had been fully processed")
             Else
                 'if it has not been downloaded, it will be downloaded very soon. We need to check if a download is already in progress.
                 If StaffBrokerFunctions.GetSetting("Datapump", PortalId) = "locked" Then
@@ -2151,7 +2158,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim message = "This reimbursement cannot be unprocessed at this time, as it is currently being downloaded by the automatic datapump (transaction broker). You can try again in a few minutes, but be aware that it will already have been processed into your accounts program."
                     Dim t As Type = Me.GetType()
                     ScriptManager.RegisterStartupScript(Page, t, "popup", "alert(""" & message & """);", True)
-                    Log(theRmb.RID, "Attempted unprocessed, but could not as it was in the process of being downloaded by the automatic transaction broker")
+                    Log(theRmb.RID, LOG_LEVEL_WARNING, "Attempted unprocessed, but could not as it was in the process of being downloaded by the automatic transaction broker")
                     Return
                 Else
                     'If not, we need to lock the download progress (to ensure that it is not downloaded whilsts we are playing with it
@@ -2164,7 +2171,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     SubmitChanges()
                     'Then release the lock.
                     StaffBrokerFunctions.SetSetting("Datapump", "Unlocked", PortalId)
-                    Log(theRmb.RID, "UNPROCESSED - before it was downloaded")
+                    Log(theRmb.RID, LOG_LEVEL_INFO, "UNPROCESSED - before it was downloaded")
                 End If
             End If
             TaskList.Add(LoadRmbAsync(hfRmbNo.Value))
@@ -3071,9 +3078,22 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
         End Sub
 
-        Protected Sub Log(ByVal RID As Integer, ByVal Message As String)
-            objEventLog.AddLog("Rmb: " & RID, Message, PortalSettings, UserId, Services.Log.EventLog.EventLogController.EventLogType.ADMIN_ALERT)
+        Protected Sub Log(ByVal RID As Integer, ByVal logType As Integer, ByVal Message As String)
+            Dim entry = New AP_Staff_Rmb_Log()
+            entry.Timestamp = DateTime.Now
+            entry.LogType = logType
+            entry.RID = RID
+            entry.Username = UserController.GetUserById(PortalId, UserId).DisplayName
+            entry.Message = Message
+            d.AP_Staff_Rmb_Logs.InsertOnSubmit(entry)
+            d.SubmitChanges()
         End Sub
+
+        'Protected Sub Log(ByVal RID As Integer, ByVal Message As String)
+        '    'Assumes a logLevel of INFO if not provided
+        '    'objEventLog.AddLog("Rmb: " & RID, Message, PortalSettings, UserId, Services.Log.EventLog.EventLogController.EventLogType.ADMIN_ALERT)
+        '    Log(RID, LOG_LEVEL_INFO, Message)
+        'End Sub
 
         Private Function hasElectronicReceipts(lineNo As Integer) As Boolean
             Return (From c In d.AP_Staff_RmbLine_Files Where c.RmbLineNo = lineNo).Count > 0
@@ -3308,7 +3328,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ddlAccountCode.SelectedValue = GetAccountCode(lt.First.LineTypeId, tbCostcenter.Text)
                 End If
             Catch ex As Exception
-                Log(lblRmbNo.Text, "ERROR Resetting Expense Popup. " + ex.ToString)
+                Log(lblRmbNo.Text, LOG_LEVEL_ERROR, "ERROR Resetting Expense Popup. " + ex.ToString)
             End Try
         End Function
 
@@ -3699,14 +3719,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Protected Async Sub DownloadBatch(Optional ByVal MarkAsProcessed As Boolean = False)
             Dim downloadStatuses() As Integer = {RmbStatus.PendingDownload, RmbStatus.DownloadFailed}
-            Log(0, "Downloading Batched Transactions")
+            Log(0, LOG_LEVEL_INFO, "Downloading Batched Transactions")
 
             Dim pendDownload = From c In d.AP_Staff_Rmbs Where downloadStatuses.Contains(c.Status) And c.PortalId = PortalId
 
             Dim export As String = "Account,Subaccount,Ref,Date," & GetOrderedString("Description", "Debit", "Credit", "Company")
             Dim RmbList As New List(Of Integer)
             For Each Rmb In pendDownload
-                Log(Rmb.RID, "Downloading Rmb")
+                Log(Rmb.RID, LOG_LEVEL_INFO, "Downloading Rmb")
                 export &= DownloadRmbSingle(Rmb.RMBNo)
 
                 RmbList.Add(Rmb.RMBNo)
@@ -3721,7 +3741,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     For Each row In q
                         row.Status = RmbStatus.Processing
                         row.ProcDate = Now
-                        Log(row.RID, "Marked as Processed - after a manual download")
+                        Log(row.RID, LOG_LEVEL_INFO, "Marked as Processed - after a manual download")
                     Next
                 End If
 
@@ -3842,7 +3862,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     SendMoreinfoEmail(Translate("Accounts"), theRmb.First.AcctComment, theRmb.First)
                     ScriptManager.RegisterClientScriptBlock(cbMoreInfo, cbMoreInfo.GetType(), "moreinfo", "alert('" + Translate("MoreInfoMsg") + "');", True)
                     lblStatus.Text = lblStatus.Text & " - " & Translate("StatusMoreInfo")
-                    Log(theRmb.First.RID, "More info requested by Finance: " + theRmb.First.AcctComment)
+                    Log(theRmb.First.RID, LOG_LEVEL_INFO, "More info requested by Finance: " + theRmb.First.AcctComment)
                 End If
             End If
         End Sub
@@ -3858,7 +3878,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     SendMoreinfoEmail(approver, theRmb.First.ApprComment, theRmb.First)
                     ScriptManager.RegisterClientScriptBlock(cbApprMoreInfo, cbApprMoreInfo.GetType(), "apprmoreinfo", "alert('" + Translate("MoreInfoMsg") + "');", True)
                     lblStatus.Text = lblStatus.Text & " - " & Translate("StatusMoreInfo")
-                    Log(theRmb.First.RID, "More info requested by Approver(" + approver + "): " + theRmb.First.ApprComment)
+                    Log(theRmb.First.RID, LOG_LEVEL_INFO, "More info requested by Approver(" + approver + "): " + theRmb.First.ApprComment)
                 End If
             End If
         End Sub
@@ -3883,7 +3903,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             'myCommand.ExecuteNonQuery()
 
             'Maybe this would be better to do my working out the current period
-            Log(0, "Step A")
+            Log(0, LOG_LEVEL_DEBUG, "Step A")
             Dim currentRmbs = From c In d.AP_Staff_RmbLines Where c.AP_Staff_Rmb.PortalId = PortalId And c.AP_Staff_Rmb.Status = RmbStatus.Processing 'And c.AP_Staff_Rmb.ProcDate > Today.AddDays(-15) And c.Department = False
 
             Dim Deductions = DotNetNuke.Entities.Profile.ProfileController.GetPropertyDefinitionsByCategory(PortalId, "Payroll-Deductions")
@@ -3903,7 +3923,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim StaffTypes = {"National Staff", "National Staff, Overseas", "Centrally Funded"}
             Dim allStaff = StaffBrokerFunctions.GetStaff(-1)
 
-            Log(0, "Step B")
+            Log(0, LOG_LEVEL_DEBUG, "Step B")
             '.OrderBy(Function(x) x.LastName).ThenBy(Function(x) x.AP_StaffBroker_Staffs.StaffId)
             Dim i As Integer = 3
             For Each row In allStaff

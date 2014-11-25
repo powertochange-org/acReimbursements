@@ -163,7 +163,7 @@
       <Column Name="ReceiptImageId" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="ReceiptText" Type="System.String" DbType="NVarChar(MAX)" CanBeNull="true" />
       <Column Name="ExchangeRate" Type="System.Double" CanBeNull="true" />
-      <Column Member="Supplier" Type="System.String" CanBeNull="false" />
+      <Column Name="Supplier" Type="System.String" CanBeNull="false" />
       <Association Name="AP_Staff_Rmb_AP_Staff_RmbLine" Member="AP_Staff_Rmb" ThisKey="RmbNo" OtherKey="RMBNo" Type="AP_Staff_Rmb" IsForeignKey="true" />
       <Association Name="AP_Staff_RmbLineType_AP_Staff_RmbLine" Member="AP_Staff_RmbLineType" ThisKey="LineType" OtherKey="LineTypeId" Type="AP_Staff_RmbLineType" IsForeignKey="true" />
     </Type>
@@ -189,6 +189,16 @@
       <Column Name="RecNum" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="URL" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
       <Association Name="AP_Staff_Rmb_AP_Staff_RmbLine_File" Member="AP_Staff_Rmb" ThisKey="RMBNo" OtherKey="RMBNo" Type="AP_Staff_Rmb" IsForeignKey="true" DeleteRule="CASCADE" DeleteOnNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.AP_Staff_Rmb_Log" Member="AP_Staff_Rmb_Logs">
+    <Type Name="AP_Staff_Rmb_Log">
+      <Column Name="LogEntryId" AutoSync="Never" Type="System.Int32" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="Timestamp" Type="System.DateTime" CanBeNull="false" />
+      <Column Name="LogType" Type="System.Int16" CanBeNull="false" />
+      <Column Name="RID" Type="System.Int32" CanBeNull="false" />
+      <Column Name="Username" Type="System.String" CanBeNull="true" />
+      <Column Name="Message" Type="System.String" CanBeNull="true" />
     </Type>
   </Table>
 </Database>
