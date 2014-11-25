@@ -1029,7 +1029,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Catch
                         uncleared_amount = 0
                     End Try
-                    pnlAdvance.Visible = (uncleared_amount > 0) And (isOwner Or isSpouse) And Not (PROCESSING Or PAID Or APPROVED)
+                    pnlAdvance.Visible = (uncleared_amount > 0) And (FORM_HAS_ITEMS) And (isOwner Or isSpouse) And Not (PROCESSING Or PAID Or APPROVED)
                     lblOutstandingAdvanceAmount.Text = uncleared_amount.ToString("C")
                     If (uncleared_amount > 0) Then
                         gvUnclearedAdvances.DataSource = (From c In uncleared_advances Order By c.TransDate)
@@ -1538,11 +1538,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Else
                 lblAdvanceClearError.Visible = True
                 btnAddClearingItem.Enabled = True
+                ScriptManager.RegisterClientScriptBlock(btnAddClearingItem, btnAddClearingItem.GetType(), "hide_loading_spinner", "updateClearingTotal(); $('#loading').hide();", True)
             End If
         End Sub
 
         Private Function validateClearingItem() As Boolean
-            Dim total As Double = 0
+            Dim clearingTotal As Double = 0
             For Each row In gvUnclearedAdvances.Rows
                 Dim outstanding As Double = 0
                 Dim payable As Double = 0
@@ -1555,7 +1556,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     lblAdvanceClearError.Text = Translate("ErrorClearAdvance") & ": " & ex.Message
                     Return False
                 End Try
-                total += payable
+                clearingTotal += payable
                 'ensure no amount is < 0 or > outstanding balance
                 If (payable < 0 Or payable > outstanding) Then
                     lblAdvanceClearError.Text = Translate("ErrorClearAdvanceAmount")
@@ -1567,8 +1568,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 End If
             Next
             'ensure total is < rmb total
-            If (total > GetTotal(hfRmbNo.Value)) Then
-                lblAdvanceClearError.Text = Translate("ErrorClearAdvanceTotal")
+            Dim rmbTotal = GetTotal(hfRmbNo.Value)
+            If (clearingTotal > rmbTotal) Then
+                lblAdvanceClearError.Text = Translate("ErrorClearAdvanceTotal").Replace("[TOTAL]", rmbTotal)
                 Return False
             End If
             Return True
@@ -4473,13 +4475,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     If (newBalance = 0) Then
                         advanceLine.Spare2 = CLEARED
-                        Log(ID, "Advance cleared")
+                        Log(ID, LOG_LEVEL_INFO, "Advance cleared")
                     Else
                         advanceLine.Spare2 = newBalance.ToString()
-                        Log(ID, "Advance reduced by " & clearingAmount)
+                        Log(ID, LOG_LEVEL_INFO, "Advance reduced by " & clearingAmount)
                     End If
                 Catch ex As Exception
-                    Log(ID, "Error updating clearing balance: " & ex.Message)
+                    Log(ID, LOG_LEVEL_ERROR, "Error updating clearing balance: " & ex.Message)
                 End Try
             Next
         End Function

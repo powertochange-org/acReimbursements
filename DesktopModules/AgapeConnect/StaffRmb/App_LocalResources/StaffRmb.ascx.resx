@@ -813,7 +813,7 @@
     <comment>Error</comment>
   </data>
   <data name="ErrorClearAdvanceTotal.Text" xml:space="preserve">
-    <value>You may not clear more than the Reimbursement total.</value>
+    <value>You may not clear more than the amount you are reimbursing ([TOTAL]).</value>
     <comment>Error</comment>
   </data>
 </root>

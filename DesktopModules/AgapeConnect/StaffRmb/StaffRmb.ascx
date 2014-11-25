@@ -121,7 +121,7 @@
         $('.clearAdvance').each(function() {
             total+=Number($(this).val());
         })
-        $("span[id$='gvUnclearedAdvances_lblClearAdvanceTotal']").text(total);
+        $("span[id$='gvUnclearedAdvances_lblClearAdvanceTotal']").text(total.toFixed(2));
     }
 
     function updatePerDiem(control, enabled) {
@@ -211,7 +211,7 @@
 
             $('.rmbAmount,.exchangeRate').keyup(function(event){
                 var xRate = $(".exchangeRate").val();
-                if (xRate == null) {
+                if (xRate == null || xRate == "") {
                     var amount = $('.rmbAmount').val();
                     $("input[name$='hfCADValue']").val(amount);
                 } else {
@@ -228,6 +228,9 @@
                 }
             });
 
+            $('.rmbAmount, .exchangeRate, .equivalentCAD').focus(function() {
+                $(this).select();
+            });
             
             $("#accordion h3").click(function (event) {
                 if (stop) {
@@ -565,7 +568,7 @@
  function showNewLinePopup()  {$("#divNewItem").dialog("open"); checkCur(); return false;}
  function showNewRmbPopup() {resetNewRmbPopup(); $("#divNewRmb").dialog("open"); return false; }
  function showNSFPopup() {$("#divInsufficientFunds").dialog("open"); return false; }
- function showClearAdvancePopup() { $("#divClearAdvancePopup").dialog("open"); return false; }
+ function showClearAdvancePopup() { updateClearingTotal(); $("#divClearAdvancePopup").dialog("open"); return false; }
  function showPopupSplit() {resetSplitPopup(); $("#divSplitPopup").dialog("open"); return false; }
  function showWarningDialog() {$("#divWarningDialog").dialog("open"); return false; }
  function showAccountWarning() { $("#divAccountWarning").dialog("open"); return false; }
@@ -1906,7 +1909,7 @@
                                             <ItemStyle HorizontalAlign="Right" Width="50px"  />
                                             <FooterTemplate>
                                                 <asp:Label ID="lblTotalAmount" runat="server" Font-Bold="True" Text="Total:"></asp:Label>
-                                                <asp:Label ID="lblClearAdvanceTotal" runat="server" Text="0.00" ></asp:Label>
+                                                <asp:Label ID="lblClearAdvanceTotal" runat="server"  ></asp:Label>
                                             </FooterTemplate>
                                             <FooterStyle HorizontalAlign="Right" Width="50px"  />
                                         </asp:TemplateField>
