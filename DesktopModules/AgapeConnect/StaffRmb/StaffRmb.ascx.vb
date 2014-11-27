@@ -3330,7 +3330,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Function
 
         Protected Sub SendEmail(sender As String, recipient As String, cc As String, subject As String, body As String)
-            DotNetNuke.Services.Mail.Mail.SendMail(sender, recipient, cc, "", Services.Mail.MailPriority.Normal, subject, Services.Mail.MailFormat.Html, System.Text.Encoding.ASCII, body, "", "", "", "", "")
+            Try
+                DotNetNuke.Services.Mail.Mail.SendMail(sender, recipient, cc, "", Services.Mail.MailPriority.Normal, subject, Services.Mail.MailFormat.Html, System.Text.Encoding.ASCII, body, "", "", "", "", "")
+            Catch ex As Exception
+                lblErrorMessage.Text = "ERROR sending email"
+                pnlError.Visible = True
+                Log(lblRmbNo.Text, LOG_LEVEL_ERROR, "ERROR sending email: " + ex.Message)
+            End Try
         End Sub
 
         Protected Sub SendEmail(address As String, cc As String, subject As String, body As String)
