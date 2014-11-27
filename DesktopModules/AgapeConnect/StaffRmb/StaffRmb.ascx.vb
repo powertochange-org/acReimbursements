@@ -671,7 +671,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim AllApproved = (From c In d.AP_Staff_Rmbs
                                    Where (c.Status = RmbStatus.Approved Or c.Status >= RmbStatus.PendingDownload) And c.PortalId = PortalId
                                    Order By c.ApprDate Ascending
-                                   Select c.RMBNo, c.CostCenter, c.RmbDate, c.ApprDate, c.UserRef, c.RID, c.UserId, c.Status, c.SpareField1, _
+                                   Select c.RMBNo, c.CostCenter, c.RmbDate, c.ApprDate, c.UserRef, c.RID, c.UserId, c.Status, c.SpareField1, c.MoreInfoRequested, _
                                        Receipts = ((c.AP_Staff_RmbLines.Where(Function(x) x.Receipt And ((From f In d.AP_Staff_RmbLine_Files Where f.RmbLineNo = x.RmbLineNo).Count = 0))).Count > 0))
                 Dim total = AllApproved.Count
 
@@ -722,7 +722,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 For Each rmb In rmbs
                     Dim rmb_node As New TreeNode()
                     Dim rmbTotal = If(rmb.SpareField1 Is Nothing, "unknown", rmb.SpareField1)
-                    rmb_node.Text = GetRmbTitleFinance(rmb.RID, rmb.ApprDate, rmbTotal)
+                    Dim flag As Boolean = (rmb.MoreInfoRequested IsNot Nothing AndAlso rmb.MoreInfoRequested)
+                    rmb_node.Text = GetRmbTitleFinance(rmb.RID, rmb.ApprDate, rmbTotal, flag)
                     rmb_node.SelectAction = TreeNodeSelectAction.Select
                     rmb_node.Value = rmb.RMBNo
                     node.ChildNodes.Add(rmb_node)
@@ -2659,10 +2660,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End Try
         End Function
 
-        Protected Function GetRmbTitleFinance(ByVal RID As Integer, ByVal ApprDate As Date?, ByVal amount As String) As String
+        Protected Function GetRmbTitleFinance(ByVal RID As Integer, ByVal ApprDate As Date?, ByVal amount As String, flag As Boolean) As String
             Try
                 Dim DateString = If(ApprDate Is Nothing, "not approved", CType(ApprDate, Date).ToShortDateString)
-                Dim rtn As String = "<span style=""font-size: 6.5pt; color: #999999;"">#" & ZeroFill(RID.ToString, 5)
+                Dim rtn As String = ""
+                If (flag) Then rtn += "<span class='highlight'>"
+                rtn = rtn & "<span style=""font-size: 6.5pt; color: #999999;"">#" & ZeroFill(RID.ToString, 5)
                 '  colourize date based on how old it is
                 If (ApprDate Is Nothing) Then
                     rtn = rtn & ": <span class='dateproblem'>" & DateString & "</span>"
@@ -2683,6 +2686,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     rtn = rtn & " - " & amount
                 End If
                 rtn = rtn & "</span>"
+                If (flag) Then rtn += "</span>"
                 Return rtn
             Catch ex As Exception
                 Throw New Exception("Error building title: " + ex.Message)
@@ -3866,6 +3870,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ScriptManager.RegisterClientScriptBlock(cbMoreInfo, cbMoreInfo.GetType(), "moreinfo", "alert('" + Translate("MoreInfoMsg") + "');", True)
                     lblStatus.Text = lblStatus.Text & " - " & Translate("StatusMoreInfo")
                     Log(theRmb.First.RID, LOG_LEVEL_INFO, "More info requested by Finance: " + theRmb.First.AcctComment)
+                End If
+                If (theRmb.First.Status = RmbStatus.Approved) Then
+                    Await buildAllApprovedTreeAsync(StaffBrokerFunctions.GetStaff())
                 End If
             End If
         End Sub
