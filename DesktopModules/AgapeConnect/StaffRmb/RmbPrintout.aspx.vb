@@ -56,17 +56,25 @@ Partial Class DesktopModules_StaffRmb_RmbPrintout
         If q.Count > 0 Then
             Dim User = DotNetNuke.Entities.Users.UserController.GetCurrentUserInfo
 
-
-
-
             If User.UserID > 0 Then
                 Dim mc As New DotNetNuke.Entities.Modules.ModuleController
                 lblAccessDenied.Text = Translate("lblAccessDenied")
                 Dim x = mc.GetModuleByDefinition(PS.PortalId, "acStaffRmb")
                 Dim RmbSettings = x.TabModuleSettings
+                Dim delegateId As Integer
+                Dim isAdministrator = User.IsInRole("Administrators")
+                Dim isDelegate = False
+                Dim isAuthUser = (User.UserID = RmbSettings("AuthUser"))
+                Dim isAuthAuthUser = (User.UserID = RmbSettings("AuthAuthUser"))
+                Try
+                    delegateId = CInt(q.First.SpareField3)
+                    isDelegate = (User.UserID = delegateId)
+                Catch
+                    delegateId = -1
+                End Try
 
                 Dim RmbRel = StaffRmbFunctions.Authenticate(User.UserID, q.First.RMBNo, PS.PortalId)
-                If RmbRel = RmbAccess.Denied And Not User.IsInRole("Administrators") And Not (User.UserID = RmbSettings("AuthUser") Or User.UserID = RmbSettings("AuthAuthUser")) Then
+                If RmbRel = RmbAccess.Denied And Not isAdministrator And Not (isDelegate Or isAuthUser Or isAuthAuthUser) Then
 
                     Dim isAccounts = False
                     For Each role In CStr(RmbSettings("AccountsRoles")).Split(";")
