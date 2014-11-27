@@ -113,7 +113,7 @@
         } else {
             result = format_money(accBal - formTot);
         }
-        $("span[id$='GridView1_lblRemainingBalanceAmount']").text(result);
+        $("span[id$='GridView1_lblRemainingBalanceAmount']:last").text(result);
     }
 
     function updateClearingTotal() {

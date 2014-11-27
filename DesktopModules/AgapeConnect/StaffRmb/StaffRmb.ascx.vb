@@ -2282,6 +2282,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ucType.GetProperty("Spare4").SetValue(theControl, theLine.First.Spare4, Nothing)
                     ucType.GetProperty("Spare5").SetValue(theControl, theLine.First.Spare5, Nothing)
 
+                    jscript.Append("$('.ddlProvince').change(function() {$('.ddlTaxable').prop('selectedIndex', ($('.ddlProvince').val()!='--'));});")
+
                     Dim mileageString As String = ""
                     If (ucType.GetProperty("Mileage") IsNot Nothing) Then
                         If (theLine.First.Mileage IsNot Nothing) Then
@@ -4554,7 +4556,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Private Sub updateBalanceLabel(accountBalance As String)
             lblAccountBalance.Text = accountBalance
-            DirectCast(GridView1.FooterRow.FindControl("lblRemainingBalance"), Label).Text = If(isStaffAccount(), Translate("lblRemainingBalance"), Translate("lblRemainingBudget"))
+            Dim control As Label = GridView1.FindControl("lblRemainingBalance")
+            If control IsNot Nothing Then control.Text = If(isStaffAccount(), Translate("lblRemainingBalance"), Translate("lblRemainingBudget"))
         End Sub
 
         Private Sub valueOrNull(hf As HiddenField, s As String)
