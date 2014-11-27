@@ -877,7 +877,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim isDelegate = (UserId = delegateId)
                     Dim isOwner = (UserId = Rmb.UserId) Or isDelegate
                     Dim isSpouse = (StaffBrokerFunctions.GetSpouseId(UserId) = Rmb.UserId)
-                    Dim isApprover = ((UserId = Rmb.ApprUserId) And Not (isOwner Or isSpouse)) _
+                    Dim isApprover = Rmb.ApprUserId IsNot Nothing AndAlso ((UserId = Rmb.ApprUserId) And Not (isOwner Or isSpouse)) _
                                     Or ((Rmb.Status = RmbStatus.PendingDirectorApproval) And (UserId = directorId)) _
                                     Or ((Rmb.Status = RmbStatus.PendingEDMSApproval) And (UserId = EDMSId))
                     Dim isFinance = IsAccounts() And Not (isOwner Or isSpouse Or isApprover) And Not DRAFT
@@ -2282,8 +2282,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ucType.GetProperty("Spare4").SetValue(theControl, theLine.First.Spare4, Nothing)
                     ucType.GetProperty("Spare5").SetValue(theControl, theLine.First.Spare5, Nothing)
 
-                    jscript.Append("$('.ddlProvince').change(function() {$('.ddlTaxable').prop('selectedIndex', ($('.ddlProvince').val()!='--'));});")
-
                     Dim mileageString As String = ""
                     If (ucType.GetProperty("Mileage") IsNot Nothing) Then
                         If (theLine.First.Mileage IsNot Nothing) Then
@@ -3280,6 +3278,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ' Save the standard values
                     If (Province Is Nothing) Then
                         Province = StaffRmbFunctions.GetDefaultProvince(UserId)
+                        taxable = If(Province.Equals("--"), 0, 1) 'Default is taxable, unless outside canada
                     End If
                     phLineDetail.Controls.Clear()
                     ddlOverideTax.SelectedIndex = taxable
