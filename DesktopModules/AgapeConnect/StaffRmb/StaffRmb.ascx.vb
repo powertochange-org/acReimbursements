@@ -2665,7 +2665,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim DateString = If(ApprDate Is Nothing, "not approved", CType(ApprDate, Date).ToShortDateString)
                 Dim rtn As String = ""
                 If (flag) Then rtn += "<span class='blue_highlight finance'>"
-                rtn = rtn & "<span style=""font-size: 6.5pt; color: #999999;"">#" & ZeroFill(RID.ToString, 5)
+                rtn = rtn & "<span style=""font-size: 6.5pt; color: #222222;"">#" & ZeroFill(RID.ToString, 5)
                 '  colourize date based on how old it is
                 If (ApprDate Is Nothing) Then
                     rtn = rtn & ": <span class='dateproblem'>" & DateString & "</span>"
