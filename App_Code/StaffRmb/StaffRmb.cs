@@ -101,6 +101,7 @@ namespace StaffRmb
         }
 
     }
+
     public class StaffRmbFunctions
     {
         public const String WEB_SERVICE_ERROR = "ERROR in web service";
