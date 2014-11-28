@@ -723,7 +723,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim rmb_node As New TreeNode()
                     Dim rmbTotal = If(rmb.SpareField1 Is Nothing, "unknown", rmb.SpareField1)
                     Dim flag As Boolean = (rmb.MoreInfoRequested IsNot Nothing AndAlso rmb.MoreInfoRequested)
-                    rmb_node.Text = GetRmbTitleFinance(rmb.RID, rmb.ApprDate, rmbTotal, flag)
+                    Dim owner = UserController.GetUserById(PortalId, rmb.UserId)
+                    Dim initials = (Left(owner.FirstName, 1) & Left(owner.LastName, 1)).ToLower()
+                    rmb_node.Text = GetRmbTitleFinance(initials, rmb.RID, rmb.ApprDate, rmbTotal, flag)
                     rmb_node.SelectAction = TreeNodeSelectAction.Select
                     rmb_node.Value = rmb.RMBNo
                     node.ChildNodes.Add(rmb_node)
@@ -835,8 +837,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     lblAccountBalance.Text = "not loaded"
 
                     Dim getAccountBalanceTask = getAccountBalanceAsync(Rmb.CostCenter, StaffRmbFunctions.logonFromId(PortalId, UserId))
-                    Dim getUnclearedAdvancesTask = getUnclearedAdvances(Rmb.UserId)
-
+                   
                     Dim DRAFT = Rmb.Status = RmbStatus.Draft
                     Dim MORE_INFO = (Rmb.MoreInfoRequested IsNot Nothing AndAlso Rmb.MoreInfoRequested = True)
                     Dim SUBMITTED = Rmb.Status = RmbStatus.Submitted Or Rmb.Status = RmbStatus.PendingDirectorApproval Or Rmb.Status = RmbStatus.PendingEDMSApproval
@@ -1023,7 +1024,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     pnlAccountsOptions.Style.Add("display", If(isFinance, "block", "none"))
 
                     '--advances
-                    Dim uncleared_advances = Await getUnclearedAdvancesTask
+                    Dim uncleared_advances = getUnclearedAdvances(Rmb.UserId)
                     Dim uncleared_amount As Double
                     Try
                         uncleared_amount = (From a In uncleared_advances Select Convert.ToDouble(a.Spare2)).Sum()
@@ -2660,12 +2661,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End Try
         End Function
 
-        Protected Function GetRmbTitleFinance(ByVal RID As Integer, ByVal ApprDate As Date?, ByVal amount As String, flag As Boolean) As String
+        Protected Function GetRmbTitleFinance(ByVal initials As String, ByVal RID As Integer, ByVal ApprDate As Date?, ByVal amount As String, flag As Boolean) As String
             Try
                 Dim DateString = If(ApprDate Is Nothing, "not approved", CType(ApprDate, Date).ToShortDateString)
-                Dim rtn As String = ""
-                If (flag) Then rtn += "<span class='blue_highlight finance'>"
-                rtn = rtn & "<span style=""font-size: 6.5pt; color: #222222;"">#" & ZeroFill(RID.ToString, 5)
+                Dim rtn As String = "<span class='" & If(flag, "blue_highlight finance padded", "") & "' onclick='finance_tree_click(this);'>"
+                rtn = rtn & "<span style=""font-size: 6.5pt; "">" & initials & " #" & ZeroFill(RID.ToString, 5)
                 '  colourize date based on how old it is
                 If (ApprDate Is Nothing) Then
                     rtn = rtn & ": <span class='dateproblem'>" & DateString & "</span>"
@@ -2685,8 +2685,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 If (amount IsNot Nothing) Then
                     rtn = rtn & " - " & amount
                 End If
-                rtn = rtn & "</span>"
-                If (flag) Then rtn += "</span>"
+                rtn = rtn & "</span></span>"
                 Return rtn
             Catch ex As Exception
                 Throw New Exception("Error building title: " + ex.Message)
@@ -3871,9 +3870,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     lblStatus.Text = lblStatus.Text & " - " & Translate("StatusMoreInfo")
                     Log(theRmb.First.RID, LOG_LEVEL_INFO, "More info requested by Finance: " + theRmb.First.AcctComment)
                 End If
-                If (theRmb.First.Status = RmbStatus.Approved) Then
-                    Await buildAllApprovedTreeAsync(StaffBrokerFunctions.GetStaff())
-                End If
             End If
         End Sub
 
@@ -4452,15 +4448,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Return newChild
         End Function
 
-        Private Async Function getUnclearedAdvances(ByVal userid As Integer) As Task(Of IQueryable(Of AP_Staff_RmbLine))
+        Private Function getUnclearedAdvances(ByVal userid As Integer) As IQueryable(Of AP_Staff_RmbLine)
             Dim advance_line_type As Integer = Settings("AdvanceLineType")
-            ' ensure that all advance lines have Spare2 (uncleared amount) filled out.  If not, fill it with the grossAmount
-            Dim update = False
-            For Each line In (From c In d.AP_Staff_RmbLines Where c.LineType = advance_line_type And c.Spare2 Is Nothing)
-                line.Spare2 = line.GrossAmount.ToString()
-                update = True
-            Next
-            If update Then d.SubmitChanges()
             Dim result = From line In d.AP_Staff_RmbLines
                          Join rmb In d.AP_Staff_Rmbs On line.RmbNo Equals rmb.RMBNo
                             Where line.LineType = advance_line_type And (line.Spare2 <> CLEARED) And line.Spare2 <> "0" _

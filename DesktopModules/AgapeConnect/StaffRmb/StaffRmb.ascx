@@ -104,6 +104,19 @@
 
     }
 
+    function finance_tree_click(menu_item) {
+        $(".currently_selected").removeClass("currently_selected");
+        $(menu_item).addClass("currently_selected").addClass("visited");
+    }
+
+    function more_info_clicked(checkbox) {
+        if ($(checkbox).is(':checked')) {
+            $(".currently_selected").addClass("blue_highlight");
+        } else {
+            $(".currently_selected").removeClass("blue_highlight");
+        }
+    }
+
     function calculate_remaining_balance() {
         var result = "";
         var accBal = $("input[id$='StaffRmb_hfAccountBalance']:first").val();
@@ -1367,7 +1380,7 @@
                                                 <asp:Label ID="lblAccComments" runat="server" Height="60px"></asp:Label>
                                                 <asp:TextBox ID="tbAccComments" runat="server" Height="35px" TextMode="MultiLine" Width="100%"
                                                     Visible="false"  onKeyPress="showSaveButton();"></asp:TextBox>
-                                                <asp:CheckBox ID="cbMoreInfo" runat="server" AutoPostBack="true" resourcekey="btnMoreInfo" />
+                                                <asp:CheckBox ID="cbMoreInfo" runat="server" AutoPostBack="true" resourcekey="btnMoreInfo" onclick="more_info_clicked(this)" />
                                             </fieldset>
                                         </td>
                                     </tr>
