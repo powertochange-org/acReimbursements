@@ -2664,7 +2664,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Protected Function GetRmbTitleFinance(ByVal initials As String, ByVal RID As Integer, ByVal ApprDate As Date?, ByVal amount As String, flag As Boolean) As String
             Try
                 Dim DateString = If(ApprDate Is Nothing, "not approved", CType(ApprDate, Date).ToShortDateString)
-                Dim rtn As String = "<span class='" & If(flag, "blue_highlight padded", "finance tree") & "' onclick='finance_tree_click(this);'>"
+                Dim rtn As String = "<span class='" & If(flag, "blue_highlight ", "") & "finance tree' onclick='finance_tree_click(this);'>"
                 rtn = rtn & "<span style=""font-size: 6.5pt; "">" & initials & " #" & ZeroFill(RID.ToString, 5)
                 '  colourize date based on how old it is
                 If (ApprDate Is Nothing) Then
