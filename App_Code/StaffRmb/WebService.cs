@@ -126,6 +126,7 @@ public class WebService : System.Web.Services.WebService {
         String STAFF_DIRECTORY = "<a href='https://staff.powertochange.org/staff-directory/'> <img src='https://staff.powertochange.org/wp-content/images/Staff-Directory-Icon.png' alt='Staff Directory'></a>";
         String REIMBURSEMENTS = "<a href='https://apps.powertochange.org/Reimbursement-form'><img src='https://staff.powertochange.org/wp-content/images/Reimbursements-Icon.png' alt='Reimbursements' /></a>";
         String HELPDESK = "<a href='mailto:helpdesk@powertochange.org'> <img src='https://staff.powertochange.org/wp-content/images/HelpDesk-Icon.png' alt='Help Desk'></a>";
+        String LINK_SHORTENER = "<a href='https://staff.powertochange.org/sh'><img src='https://staff.powertochange.org/wp-content/images/Link-Shortener-Icon.png' alt='Link Shortener'></a>";
         String WIKI = "<a href='https://wiki.powertochange.org/help'><img src='https://staff.powertochange.org/wp-content/images/Self-Help-Wiki-Icon.png' alt='Self-Help Wiki'></a>";
         String SETTINGS = "<a href='https://staff.powertochange.org/staff-directory/?page=profile'><img src='https://staff.powertochange.org/wp-content/images/My-Settings-Icon.png' alt='Settings' /></a>";
 
@@ -145,7 +146,7 @@ public class WebService : System.Web.Services.WebService {
                "</tr><tr>" +
                "<td style='border:0;'>" + HELPDESK + "</td>" +
                "<td style='border:0;'>" + WIKI + "</td>" +
-               "<td style='border:0;'></td>" +
+               "<td style='border:0;'>" + LINK_SHORTENER + "</td>" +
                "<td style='border:0;'>" + SETTINGS + "</td>" +
                "</tr></tbody></table></ul></center></div>" +
                 STYLE + SCRIPT + "</div>";

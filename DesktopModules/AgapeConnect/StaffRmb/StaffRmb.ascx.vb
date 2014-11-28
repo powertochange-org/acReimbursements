@@ -2109,6 +2109,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             PostingData.RemitToAddress = ddlRemitTo.SelectedValue
 
             'TaskList.Add(LoadRmbAsync(hfRmbNo.Value))
+            Await Task.WhenAll(TaskList)
             If (insert) Then
                 d.AP_Staff_Rmb_Post_Extras.InsertOnSubmit(PostingData)
             End If
@@ -2116,7 +2117,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             SubmitChanges()
             Log(theRmb.First.RID, LOG_LEVEL_INFO, "Processed - this reimbursement will be added to the next download batch")
             pnlMain.Visible = False
-            Await Task.WhenAll(TaskList)
             '
             If (tvFinance.Nodes.Count = 1 And tvFinance.Nodes.Item(0).ChildNodes.Count = 5) Then
                 tvFinance.Nodes.Item(0).ChildNodes.Item(0).Expand()
