@@ -1828,7 +1828,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             rmb.First.Locked = True
                             SendApprovedEmail(rmb.First)
                         End If
-                        Log(rmb.First.RID, LOG_LEVEL_INFO, "Approved")
+                        Log(rmb.First.RID, LOG_LEVEL_INFO, "APPROVED")
                     End If
                 End If
                 If rmb.First.Status = RmbStatus.PendingDirectorApproval Then
@@ -1844,7 +1844,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             rmb.First.Locked = True
                             shouldSendApprovalEmail = False
                             SendApprovedEmail(rmb.First)
-                            Log(rmb.First.RID, LOG_LEVEL_INFO, "Approved by " & UserController.GetCurrentUserInfo.DisplayName)
+                            Log(rmb.First.RID, LOG_LEVEL_INFO, "APPROVED by director (" & UserController.GetCurrentUserInfo.DisplayName) & ")"
                         End If
                         message += Translate("RmbApprovedDirector").Replace("[RMBNO]", rmb.First.RID) + "\n"
                     End If
@@ -1857,7 +1857,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         shouldSendApprovalEmail = False
                         SendApprovedEmail(rmb.First)
                         message += Translate("RmbApprovedEDMS").Replace("[RMBNO]", rmb.First.RID)
-                        Log(rmb.First.RID, LOG_LEVEL_INFO, "Approved by EDMS")
+                        Log(rmb.First.RID, LOG_LEVEL_INFO, "APPROVED by EDMS")
                     End If
                 End If
                 If shouldSendApprovalEmail Then SendApprovalEmail(rmb.First)
