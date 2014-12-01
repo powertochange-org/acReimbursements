@@ -1844,7 +1844,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             rmb.First.Locked = True
                             shouldSendApprovalEmail = False
                             SendApprovedEmail(rmb.First)
-                            Log(rmb.First.RID, LOG_LEVEL_INFO, "APPROVED by director (" & UserController.GetCurrentUserInfo.DisplayName & ")")
+                            Log(rmb.First.RID, LOG_LEVEL_INFO, "APPROVED by director (" & UserController.Instance.GetCurrentUserInfo.DisplayName & ")")
                         End If
                         message += Translate("RmbApprovedDirector").Replace("[RMBNO]", rmb.First.RID) + "\n"
                     End If
@@ -3362,7 +3362,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim rmblink = "<a href='" & link & "'>" & link & "</a>"
             Dim subject = Translate("MoreInfoSubject").Replace("[USERREF]", rmbno)
             Dim body = Translate("MoreInfoBody").Replace("[WHO]", sender).Replace("[USERREF]", rmbno).Replace("[RMBLINK]", rmblink).Replace("[COMMENTS]", comments)
-            SendEmail(address, delegateEmail, subject, body)
+            Dim fromEmail = UserController.Instance.GetCurrentUserInfo.Email
+            SendEmail("P2C Reimbursements <" & fromEmail & ">", address, delegateEmail, subject, body)
         End Sub
 
         Protected Sub SendApprovalEmail(ByVal theRmb As AP_Staff_Rmb)
