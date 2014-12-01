@@ -183,6 +183,13 @@ Partial Class controls_RmbSubPD
 
         End Set
     End Property
+    Public Property ReceiptType() As Integer
+        Get
+            Return 0 'no receipt required for perdiem expenses
+        End Get
+        Set(ByVal value As Integer)
+        End Set
+    End Property
     Public Property ErrorText() As String
         Get
             Return ""

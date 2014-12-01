@@ -1237,7 +1237,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                             End If
                         Catch ex As Exception
-                            Log(lblRmbNo.Text, LOG_LEVEL_WARNING, "WARNING: Failed to Add Electronic Receipt: " & ex.ToString)
+                            Log(lblRmbNo.Text, LOG_LEVEL_WARNING, "WARNING: Failed to Add Electronic Receipt: Rmb#" & hfRmbNo.Value & " control type:" & ucType.Name & " Message:" & ex.ToString)
                         End Try
                         If insert.Receipt Then
                             If q.Count = 0 Then

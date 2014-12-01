@@ -157,6 +157,13 @@ Partial Class controls_Mileage
         Set(ByVal value As Boolean)
         End Set
     End Property
+    Public Property ReceiptType() As Integer
+        Get
+            Return 0 'no receipt required for mileage expenses
+        End Get
+        Set(ByVal value As Integer)
+        End Set
+    End Property
     Public Property VAT() As Boolean
         Get
             Return False
