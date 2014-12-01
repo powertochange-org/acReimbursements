@@ -2115,7 +2115,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
             Await clearAdvanceBalancesTask
             SubmitChanges()
-            Log(theRmb.First.RID, LOG_LEVEL_INFO, "Processed - this reimbursement will be added to the next download batch")
+            Log(theRmb.First.RID, LOG_LEVEL_INFO, "PROCESSED - this reimbursement will be added to the next download batch")
             pnlMain.Visible = False
             '
             If (tvFinance.Nodes.Count = 1 And tvFinance.Nodes.Item(0).ChildNodes.Count = 5) Then
