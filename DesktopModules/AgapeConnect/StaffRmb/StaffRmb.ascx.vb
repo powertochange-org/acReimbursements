@@ -1628,7 +1628,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             insert.RID = StaffRmbFunctions.GetNewRID(PortalId)
             insert.CostCenter = hfNewChargeTo.Value
             insert.UserComment = tbNewComments.Text
-            If (hfOnBehalfOf.Value.Equals(String.Empty)) Then
+            If (hfOnBehalfOf.Value.Equals(String.Empty) Or hfOnBehalfOf.Value.Equals(CStr(UserId))) Then 'if onbehalfof is empty or is the form creator
                 insert.UserId = UserId
                 Log(insert.RID, LOG_LEVEL_INFO, "New Reimbursement CREATED")
             Else
