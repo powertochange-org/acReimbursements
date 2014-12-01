@@ -1454,6 +1454,23 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
         End Sub
 
+        Protected Sub btnCancelLine_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnCancelLine.Click
+            Try
+                Dim rmbs = (From r In d.AP_Staff_Rmbs Where r.RMBNo = hfRmbNo.Value)
+                If (rmbs.Count > 0) Then
+                    Dim path = "/_RmbReceipts/" & rmbs.First.UserId
+                    Dim theFolder As IFolderInfo = FolderManager.Instance.GetFolder(rmbs.First.PortalId, path)
+                    Dim deletable = From item In d.AP_Staff_RmbLine_Files Select item Where item.RMBNo = hfRmbNo.Value And item.RmbLineNo Is Nothing
+                    For Each item In deletable
+                        Dim theFile = FileManager.Instance.GetFile(item.FileId)
+                        FileManager.Instance.DeleteFile(theFile)
+                    Next
+                End If
+            Catch ex As Exception
+                Log(lblRmbNo.Text, LOG_LEVEL_ERROR, "ERROR: removing receipts upon cancel: " & ex.Message)
+            End Try
+        End Sub
+
         Private Sub ReloadInvalidForm()
             ' Need to check the current state of the electronic receipts and currency conversions 
             ' and set the attribute to match; otherwise, it will get reset to the default state. 
