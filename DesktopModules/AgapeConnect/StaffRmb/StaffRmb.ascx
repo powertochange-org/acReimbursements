@@ -442,6 +442,7 @@
                         })
                 }
             );
+            var total_processing = 0;
             $.getJSON(
                 "/DesktopModules/AgapeConnect/StaffRmb/WebService.asmx/AllRmbs?portalid="+$('#<%= hfPortalId.ClientID %>').val()+
                             "&tabmoduleid="+$('#<%= hfTabModuleId.ClientID %>').val()+"&status=<%= StaffRmb.RmbStatus.Processing%>",
@@ -450,6 +451,7 @@
                         data: data,
                         onCreateLi: function(node, $li) {
                             $li.find('.jqtree-title').not('.jqtree-title-folder').addClass('menu_link');
+                            total_processing++;
                         }
                     });
                     $("#treeProcessing").bind(
@@ -462,6 +464,11 @@
                                 $("#treeProcessing").tree('toggle', node);
                             }
                         })
+                }
+                ).done(function() {
+                    <%If IsAccounts() Then%>
+                    $('#lblProcessing').text('(' + total_processing + ')');
+                    <%End If%>
                 }
             );
             $.getJSON(
@@ -1126,7 +1133,7 @@
                     <div>
                         <h3>
                             <a href="#" id="tab3" class="AcHdr">
-                                <asp:Label ID="Label8" runat="server" Font-Bold="true" ResourceKey="Processing"></asp:Label></a></h3>
+                                <asp:Label runat="server" Font-Bold="true" ResourceKey="Processing"></asp:Label>&nbsp;<label id="lblProcessing"></label></a></h3>
                        <div id="ProcessingPane" class="AcPane">
                             <asp:UpdatePanel ID="ProcessingUpdatePanel" runat="server" ChildrenAsTriggers="false" UpdateMode="Conditional" >
                                  <ContentTemplate>
