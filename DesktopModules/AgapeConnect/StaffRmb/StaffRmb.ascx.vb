@@ -1844,7 +1844,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             rmb.First.Locked = True
                             shouldSendApprovalEmail = False
                             SendApprovedEmail(rmb.First)
-                            Log(rmb.First.RID, LOG_LEVEL_INFO, "APPROVED by director (" & UserController.GetCurrentUserInfo.DisplayName) & ")"
+                            Log(rmb.First.RID, LOG_LEVEL_INFO, "APPROVED by director (" & UserController.GetCurrentUserInfo.DisplayName & ")")
                         End If
                         message += Translate("RmbApprovedDirector").Replace("[RMBNO]", rmb.First.RID) + "\n"
                     End If
