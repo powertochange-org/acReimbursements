@@ -127,7 +127,7 @@
     <value>Date</value>
   </data>
   <data name="Description.Text" xml:space="preserve">
-    <value>Description</value>
+    <value>Comment</value>
   </data>
   <data name="Type.Text" xml:space="preserve">
     <value>Type</value>
@@ -148,7 +148,7 @@
     <value>ReceiptNo</value>
   </data>
   <data name="Taxed.Text" xml:space="preserve">
-    <value>Taxed</value>
+    <value> </value>
   </data>
   <data name="Total.Text" xml:space="preserve">
     <value>Total:</value>
