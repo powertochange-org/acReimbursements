@@ -595,7 +595,7 @@
     <value>Saved</value>
   </data>
   <data name="BudgetBalance.Text" xml:space="preserve">
-    <value>Fiscal year-to-date Budget surplus/deficit: </value>
+    <value>Fiscal YTD Budget surplus/deficit: </value>
   </data>
   <data name="Warning.Text" xml:space="preserve">
     <value>Warning</value>
@@ -790,7 +790,7 @@
     <value>Address on file for:</value>
   </data>
   <data name="ActualBalance.Text" xml:space="preserve">
-    <value>Actual surplus/deficit: </value>
+    <value>Income minus Expenses:</value>
   </data>
   <data name="btnClearAdvance.Text" xml:space="preserve">
     <value>Clear Advance</value>
