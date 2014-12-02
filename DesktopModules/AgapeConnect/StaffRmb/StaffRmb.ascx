@@ -59,7 +59,7 @@
         var expiry = new Date((new Date()).getTime() - <%= Settings("Expire") %>*24*3600000); //Number of days is set in Reimbursement settings
         if (date < expiry) {
             control.addClass("old_date");
-            $("span#olddatetext").html("<-- <%= Translate("OldDate") %>");
+            $("span#olddatetext").html("<-- <%= Translate("OldDate").Replace("[DAYS]",Settings("Expire")) %>");
         } else {
             control.removeClass("old_date");
             $("span#olddatetext").html("");
@@ -1406,7 +1406,7 @@
                                                         <asp:TextBox ID="TextBox2" runat="server" Text='<%# Bind("TransDate") %>'></asp:TextBox>
                                                     </EditItemTemplate>
                                                     <ItemTemplate>
-                                                        <asp:Label ID="Label2" runat="server" CssClass='<%# IIF(Eval("OutOfDate"), "ui-state-highlight ui-corner-all","") %>' ToolTip='<%# IIF(Eval("OutOfDate"),Translate("OutOfDate"),"") %>' Text='<%# Bind("TransDate", "{0:d}") %>'></asp:Label>
+                                                        <asp:Label ID="Label2" runat="server" CssClass='<%# IIF(Eval("OutOfDate"), "ui-state-highlight highlight ui-corner-all","") %>' ToolTip='<%# IIF(Eval("OutOfDate"),Translate("OutOfDate"),"") %>' Text='<%# Bind("TransDate", "{0:d}") %>'></asp:Label>
                                                     </ItemTemplate>
                                                     <ItemStyle HorizontalAlign="Left" Width="50px" />
                                                 </asp:TemplateField>

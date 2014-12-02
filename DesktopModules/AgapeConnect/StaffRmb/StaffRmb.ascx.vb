@@ -1684,6 +1684,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             Dim rmbs = From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value
             If rmbs.Count > 0 Then
+                updateOutOfDateFlag()
                 Dim rmb = rmbs.First
                 Dim NewStatus As Integer = rmb.Status
                 Dim rmbTotal = CType((From t In d.AP_Staff_RmbLines Where t.RmbNo = rmb.RMBNo Select t.GrossAmount).Sum(), Decimal?).GetValueOrDefault(0)
@@ -1702,7 +1703,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     rmb.Locked = True
                     tbComments.Enabled = False
                 Else
-                    If StaffBrokerFunctions.RequiresExtraApproval(rmb.CostCenter) Then
+                    If StaffBrokerFunctions.MinistryRequiresExtraApproval(rmb.CostCenter) Then
                         rmb.SpareField2 = StaffBrokerFunctions.getDirectorFor(rmb.CostCenter, CType(Settings("EDMSId"), Integer))
                     End If
                     NewStatus = RmbStatus.Submitted
@@ -1817,11 +1818,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 If rmb.First.Status = RmbStatus.Submitted Then
                     If UserId = rmb.First.ApprUserId Then
                         message += Translate("RmbApproved").Replace("[RMBNO]", rmb.First.RID) + "\n"
-                        If StaffBrokerFunctions.RequiresExtraApproval(rmb.First.CostCenter) Then
+                        If StaffBrokerFunctions.MinistryRequiresExtraApproval(rmb.First.CostCenter) Then
                             rmb.First.Status = RmbStatus.PendingDirectorApproval
                             rmb.First.SpareField2 = StaffBrokerFunctions.getDirectorFor(rmb.First.CostCenter, CType(Settings("EDMSId"), Integer))
                             shouldSendApprovalEmail = True '
                             message += Translate("ExtraApproval") + "\n"
+                        ElseIf hasOldExpenses() Then
+                            rmb.First.Status = RmbStatus.PendingEDMSApproval
+                            shouldSendApprovalEmail = True
+                            message += Translate("WarningOldExpenses").Replace("[DAYS]", Settings("Expire"))
                         Else
                             rmb.First.Status = RmbStatus.Approved
                             rmb.First.ApprDate = Now
@@ -1835,7 +1840,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim directorId = StaffBrokerFunctions.getDirectorFor(rmb.First.CostCenter, CType(Settings("EDMSId"), Integer))
                     If UserId = directorId Then
                         'Check to see if extra approval is still necessary (the requirement may have been removed)
-                        If StaffBrokerFunctions.RequiresExtraApproval(rmb.First.CostCenter) Then
+                        Dim ministryFlagged = StaffBrokerFunctions.MinistryRequiresExtraApproval(rmb.First.CostCenter)
+                        Dim rmbFlagged = hasOldExpenses()
+                        If ministryFlagged Or rmbFlagged Then
                             rmb.First.Status = RmbStatus.PendingEDMSApproval
                             shouldSendApprovalEmail = True
                         Else
@@ -3384,7 +3391,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim DelegateName = If(delegateId >= 0, UserController.GetUserById(PortalId, delegateId).DisplayName, "")
                 Dim DelegateEmail = If(delegateId >= 0, UserController.GetUserById(PortalId, delegateId).Email, "")
                 Dim amount = theRmb.SpareField1
-                Dim extra = If(StaffBrokerFunctions.RequiresExtraApproval(theRmb.RMBNo), Translate("ExtraApproval"), "")
+                Dim extra = If(StaffBrokerFunctions.MinistryRequiresExtraApproval(theRmb.RMBNo), Translate("ExtraApproval"), "")
                 Dim toEmail = approver.Email
                 Dim toName = approver.FirstName
                 Dim hasReceipts = (From c In theRmb.AP_Staff_RmbLines
@@ -3419,7 +3426,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     approverMessage = approverMessage.Replace("[APPRNAME]", toName)
                     approverMessage = approverMessage.Replace("[EXTRA]", extra)
                     approverMessage = approverMessage.Replace("[AMOUNT]", amount)
-                    approverMessage = approverMessage.Replace("[OLDEXPENSES]", If(hasOldExpenses(), Translate("WarningOldExpenses"), ""))
+                    approverMessage = approverMessage.Replace("[OLDEXPENSES]", If(hasOldExpenses(), Translate("WarningOldExpenses").Replace("[DAYS]", Settings("Expire")), ""))
                     approverMessage = approverMessage.Replace("[COMMENTS]", If(theRmb.UserComment <> "", Translate("EmailComments") & "<br />" & theRmb.UserComment, ""))
                     If StaffRmbFunctions.isStaffAccount(theRmb.CostCenter) Then
                         'Personal Reimbursement
@@ -4584,6 +4591,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim oldest_allowable_date = Today.AddDays(-Settings("Expire"))
             Dim old_lines = (From c In d.AP_Staff_RmbLines Where c.RmbNo = hfRmbNo.Value And c.TransDate < oldest_allowable_date Select c.TransDate).Count()
             Return old_lines > 0
+        End Function
+
+        Private Function updateOutOfDateFlag()
+            Dim oldest_allowable_date = Today.AddDays(-Settings("Expire"))
+            For Each line In (From c In d.AP_Staff_RmbLines Where c.RmbNo = hfRmbNo.Value And c.TransDate < oldest_allowable_date)
+                line.OutOfDate = True
+            Next
+            d.SubmitChanges()
         End Function
 
         Private Async Function LoadAddressAsync(UserId As Integer) As Task
