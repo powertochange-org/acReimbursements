@@ -1172,6 +1172,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                         insert.RmbNo = hfRmbNo.Value
                         insert.TransDate = transactionDate
+                        insert.OutOfDate = (age > Settings("Expire"))
                         insert.AccountCode = ddlAccountCode.SelectedValue
                         insert.CostCenter = tbCostcenter.Text
                         insert.LineType = CInt(ddlLineTypes.SelectedValue)
@@ -1367,12 +1368,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             FileManager.Instance.DeleteFiles(files)
                         End If
 
+                        Dim age = DateDiff(DateInterval.Day, line.First.TransDate, Today)
+
                         line.First.AccountCode = ddlAccountCode.SelectedValue
                         line.First.CostCenter = tbCostcenter.Text
                         line.First.LineType = CInt(ddlLineTypes.SelectedValue)
                         line.First.Supplier = CStr(ucType.GetProperty("Supplier").GetValue(theControl, Nothing))
                         line.First.Comment = ucType.GetProperty("Comment").GetValue(theControl, Nothing)
                         line.First.TransDate = CDate(ucType.GetProperty("theDate").GetValue(theControl, Nothing))
+                        line.First.OutOfDate = (age > Settings("Expire"))
                         line.First.Taxable = (ddlOverideTax.SelectedIndex = 1)
                         line.First.VATReceipt = CBool(ucType.GetProperty("VAT").GetValue(theControl, Nothing))
                         'Dim AccType = Right(ddlChargeTo.SelectedValue, 1)
