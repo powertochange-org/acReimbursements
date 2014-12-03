@@ -1770,6 +1770,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ScriptManager.RegisterStartupScript(btnDelete, btnDelete.GetType(), "select5", "selectIndex(5)", True)
                 Else
                     'Send an email to the end user
+                    Dim from_email = UserController.GetUserById(PortalId, UserId).Email
                     Dim Message = StaffBrokerFunctions.GetTemplate("RmbCancelled", PortalId)
                     Dim StaffMbr = UserController.GetUserById(PortalId, rmb.First.UserId)
                     Dim delegateId As Integer = -1
@@ -1792,7 +1793,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Message = Message.Replace("[APPRFIRSTNAME]", UserInfo.FirstName)
                     Message = Message.Replace("[COMMENTS]", comments)
 
-                    SendEmail(StaffMbr.Email, DelegateEmail, Translate("EmailCancelledSubject").Replace("[RMBNO]", rmb.First.RID).Replace("[USERREF]", rmb.First.UserRef), Message)
+                    SendEmail("P2C Reimbursements <" & from_email & ">", StaffMbr.Email, DelegateEmail, Translate("EmailCancelledSubject").Replace("[RMBNO]", rmb.First.RID).Replace("[USERREF]", rmb.First.UserRef), Message)
 
                     pnlMain.Visible = False
                     ltSplash.Text = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbSplash", PortalId))
@@ -3353,12 +3354,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End Try
         End Sub
 
-        Protected Sub SendEmail(address As String, cc As String, subject As String, body As String)
-            Dim sender = "P2C Reimbursements <reimbursements@p2c.com>"
-            SendEmail(sender, address, cc, subject, body)
-        End Sub
-
         Protected Sub SendMoreinfoEmail(sender As String, comments As String, ByRef Rmb As AP_Staff_Rmb)
+            Dim from_email = UserController.GetUserById(PortalId, UserId).Email
             Dim theUser = UserController.GetUserById(PortalId, Rmb.UserId)
             Dim address = theUser.Email
             Dim delegateId = -1
@@ -3373,7 +3370,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim rmblink = "<a href='" & link & "'>" & link & "</a>"
             Dim subject = Translate("MoreInfoSubject").Replace("[USERREF]", rmbno)
             Dim body = Translate("MoreInfoBody").Replace("[WHO]", sender).Replace("[USERREF]", rmbno).Replace("[RMBLINK]", rmblink).Replace("[COMMENTS]", comments)
-            SendEmail(address, delegateEmail, subject, body)
+            SendEmail("P2C Reimbursements <" & from_email & ">", address, delegateEmail, subject, body)
         End Sub
 
         Protected Sub SendApprovalEmail(ByVal theRmb As AP_Staff_Rmb)
@@ -3420,7 +3417,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 ownerMessage = ownerMessage.Replace("[RMBNO]", theRmb.RID).Replace("[USERREF]", theRmb.UserRef)
                 ownerMessage = ownerMessage.Replace("[PRINTOUT]", "<a href='" & Request.Url.Scheme & "://" & Request.Url.Authority & Request.ApplicationPath & "DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & theRmb.RMBNo & "&UID=" & theRmb.UserId & "' target-'_blank' style='width: 134px; display:block;)'><div style='text-align: center; width: 122px; margin: 10px;'><img src='" _
                     & Request.Url.Scheme & "://" & Request.Url.Authority & Request.ApplicationPath & "DesktopModules/AgapeConnect/StaffRmb/Images/PrintoutIcon.jpg' /><br />Printout</div></a><style> a div:hover{border: solid 1px blue;}</style>")
-                SendEmail(owner.Email, DelegateEmail, Translate("EmailSubmittedSubject").Replace("[RMBNO]", theRmb.RID), ownerMessage)
+                SendEmail("P2C Reimbursements <reimbursements@p2c.com>", owner.Email, DelegateEmail, Translate("EmailSubmittedSubject").Replace("[RMBNO]", theRmb.RID), ownerMessage)
 
                 'Send Approvers Instructions Here
                 If toEmail.Length > 0 Then
@@ -3457,6 +3454,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Sub SendApprovedEmail(ByVal theRmb As AP_Staff_Rmb)
             Dim apprname As String = UserController.GetUserById(PortalId, Me.UserId).DisplayName
+            Dim from_email As String = UserController.GetUserById(PortalId, Me.UserId).Email
             Dim staffname As String = UserController.GetUserById(PortalId, theRmb.UserId).DisplayName
             Dim emailaddress As String = UserController.GetUserById(PortalId, theRmb.UserId).Email
             Dim delegateId As Integer = -1
@@ -3481,11 +3479,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Else
                 Emessage = Emessage.Replace("[CHANGES]", "")
             End If
-            SendEmail(emailaddress, DelegateEmail, subject, Emessage)
+            SendEmail("P2C Reimbursements <" & from_email & ">", emailaddress, DelegateEmail, subject, Emessage)
         End Sub
 
         Sub SendRejectionLetter(theRmb As AP_Staff_Rmb)
             Dim staffname As String = UserController.GetUserById(PortalId, theRmb.UserId).DisplayName
+            Dim from_email As String = UserController.GetUserById(PortalId, Me.UserId).Email
             Dim emailaddress As String = UserController.GetUserById(PortalId, theRmb.UserId).Email
             Dim delegateId As Integer = -1
             Try
@@ -3501,7 +3500,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             Emessage = Emessage.Replace("[STAFFNAME]", If(delegateId >= 0, DelegateName & " (" & Translate("OnBehalfOf") & " " & staffname & ")", staffname))
             Emessage = Emessage.Replace("[APPROVER]", apprname).Replace("[RMBNO]", theRmb.RID).Replace("[USERREF]", theRmb.UserRef)
-            SendEmail(emailaddress, DelegateEmail, subject, Emessage)
+            SendEmail("P2C Reimbursements <" & from_email & ">", emailaddress, DelegateEmail, subject, Emessage)
         End Sub
 
         Public Function Translate(ByVal ResourceString As String) As String
