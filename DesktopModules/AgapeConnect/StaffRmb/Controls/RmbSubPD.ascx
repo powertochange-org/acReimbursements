@@ -66,7 +66,7 @@
         <td></td>
         <td>
             <b><dnn:label id="lbl"  runat="server"  ResourceKey="lblTotal" />:</b>
-            $<span id="tbAmount">0.00</span>
+            $<span id="tbPDTotal">0.00</span>
         </td>
     </tr>
     <tr>

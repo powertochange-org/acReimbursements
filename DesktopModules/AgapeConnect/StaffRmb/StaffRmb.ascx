@@ -59,7 +59,7 @@
         var expiry = new Date((new Date()).getTime() - <%= Settings("Expire") %>*24*3600000); //Number of days is set in Reimbursement settings
         if (date < expiry) {
             control.addClass("old_date");
-            $("span#olddatetext").html("<-- <%= Translate("OldDate") %>");
+            $("span#olddatetext").html("<-- <%= Translate("OldDate").Replace("[DAYS]",Settings("Expire")) %>");
         } else {
             control.removeClass("old_date");
             $("span#olddatetext").html("");
@@ -153,7 +153,7 @@
         if ($('.pdbreakfast').is(':enabled')) { total += parseFloat($('.pdbreakfast').val()) };
         if ($('.pdlunch').is(':enabled')) { total += parseFloat($('.pdlunch').val()) };
         if ($('.pdsupper').is(':enabled')) { total += parseFloat($('.pdsupper').val()) };
-        $('#tbAmount').text(total.toFixed(2));
+        $('#tbPDTotal').text(total.toFixed(2));
     }
 
     function disableSubmitOnEnter(e)
@@ -1413,7 +1413,7 @@
                                                         <asp:TextBox ID="TextBox2" runat="server" Text='<%# Bind("TransDate") %>'></asp:TextBox>
                                                     </EditItemTemplate>
                                                     <ItemTemplate>
-                                                        <asp:Label ID="Label2" runat="server" CssClass='<%# IIF(Eval("OutOfDate"), "ui-state-highlight ui-corner-all","") %>' ToolTip='<%# IIF(Eval("OutOfDate"),Translate("OutOfDate"),"") %>' Text='<%# Bind("TransDate", "{0:d}") %>'></asp:Label>
+                                                        <asp:Label ID="Label2" runat="server" CssClass='<%# IIF(Eval("OutOfDate"), "ui-state-highlight highlight ui-corner-all","") %>' ToolTip='<%# IIF(Eval("OutOfDate"),Translate("OutOfDate"),"") %>' Text='<%# Bind("TransDate", "{0:d}") %>'></asp:Label>
                                                     </ItemTemplate>
                                                     <ItemStyle HorizontalAlign="Left" Width="50px" />
                                                 </asp:TemplateField>
@@ -1655,7 +1655,7 @@
                                 </tr>
                             </table>
                             <asp:PlaceHolder ID="phLineDetail" runat="server"></asp:PlaceHolder>
-                            <asp:Panel ID="pnlElecReceipts" runat="server" style="display: none;">
+                            <asp:Panel ID="pnlElecReceipts" runat="server" CssClass="electronic_receipts_panel" style="display: none;">
                             <table style="font-size: 9pt;">
                                 <tr valign="top">
                                     <td width="150px;"><b>

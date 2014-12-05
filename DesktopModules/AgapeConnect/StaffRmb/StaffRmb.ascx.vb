@@ -1172,6 +1172,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                         insert.RmbNo = hfRmbNo.Value
                         insert.TransDate = transactionDate
+                        insert.OutOfDate = (age > Settings("Expire"))
                         insert.AccountCode = ddlAccountCode.SelectedValue
                         insert.CostCenter = tbCostcenter.Text
                         insert.LineType = CInt(ddlLineTypes.SelectedValue)
@@ -1367,12 +1368,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             FileManager.Instance.DeleteFiles(files)
                         End If
 
+                        Dim age = DateDiff(DateInterval.Day, line.First.TransDate, Today)
+
                         line.First.AccountCode = ddlAccountCode.SelectedValue
                         line.First.CostCenter = tbCostcenter.Text
                         line.First.LineType = CInt(ddlLineTypes.SelectedValue)
                         line.First.Supplier = CStr(ucType.GetProperty("Supplier").GetValue(theControl, Nothing))
                         line.First.Comment = ucType.GetProperty("Comment").GetValue(theControl, Nothing)
                         line.First.TransDate = CDate(ucType.GetProperty("theDate").GetValue(theControl, Nothing))
+                        line.First.OutOfDate = (age > Settings("Expire"))
                         line.First.Taxable = (ddlOverideTax.SelectedIndex = 1)
                         line.First.VATReceipt = CBool(ucType.GetProperty("VAT").GetValue(theControl, Nothing))
                         'Dim AccType = Right(ddlChargeTo.SelectedValue, 1)
@@ -1701,6 +1705,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             Dim rmbs = From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value
             If rmbs.Count > 0 Then
+                updateOutOfDateFlag()
                 Dim rmb = rmbs.First
                 Dim NewStatus As Integer = rmb.Status
                 Dim rmbTotal = CType((From t In d.AP_Staff_RmbLines Where t.RmbNo = rmb.RMBNo Select t.GrossAmount).Sum(), Decimal?).GetValueOrDefault(0)
@@ -1719,7 +1724,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     rmb.Locked = True
                     tbComments.Enabled = False
                 Else
-                    If StaffBrokerFunctions.RequiresExtraApproval(rmb.CostCenter) Then
+                    If StaffBrokerFunctions.MinistryRequiresExtraApproval(rmb.CostCenter) Then
                         rmb.SpareField2 = StaffBrokerFunctions.getDirectorFor(rmb.CostCenter, CType(Settings("EDMSId"), Integer))
                     End If
                     NewStatus = RmbStatus.Submitted
@@ -1782,6 +1787,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ScriptManager.RegisterStartupScript(btnDelete, btnDelete.GetType(), "select5", "selectIndex(5)", True)
                 Else
                     'Send an email to the end user
+                    Dim from_email = UserController.GetUserById(PortalId, UserId).Email
                     Dim Message = StaffBrokerFunctions.GetTemplate("RmbCancelled", PortalId)
                     Dim StaffMbr = UserController.GetUserById(PortalId, rmb.First.UserId)
                     Dim delegateId As Integer = -1
@@ -1804,7 +1810,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Message = Message.Replace("[APPRFIRSTNAME]", UserInfo.FirstName)
                     Message = Message.Replace("[COMMENTS]", comments)
 
-                    SendEmail(StaffMbr.Email, DelegateEmail, Translate("EmailCancelledSubject").Replace("[RMBNO]", rmb.First.RID).Replace("[USERREF]", rmb.First.UserRef), Message)
+                    SendEmail("P2C Reimbursements <" & from_email & ">", StaffMbr.Email, DelegateEmail, Translate("EmailCancelledSubject").Replace("[RMBNO]", rmb.First.RID).Replace("[USERREF]", rmb.First.UserRef), Message)
 
                     pnlMain.Visible = False
                     ltSplash.Text = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbSplash", PortalId))
@@ -1834,11 +1840,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 If rmb.First.Status = RmbStatus.Submitted Then
                     If UserId = rmb.First.ApprUserId Then
                         message += Translate("RmbApproved").Replace("[RMBNO]", rmb.First.RID) + "\n"
-                        If StaffBrokerFunctions.RequiresExtraApproval(rmb.First.CostCenter) Then
+                        If StaffBrokerFunctions.MinistryRequiresExtraApproval(rmb.First.CostCenter) Then
                             rmb.First.Status = RmbStatus.PendingDirectorApproval
                             rmb.First.SpareField2 = StaffBrokerFunctions.getDirectorFor(rmb.First.CostCenter, CType(Settings("EDMSId"), Integer))
                             shouldSendApprovalEmail = True '
                             message += Translate("ExtraApproval") + "\n"
+                        ElseIf hasOldExpenses() Then
+                            rmb.First.Status = RmbStatus.PendingEDMSApproval
+                            shouldSendApprovalEmail = True
+                            message += Translate("WarningOldExpenses").Replace("[DAYS]", Settings("Expire"))
                         Else
                             rmb.First.Status = RmbStatus.Approved
                             rmb.First.ApprDate = Now
@@ -1852,7 +1862,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim directorId = StaffBrokerFunctions.getDirectorFor(rmb.First.CostCenter, CType(Settings("EDMSId"), Integer))
                     If UserId = directorId Then
                         'Check to see if extra approval is still necessary (the requirement may have been removed)
-                        If StaffBrokerFunctions.RequiresExtraApproval(rmb.First.CostCenter) Then
+                        Dim ministryFlagged = StaffBrokerFunctions.MinistryRequiresExtraApproval(rmb.First.CostCenter)
+                        Dim rmbFlagged = hasOldExpenses()
+                        If ministryFlagged Or rmbFlagged Then
                             rmb.First.Status = RmbStatus.PendingEDMSApproval
                             shouldSendApprovalEmail = True
                         Else
@@ -3270,7 +3282,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim VAT As Boolean = False
                     Dim Receipt As Boolean = True
                     Dim Province As String = Nothing
-                    Dim receiptMode As Integer = 1
+                    Dim receiptMode As Integer = If(Settings("NoReceipt") > 0, -1, 1)
                     Dim currency As String = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)
 
                     If Not blankValues Then
@@ -3359,12 +3371,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End Try
         End Sub
 
-        Protected Sub SendEmail(address As String, cc As String, subject As String, body As String)
-            Dim sender = "P2C Reimbursements <reimbursements@p2c.com>"
-            SendEmail(sender, address, cc, subject, body)
-        End Sub
-
         Protected Sub SendMoreinfoEmail(sender As String, comments As String, ByRef Rmb As AP_Staff_Rmb)
+            Dim from_email = UserController.GetUserById(PortalId, UserId).Email
             Dim theUser = UserController.GetUserById(PortalId, Rmb.UserId)
             Dim address = theUser.Email
             Dim delegateId = -1
@@ -3379,8 +3387,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim rmblink = "<a href='" & link & "'>" & link & "</a>"
             Dim subject = Translate("MoreInfoSubject").Replace("[USERREF]", rmbno)
             Dim body = Translate("MoreInfoBody").Replace("[WHO]", sender).Replace("[USERREF]", rmbno).Replace("[RMBLINK]", rmblink).Replace("[COMMENTS]", comments)
-            Dim fromEmail = UserController.Instance.GetCurrentUserInfo.Email
-            SendEmail("P2C Reimbursements <" & fromEmail & ">", address, delegateEmail, subject, body)
+            SendEmail("P2C Reimbursements <" & from_email & ">", address, delegateEmail, subject, body)
         End Sub
 
         Protected Sub SendApprovalEmail(ByVal theRmb As AP_Staff_Rmb)
@@ -3402,7 +3409,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim DelegateName = If(delegateId >= 0, UserController.GetUserById(PortalId, delegateId).DisplayName, "")
                 Dim DelegateEmail = If(delegateId >= 0, UserController.GetUserById(PortalId, delegateId).Email, "")
                 Dim amount = theRmb.SpareField1
-                Dim extra = If(StaffBrokerFunctions.RequiresExtraApproval(theRmb.RMBNo), Translate("ExtraApproval"), "")
+                Dim extra = If(StaffBrokerFunctions.MinistryRequiresExtraApproval(theRmb.RMBNo), Translate("ExtraApproval"), "")
                 Dim toEmail = approver.Email
                 Dim toName = approver.FirstName
                 Dim hasReceipts = (From c In theRmb.AP_Staff_RmbLines
@@ -3427,7 +3434,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 ownerMessage = ownerMessage.Replace("[RMBNO]", theRmb.RID).Replace("[USERREF]", theRmb.UserRef)
                 ownerMessage = ownerMessage.Replace("[PRINTOUT]", "<a href='" & Request.Url.Scheme & "://" & Request.Url.Authority & Request.ApplicationPath & "DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & theRmb.RMBNo & "&UID=" & theRmb.UserId & "' target-'_blank' style='width: 134px; display:block;)'><div style='text-align: center; width: 122px; margin: 10px;'><img src='" _
                     & Request.Url.Scheme & "://" & Request.Url.Authority & Request.ApplicationPath & "DesktopModules/AgapeConnect/StaffRmb/Images/PrintoutIcon.jpg' /><br />Printout</div></a><style> a div:hover{border: solid 1px blue;}</style>")
-                SendEmail(owner.Email, DelegateEmail, Translate("EmailSubmittedSubject").Replace("[RMBNO]", theRmb.RID), ownerMessage)
+                SendEmail("P2C Reimbursements <reimbursements@p2c.com>", owner.Email, DelegateEmail, Translate("EmailSubmittedSubject").Replace("[RMBNO]", theRmb.RID), ownerMessage)
 
                 'Send Approvers Instructions Here
                 If toEmail.Length > 0 Then
@@ -3437,7 +3444,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     approverMessage = approverMessage.Replace("[APPRNAME]", toName)
                     approverMessage = approverMessage.Replace("[EXTRA]", extra)
                     approverMessage = approverMessage.Replace("[AMOUNT]", amount)
-                    approverMessage = approverMessage.Replace("[OLDEXPENSES]", If(hasOldExpenses(), Translate("WarningOldExpenses"), ""))
+                    approverMessage = approverMessage.Replace("[OLDEXPENSES]", If(hasOldExpenses(), Translate("WarningOldExpenses").Replace("[DAYS]", Settings("Expire")), ""))
                     approverMessage = approverMessage.Replace("[COMMENTS]", If(theRmb.UserComment <> "", Translate("EmailComments") & "<br />" & theRmb.UserComment, ""))
                     If StaffRmbFunctions.isStaffAccount(theRmb.CostCenter) Then
                         'Personal Reimbursement
@@ -3464,6 +3471,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Sub SendApprovedEmail(ByVal theRmb As AP_Staff_Rmb)
             Dim apprname As String = UserController.GetUserById(PortalId, Me.UserId).DisplayName
+            Dim from_email As String = UserController.GetUserById(PortalId, Me.UserId).Email
             Dim staffname As String = UserController.GetUserById(PortalId, theRmb.UserId).DisplayName
             Dim emailaddress As String = UserController.GetUserById(PortalId, theRmb.UserId).Email
             Dim delegateId As Integer = -1
@@ -3488,11 +3496,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Else
                 Emessage = Emessage.Replace("[CHANGES]", "")
             End If
-            SendEmail(emailaddress, DelegateEmail, subject, Emessage)
+            SendEmail("P2C Reimbursements <" & from_email & ">", emailaddress, DelegateEmail, subject, Emessage)
         End Sub
 
         Sub SendRejectionLetter(theRmb As AP_Staff_Rmb)
             Dim staffname As String = UserController.GetUserById(PortalId, theRmb.UserId).DisplayName
+            Dim from_email As String = UserController.GetUserById(PortalId, Me.UserId).Email
             Dim emailaddress As String = UserController.GetUserById(PortalId, theRmb.UserId).Email
             Dim delegateId As Integer = -1
             Try
@@ -3508,7 +3517,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             Emessage = Emessage.Replace("[STAFFNAME]", If(delegateId >= 0, DelegateName & " (" & Translate("OnBehalfOf") & " " & staffname & ")", staffname))
             Emessage = Emessage.Replace("[APPROVER]", apprname).Replace("[RMBNO]", theRmb.RID).Replace("[USERREF]", theRmb.UserRef)
-            SendEmail(emailaddress, DelegateEmail, subject, Emessage)
+            SendEmail("P2C Reimbursements <" & from_email & ">", emailaddress, DelegateEmail, subject, Emessage)
         End Sub
 
         Public Function Translate(ByVal ResourceString As String) As String
@@ -4602,6 +4611,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim oldest_allowable_date = Today.AddDays(-Settings("Expire"))
             Dim old_lines = (From c In d.AP_Staff_RmbLines Where c.RmbNo = hfRmbNo.Value And c.TransDate < oldest_allowable_date Select c.TransDate).Count()
             Return old_lines > 0
+        End Function
+
+        Private Function updateOutOfDateFlag()
+            Dim oldest_allowable_date = Today.AddDays(-Settings("Expire"))
+            For Each line In (From c In d.AP_Staff_RmbLines Where c.RmbNo = hfRmbNo.Value And c.TransDate < oldest_allowable_date)
+                line.OutOfDate = True
+            Next
+            d.SubmitChanges()
         End Function
 
         Private Async Function LoadAddressAsync(UserId As Integer) As Task

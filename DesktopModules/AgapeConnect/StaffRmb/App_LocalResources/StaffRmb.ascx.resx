@@ -475,7 +475,7 @@
     <value>Large Transaction</value>
   </data>
   <data name="OutOfDate.Text" xml:space="preserve">
-    <value>This expense is out of date and will be taxed.</value>
+    <value>This expense is out of date.</value>
   </data>
   <data name="OverideTax.Help" xml:space="preserve">
     <value>Use this setting to overide the tax setting. By default, the system will calculate tax based on the information provided by the user - but accounts staff can use this setting to overide this.</value>
@@ -595,7 +595,7 @@
     <value>Saved</value>
   </data>
   <data name="BudgetBalance.Text" xml:space="preserve">
-    <value>Fiscal year-to-date Budget surplus/deficit: </value>
+    <value>Fiscal YTD Budget surplus/deficit: </value>
   </data>
   <data name="Warning.Text" xml:space="preserve">
     <value>Warning</value>
@@ -679,13 +679,13 @@
     <value>Name this reimbursement:</value>
   </data>
   <data name="WarningOldExpenses.Text" xml:space="preserve">
-    <value>Notice: This reimbursement contains expenses that are more than 90 days old.</value>
+    <value>Notice: This reimbursement contains expenses that are more than [DAYS] days old, and will require extra approval.</value>
   </data>
   <data name="WarningLowBalanceStaffAccount.Text" xml:space="preserve">
     <value>Warning: There are insufficient funds in this staff account to fulfil this reimbursement.  You may still choose to approve it, if you are aware of sufficient incoming funds to cover it.</value>
   </data>
   <data name="OldDate.Text" xml:space="preserve">
-    <value>Expenses may only be reimbursed within 90 days.  Reimbursements older than this may be denied, and will be taxed.</value>
+    <value>Expenses may only be reimbursed within [DAYS] days.  Reimbursements older than this may be denied, and will be taxed.</value>
   </data>
   <data name="ViewReceipt.Text" xml:space="preserve">
     <value>View Receipt</value>
@@ -790,7 +790,7 @@
     <value>Address on file for:</value>
   </data>
   <data name="ActualBalance.Text" xml:space="preserve">
-    <value>Actual surplus/deficit: </value>
+    <value>Income minus Expenses:</value>
   </data>
   <data name="btnClearAdvance.Text" xml:space="preserve">
     <value>Clear Advance</value>
