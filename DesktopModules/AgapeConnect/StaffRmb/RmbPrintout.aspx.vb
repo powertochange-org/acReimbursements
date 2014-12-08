@@ -177,7 +177,7 @@ Partial Class DesktopModules_StaffRmb_RmbPrintout
                 output = output.Replace("[RMBHEADER1]", "<tr class=""Agape_Red_H5""><td>" & Translate("Date") & "</td><td>" & Translate("Type") & "</td><td>" & Translate("Description") & "</td><td>" & Translate("Taxed") & "</td><td>" & Translate("Amount") & "</td><td></td><td></td><td>" & Translate("ReceiptNo") & "</td></tr>")
 
                 For Each row In theLines
-                    lines = lines & "<tr><td>" & row.TransDate.ToString("dd/MM/yyyy") & "</td>"
+                    lines = lines & "<tr><td>" & row.TransDate.ToShortDateString() & "</td>"
 
                     lines = lines & "<td><span style=""color: #AAA;"">" & row.AccountCode & "-</span>" & GetLocalTypeName(row.LineType, PS.PortalId) & "</td>"
                     lines = lines & "<td>" & row.Comment
