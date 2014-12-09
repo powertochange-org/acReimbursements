@@ -38,31 +38,31 @@ Partial Class controls_RmbEquipment
             If settings("VatAttrib") = False And settings("ElectonicReceipts") = False Then
                 'receipts are always required (and no VAT issues) so don't ask... Just assume receipts
 
-                ddlVATReceipt.SelectedValue = 1
+                ddlReceipt.SelectedValue = 1
                 ReceiptLine.Visible = False
 
             End If
-            ddlVATReceipt.Items(3).Enabled = False
+            ddlReceipt.Items(3).Enabled = False
         Else
             hfNoReceiptLimit.Value = settings("NoReceipt")
             Dim _LIMIT As String = StaffBrokerFunctions.GetSetting("Currency", PortalId) & settings("NoReceipt")
-            ddlVATReceipt.Items(3).Text = DotNetNuke.Services.Localization.Localization.GetString("NoReceipt.Text", LocalResourceFile).Replace("[LIMIT]", _LIMIT)
+            ddlReceipt.Items(3).Text = DotNetNuke.Services.Localization.Localization.GetString("NoReceipt.Text", LocalResourceFile).Replace("[LIMIT]", _LIMIT)
             ttlReceipt.Text = DotNetNuke.Services.Localization.Localization.GetString("lblReceipt.Text", LocalResourceFile)
             ttlReceipt.HelpText = DotNetNuke.Services.Localization.Localization.GetString("lblReceipt.Help", LocalResourceFile).Replace("[LIMIT]", _LIMIT)
             ReceiptLine.Visible = True
-            ddlVATReceipt.Items(3).Enabled = True
+            ddlReceipt.Items(3).Enabled = True
         End If
 
         tbDesc.Attributes.Add("placeholder", DotNetNuke.Services.Localization.Localization.GetString("DescriptionHint.Text", "/DesktopModules/AgapeConnect/StaffRmb/App_LocalResources/StaffRmb.ascx.resx"))
-        ddlVATReceipt.Items(0).Enabled = settings("VatAttrib")
-        ddlVATReceipt.Items(2).Enabled = settings("ElectronicReceipts") Or ddlVATReceipt.SelectedValue = 2
+        ddlReceipt.Items(0).Enabled = settings("VatAttrib")
+        ddlReceipt.Items(2).Enabled = settings("ElectronicReceipts") Or ddlReceipt.SelectedValue = 2
     End Sub
     Public Property ReceiptType() As Integer
         Get
-            Return ddlVATReceipt.SelectedValue
+            Return ddlReceipt.SelectedValue
         End Get
         Set(ByVal value As Integer)
-            ddlVATReceipt.SelectedValue = value
+            ddlReceipt.SelectedValue = value
         End Set
     End Property
     Public Property Comment() As String
@@ -95,13 +95,13 @@ Partial Class controls_RmbEquipment
     End Property
     Public Property VAT() As Boolean
         Get
-            Return (ddlVATReceipt.SelectedValue = 0)
+            Return (ddlReceipt.SelectedValue = 0)
         End Get
         Set(ByVal value As Boolean)
             If value = True Then
-                ddlVATReceipt.SelectedValue = 0
+                ddlReceipt.SelectedValue = 0
             Else
-                ddlVATReceipt.SelectedValue = 1
+                ddlReceipt.SelectedValue = 1
             End If
 
 
@@ -174,11 +174,11 @@ Partial Class controls_RmbEquipment
     End Property
     Public Property Receipt() As Boolean
         Get
-            Return ddlVATReceipt.SelectedValue >= 0
+            Return ddlReceipt.SelectedValue >= 0
         End Get
         Set(ByVal value As Boolean)
             If value = False Then
-                ddlVATReceipt.SelectedValue = -1
+                ddlReceipt.SelectedValue = -1
             End If
         End Set
     End Property
@@ -224,9 +224,9 @@ Partial Class controls_RmbEquipment
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Amount.Error", LocalResourceFile)
                 Return False
             End If
-            If ddlVATReceipt.SelectedValue = "-1" And theAmount > CDbl(hfNoReceiptLimit.Value) Then
+            If ddlReceipt.SelectedValue = "-1" And theAmount > CDbl(hfNoReceiptLimit.Value) Then
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("AmountRec.Error", LocalResourceFile).Replace("[LIMIT]", StaffBrokerFunctions.GetSetting("Currency", PortalId) & hfNoReceiptLimit.Value)
-                ddlVATReceipt.SelectedValue = 1
+                ddlReceipt.SelectedValue = 1
                 Return False
             End If
         Catch ex As Exception

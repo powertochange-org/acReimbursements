@@ -80,11 +80,11 @@
 <tr id="ReceiptLine" runat="server">
         <td>
             <b>
-                <dnn:Label ID="ttlReceipt" runat="server" ControlName="ddlVATReceipt" />
+                <dnn:Label ID="ttlReceipt" runat="server" ControlName="ddlReceipt" />
             </b>
         </td>
         <td>
-            <asp:DropDownList ID="ddlVATReceipt" runat="server"  CssClass="ddlReceipt">
+            <asp:DropDownList ID="ddlReceipt" runat="server"  CssClass="ddlReceipt">
                 <asp:ListItem ResourceKey="VAT" Value="0">VAT</asp:ListItem>
                 <asp:ListItem ResourceKey="Standard" Value="1">Standard</asp:ListItem>
                 <asp:ListItem  Value="2" ResourceKey="Electronic">Electronic Receipt</asp:ListItem>
@@ -95,7 +95,7 @@
     <tr>
         <td>
             <b>
-                <dnn:Label ID="Label5" runat="server" ControlName="ddlVATReceipt" ResourceKey="lblMoreInfo" />
+                <dnn:Label ID="Label5" runat="server" ControlName="ddlReceipt" ResourceKey="lblMoreInfo" />
             </b>
         </td>
         <td>

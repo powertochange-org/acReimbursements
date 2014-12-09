@@ -216,4 +216,7 @@
   <data name="tbOrigin.Hint" xml:space="preserve">
     <value>origin</value>
   </data>
+  <data name="Error.NoElecReceipt" xml:space="preserve">
+    <value>When you choose Electronic Receipts, you must attach your receipt by clicking the Add Receipt button</value>
+  </data>
 </root>

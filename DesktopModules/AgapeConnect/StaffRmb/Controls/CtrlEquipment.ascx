@@ -5,7 +5,7 @@
     <tr>
         <td style="width:200px">
             <b>
-                <dnn:Label ID="lblMoreInfo" runat="server" ControlName="ddlVATReceipt" ResourceKey="lblMoreInfo" />
+                <dnn:Label ID="lblMoreInfo" runat="server" ControlName="ddlType" ResourceKey="lblMoreInfo" />
             </b>
         </td>
         <td>

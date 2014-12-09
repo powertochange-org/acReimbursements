@@ -15,7 +15,7 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
         lbSupplier.Visible = false;
         lblSupplier.Visible = false;
         ddlCurrencies.Visible = false;
-        ddlVATReceipt.Visible = false;
+        ddlReceipt.Visible = false;
         lblReceipt.Visible = false;
         lbReceipt.Visible = false;
         lblAmount.Visible = false;

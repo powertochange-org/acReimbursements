@@ -21,23 +21,46 @@ using System.Threading.Tasks;
 namespace StaffRmb
 {
 
-    public static class RmbReceiptMode
+    //public static class RmbReceiptMode
+    //{
+    //    public const int Disabled = 0;
+    //    public const int NoVAT = 1;
+    //    public const int VAT = 2;
+    //    static public string ModeName(int ModeNo)
+    //    {
+    //        switch (ModeNo)
+    //        {
+    //            case 0: return "Disabled";
+    //            case 1: return "NoVAT";
+    //            case 2: return "VAT";
+    //            default: return "Unknown";
+    //        }
+
+    //    }
+    //}
+
+    public static class RmbReceiptType
     {
-        public const int Disabled = 0;
-        public const int NoVAT = 1;
-        public const int VAT = 2;
-        static public string ModeName(int ModeNo)
+        public const int UNSELECTED = -1;
+        public const int No_Receipt = 0;
+        public const int Standard = 1;
+        public const int Electronic = 2;
+        public const int VAT = 3;
+
+        static public string Name(int type)
         {
-            switch (ModeNo)
+            switch (type)
             {
-                case 0: return "Disabled";
-                case 1: return "NoVAT";
-                case 2: return "VAT";
+                case -1: return "UNSELECTED";
+                case 0: return "No_Receipt";
+                case 1: return "Standard";
+                case 2: return "Electronic";
+                case 3: return "VAT";
                 default: return "Unknown";
             }
-
         }
     }
+
     public static class RmbStatus
     {
         public const int Draft = 0;

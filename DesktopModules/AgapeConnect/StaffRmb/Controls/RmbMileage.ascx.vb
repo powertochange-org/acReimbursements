@@ -152,7 +152,7 @@ Partial Class controls_Mileage
     End Property
     Public Property Receipt() As Boolean
         Get
-            Return False ' ddlVATReceipt.SelectedValue = "Yes"
+            Return False ' ddlReceipt.SelectedValue = "Yes"
         End Get
         Set(ByVal value As Boolean)
         End Set

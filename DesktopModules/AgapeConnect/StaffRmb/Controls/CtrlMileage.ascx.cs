@@ -102,7 +102,7 @@ public partial class ControlBase : StaffRmbControl {
     }
     new public int ReceiptType
     {
-        get { return 0; } //no receipt required for mileage expenses
+        get { return StaffRmb.RmbReceiptType.No_Receipt; } //no receipt required for mileage expenses
         set { }
     }
     new public bool VAT
@@ -153,7 +153,7 @@ public partial class ControlBase : StaffRmbControl {
         lbSupplier.Visible = false;
         currencyUpdatePanel.Visible = false;
         lblReceipt.Visible = false;
-        ddlVATReceipt.Visible = false;
+        ddlReceipt.Visible = false;
         lbReceipt.Visible = false;
     }
 

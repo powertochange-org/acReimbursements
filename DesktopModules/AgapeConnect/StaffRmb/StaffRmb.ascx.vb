@@ -1143,9 +1143,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If State = RmbStatus.Paid Or State = RmbStatus.Processing Or State = RmbStatus.PendingDownload Or State = RmbStatus.DownloadFailed Then Return
 
             Dim ucType As Type = theControl.GetType()
+            Dim theFiles As IQueryable(Of AP_Staff_RmbLine_File)
 
             If btnSaveLine.CommandName = "Save" Then
                 Dim theUserId = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.UserId).First
+                theFiles = (From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo Is Nothing And lf.RMBNo = hfRmbNo.Value)
+                ucType.GetProperty("ReceiptsAttached").SetValue(theControl, theFiles.Count() > 0, Nothing)
                 If ucType.GetMethod("ValidateForm").Invoke(theControl, New Object() {theUserId}) = True Then
 
                     Dim q = From c In d.AP_Staff_RmbLines Where c.RmbNo = hfRmbNo.Value And c.Receipt Select c.ReceiptNo
@@ -1226,9 +1229,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         Dim theFile As IFileInfo
                         Dim ElectronicReceipt As Boolean = False
                         ' Get each of the files from the line - file table
-                        Dim theFiles = (From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo Is Nothing And lf.RMBNo = insert.RmbNo)
+
                         Try
-                            If (CInt(ucType.GetProperty("ReceiptType").GetValue(theControl, Nothing) = 2) And theFiles.Count > 0) Then
+                            If (CInt(ucType.GetProperty("ReceiptType").GetValue(theControl, Nothing) = RmbReceiptType.Electronic) And theFiles.Count > 0) Then
 
                                 ElectronicReceipt = True
 
@@ -1288,6 +1291,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ReloadInvalidForm()
                 End If
             ElseIf btnSaveLine.CommandName = "Edit" Then
+                theFiles = (From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo = CInt(btnSaveLine.CommandArgument) And lf.RMBNo = hfRmbNo.Value)
+                ucType.GetProperty("ReceiptsAttached").SetValue(theControl, theFiles.Count() > 0, Nothing)
                 If ucType.GetMethod("ValidateForm").Invoke(theControl, New Object() {UserId}) = True Then
 
                     Dim line = From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(btnSaveLine.CommandArgument)
@@ -1344,12 +1349,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         End If
 
 
-                        ' Get all of the electronic receipts for this rmb line
-                        Dim line_files = From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo = line.First.RmbLineNo And lf.RMBNo = line.First.RmbNo
                         ' Get the receipt type property
                         Dim receiptType = ucType.GetProperty("ReceiptType")
                         'look for electronic receipt
-                        If (Not receiptType Is Nothing AndAlso (CInt(receiptType.GetValue(theControl, Nothing) = 2) AndAlso line_files.Count > 0)) Then
+                        If (Not receiptType Is Nothing AndAlso (CInt(receiptType.GetValue(theControl, Nothing) = RmbReceiptType.Electronic) AndAlso theFiles.Count > 0)) Then
                             ' Set the ImageReceiptId to the first file
                             'line.First.ReceiptImageId = line_files.First.FileId
                         Else
@@ -1360,7 +1363,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             ' are already associated with this line
                             Dim files As New List(Of IFileInfo)
                             ' Iterate through all of the line_files we got
-                            For Each line_file As AP_Staff_RmbLine_File In line_files
+                            For Each line_file As AP_Staff_RmbLine_File In theFiles
                                 ' Add the file to the list
                                 files.Add(FileManager.Instance.GetFile(line_file.FileId))
                             Next
@@ -1484,7 +1487,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 ScriptManager.RegisterClientScriptBlock(Page, Me.GetType(), "fixCurrency", jscript, True)
             End If
             If (theControl.GetType().GetProperty("ReceiptType") IsNot Nothing) Then
-                If (CInt(theControl.GetType().GetProperty("ReceiptType").GetValue(theControl, Nothing) = 2)) Then
+                If (CInt(theControl.GetType().GetProperty("ReceiptType").GetValue(theControl, Nothing) = RmbReceiptType.Electronic)) Then
                     ' If the receipt type is set to 2, we keep it visible
                     pnlElecReceipts.Attributes("style") = ""
                 Else
@@ -2298,7 +2301,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
                     If (Not String.IsNullOrEmpty(theLine.First.OrigCurrency)) Then
                         'hfOrigCurrency.Value = theLine.First.OrigCurrency
-                        jscript.Append(" currencyChange('" & theLine.First.OrigCurrency & "');")
+                        ucType.GetProperty("Currency").SetValue(theControl, theLine.First.OrigCurrency, Nothing)
                     Else
                         'hfOrigCurrency.Value = ac
                         jscript.Append(" $('#" & hfOrigCurrency.ClientID & "').val('" & ac & "');")
@@ -2323,15 +2326,19 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         End If
                     End If
 
-                    Dim receiptMode = 1
+                    ' The control must be initialized before the receipt type can be set
+                    ucType.GetMethod("Initialize").Invoke(theControl, New Object() {Settings})
+
+                    Dim receiptMode = RmbReceiptType.Standard
                     If theLine.First.VATReceipt Then
-                        receiptMode = 0
+                        receiptMode = RmbReceiptType.VAT
                         ' If we have any files matching this line, or our receiptImageId is valid
                     ElseIf (From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo = theLine.First.RmbLineNo And lf.RMBNo = theLine.First.RmbNo).Count > 0 Then
-                        receiptMode = 2
+                        receiptMode = RmbReceiptType.Electronic
+                        ucType.GetProperty("ReceiptsAttached").SetValue(theControl, True, Nothing)
                         ' If we don't have a receipt
                     ElseIf Not theLine.First.Receipt Then
-                        receiptMode = -1
+                        receiptMode = RmbReceiptType.No_Receipt
                     End If
                     Try
                         ucType.GetProperty("ReceiptType").SetValue(theControl, receiptMode, Nothing)
@@ -2339,7 +2346,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     End Try
 
-                    ucType.GetMethod("Initialize").Invoke(theControl, New Object() {Settings})
                     cbRecoverVat.Checked = False
                     ddlOverideTax.SelectedIndex = If(theLine.First.Taxable, 1, 0)
                     tbVatRate.Text = ""
@@ -2368,7 +2374,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     ifReceipt.Attributes("src") = Request.Url.Scheme & "://" & Request.Url.Authority & "/DesktopModules/AgapeConnect/StaffRmb/ReceiptEditor.aspx?RmbNo=" & theLine.First.RmbNo & "&RmbLine=" & theLine.First.RmbLineNo
                     ' Check to see if we have any images
-                    If receiptMode = 2 Then
+                    If receiptMode = RmbReceiptType.Electronic Then
                         pnlElecReceipts.Attributes("style") = ""
                     Else
                         pnlElecReceipts.Attributes("style") = "display: none;"
@@ -2376,6 +2382,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     Dim t As Type = GridView1.GetType()
                     jscript.Append(" showNewLinePopup();")
+                    jscript.Append(" check_if_receipt_is_required();")
+
                     ScriptManager.RegisterStartupScript(GridView1, t, "popupedit", jscript.ToString, True)
                 End If
             ElseIf e.CommandName = "mySplit" Then
@@ -3282,7 +3290,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim VAT As Boolean = False
                     Dim Receipt As Boolean = True
                     Dim Province As String = Nothing
-                    Dim receiptMode As Integer = If(Settings("NoReceipt") > 0, -1, 1)
+                    Dim receiptMode As Integer = RmbReceiptType.UNSELECTED
+                    Dim receiptsAttached As Boolean = False
                     Dim currency As String = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)
 
                     If Not blankValues Then
@@ -3300,6 +3309,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                 Amount = CDbl(ucTypeOld.GetProperty("Amount").GetValue(theControl, Nothing))
                                 VAT = CStr(ucTypeOld.GetProperty("VAT").GetValue(theControl, Nothing))
                                 Receipt = CStr(ucTypeOld.GetProperty("Receipt").GetValue(theControl, Nothing))
+                                receiptsAttached = CBool(ucTypeOld.GetProperty("ReceiptsAttached").GetValue(theControl, Nothing))
                                 Province = CStr(ucTypeOld.GetProperty("Spare1").GetValue(theControl, Nothing))
                                 taxable = If(Province.Equals("--"), 0, 1) 'Default is taxable, unless outside canada
                                 currency = hfOrigCurrency.Value
@@ -3329,6 +3339,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ucType.GetProperty("theDate").SetValue(theControl, theDate, Nothing)
                     ucType.GetProperty("VAT").SetValue(theControl, VAT, Nothing)
                     ucType.GetProperty("Receipt").SetValue(theControl, Receipt, Nothing)
+                    ucType.GetProperty("ReceiptsAttached").SetValue(theControl, receiptsAttached, Nothing)
                     ucType.GetProperty("Spare1").SetValue(theControl, Province, Nothing)
                     ucType.GetProperty("Spare2").SetValue(theControl, "", Nothing)
                     ucType.GetProperty("Spare3").SetValue(theControl, "", Nothing)
@@ -3337,13 +3348,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     If (ucType.GetProperty("Mileage") IsNot Nothing) Then
                         ucType.GetProperty("Mileage").SetValue(theControl, 0, Nothing)
                     End If
-                    Dim jscript As String = "currencyChange('" & currency & "');"
-                    jscript += "$('.ddlProvince').change(function() {$('.ddlTaxable').prop('selectedIndex', ($('.ddlProvince').val()!='--'));});"
+                    ucType.GetProperty("Currency").SetValue(theControl, currency, Nothing)
+                    Dim jscript As String = "$('.ddlProvince').change(function() {$('.ddlTaxable').prop('selectedIndex', ($('.ddlProvince').val()!='--'));});"
                     ScriptManager.RegisterStartupScript(Page, Me.GetType(), "setCur", jscript, True)
                     ' Attempt to set the receipttype
                     Try
                         ucType.GetProperty("ReceiptType").SetValue(theControl, receiptMode, Nothing)
-                        If (receiptMode = 2) Then ' We have electronic receipts
+                        If (receiptMode = RmbReceiptType.Electronic) Then ' We have electronic receipts
                             pnlElecReceipts.Attributes("style") = ""
                         Else ' Make sure it's hidden
                             pnlElecReceipts.Attributes("style") = "display: none"

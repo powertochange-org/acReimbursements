@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using StaffRmb;
 
 public partial class ControlBase : StaffRmb.StaffRmbControl {
     new protected void Page_Init(object sender, EventArgs e)
@@ -16,8 +17,9 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
     new public void Initialize(Hashtable settings)
     {
         base.Initialize(settings);
-        ddlVATReceipt.Items[3].Enabled = false; //require a receipt
-        ddlVATReceipt.SelectedValue = "2";
+        ListItem noReceiptItem = ddlReceipt.Items.FindByValue(RmbReceiptType.No_Receipt.ToString());
+        if (noReceiptItem != null) noReceiptItem.Enabled = false; //require a receipt
+        ddlReceipt.SelectedValue = RmbReceiptType.Electronic.ToString();
         ScriptManager.RegisterClientScriptBlock(this, typeof(WebControl), "open_receipts", "$('.electronic_receipts_panel').show();", true);
     }
 
@@ -25,15 +27,6 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
     {
         get { return (cbExtra.Checked ? "true" : "false"); }
         set { cbExtra.Checked = value.Equals("true"); }
-    }
-    new public bool VAT
-    {
-        get { return ddlVATReceipt.SelectedValue == "0"; }
-        set
-        {
-            if (value == true) ddlVATReceipt.SelectedValue = "0";
-            else ddlVATReceipt.SelectedValue = "1";
-        }
     }
   
 

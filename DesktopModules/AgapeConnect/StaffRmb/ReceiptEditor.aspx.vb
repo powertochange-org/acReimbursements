@@ -237,7 +237,6 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
             d.AP_Staff_RmbLine_Files.InsertOnSubmit(insert)
         End If
         d.SubmitChanges()
-
     End Sub
 
     Protected Async Sub btnUploadReceipt_Click(sender As Object, e As System.EventArgs) Handles btnUploadReceipt.Click

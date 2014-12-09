@@ -58,9 +58,9 @@
         </asp:DropDownList></td>
 </tr>
 <tr id="ReceiptLine" runat="server">
-    <td><b><dnn:label id="ttlReceipt"  runat="server" controlname="ddlVATReceipt" /></b></td>
+    <td><b><dnn:label id="ttlReceipt"  runat="server" controlname="ddlReceipt" /></b></td>
     <td>
-        <asp:DropDownList ID="ddlVATReceipt" runat="server"  CssClass="ddlReceipt">
+        <asp:DropDownList ID="ddlReceipt" runat="server"  CssClass="ddlReceipt">
             <asp:ListItem Value="0" ResourceKey="VAT">VAT</asp:ListItem>
             <asp:ListItem Value="1" ResourceKey="Standard">Standard</asp:ListItem>
             <asp:ListItem  Value="2" ResourceKey="Electronic">Electronic Receipt</asp:ListItem>

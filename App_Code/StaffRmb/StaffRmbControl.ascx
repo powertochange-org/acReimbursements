@@ -1,7 +1,7 @@
 ﻿<%@ Control Language="C#" ClassName="StaffRmb.StaffRmbControl" Inherits="DotNetNuke.Entities.Modules.PortalModuleBase"%>
 
 <asp:HiddenField ID="hfNoReceiptLimit" runat="server" Value="0" />
-<asp:HiddenField ID="hfCADValue" runat="server" Value="" />
+<asp:HiddenField id="hfElecReceiptAttached" runat="server" value="false" />
     
 <div class="Agape_SubTitle"> 
     <asp:Label id="lblExplanation" runat="server" Font-Italic="true" ForeColor="Gray" CssClass="explanation" resourcekey="Explanation"></asp:Label>
@@ -72,7 +72,7 @@
         <td>
             <table style="font-size:9pt">
                 <tr>
-                    <td><asp:TextBox ID="tbAmount" runat="server" Width="90px" class="required numeric rmbAmount" onFocus="select();"></asp:TextBox></td>
+                    <td><asp:TextBox ID="tbAmount" runat="server" Width="90px" class="required numeric rmbAmount" onFocus="select();" onKeyUp="update_CAD();" onBlur="format_currency(this);"></asp:TextBox></td>
                     <td colspan="2">
                         <asp:UpdatePanel ID="currencyUpdatePanel" runat="server">
                             <ContentTemplate>
@@ -233,11 +233,11 @@
                                             <th colspan="2"><asp:Label runat="server" ResourceKey="lblExchangeHeader" /></th></tr><tr>
                                             <td style="text-align:center">
                                                 <b><label for="exchange_rate"><%=DotNetNuke.Services.Localization.Localization.GetString("lblExchangeRate.Text", LocalResourceFile)%></label></b><br />
-                                                <input type="text" id="exchange_rate" class="exchangeRate" style="width:80px" />
+                                                <input type="text" id="exchange_rate" class="exchangeRate" style="width:80px" onfocus="select();" onkeyup="update_CAD();" onblur="format_exchange_rate(this);" />
                                             </td>
                                             <td style="text-align:center;margin-left:20px">
                                                 <b><asp:Label runat="server" ResourceKey="lblEquivalentCAD"/></b><br />
-                                                <asp:TextBox ID="CADAmount" runat="server" cssclass="equivalentCAD" style="width:80px;" />
+                                                <asp:TextBox ID="CADAmount" runat="server" cssclass="equivalentCAD" style="width:80px;" onfocus="select();" onKeyUp="calculate_exchange_rate();check_if_receipt_is_required();" onBlur="format_currency(this);"/>
                                             </td>
                                             <tr><td colspan="2" class="footer"><asp:label runat="server" ResourceKey="lblExchangeFooter"></asp:label></td></tr>
                                         </tr></table>
@@ -283,7 +283,7 @@
              </asp:DropDownList></td>
     </tr>
     <tr  id="ReceiptLine" runat="server">
-        <td><b><asp:label id="lblReceipt"  runat="server" controlname="ddlVATReceipt"  ResourceKey="lblReceipt" /></b>
+        <td><b><asp:label id="lblReceipt"  runat="server" controlname="ddlReceipt"  ResourceKey="lblReceipt" /></b>
             <asp:LinkButton id="lbReceipt" TabIndex="-1" runat="server" CausesValidation="False" EnableViewState="False" CssClass="dnnFormHelp"  style="position:relative"/>
             <asp:Panel runat="server" CssClass="dnnTooltip">
                 <div class="dnnFormHelpContent dnnClear">
@@ -293,16 +293,101 @@
             </asp:Panel>
         </td>
         <td colspan="2">
-            <asp:DropDownList ID="ddlVATReceipt" runat="server"  CssClass="ddlReceipt">
-                <asp:ListItem Value="0" ResourceKey="VAT"></asp:ListItem>
-                <asp:ListItem Value="1" ResourceKey="Standard"></asp:ListItem>
-                <asp:ListItem Value="2"  ResourceKey="Electronic"></asp:ListItem>
-                <asp:ListItem Value="-1"></asp:ListItem>
+            <asp:DropDownList ID="ddlReceipt" runat="server"  CssClass="ddlReceipt required">
             </asp:DropDownList>
         </td>
     </tr>
 </table>
  <asp:Label ID="ErrorLbl" runat="server" Font-Size="9pt" ForeColor="Red" />
+
+<script type="text/javascript" >
+
+    function calculate_exchange_rate() {
+        var foreign = $('input.rmbAmount').val();
+        var CAD = $('input.equivalentCAD').val();
+        var xRate = 1;
+        if (CAD.length > 0 && parseFloat(CAD) != 0) {
+            xRate = foreign / CAD;
+        };
+        xRate = Number(xRate).toFixed(4);
+        set_exchange_rate(xRate);
+    }
+
+    function set_exchange_rate(xRate) {
+        if (xRate == null || xRate == "") {
+            $(".exchangeRate").val("1.000");
+            update_exchangeRate(1);
+        } else {
+            $(".exchangeRate").val(xRate);
+            update_exchangeRate(xRate);
+        }
+    }
+
+    function currencyChange(selected_currency) {
+        console.log("currencyChange(" + selected_currency + ");");
+        var local_currency = $("input[name$='hfAccountingCurrency']").val();
+        $(".ddlCur").val(selected_currency);
+        $("[name$='hfOrigCurrency']").val(selected_currency);
+        if (selected_currency != local_currency) {
+            //foreign currency
+            if ($("input[name$='hfCADValue']").val() != "0.00") {
+                $(".equivalentCAD").val($("input[name$='hfCADValue']").val())
+            } else {
+                $(".equivalentCAD").val($(".rmbAmount").val())
+            }
+            calculate_exchange_rate();
+            $(".curDetails").show();
+            updateCurOpen("true");
+        } else {
+            set_exchange_rate(1);
+            update_OrigCurrencyValue($(".rmbAmount").val());
+            $(".curDetails").hide();
+            updateCurOpen("false");
+        }
+    };
+
+    function update_CAD() {
+        var foreign = $('input.rmbAmount').val();
+        var xRate = $('input.exchangeRate').val();
+        if (xRate.length == 0 || xRate <= 0) {
+            xRate = 1
+        }
+        set_exchange_rate(xRate);
+        $('input.equivalentCAD').val((foreign / xRate).toFixed(2));
+        update_OrigCurrencyValue(foreign);
+        check_if_receipt_is_required();
+    }
+
+    function check_if_receipt_is_required() {
+        var limit =  $("#<%= hfNoReceiptLimit.ClientID%>").attr('value');
+        var amount = $("input.equivalentCAD").val();
+        try {
+            if (parseFloat(amount) > parseFloat(limit)) {
+                if ($('.ddlReceipt').val() == '<%=RmbReceiptType.No_Receipt %>') {
+                    $('.ddlReceipt').val(<%=RmbReceiptType.Standard %>);
+                };
+                $('.ddlReceipt option[value="<%=RmbReceiptType.No_Receipt%>"]').prop('disabled', true);
+            } else {
+                $('.ddlReceipt option[value="<%=RmbReceiptType.No_Receipt%>"]').prop('disabled', false);
+            };
+        } catch (err) { }
+    };
+
+    function format_currency(item) {
+        var value = Number($(this).val());
+        if (value != null) {
+            $(this).val(value.toFixed(2));
+        }
+    }
+
+    function format_exchange_rate(item) {
+        var value = Number($(this).val());
+        if (value != null) {
+            $(this).val(value.toFixed(4));
+        }
+    }
+
+</script>
 
 <script runat="server">
 
@@ -346,7 +431,6 @@
         accounting_currency = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId);
         if (StaffBrokerFunctions.GetSetting("CurConverter", PortalId) == "True")
         {
-            ddlCurrencies.Attributes.Add("onchange", "currencyChange(this.value);");
             if (Page.IsPostBack)
             {
                 display_currency_details();
@@ -362,20 +446,35 @@
     {
         double LIMIT = double.Parse(settings["NoReceipt"].ToString());
         hfNoReceiptLimit.Value = LIMIT.ToString();
-        ddlVATReceipt.Items[0].Enabled = settings["VatAttrib"].ToString() == "True";
-        ddlVATReceipt.Items[2].Enabled = settings["ElectronicReceipts"].ToString() == "True" || ddlVATReceipt.SelectedValue == "2";
-        ddlVATReceipt.Items[3].Enabled = (LIMIT > 0);
-        if (LIMIT > 0)
+        
+        //Add items to receipt dropdown
+        string text = DotNetNuke.Services.Localization.Localization.GetString(RmbReceiptType.Name(RmbReceiptType.Standard) + ".Text", LocalResourceFile);
+        ListItem StandardItem = new ListItem(text, RmbReceiptType.Standard.ToString());
+        text = DotNetNuke.Services.Localization.Localization.GetString(RmbReceiptType.Name(RmbReceiptType.No_Receipt) + ".Text", LocalResourceFile);
+        ListItem NoReceiptItem = new ListItem(text, RmbReceiptType.No_Receipt.ToString(), true);
+        text = DotNetNuke.Services.Localization.Localization.GetString(RmbReceiptType.Name(RmbReceiptType.Electronic) + ".Text", LocalResourceFile);
+        ListItem ElectronicItem = new ListItem(text,RmbReceiptType.Electronic.ToString(), settings["ElectronicReceipts"].ToString().Equals("True"));
+        text = DotNetNuke.Services.Localization.Localization.GetString(RmbReceiptType.Name(RmbReceiptType.VAT) + ".Text", LocalResourceFile);
+        ListItem VATItem = new ListItem(text, RmbReceiptType.VAT.ToString(), settings["VatAttrib"].ToString().Equals("True"));
+
+        ddlReceipt.Items.Clear();
+        ddlReceipt.Items.Add(new ListItem("", "-1", true));
+        if (NoReceiptItem.Enabled)
         {
-            ReceiptLine.Visible = true;
-            ddlVATReceipt.Items[3].Text = DotNetNuke.Services.Localization.Localization.GetString("NoReceipt", LocalResourceFile).Replace("[LIMIT]", LIMIT.ToString());
+            NoReceiptItem.Text = DotNetNuke.Services.Localization.Localization.GetString("NoReceipt", LocalResourceFile).Replace("[LIMIT]", LIMIT.ToString());
+            ddlReceipt.Items.Add(NoReceiptItem);
         }
-        if (!(ddlVATReceipt.Items[0].Enabled || ddlVATReceipt.Items[2].Enabled || ddlVATReceipt.Items[3].Enabled))
+        ddlReceipt.Items.Add(StandardItem);
+        if (ElectronicItem.Enabled) ddlReceipt.Items.Add(ElectronicItem);
+        if (VATItem.Enabled) ddlReceipt.Items.Add(VATItem);
+        ReceiptLine.Visible = true;
+        if (!(NoReceiptItem.Enabled || ElectronicItem.Enabled || VATItem.Enabled))
         {
             // If there are no other options, hide the receipts item and assume paper receipts will be sent.
             ReceiptLine.Visible = false;
-            ddlVATReceipt.SelectedValue = "1";
+            ddlReceipt.SelectedValue = StandardItem.Value;
         }
+        
         // Help strings
         hlpSupplier.Text = DotNetNuke.Services.Localization.Localization.GetString("lblSupplier.Help", LocalResourceFile);
         hlpDesc.Text = DotNetNuke.Services.Localization.Localization.GetString("lblDesc.Help", LocalResourceFile);
@@ -420,15 +519,15 @@
             set { tbAmount.Text = value.ToString("n2", new CultureInfo("en-US")); }
         }
         public bool VAT {
-            get { return ddlVATReceipt.SelectedValue == "0"; }
+            get { return ddlReceipt.SelectedValue == RmbReceiptType.VAT.ToString(); }
             set {
-                if (value == true) ddlVATReceipt.SelectedValue = "0";
-                else ddlVATReceipt.SelectedValue = "1";
+                if (value == true) ddlReceipt.SelectedValue = RmbReceiptType.VAT.ToString();
+                else ddlReceipt.SelectedValue = RmbReceiptType.Standard.ToString();
             }
         }
         public int ReceiptType {
-            get { return int.Parse(ddlVATReceipt.SelectedValue); }
-            set { ddlVATReceipt.SelectedValue = value.ToString(); }
+            get { return int.Parse(ddlReceipt.SelectedValue); }
+            set { ddlReceipt.SelectedValue = value.ToString(); }
         }
         public bool Taxable {
             get { return ddlProvince.SelectedValue == "--"; }
@@ -459,13 +558,26 @@
             set { ErrorLbl.Text = value; }
         }
         public bool Receipt {
-            get { return int.Parse(ddlVATReceipt.SelectedValue) > 0;  }
-            set { if (!value) ddlVATReceipt.SelectedValue = "1"; }
+            get { return ddlReceipt.SelectedValue == RmbReceiptType.Standard.ToString() || ddlReceipt.SelectedValue==RmbReceiptType.Electronic.ToString() || ddlReceipt.SelectedValue==RmbReceiptType.VAT.ToString();  }
+            set { if (!value) ddlReceipt.SelectedValue = RmbReceiptType.Standard.ToString(); }
+        }
+        public bool ReceiptsAttached
+        {
+            get { return hfElecReceiptAttached.Value.ToLower().Equals("true"); }
+            set { hfElecReceiptAttached.Value = value.ToString(); }
         }
         public double CADValue
         {
-            get { return double.Parse(hfCADValue.Value); }
-            set { hfCADValue.Value = value.ToString(); }
+            get { return double.Parse(CADAmount.Text); }
+            set { CADAmount.Text = value.ToString(); }
+        }
+        public string Currency
+        {
+            get { return ddlCurrencies.SelectedValue; }
+            set {
+                ddlCurrencies.SelectedValue = value;
+                ScriptManager.RegisterClientScriptBlock(this, this.GetType(), "update_currency", "currencyChange('"+value+"');", true);
+            }
         }
     #endregion
 
@@ -474,8 +586,7 @@
     {
         string foreign_currency = ddlCurrencies.SelectedValue;
         decimal exchangeRate = StaffBrokerFunctions.GetExchangeRate(PortalId, accounting_currency, foreign_currency);
-        string script = "setXRate(" + exchangeRate + "); calculateEquivalentCAD();";
-        ScriptManager.RegisterStartupScript(Page, this.GetType(), "xrate", script, true);
+        Currency = foreign_currency;
     }
 
     private void display_currency_details()
@@ -562,17 +673,33 @@
             return true;
         }
         public bool validate_receipt()
+            // Ensure if no receipt is selected, that the value is below the no receipt limit
+            // and ensure that if electronic receipt has been selected, that something has been attached
         {
+            ddlReceipt.CssClass = ddlReceipt.CssClass.Replace("missing", "");
+            if (ddlReceipt.SelectedValue.Equals(RmbReceiptType.UNSELECTED.ToString()))
+            {
+                ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.RequiredField", LocalResourceFile).Replace("[LIMIT]", hfNoReceiptLimit.Value);
+                ddlReceipt.CssClass = ddlReceipt.CssClass + " missing";
+                return false;
+            }
             double limit = 0;
             try
             {
                 limit = Double.Parse(hfNoReceiptLimit.Value);
             }
             catch { }
-            if (int.Parse(ddlVATReceipt.SelectedValue) == -1 && Double.Parse(tbAmount.Text) > limit)
+            if ((ddlReceipt.SelectedValue.Equals(RmbReceiptType.No_Receipt.ToString())) && (Double.Parse(tbAmount.Text) > limit))
             {
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.NoReceipt", LocalResourceFile).Replace("[LIMIT]", hfNoReceiptLimit.Value);
                 return false;
+            }
+            if (ddlReceipt.SelectedValue.Equals(RmbReceiptType.Electronic.ToString())) {
+                if (! hfElecReceiptAttached.Value.ToLower().Equals("true"))
+                {
+                    ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.NoElecReceipt", LocalResourceFile);
+                    return false;
+                }
             }
             return true;
         }

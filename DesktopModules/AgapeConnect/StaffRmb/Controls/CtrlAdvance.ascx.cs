@@ -37,7 +37,7 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
     }
     public int ReceiptType
     {
-        get { return -1; }
+        get { return StaffRmb.RmbReceiptType.No_Receipt; }
         set {}
     }
     public bool Taxable
@@ -117,7 +117,7 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
         lbProvince.Visible = false;
         ddlProvince.Visible = false;
         lblReceipt.Visible = false;
-        ddlVATReceipt.Visible = false;
+        ddlReceipt.Visible = false;
         lbReceipt.Visible = false;
     }
 
