@@ -3320,8 +3320,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         End Try
                     End If
                     ' Save the standard values
+                    Dim owner As Integer
+                    Try
+                        owner = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.UserId).First()
+                    Catch
+                        owner = UserId
+                    End Try
+
                     If (Province Is Nothing) Then
-                        Province = StaffRmbFunctions.GetDefaultProvince(UserId)
+                        Province = StaffRmbFunctions.GetDefaultProvince(owner)
                         taxable = If(Province.Equals("--"), 0, 1) 'Default is taxable, unless outside canada
                     End If
                     phLineDetail.Controls.Clear()
