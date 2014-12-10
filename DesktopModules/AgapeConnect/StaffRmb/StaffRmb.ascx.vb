@@ -798,6 +798,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 End If
             Else
                 Dim user = UserController.GetUserById(PortalId, UserId)
+                Dim ownerName As String
+                Try
+                    Dim ownerID = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.UserId).First()
+                    ownerName = UserController.GetUserById(PortalId, ownerID).DisplayName
+                Catch ex As Exception
+                    ownerName = ""
+                End Try
                 Dim initials = Left(user.FirstName, 1) + Left(user.LastName, 1)
                 ddlCompany.SelectedIndex = -1
                 dtPostingDate.Text = Today.ToString("MM/dd/yyyy")
@@ -805,7 +812,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 If (batchIds.Count() > 0) Then
                     tbBatchId.Text = batchIds.First()
                 End If
-                tbPostingReference.Text = ""
+
+                tbPostingReference.Text = "Reimb-" & ownerName
                 tbInvoiceNumber.Text = "REIMB" & lblRmbNo.Text
                 tbVendorId.Text = ""
                 tbVendorId.Enabled = ddlCompany.SelectedIndex > 0
