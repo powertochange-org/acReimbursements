@@ -437,7 +437,7 @@
             }
         }
         public bool VAT {
-            get { return ddlReceipt.SelectedValue == RmbReceiptType.VAT.ToString(); }
+            get { return ddlReceipt.SelectedValue.Equals(RmbReceiptType.VAT.ToString()); }
             set {
                 if (value == true) ddlReceipt.SelectedValue = RmbReceiptType.VAT.ToString();
                 else ddlReceipt.SelectedValue = RmbReceiptType.Standard.ToString();

@@ -17,24 +17,14 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
     new public void Initialize(Hashtable settings)
     {
         base.Initialize(settings);
-        ddlReceipt.Items[3].Enabled = false; //require a receipt
-        ddlReceipt.SelectedValue = RmbReceiptType.Electronic.ToString();
-        ScriptManager.RegisterClientScriptBlock(this, typeof(WebControl), "open_receipts", "$('.electronic_receipts_panel').show();", true);
+        ListItem noReceiptItem = ddlReceipt.Items.FindByValue(RmbReceiptType.No_Receipt.ToString());
+        if (noReceiptItem != null) noReceiptItem.Enabled = false; //require a receipt
     }
 
     new public string Spare2
     {
         get { return (cbExtra.Checked ? "true" : "false"); }
         set { cbExtra.Checked = value.Equals("true"); }
-    }
-    new public bool VAT
-    {
-        get { return ddlReceipt.SelectedValue.Equals(RmbReceiptType.VAT.ToString()); }
-        set
-        {
-            if (value == true) ddlReceipt.SelectedValue = RmbReceiptType.VAT.ToString();
-            else ddlReceipt.SelectedValue = RmbReceiptType.Standard.ToString() ;
-        }
     }
   
 

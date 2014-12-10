@@ -19,8 +19,6 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
         base.Initialize(settings);
         ListItem noReceiptItem = ddlReceipt.Items.FindByValue(RmbReceiptType.No_Receipt.ToString());
         if (noReceiptItem != null) noReceiptItem.Enabled = false; //require a receipt
-        ddlReceipt.SelectedValue = RmbReceiptType.Electronic.ToString();
-        ScriptManager.RegisterClientScriptBlock(this, typeof(WebControl), "open_receipts", "$('.electronic_receipts_panel').show();", true);
     }
 
     new public string Spare2
