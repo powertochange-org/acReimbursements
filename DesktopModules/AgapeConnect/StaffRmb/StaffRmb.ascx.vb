@@ -1148,7 +1148,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If btnSaveLine.CommandName = "Save" Then
                 Dim theUserId = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.UserId).First
                 theFiles = (From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo Is Nothing And lf.RMBNo = hfRmbNo.Value)
-                ucType.GetProperty("ReceiptsAttached").SetValue(theControl, theFiles.Count() > 0, Nothing)
+                Dim propReceipts As Reflection.PropertyInfo = ucType.GetProperty("ReceiptsAttached")
+                If (propReceipts IsNot Nothing) Then
+                    propReceipts.SetValue(theControl, theFiles.Count() > 0, Nothing)
+                End If
                 If ucType.GetMethod("ValidateForm").Invoke(theControl, New Object() {theUserId}) = True Then
 
                     Dim q = From c In d.AP_Staff_RmbLines Where c.RmbNo = hfRmbNo.Value And c.Receipt Select c.ReceiptNo
@@ -1292,7 +1295,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 End If
             ElseIf btnSaveLine.CommandName = "Edit" Then
                 theFiles = (From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo = CInt(btnSaveLine.CommandArgument) And lf.RMBNo = hfRmbNo.Value)
-                ucType.GetProperty("ReceiptsAttached").SetValue(theControl, theFiles.Count() > 0, Nothing)
+                Dim propReceipts As Reflection.PropertyInfo = ucType.GetProperty("ReceiptsAttached")
+                If (propReceipts IsNot Nothing) Then
+                    propReceipts.SetValue(theControl, theFiles.Count() > 0, Nothing)
+                End If
                 If ucType.GetMethod("ValidateForm").Invoke(theControl, New Object() {UserId}) = True Then
 
                     Dim line = From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(btnSaveLine.CommandArgument)
@@ -2301,7 +2307,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
                     If (Not String.IsNullOrEmpty(theLine.First.OrigCurrency)) Then
                         'hfOrigCurrency.Value = theLine.First.OrigCurrency
-                        ucType.GetProperty("Currency").SetValue(theControl, theLine.First.OrigCurrency, Nothing)
+                        jscript.Append(" currencyChange('" & theLine.First.OrigCurrency & "');")
                     Else
                         'hfOrigCurrency.Value = ac
                         jscript.Append(" $('#" & hfOrigCurrency.ClientID & "').val('" & ac & "');")
@@ -2382,8 +2388,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     Dim t As Type = GridView1.GetType()
                     jscript.Append(" showNewLinePopup();")
-                    jscript.Append(" check_if_receipt_is_required();")
-
                     ScriptManager.RegisterStartupScript(GridView1, t, "popupedit", jscript.ToString, True)
                 End If
             ElseIf e.CommandName = "mySplit" Then
@@ -3309,10 +3313,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                 Amount = CDbl(ucTypeOld.GetProperty("Amount").GetValue(theControl, Nothing))
                                 VAT = CStr(ucTypeOld.GetProperty("VAT").GetValue(theControl, Nothing))
                                 Receipt = CStr(ucTypeOld.GetProperty("Receipt").GetValue(theControl, Nothing))
-                                receiptsAttached = CBool(ucTypeOld.GetProperty("ReceiptsAttached").GetValue(theControl, Nothing))
                                 Province = CStr(ucTypeOld.GetProperty("Spare1").GetValue(theControl, Nothing))
                                 taxable = If(Province.Equals("--"), 0, 1) 'Default is taxable, unless outside canada
                                 currency = hfOrigCurrency.Value
+                                If (ucTypeOld.GetProperty("ReceiptsAttached") IsNot Nothing) Then
+                                    receiptsAttached = CBool(ucTypeOld.GetProperty("ReceiptsAttached").GetValue(theControl, Nothing))
+                                End If
                             End If
                         Catch ex As Exception
                         End Try
@@ -3339,7 +3345,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ucType.GetProperty("theDate").SetValue(theControl, theDate, Nothing)
                     ucType.GetProperty("VAT").SetValue(theControl, VAT, Nothing)
                     ucType.GetProperty("Receipt").SetValue(theControl, Receipt, Nothing)
-                    ucType.GetProperty("ReceiptsAttached").SetValue(theControl, receiptsAttached, Nothing)
+                    If (ucType.GetProperty("ReceiptsAttached") IsNot Nothing) Then
+                        ucType.GetProperty("ReceiptsAttached").SetValue(theControl, receiptsAttached, Nothing)
+                    End If
                     ucType.GetProperty("Spare1").SetValue(theControl, Province, Nothing)
                     ucType.GetProperty("Spare2").SetValue(theControl, "", Nothing)
                     ucType.GetProperty("Spare3").SetValue(theControl, "", Nothing)
@@ -3348,8 +3356,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     If (ucType.GetProperty("Mileage") IsNot Nothing) Then
                         ucType.GetProperty("Mileage").SetValue(theControl, 0, Nothing)
                     End If
-                    ucType.GetProperty("Currency").SetValue(theControl, currency, Nothing)
-                    Dim jscript As String = "$('.ddlProvince').change(function() {$('.ddlTaxable').prop('selectedIndex', ($('.ddlProvince').val()!='--'));});"
+                    Dim jscript As String = "currencyChange('" & currency & "');"
+                    jscript += "$('.ddlProvince').change(function() {$('.ddlTaxable').prop('selectedIndex', ($('.ddlProvince').val()!='--'));});"
                     ScriptManager.RegisterStartupScript(Page, Me.GetType(), "setCur", jscript, True)
                     ' Attempt to set the receipttype
                     Try

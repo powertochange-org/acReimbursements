@@ -208,7 +208,43 @@
                 }
             });
 
+           
+            // This is within the currency converter; anytime the exchange rate gets changed
+            $('.equivalentCAD').keyup(function() { 
+                calculateXRate(); 
+                checkRecReq;
+            });
 
+            $('.equivalentCAD').blur(function() {
+                var value = Number($('.equivalentCAD').val());
+                if (value != null) {
+                    $('.equivalentCAD').val(value.toFixed(2));
+                }
+            });
+
+            $('.rmbAmount,.exchangeRate').keyup(function(event){
+                var xRate = $(".exchangeRate").val();
+                if (xRate == null || xRate == "") {
+                    var amount = $('.rmbAmount').val();
+                    $("input[name$='hfCADValue']").val(amount);
+                } else {
+                    console.log("setting exchange rate: "+xRate);
+                    setXRate(xRate);
+                    calculateEquivalentCAD();
+                } 
+            });
+
+            $('.exchangeRate').blur(function() {
+                var value = Number($('.exchangeRate').val());
+                if (value != null) {
+                    $('.exchangeRate').val(value.toFixed(4));
+                }
+            });
+
+            $('.rmbAmount, .exchangeRate, .equivalentCAD').focus(function() {
+                $(this).select();
+            });
+            
             $("#accordion h3").click(function (event) {
                 if (stop) {
                     event.stopImmediatePropagation();
@@ -576,13 +612,13 @@
          var exchangerate=1;
          if (currency == ac) {
              console.log("Canadian Currency, exchange rate set to 1.0000");
-             set_exchange_rate(1.0000);//TODO
+             setXRate(1.0000);
          } else {
              $('.ddlCur').val(currency);
              var CADAmount = $(".equivalentCAD").val();
              if (CADAmount>0) {
                  exchangerate = (amount/CADAmount).toFixed(4);
-                 set_exchange_rate(exchangerate);//TODO
+                 setXRate(exchangerate);
                  //calculateRevXRate();
                  console.log("checkCur(): "+amount+" "+currency+ " = " + CADAmount + " CAD @ " + exchangerate);
              } else {
@@ -594,7 +630,61 @@
 }
 
 
+    // This function calculates the new exchange rate based on foreign amount and
+    // canadian amount, and updates the amount field
+    function calculateXRate() {
+        var foreign = $('.rmbAmount').val();
+        var cad = $('.equivalentCAD').val();
+        var xRate = 1;
+        if (cad.length>0 && parseFloat(cad) != 0) {
+            xRate = foreign/cad;
+        };
+        xRate = Number(xRate).toFixed(4);
+        $('.exchangeRate').val(xRate);
+        console.log("calculateXRate(): "+xRate);
+        setXRate(xRate);
+        // Need to update some values for the backend:
+        $("#<%= hfOrigCurrencyValue.ClientID%>").val(foreign);
+        $("input[name$='hfCADValue']").val(cad);
+    };
 
+    function calculateEquivalentCAD() {
+        var foreign = $('.rmbAmount').val();
+        var xRate = $('#<%=hfExchangeRate.ClientID%>').val();
+        if (xRate.length==0 || xRate<=0) {
+            $(".equivalentCAD").val("0.00");
+        } else {
+            $('.equivalentCAD').val((foreign/xRate).toFixed(2));
+        }
+        $("#<%= hfOrigCurrencyValue.ClientID%>").val(foreign);
+        $("input[name$='hfCADValue']").val($(".equivalentCAD").val());
+        console.log("calculateEquivalentCAD(): " + foreign + " " + $("input[name$='hfOrigCurrency']").val() + " equals: " + $(".equivalentCAD").val() + " CAD");
+        checkRecReq();
+    };
+
+    function currencyChange(selected_currency) {
+        console.log("currencyChange(" + selected_currency + ");");
+        var local_currency = $("input[name$='hfAccountingCurrency']").val();
+        $(".ddlCur").val(selected_currency);
+        $("[name$='hfOrigCurrency']").val(selected_currency);
+        if (selected_currency != local_currency) {
+            //foreign currency
+            if ($("input[name$='hfCADValue']").val() != "0.00") {
+                $(".equivalentCAD").val($("input[name$='hfCADValue']").val())
+            } else {
+                $(".equivalentCAD").val($(".rmbAmount").val())
+            }
+            calculateXRate();
+            $(".curDetails").show();
+            $(".ddlProvince").val("--");
+            $('#<%= hfCurOpen.ClientID %>').val("true");
+        } else {
+            $("input[name$='hfExchangeRate']").val(1);
+            $("input[name$='hfOrigCurrencyValue']").val($(".rmbAmount").val());
+            $(".curDetails").hide();
+            $('#<%= hfCurOpen.ClientID %>').val("false");
+        }
+    };
 
     function calculateRevXRate() {
         
@@ -627,6 +717,39 @@
     function update_ExchangeRate(value) {
         $("#<%= hfExchangeRate.ClientId %>").val(Number(value));
     }
+
+    function setXRate(xRate){
+        $("#<%= hfExchangeRate.ClientId %>").val(Number(xRate));
+        $(".exchangeRate").val(xRate)
+    };
+
+    function checkRecReq(){
+        try{
+            
+            var limit =  $("#<%= hfNoReceiptLimit.ClientID%>").attr('value');
+            var Am=$("input[name$='hfCADValue']").val() ;
+            //console.log(limit, Am);
+            if( $('.ddlReceipt').val()==-1 && parseFloat(Am)>parseFloat(limit))
+                $('.ddlReceipt').val(1);
+
+
+            if(parseFloat(Am)>parseFloat(limit)){
+                $('.ddlReceipt option[value="-1"]').attr("disabled", "disabled");
+                //$('.ddlReceipt').attr("disabled", "disabled");
+            }
+            else 
+            {
+                $('.ddlReceipt option[value="-1"]').removeAttr("disabled");
+            }
+
+            // else   $('.ddlReceipt').removeAttr("disabled");
+            
+
+        }
+        catch(err){
+
+        }
+    };
 
 
     function calculateTotal() {
