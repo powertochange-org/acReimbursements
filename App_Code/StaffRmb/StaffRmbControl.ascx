@@ -80,7 +80,7 @@
                                 <div id="dCurrency" class="divCur" >
                                     <table style="font-size:9pt"><tr>
                                     <td style="margin-left:30px">
-                                        <asp:DropDownList ID="ddlCurrencies" runat="server" CssClass="ddlCur" AutoPostBack="true" OnSelectedIndexChanged="Currency_Change">
+                                        <asp:DropDownList ID="ddlCurrencies" runat="server" CssClass="ddlCur" AutoPostBack="true" OnSelectedIndexChanged="Currency_Change" OnChange="currencyChange(this.value);">
                                             <asp:ListItem Value="ALL">Albanian Lek</asp:ListItem>
                                             <asp:ListItem Value="DZD">Algerian Dinar</asp:ListItem>
                                             <asp:ListItem Value="ARS">Argentine Peso</asp:ListItem>
@@ -234,11 +234,11 @@
                                             <th colspan="2"><asp:Label runat="server" ResourceKey="lblExchangeHeader" /></th></tr><tr>
                                             <td style="text-align:center">
                                                 <b><label for="tbExchangeRate"><%=DotNetNuke.Services.Localization.Localization.GetString("lblExchangeRate.Text", LocalResourceFile)%></label></b><br />
-                                                <asp:textbox id="tbExchangeRate" runat="server" cssClass="exchangeRate" style="width:80px" onfocus="select();" onkeyup="update_CAD();" onblur="format_exchange_rate(this);" />
+                                                <asp:textbox id="tbExchangeRate" runat="server" cssClass="exchangeRate" style="width:80px" onfocus="select();" Text="1.0000"/>
                                             </td>
                                             <td style="text-align:center;margin-left:20px">
                                                 <b><asp:Label runat="server" ResourceKey="lblEquivalentCAD"/></b><br />
-                                                <asp:TextBox ID="tbCADAmount" runat="server" cssclass="equivalentCAD" style="width:80px;" onfocus="select();" onKeyUp="calculate_exchange_rate();check_if_receipt_is_required();" onBlur="format_currency(this);"/>
+                                                <asp:TextBox ID="tbCADAmount" runat="server" cssclass="equivalentCAD" style="width:80px;" onfocus="select();"/>
                                             </td>
                                             <tr><td colspan="2" class="footer"><asp:label runat="server" ResourceKey="lblExchangeFooter"></asp:label></td></tr>
                                         </tr></table>
@@ -373,6 +373,7 @@
         if (NoReceiptItem.Enabled)
         {
             NoReceiptItem.Text = DotNetNuke.Services.Localization.Localization.GetString("NoReceipt", LocalResourceFile).Replace("[LIMIT]", LIMIT.ToString());
+            NoReceiptItem.Attributes.Add("disabled", (CADValue > LIMIT)?"disabled":"");
             ddlReceipt.Items.Add(NoReceiptItem);
         }
         ddlReceipt.Items.Add(StandardItem);
@@ -427,7 +428,13 @@
                     return 0;
                 }
             }
-            set { tbAmount.Text = value.ToString("n2", new CultureInfo("en-US")); }
+            set { 
+                tbAmount.Text = value.ToString("n2", new CultureInfo("en-US"));
+                double exchange_rate;
+                try { exchange_rate = double.Parse(tbExchangeRate.Text); }
+                catch { exchange_rate = 1; }
+                CADValue = value * exchange_rate;
+            }
         }
         public bool VAT {
             get { return ddlReceipt.SelectedValue == RmbReceiptType.VAT.ToString(); }
@@ -472,10 +479,29 @@
             get { return ddlReceipt.SelectedValue == RmbReceiptType.Standard.ToString() || ddlReceipt.SelectedValue==RmbReceiptType.Electronic.ToString() || ddlReceipt.SelectedValue==RmbReceiptType.VAT.ToString();  }
             set { if (!value) ddlReceipt.SelectedValue = RmbReceiptType.Standard.ToString(); }
         }
+        public bool ReceiptsAttached
+        {
+            get { return hfElecReceiptAttached.Value.ToLower().Equals("true"); }
+            set { hfElecReceiptAttached.Value = value.ToString(); }
+        }
         public double CADValue
         {
-            get { return double.Parse(hfCADValue.Value); }
-            set { hfCADValue.Value = value.ToString(); }
+            get {
+                try
+                {
+                    return double.Parse(hfCADValue.Value);
+                } catch {
+                    return 0;
+                }
+            }
+            set { 
+                hfCADValue.Value = value.ToString(); //this is used by javascript for some reason TODO:get rid of this
+                // disable "No Receipt" option, if above limit
+                ddlReceipt.Items.FindByValue(RmbReceiptType.No_Receipt.ToString()).Attributes.Add("disabled", (value <= double.Parse(hfNoReceiptLimit.Value))?"disabled":"");
+                if (value <= 0) return;
+                double xRate = (Amount / value);
+                tbExchangeRate.Text = string.Format("{0:f4}", xRate);
+            }
         }
     #endregion
 
@@ -524,8 +550,10 @@
         }
         public bool validate_description()
         {
+            tbDesc.CssClass = tbDesc.CssClass.Replace("missing", "");
             if (tbDesc.Text.Length < 5)
             {
+                tbDesc.CssClass += " missing";
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.Description", LocalResourceFile);
                 return false;
             }

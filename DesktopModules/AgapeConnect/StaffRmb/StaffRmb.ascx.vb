@@ -1148,9 +1148,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If btnSaveLine.CommandName = "Save" Then
                 Dim theUserId = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.UserId).First
                 theFiles = (From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo Is Nothing And lf.RMBNo = hfRmbNo.Value)
-                Dim propReceipts As Reflection.PropertyInfo = ucType.GetProperty("ReceiptsAttached")
-                If (propReceipts IsNot Nothing) Then
-                    propReceipts.SetValue(theControl, theFiles.Count() > 0, Nothing)
+                If (ucType.GetProperty("ReceiptsAttached") IsNot Nothing) Then
+                    ucType.GetProperty("ReceiptsAttached").SetValue(theControl, theFiles.Count() > 0, Nothing)
                 End If
                 If ucType.GetMethod("ValidateForm").Invoke(theControl, New Object() {theUserId}) = True Then
 
@@ -1295,9 +1294,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 End If
             ElseIf btnSaveLine.CommandName = "Edit" Then
                 theFiles = (From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo = CInt(btnSaveLine.CommandArgument) And lf.RMBNo = hfRmbNo.Value)
-                Dim propReceipts As Reflection.PropertyInfo = ucType.GetProperty("ReceiptsAttached")
-                If (propReceipts IsNot Nothing) Then
-                    propReceipts.SetValue(theControl, theFiles.Count() > 0, Nothing)
+                If (ucType.GetProperty("ReceiptsAttached") IsNot Nothing) Then
+                    ucType.GetProperty("ReceiptsAttached").SetValue(theControl, theFiles.Count() > 0, Nothing)
                 End If
                 If ucType.GetMethod("ValidateForm").Invoke(theControl, New Object() {UserId}) = True Then
 
@@ -1359,11 +1357,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         Dim receiptType = ucType.GetProperty("ReceiptType")
                         'look for electronic receipt
                         If (Not receiptType Is Nothing AndAlso (CInt(receiptType.GetValue(theControl, Nothing) = RmbReceiptType.Electronic) AndAlso theFiles.Count > 0)) Then
-                            ' Set the ImageReceiptId to the first file
-                            'line.First.ReceiptImageId = line_files.First.FileId
                         Else
-                            ' Unset the receipt
-                            'line.First.ReceiptImageId = Nothing
                             ' Since we aren't supposed to have any receipts with
                             ' this, we should forcefully remove any receipts that
                             ' are already associated with this line
@@ -1485,13 +1479,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Sub
 
         Private Sub ReloadInvalidForm()
-            ' Need to check the current state of the electronic receipts and currency conversions 
+            ' Need to check the current state of electronic receipts and currency conversions 
             ' and set the attribute to match; otherwise, it will get reset to the default state. 
             If (hfOrigCurrency.Value <> StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)) Then
                 Dim jscript = "$('.exchangeRate').val('" & hfExchangeRate.Value + "');"
                 jscript &= "$('.equivalentCAD').val('" & hfOrigCurrencyValue.Value / hfExchangeRate.Value & "');"
                 ScriptManager.RegisterClientScriptBlock(Page, Me.GetType(), "fixCurrency", jscript, True)
             End If
+            theControl.GetType().GetMethod("Initialize").Invoke(theControl, New Object() {Settings})
             If (theControl.GetType().GetProperty("ReceiptType") IsNot Nothing) Then
                 If (CInt(theControl.GetType().GetProperty("ReceiptType").GetValue(theControl, Nothing) = RmbReceiptType.Electronic)) Then
                     ' If the receipt type is set to 2, we keep it visible
@@ -2290,6 +2285,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
                     hfExchangeRate.Value = xRate.ToString(New CultureInfo(""))
 
+                    ucType.GetMethod("Initialize").Invoke(theControl, New Object() {Settings})
+
                     ucType.GetProperty("Supplier").SetValue(theControl, theLine.First.Supplier, Nothing)
                     ucType.GetProperty("Comment").SetValue(theControl, theLine.First.Comment, Nothing)
                     If (theLine.First.OrigCurrency = ac) Then
@@ -2332,135 +2329,134 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         End If
                     End If
 
-                    ' The control must be initialized before the receipt type can be set
-                    ucType.GetMethod("Initialize").Invoke(theControl, New Object() {Settings})
-
                     Dim receiptMode = RmbReceiptType.Standard
                     If theLine.First.VATReceipt Then
                         receiptMode = RmbReceiptType.VAT
                         ' If we have any files matching this line, or our receiptImageId is valid
                     ElseIf (From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo = theLine.First.RmbLineNo And lf.RMBNo = theLine.First.RmbNo).Count > 0 Then
                         receiptMode = RmbReceiptType.Electronic
-                        ucType.GetProperty("ReceiptsAttached").SetValue(theControl, True, Nothing)
-                        ' If we don't have a receipt
-                    ElseIf Not theLine.First.Receipt Then
-                        receiptMode = RmbReceiptType.No_Receipt
-                    End If
-                    Try
-                        ucType.GetProperty("ReceiptType").SetValue(theControl, receiptMode, Nothing)
-                    Catch ex As Exception
-
-                    End Try
-
-                    cbRecoverVat.Checked = False
-                    ddlOverideTax.SelectedIndex = If(theLine.First.Taxable, 1, 0)
-                    tbVatRate.Text = ""
-                    If theLine.First.VATRate > 0 Then
-                        If theLine.First.VATRate > 0 Then
-                            cbRecoverVat.Checked = True
-                            tbVatRate.Text = theLine.First.VATRate
+                        If (ucType.GetProperty("ReceiptsAttached") IsNot Nothing) Then
+                            ucType.GetProperty("ReceiptsAttached").SetValue(theControl, True, Nothing)
                         End If
+                        ' If we don't have a receipt
+                        ElseIf Not theLine.First.Receipt Then
+                            receiptMode = RmbReceiptType.No_Receipt
+                        End If
+                        Try
+                            ucType.GetProperty("ReceiptType").SetValue(theControl, receiptMode, Nothing)
+                        Catch ex As Exception
+
+                        End Try
+
+                        cbRecoverVat.Checked = False
+                        ddlOverideTax.SelectedIndex = If(theLine.First.Taxable, 1, 0)
+                        tbVatRate.Text = ""
+                        If theLine.First.VATRate > 0 Then
+                            If theLine.First.VATRate > 0 Then
+                                cbRecoverVat.Checked = True
+                                tbVatRate.Text = theLine.First.VATRate
+                            End If
+                        End If
+
+                        Try
+                            tbShortComment.Text = GetLineComment(theLine.First.Comment, theLine.First.OrigCurrency, If(theLine.First.OrigCurrencyAmount Is Nothing, 0, theLine.First.OrigCurrencyAmount), theLine.First.ShortComment, False, Nothing, mileageString)
+                        Catch
+                            tbShortComment.Text = ""
+                        End Try
+
+                        'If ddlLineTypes.SelectedValue = 7 Then
+
+                        '    ucType.GetMethod("LoadStaff").Invoke(theControl, New Object() {theLine.First.RmbLineNo, Settings, CanAddPass()})
+                        'End If
+
+                        btnSaveLine.CommandName = "Edit"
+                        btnSaveLine.CommandArgument = CInt(e.CommandArgument)
+                        tbCostcenter.Text = theLine.First.CostCenter
+                        ddlAccountCode.SelectedValue = theLine.First.AccountCode
+
+                        ifReceipt.Attributes("src") = Request.Url.Scheme & "://" & Request.Url.Authority & "/DesktopModules/AgapeConnect/StaffRmb/ReceiptEditor.aspx?RmbNo=" & theLine.First.RmbNo & "&RmbLine=" & theLine.First.RmbLineNo
+                        ' Check to see if we have any images
+                        If receiptMode = RmbReceiptType.Electronic Then
+                            pnlElecReceipts.Attributes("style") = ""
+                        Else
+                            pnlElecReceipts.Attributes("style") = "display: none;"
+                        End If
+
+                        Dim t As Type = GridView1.GetType()
+                        jscript.Append(" showNewLinePopup();")
+                        ScriptManager.RegisterStartupScript(GridView1, t, "popupedit", jscript.ToString, True)
                     End If
+                ElseIf e.CommandName = "mySplit" Then
+                    hfRows.Value = 1
+                    hfSplitLineId.Value = CInt(e.CommandArgument)
+                    lblSplitError.Visible = False
+                    Dim theLine = From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(e.CommandArgument)
 
-                    Try
-                        tbShortComment.Text = GetLineComment(theLine.First.Comment, theLine.First.OrigCurrency, If(theLine.First.OrigCurrencyAmount Is Nothing, 0, theLine.First.OrigCurrencyAmount), theLine.First.ShortComment, False, Nothing, mileageString)
-                    Catch
-                        tbShortComment.Text = ""
-                    End Try
-
-                    'If ddlLineTypes.SelectedValue = 7 Then
-
-                    '    ucType.GetMethod("LoadStaff").Invoke(theControl, New Object() {theLine.First.RmbLineNo, Settings, CanAddPass()})
-                    'End If
-
-                    btnSaveLine.CommandName = "Edit"
-                    btnSaveLine.CommandArgument = CInt(e.CommandArgument)
-                    tbCostcenter.Text = theLine.First.CostCenter
-                    ddlAccountCode.SelectedValue = theLine.First.AccountCode
-
-                    ifReceipt.Attributes("src") = Request.Url.Scheme & "://" & Request.Url.Authority & "/DesktopModules/AgapeConnect/StaffRmb/ReceiptEditor.aspx?RmbNo=" & theLine.First.RmbNo & "&RmbLine=" & theLine.First.RmbLineNo
-                    ' Check to see if we have any images
-                    If receiptMode = RmbReceiptType.Electronic Then
-                        pnlElecReceipts.Attributes("style") = ""
-                    Else
-                        pnlElecReceipts.Attributes("style") = "display: none;"
+                    If theLine.Count > 0 Then
+                        lblOriginalDesc.Text = theLine.First.Comment
+                        lblOriginalAmt.Text = theLine.First.GrossAmount.ToString("0.00")
+                        tbSplitDesc.Text = lblOriginalDesc.Text
                     End If
+                    tbSplitAmt.Attributes.Add("onblur", "calculateTotal();")
+                    tbSplitAmt.Text = ""
+                    tbSplitDesc.Text = ""
 
-                    Dim t As Type = GridView1.GetType()
-                    jscript.Append(" showNewLinePopup();")
-                    ScriptManager.RegisterStartupScript(GridView1, t, "popupedit", jscript.ToString, True)
-                End If
-            ElseIf e.CommandName = "mySplit" Then
-                hfRows.Value = 1
-                hfSplitLineId.Value = CInt(e.CommandArgument)
-                lblSplitError.Visible = False
-                Dim theLine = From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(e.CommandArgument)
-
-                If theLine.Count > 0 Then
-                    lblOriginalDesc.Text = theLine.First.Comment
-                    lblOriginalAmt.Text = theLine.First.GrossAmount.ToString("0.00")
-                    tbSplitDesc.Text = lblOriginalDesc.Text
-                End If
-                tbSplitAmt.Attributes.Add("onblur", "calculateTotal();")
-                tbSplitAmt.Text = ""
-                tbSplitDesc.Text = ""
-
-                Dim t As Type = GridView1.GetType()
-                Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
-                sb.Append("<script language='javascript'>")
-                sb.Append("showPopupSplit();")
-                sb.Append("</script>")
-                ScriptManager.RegisterStartupScript(GridView1, t, "popupSplit", sb.ToString, False)
-
-            ElseIf e.CommandName = "myDefer" Then
-                'Try to find a deferred transactions pending reimbursement
-                Dim theLine = From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(e.CommandArgument)
-                If theLine.Count > 0 Then
-                    theLine.First.Spare5 = theLine.First.RmbNo
-                    Dim q = From c In d.AP_Staff_RmbLines Where c.Spare5 = theLine.First.RmbNo And c.AP_Staff_Rmb.Status = RmbStatus.Draft And c.AP_Staff_Rmb.UserId = theLine.First.AP_Staff_Rmb.UserId And c.AP_Staff_Rmb.PortalId = PortalId Select c.AP_Staff_Rmb
-                    If q.Count = 0 Then
-
-                        Dim insert As New AP_Staff_Rmb
-                        insert.UserRef = "Deferred"
-                        insert.AcctComment = "Contains transactions deferred from previous month"
-                        insert.RID = StaffRmbFunctions.GetNewRID(PortalId)
-                        insert.CostCenter = theLine.First.AP_Staff_Rmb.CostCenter
-
-                        insert.UserComment = ""
-                        insert.UserId = theLine.First.AP_Staff_Rmb.UserId
-                        ' insert.PersonalCC = ddlNewChargeTo.Items(0).Value
-
-                        insert.PortalId = PortalId
-
-                        insert.Status = RmbStatus.Draft
-
-                        insert.Locked = False
-                        insert.SupplierCode = theLine.First.AP_Staff_Rmb.SupplierCode
-
-                        insert.Department = theLine.First.AP_Staff_Rmb.Department
-
-                        d.AP_Staff_Rmbs.InsertOnSubmit(insert)
-                        d.SubmitChanges()
-                        theLine.First.AP_Staff_Rmb = insert
-
-                    Else
-                        theLine.First.AP_Staff_Rmb = q.First
-                    End If
-                    Dim loadRmbTask = LoadRmbAsync(hfRmbNo.Value)
-                    SubmitChanges()
-
-                    Dim theUser = UserController.GetUserById(PortalId, theLine.First.AP_Staff_Rmb.UserId)
                     Dim t As Type = GridView1.GetType()
                     Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
                     sb.Append("<script language='javascript'>")
-                    sb.Append("window.open('mailto:" & theUser.Email & "?subject=Reimbursement " & theLine.First.AP_Staff_Rmb.RID & ": Deferred Transactions');")
+                    sb.Append("showPopupSplit();")
                     sb.Append("</script>")
-                    Await loadRmbTask
+                    ScriptManager.RegisterStartupScript(GridView1, t, "popupSplit", sb.ToString, False)
 
-                    ScriptManager.RegisterStartupScript(GridView1, t, "email", sb.ToString, False)
+                ElseIf e.CommandName = "myDefer" Then
+                    'Try to find a deferred transactions pending reimbursement
+                    Dim theLine = From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(e.CommandArgument)
+                    If theLine.Count > 0 Then
+                        theLine.First.Spare5 = theLine.First.RmbNo
+                        Dim q = From c In d.AP_Staff_RmbLines Where c.Spare5 = theLine.First.RmbNo And c.AP_Staff_Rmb.Status = RmbStatus.Draft And c.AP_Staff_Rmb.UserId = theLine.First.AP_Staff_Rmb.UserId And c.AP_Staff_Rmb.PortalId = PortalId Select c.AP_Staff_Rmb
+                        If q.Count = 0 Then
 
+                            Dim insert As New AP_Staff_Rmb
+                            insert.UserRef = "Deferred"
+                            insert.AcctComment = "Contains transactions deferred from previous month"
+                            insert.RID = StaffRmbFunctions.GetNewRID(PortalId)
+                            insert.CostCenter = theLine.First.AP_Staff_Rmb.CostCenter
+
+                            insert.UserComment = ""
+                            insert.UserId = theLine.First.AP_Staff_Rmb.UserId
+                            ' insert.PersonalCC = ddlNewChargeTo.Items(0).Value
+
+                            insert.PortalId = PortalId
+
+                            insert.Status = RmbStatus.Draft
+
+                            insert.Locked = False
+                            insert.SupplierCode = theLine.First.AP_Staff_Rmb.SupplierCode
+
+                            insert.Department = theLine.First.AP_Staff_Rmb.Department
+
+                            d.AP_Staff_Rmbs.InsertOnSubmit(insert)
+                            d.SubmitChanges()
+                            theLine.First.AP_Staff_Rmb = insert
+
+                        Else
+                            theLine.First.AP_Staff_Rmb = q.First
+                        End If
+                        Dim loadRmbTask = LoadRmbAsync(hfRmbNo.Value)
+                        SubmitChanges()
+
+                        Dim theUser = UserController.GetUserById(PortalId, theLine.First.AP_Staff_Rmb.UserId)
+                        Dim t As Type = GridView1.GetType()
+                        Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
+                        sb.Append("<script language='javascript'>")
+                        sb.Append("window.open('mailto:" & theUser.Email & "?subject=Reimbursement " & theLine.First.AP_Staff_Rmb.RID & ": Deferred Transactions');")
+                        sb.Append("</script>")
+                        Await loadRmbTask
+
+                        ScriptManager.RegisterStartupScript(GridView1, t, "email", sb.ToString, False)
+
+                    End If
                 End If
-            End If
 
         End Sub
 
@@ -3339,6 +3335,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     phLineDetail.Controls.Add(theControl)
 
                     Dim ucType As Type = theControl.GetType()
+                    ucType.GetMethod("Initialize").Invoke(theControl, New Object() {Settings})
+
                     ucType.GetProperty("Supplier").SetValue(theControl, Supplier, Nothing)
                     ucType.GetProperty("Comment").SetValue(theControl, Comment, Nothing)
                     ucType.GetProperty("Amount").SetValue(theControl, Amount, Nothing)
@@ -3372,7 +3370,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         ' Need to ensure the electronic receipts are hidden
                         pnlElecReceipts.Attributes("style") = "display: none;"
                     End Try
-                    ucType.GetMethod("Initialize").Invoke(theControl, New Object() {Settings})
                     ddlAccountCode.SelectedValue = GetAccountCode(lt.First.LineTypeId, tbCostcenter.Text)
                 End If
             Catch ex As Exception

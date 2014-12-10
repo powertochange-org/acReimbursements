@@ -245,6 +245,7 @@
                 $(this).select();
             });
             
+
             $("#accordion h3").click(function (event) {
                 if (stop) {
                     event.stopImmediatePropagation();
@@ -729,22 +730,17 @@
             var limit =  $("#<%= hfNoReceiptLimit.ClientID%>").attr('value');
             var Am=$("input[name$='hfCADValue']").val() ;
             //console.log(limit, Am);
-            if( $('.ddlReceipt').val()==-1 && parseFloat(Am)>parseFloat(limit))
-                $('.ddlReceipt').val(1);
+            if( $('.ddlReceipt').val()==<%= StaffRmb.RmbReceiptType.No_Receipt%> && parseFloat(Am)>parseFloat(limit))
+                $('.ddlReceipt').val(<%= StaffRmb.RmbReceiptType.Standard%>);
 
 
             if(parseFloat(Am)>parseFloat(limit)){
-                $('.ddlReceipt option[value="-1"]').attr("disabled", "disabled");
-                //$('.ddlReceipt').attr("disabled", "disabled");
+                $('.ddlReceipt option[value="<%= StaffRmb.RmbReceiptType.No_Receipt%>"]').attr("disabled", "disabled");
             }
             else 
             {
-                $('.ddlReceipt option[value="-1"]').removeAttr("disabled");
+                $('.ddlReceipt option[value="<%= StaffRmb.RmbReceiptType.No_Receipt%>"]').removeAttr("disabled");
             }
-
-            // else   $('.ddlReceipt').removeAttr("disabled");
-            
-
         }
         catch(err){
 
