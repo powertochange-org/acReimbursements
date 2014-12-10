@@ -294,6 +294,8 @@
                 position:['middle', 120],
                 width: 780,
                 modal: true,
+                draggable: false,
+                dialogClass: 'draggable',
                 title: '<%= Translate("AddEditRmb") %>',
                 close: function () {
                     //  allFields.val("").removeClass("ui-state-error");
