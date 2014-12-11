@@ -208,43 +208,6 @@
                 }
             });
 
-           
-            // This is within the currency converter; anytime the exchange rate gets changed
-            $('.equivalentCAD').keyup(function() { 
-                calculateXRate(); 
-                checkRecReq;
-            });
-
-            $('.equivalentCAD').blur(function() {
-                var value = Number($('.equivalentCAD').val());
-                if (value != null) {
-                    $('.equivalentCAD').val(value.toFixed(2));
-                }
-            });
-
-            $('.rmbAmount,.exchangeRate').keyup(function(event){
-                var xRate = $(".exchangeRate").val();
-                if (xRate == null || xRate == "") {
-                    var amount = $('.rmbAmount').val();
-                    $("input[name$='hfCADValue']").val(amount);
-                } else {
-                    console.log("setting exchange rate: "+xRate);
-                    setXRate(xRate);
-                    calculateEquivalentCAD();
-                } 
-            });
-
-            $('.exchangeRate').blur(function() {
-                var value = Number($('.exchangeRate').val());
-                if (value != null) {
-                    $('.exchangeRate').val(value.toFixed(4));
-                }
-            });
-
-            $('.rmbAmount, .exchangeRate, .equivalentCAD').focus(function() {
-                $(this).select();
-            });
-            
 
             $("#accordion h3").click(function (event) {
                 if (stop) {
@@ -588,7 +551,7 @@
         $('#<%= tblSplit.ClientID%>').find('input').val('');
     }
     
- function showNewLinePopup()  {$("#divNewItem").dialog("open"); checkCur(); return false;}
+ function showNewLinePopup()  {$("#divNewItem").dialog("open"); return false;}
  function showNewRmbPopup() {resetNewRmbPopup(); $("#divNewRmb").dialog("open"); return false; }
  function showNSFPopup() {$("#divInsufficientFunds").dialog("open"); return false; }
  function showClearAdvancePopup() { updateClearingTotal(); $("#divClearAdvancePopup").dialog("open"); return false; }
@@ -606,31 +569,6 @@
      return false;
 
  }
-
- function checkCur(){
-     var ac = '<%= StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId) %>';
-     var currency = $("#<%= hfOrigCurrency.ClientID%>").val();
-     var amount = Number($("#<%= hfOrigCurrencyValue.ClientID%>").val());
-     if ($('.divCur').is(':visible')) {
-         var exchangerate=1;
-         if (currency == ac) {
-             console.log("Canadian Currency, exchange rate set to 1.0000");
-             setXRate(1.0000);
-         } else {
-             $('.ddlCur').val(currency);
-             var CADAmount = $(".equivalentCAD").val();
-             if (CADAmount>0) {
-                 exchangerate = (amount/CADAmount).toFixed(4);
-                 setXRate(exchangerate);
-                 //calculateRevXRate();
-                 console.log("checkCur(): "+amount+" "+currency+ " = " + CADAmount + " CAD @ " + exchangerate);
-             } else {
-                 console.log("ERROR: $CAD = 0");
-             }
-             
-         }
-    }
-}
 
 
     // This function calculates the new exchange rate based on foreign amount and
@@ -662,7 +600,7 @@
         $("#<%= hfOrigCurrencyValue.ClientID%>").val(foreign);
         $("input[name$='hfCADValue']").val($(".equivalentCAD").val());
         console.log("calculateEquivalentCAD(): " + foreign + " " + $("input[name$='hfOrigCurrency']").val() + " equals: " + $(".equivalentCAD").val() + " CAD");
-        checkRecReq();
+        check_if_receipt_is_required();
     };
 
     function currencyChange(selected_currency) {
@@ -724,29 +662,6 @@
     function setXRate(xRate){
         $("#<%= hfExchangeRate.ClientId %>").val(Number(xRate));
         $(".exchangeRate").val(xRate)
-    };
-
-    function checkRecReq(){
-        try{
-            
-            var limit =  $("#<%= hfNoReceiptLimit.ClientID%>").attr('value');
-            var Am=$("input[name$='hfCADValue']").val() ;
-            //console.log(limit, Am);
-            if( $('.ddlReceipt').val()==<%= StaffRmb.RmbReceiptType.No_Receipt%> && parseFloat(Am)>parseFloat(limit))
-                $('.ddlReceipt').val(<%= StaffRmb.RmbReceiptType.Standard%>);
-
-
-            if(parseFloat(Am)>parseFloat(limit)){
-                $('.ddlReceipt option[value="<%= StaffRmb.RmbReceiptType.No_Receipt%>"]').attr("disabled", "disabled");
-            }
-            else 
-            {
-                $('.ddlReceipt option[value="<%= StaffRmb.RmbReceiptType.No_Receipt%>"]').removeAttr("disabled");
-            }
-        }
-        catch(err){
-
-        }
     };
 
 
