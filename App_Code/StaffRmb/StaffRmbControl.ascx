@@ -21,8 +21,8 @@
                </div>   
             </asp:Panel>
         </td>
-        <td><asp:TextBox ID="tbOrigin" runat="server" CssClass="required" Visible="false"/></td>
-        <td><asp:TextBox ID="tbDestination" runat="server" CssClass="required" visible="false"/></td>
+        <td><asp:TextBox ID="tbOrigin" runat="server" CssClass="required" Visible="false"/>
+            <asp:TextBox ID="tbDestination" runat="server" CssClass="required" visible="false" style="border-left:10px;"/></td>
     </tr>
     <tr>
         <td ><b><asp:label ID="lblSupplier" runat="server" ControlName="tbSupplier" ResourceKey="lblSupplier" /></b>
@@ -397,8 +397,8 @@
         hlpOrigin.Text = DotNetNuke.Services.Localization.Localization.GetString("hlpOrigin.Help", LocalResourceFile);
         // Hint strings
         tbDesc.Attributes.Add("Placeholder", DotNetNuke.Services.Localization.Localization.GetString("lblDesc.Hint", LocalResourceFile));
-        tbOrigin.Attributes.Add("Placeholder", DotNetNuke.Services.Localization.Localization.GetString("lblOrigin.Hint", LocalResourceFile));
-        tbDestination.Attributes.Add("Placeholder", DotNetNuke.Services.Localization.Localization.GetString("lblDestination.Hint", LocalResourceFile));
+        tbOrigin.Attributes.Add("Placeholder", DotNetNuke.Services.Localization.Localization.GetString("tbOrigin.Hint", LocalResourceFile));
+        tbDestination.Attributes.Add("Placeholder", DotNetNuke.Services.Localization.Localization.GetString("tbDestination.Hint", LocalResourceFile));
     }
 
     #region Properties 
