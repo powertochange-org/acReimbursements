@@ -260,6 +260,8 @@
                 height: 240,
                 width: 500,
                 modal: true,
+                draggable: false,
+                dialogClass: 'draggable',
                 close: function () {}
             });
             $("#divWarningDialog").parent().appendTo($("form:first"));
@@ -269,6 +271,8 @@
                 width: 600,
                 position: ['middle', 230],
                 modal: true,
+                draggable: false,
+                dialogClass: 'draggable',
                 title: '<%= Translate("ClearAdvance") %>',
                 close: function () {
                     // allFields.val("").removeClass("ui-state-error");
@@ -282,6 +286,8 @@
                 width: 500,
                 position: ['middle', 230],
                 modal: true,
+                draggable: false,
+                dialogClass: 'draggable',
                 title: '<%= Translate("SplitTransaction") %>',
                 close: function () {
                     // allFields.val("").removeClass("ui-state-error");
@@ -308,6 +314,8 @@
                 position:['middle', 150],
                 width: 500,
                 modal: true,
+                draggable: false,
+                dialogClass: 'draggable',
                 title: '<%= Translate("CreateRmb") %>',
                 close: function () {
                     //  allFields.val("").removeClass("ui-state-error");
@@ -321,6 +329,8 @@
                 height: 400,
                 width: 600,
                 modal: true,
+                draggable: false,
+                dialogClass: 'draggable',
                 close: function () {
                     // allFields.val("").removeClass("ui-state-error");
                 }
@@ -333,6 +343,8 @@
                 height: 150,
                 width: 500,
                 modal: true,
+                draggable: false,
+                dialogClass: 'draggable',
                 title: '<%= Translate("AccountWarning")%>',
                 close: function () {
                     //  allFields.val("").removeClass("ui-state-error");
@@ -358,6 +370,8 @@
                 height: 235,
                 width: 625,
                 modal: true,
+                draggable: false,
+                dialogClass: 'draggable',
                 title: '<%= Translate("SuggestedPayments") %>',
                 close: function () {
                     //  allFields.val("").removeClass("ui-state-error");
