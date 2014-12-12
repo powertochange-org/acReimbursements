@@ -1,9 +1,6 @@
 ﻿<%@ Control Language="VB" AutoEventWireup="false" CodeFile="StaffRmb.ascx.vb" Inherits="DotNetNuke.Modules.StaffRmbMod.ViewStaffRmb" %>
 <%@ Register TagPrefix="dnn" TagName="Label" Src="~/controls/LabelControl.ascx" %>
 
-<%@ Register Src="Controls/Currency.ascx" TagName="Currency" TagPrefix="uc1" %>
-<%@ Register Src="~/DesktopModules/AgapeConnect/StaffRmb/Controls/Currency.ascx" TagPrefix="dnn" TagName="Currency" %>
-
 <script src="/js/gplus-youtubeembed.js" type="text/javascript"></script>
 
 <script src="/js/jquery.numeric.js" type="text/javascript"></script>
