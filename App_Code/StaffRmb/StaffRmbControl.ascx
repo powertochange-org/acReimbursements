@@ -73,14 +73,14 @@
         <td>
             <table style="font-size:9pt">
                 <tr>
-                    <td><asp:TextBox ID="tbAmount" runat="server" Width="90px" class="required numeric rmbAmount" onChange="updateCAD" onFocus="select();" onBlur="formatCurrency(this);" AutoPostBack="true"></asp:TextBox></td>
+                    <td><asp:TextBox ID="tbAmount" runat="server" Width="90px" class="required numeric rmbAmount" onKeyUp="update_CAD();" onFocus="select();" onblur="format_number(this, 2);" ></asp:TextBox></td>
                     <td colspan="2">
                         <asp:UpdatePanel ID="currencyUpdatePanel" runat="server">
                             <ContentTemplate>
                                 <div id="dCurrency" class="divCur" >
                                     <table style="font-size:9pt"><tr>
                                     <td style="margin-left:30px">
-                                        <asp:DropDownList ID="ddlCurrencies" runat="server" CssClass="ddlCur" AutoPostBack="true" OnSelectedIndexChanged="Currency_Change" OnChange="currencyChange(this.value);">
+                                        <asp:DropDownList ID="ddlCurrencies" runat="server" CssClass="ddlCur" AutoPostBack="true" OnSelectedIndexChanged="Currency_Change" OnChange="display_foreign_exchange();">
                                             <asp:ListItem Value="ALL">Albanian Lek</asp:ListItem>
                                             <asp:ListItem Value="DZD">Algerian Dinar</asp:ListItem>
                                             <asp:ListItem Value="ARS">Argentine Peso</asp:ListItem>
@@ -234,11 +234,11 @@
                                             <th colspan="2"><asp:Label runat="server" ResourceKey="lblExchangeHeader" /></th></tr><tr>
                                             <td style="text-align:center">
                                                 <b><label for="tbExchangeRate"><%=DotNetNuke.Services.Localization.Localization.GetString("lblExchangeRate.Text", LocalResourceFile)%></label></b><br />
-                                                <asp:textbox id="tbExchangeRate" runat="server" cssClass="exchangeRate" style="width:80px" onChange="updateCAD" onfocus="select();" Text="1.0000" onBlur="formatXRate(this);" AutoPostBack="true"/>
+                                                <asp:textbox id="tbExchangeRate" runat="server" cssClass="exchangeRate" style="width:80px" onKeyUp="update_CAD();" onfocus="select();" onblur="format_number(this, 4);" />
                                             </td>
                                             <td style="text-align:center;margin-left:20px">
                                                 <b><asp:Label runat="server" ResourceKey="lblEquivalentCAD"/></b><br />
-                                                <asp:TextBox ID="tbCADAmount" runat="server" cssclass="equivalentCAD" style="width:80px;" OnChange="adjustExchangeRate" onfocus="select();" onBlur="formatCurrency(this);" AutoPostBack="true"/>
+                                                <asp:TextBox ID="tbCADAmount" runat="server" cssclass="equivalentCAD" style="width:80px;" OnChange="adjust_exchange_rate();" onfocus="select();" onblur="format_number(this, 2);" />
                                             </td>
                                             <tr><td colspan="2" class="footer"><asp:label runat="server" ResourceKey="lblExchangeFooter"></asp:label></td></tr>
                                         </tr></table>
@@ -301,34 +301,6 @@
 </table>
  <asp:Label ID="ErrorLbl" runat="server" Font-Size="9pt" ForeColor="Red" />
 
-<script type="text/javascript">
-    function check_if_receipt_is_required() {
-        var limit = $("#<%= hfNoReceiptLimit.ClientID%>").attr('value');
-        var amount = $("input.equivalentCAD").val();
-        try {
-            if (parseFloat(amount) > parseFloat(limit)) {
-                if ($('.ddlReceipt').val() == '<%=RmbReceiptType.No_Receipt %>') {
-                    $('.ddlReceipt').val(<%=RmbReceiptType.Standard %>);
-                };
-                $('.ddlReceipt option[value="<%=RmbReceiptType.No_Receipt%>"]').prop('disabled', true);
-            } else {
-                $('.ddlReceipt option[value="<%=RmbReceiptType.No_Receipt%>"]').prop('disabled', false);
-            };
-        } catch (err) { }
-    };
-
-    function formatCurrency(item) {
-        var value = Number($(item).val());
-        if (value != null) {}
-        $(item).val(value.toFixed(2));
-    }
-
-    function formatXRate(item) {
-        var value = Number($(item).val());
-        if (value != null) { }
-        $(item).val(value.toFixed(4));
-    }
-</script>
 
 <script runat="server">
 
@@ -374,7 +346,7 @@
         {
             if (Page.IsPostBack)
             {
-                display_currency_details();
+                //Currency_Change(null, null);
             }
         }
         else
@@ -459,7 +431,13 @@
             }
             set { 
                 tbAmount.Text = value.ToString("n2", new CultureInfo("en-US"));
-                updateCAD(null, null);
+                double exchangeRate;
+                try { exchangeRate = double.Parse(tbExchangeRate.Text); }
+                catch { tbExchangeRate.Text = "1.0000"; exchangeRate = 1; }
+                if (exchangeRate > 0)
+                {
+                    CADValue = value / exchangeRate;
+                }
             }
         }
         public bool VAT {
@@ -523,61 +501,39 @@
             set { 
                 hfCADValue.Value = value.ToString(); //this is used by javascript for some reason TODO:get rid of this
                 tbCADAmount.Text = value.ToString("n2", new CultureInfo("en-US"));
-                display_currency_details();
-                ScriptManager.RegisterClientScriptBlock(this, this.GetType(), "check_if_receipt_is_required", "check_if_receipt_is_required();", true);
+                string script = "check_if_receipt_is_required(); ";
+                if (!tbAmount.Text.Equals(string.Empty)) { script += "adjust_exchange_rate(); display_foreign_exchange(); "; }
+                ScriptManager.RegisterClientScriptBlock(tbCADAmount, tbCADAmount.GetType(), "set_CAD_amount", script, true);
             }
         }
     #endregion
 
     #region Currency functions
-    
-        protected void updateCAD(object sender, System.EventArgs e) {
-            // update CADValue based on exchange_rate
-            double exchange_rate;
-            double value;
-            try { 
-                exchange_rate = double.Parse(tbExchangeRate.Text);
-            } catch { 
-                exchange_rate = 1;
-                tbExchangeRate.Text = "1.0000";
-            }
-            try
-            {
-                value = double.Parse(tbAmount.Text);
-            }
-            catch
-            {
-                value = 0;
-                tbAmount.Text = "0.00";
-            }
-            CADValue = value * exchange_rate;
-        }
 
-        protected void adjustExchangeRate(object sender, System.EventArgs e) {
-            // adjust the exchange rate based on a manual change of the Equivalent CAD
-            if (CADValue <= 0) { 
-                tbExchangeRate.Text = "1.0000";
-                return;
-            }
-            tbExchangeRate.Text =  String.Format("{0:f4}", (Amount / CADValue));
+        public void Set_Currency(string new_currency)
+        //does not change exchange rate
+        {
+            ddlCurrencies.SelectedValue = new_currency;
         }
-
         
-        public void Currency_Change(object sender, System.EventArgs e)
+        private void Currency_Change(object sender, System.EventArgs e)
+        //includes exchange rate lookup, and CAD recalculation
         {
             string foreign_currency = ddlCurrencies.SelectedValue;
             decimal exchangeRate = StaffBrokerFunctions.GetExchangeRate(PortalId, accounting_currency, foreign_currency);
             tbExchangeRate.Text = String.Format("{0:f4}", exchangeRate);
-            display_currency_details();
-            updateCAD(null, null);
+               if (exchangeRate > 0) {
+                    try {
+                       double amount = double.Parse(tbAmount.Text);
+                       CADValue = (amount / (double)exchangeRate);
+                    } catch {
+                        tbAmount.Text = "0.00";
+                        tbCADAmount.Text = "0.00";
+                    }
+               }
+            ScriptManager.RegisterClientScriptBlock(ddlCurrencies, ddlCurrencies.GetType(), "display_foreign_exchange", "display_foreign_exchange();", true);
         }
 
-        private void display_currency_details()
-        {
-            string script = "$('.hfCurOpen').val('true');";
-            script = script + "if ($('.ddlCur').val() == '" + accounting_currency + "') {$('.curDetails').hide();} else {$('.curDetails').show();}";
-            ScriptManager.RegisterStartupScript(Page, this.GetType(), "cur", script, true);
-        }
     #endregion
 
     #region Validation

@@ -2287,12 +2287,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim jscript As System.Text.StringBuilder = New System.Text.StringBuilder()
                     Dim ucType As Type = theControl.GetType()
                     Dim ac = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)
-                    Dim xRate = 1
-                    If (theLine.First.GrossAmount > 0) Then
-                        xRate = Math.Round(CDbl(theLine.First.OrigCurrencyAmount / theLine.First.GrossAmount), 4)
-                    End If
-                    hfExchangeRate.Value = xRate.ToString(New CultureInfo(""))
-
                     ucType.GetMethod("Initialize").Invoke(theControl, New Object() {Settings})
 
                     ucType.GetProperty("Supplier").SetValue(theControl, theLine.First.Supplier, Nothing)
@@ -2301,9 +2295,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         ucType.GetProperty("Amount").SetValue(theControl, CDbl(theLine.First.GrossAmount), Nothing)
                     Else
                         ucType.GetProperty("Amount").SetValue(theControl, CDbl(theLine.First.OrigCurrencyAmount), Nothing)
-                        jscript.Append(" $('.equivalentCAD').val(" & theLine.First.GrossAmount & ");")
-                        jscript.Append(" $('.exchangeRate').val(Number(" & xRate & ").toFixed(4));")
-                        jscript.Append(" $('.curDetails').show();")
                     End If
                     ucType.GetProperty("CADValue").SetValue(theControl, Math.Round(CDbl(theLine.First.GrossAmount), 2), Nothing)
                     If (Not theLine.First.OrigCurrencyAmount Is Nothing) Then
@@ -2312,7 +2303,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
                     If (Not String.IsNullOrEmpty(theLine.First.OrigCurrency)) Then
                         'hfOrigCurrency.Value = theLine.First.OrigCurrency
-                        jscript.Append(" currencyChange('" & theLine.First.OrigCurrency & "');")
+                        ucType.GetMethod("Set_Currency").Invoke(theControl, New Object() {theLine.First.OrigCurrency})
+                        jscript.Append(" $('#" & hfOrigCurrency.ClientID & "').val('" & theLine.First.OrigCurrency & "');")
                     Else
                         'hfOrigCurrency.Value = ac
                         jscript.Append(" $('#" & hfOrigCurrency.ClientID & "').val('" & ac & "');")
@@ -3369,7 +3361,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     If (ucType.GetProperty("Mileage") IsNot Nothing) Then
                         ucType.GetProperty("Mileage").SetValue(theControl, 0, Nothing)
                     End If
-                    Dim jscript As String = "currencyChange('" & currency & "');"
+                    ucType.GetMethod("Set_Currency").Invoke(theControl, New Object() {currency})
+                    Dim jscript = "$('#" & hfOrigCurrency.ClientID & "').val('" & currency & "');"
                     jscript += "$('.ddlProvince').change(function() {$('.ddlTaxable').prop('selectedIndex', ($('.ddlProvince').val()!='--'));});"
                     ScriptManager.RegisterStartupScript(Page, Me.GetType(), "setCur", jscript, True)
                     ' Attempt to set the receipttype

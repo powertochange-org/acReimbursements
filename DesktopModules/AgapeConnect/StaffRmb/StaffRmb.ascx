@@ -570,99 +570,86 @@
 
  }
 
+    //********StaffRmbControl functions**************
+    function format_number(item, places) {
+        $(item).val(Number($(item).val()).toFixed(places));
+    }
 
-    // This function calculates the new exchange rate based on foreign amount and
-    // canadian amount, and updates the amount field
-    function calculateXRate() {
-        var foreign = $('.rmbAmount').val();
-        var cad = $('.equivalentCAD').val();
-        var xRate = 1;
-        if (cad.length>0 && parseFloat(cad) != 0) {
-            xRate = foreign/cad;
-        };
-        xRate = Number(xRate).toFixed(4);
-        $('.exchangeRate').val(xRate);
-        console.log("calculateXRate(): "+xRate);
-        setXRate(xRate);
-        // Need to update some values for the backend:
-        $("#<%= hfOrigCurrencyValue.ClientID%>").val(foreign);
-        $("input[name$='hfCADValue']").val(cad);
-    };
-
-    function calculateEquivalentCAD() {
-        var foreign = $('.rmbAmount').val();
-        var xRate = $('#<%=hfExchangeRate.ClientID%>').val();
-        if (xRate.length==0 || xRate<=0) {
-            $(".equivalentCAD").val("0.00");
-        } else {
-            $('.equivalentCAD').val((foreign/xRate).toFixed(2));
+    function update_CAD() {
+        // update the equivalent CAD based on the (foreign) amount and exchange rate
+        console.log('update_CAD()');
+        var exchange_rate = $('.exchangeRate').val();
+        if (exchange_rate==0) {
+            exchange_rate==1;
+            $('.exchangeRate').val('1.0000');
+            console.log('0 exchange rate; set to 1');
         }
-        $("#<%= hfOrigCurrencyValue.ClientID%>").val(foreign);
-        $("input[name$='hfCADValue']").val($(".equivalentCAD").val());
-        console.log("calculateEquivalentCAD(): " + foreign + " " + $("input[name$='hfOrigCurrency']").val() + " equals: " + $(".equivalentCAD").val() + " CAD");
+        var amount = $('.rmbAmount').val();
+        if (amount==0) {
+            $('.rmbAmount').val('0.00');
+        }
+        var CAD = Number(amount / exchange_rate).toFixed(2);
+        $('.equivalentCAD').val(CAD);
+        $("input[name$='hfCADValue']").val(CAD); //TODO:Get rid of this - use .equivalentCAD instead
         check_if_receipt_is_required();
-    };
+        console.log('--Equivalent CAD set to: '+CAD);
+    }
 
-    function currencyChange(selected_currency) {
-        console.log("currencyChange(" + selected_currency + ");");
-        var local_currency = $("input[name$='hfAccountingCurrency']").val();
-        $(".ddlCur").val(selected_currency);
-        $("[name$='hfOrigCurrency']").val(selected_currency);
-        if (selected_currency != local_currency) {
-            //foreign currency
-            if ($("input[name$='hfCADValue']").val() != "0.00") {
-                $(".equivalentCAD").val($("input[name$='hfCADValue']").val())
-            } else {
-                $(".equivalentCAD").val($(".rmbAmount").val())
-            }
-            calculateXRate();
-            $(".curDetails").show();
-            $(".ddlProvince").val("--");
-            $('#<%= hfCurOpen.ClientID %>').val("true");
+    function adjust_exchange_rate() {
+        // adjust the exchange rate based on foreign and CAD amounts
+        console.log('adjust_exchange_rate()');
+        var amount = $('.rmbAmount').val();
+        var CAD = $('.equivalentCAD').val();
+        var exchange_rate = 0;
+        if (CAD <=0 ) {
+            $('.equivalentCAD').val($('.rmbAmount').val());
+            exchange_rate = '1.0000';
+            console.log('ERROR: equivalent CAD was <= 0');
         } else {
-            $("input[name$='hfExchangeRate']").val(1);
-            $("input[name$='hfOrigCurrencyValue']").val($(".rmbAmount").val());
-            $(".curDetails").hide();
-            $('#<%= hfCurOpen.ClientID %>').val("false");
+            exchange_rate = Number(amount / CAD).toFixed(4);
         }
-    };
-
-    function calculateRevXRate() {
-        
-        var xRate = $("#<%= hfExchangeRate.ClientId %>").attr('value');
-        var inAmt=$('.rmbAmount').val() ;
-
-        if(parseFloat(xRate) <0)
-        {
-            $('.currency').val('');
-            $("#<%= hfOrigCurrencyValue.ClientID%>").attr('value',"");
-         
-            return;
-        }
-        
-           
-        if(inAmt.length>0){
-            var value = (parseFloat(inAmt)/parseFloat(xRate) ).toFixed(2) ;
-            $('.currency').val(value);
-            $("#<%= hfOrigCurrencyValue.ClientID%>").attr('value',value);
-            console.log("Currency Value:" + value);
-        }
-    };
-
-    function update_CurOpen(value) {
-        $('#<%=hfCurOpen.ClientId%>').val(value);
-    }
-    function update_OrigCurrencyValue(value) {
-        $('#<%=hfOrigCurrencyValue.ClientID%>').val(value);
-    }
-    function update_ExchangeRate(value) {
-        $("#<%= hfExchangeRate.ClientId %>").val(Number(value));
+        $('.exchangeRate').val(exchange_rate);
+        console.log('--exchange rate set to: '+ exchange_rate);
     }
 
-    function setXRate(xRate){
-        $("#<%= hfExchangeRate.ClientId %>").val(Number(xRate));
-        $(".exchangeRate").val(xRate)
+    function display_foreign_exchange() {
+        //show the foreign exchange details box if the currency is not the local currency
+        console.log('display_foreign_exchange()');
+        var local_currency = $("input[name$='hfAccountingCurrency']").val();
+        var selected_currency = $('.ddlCur').val();
+        var action;
+        $("[name$='hfOrigCurrency']").val(selected_currency); //TODO: get rid of hfOrigCurrency
+        $('.hfCurOpen').val(selected_currency != local_currency); //TODO: get rid of hfCurOpen
+        if (selected_currency == local_currency) {
+            $('.curDetails').hide();
+            action='hide()';
+        } else {
+            $(".ddlProvince").val("--");
+            $('.curDetails').show();
+            action='show() & location reset to Outside Canada';
+        }
+        console.log('--currency: '+selected_currency + " - " + action);
+    }
+
+    function check_if_receipt_is_required() {
+        // determine whether the "no receipt" option should be enabled
+        console.log('check_if_receipt_is_required()');
+        var limit = $("#<%= hfNoReceiptLimit.ClientID%>").attr('value');
+        var amount = $("input.equivalentCAD").val();
+        var disabled=false;
+        try {
+            if (parseFloat(amount) > parseFloat(limit)) {
+                if ($('.ddlReceipt').val() == '<%=StaffRmb.RmbReceiptType.No_Receipt %>') {
+                    $('.ddlReceipt').val(<%=StaffRmb.RmbReceiptType.Standard %>);
+                };
+                disabled=true;
+            }
+            $('.ddlReceipt option[value="<%=StaffRmb.RmbReceiptType.No_Receipt%>"]').prop('disabled', disabled);
+        } catch (err) { }
+        console.log('-- '+disabled);
     };
+
+    //***********************************************
 
 
     function calculateTotal() {
