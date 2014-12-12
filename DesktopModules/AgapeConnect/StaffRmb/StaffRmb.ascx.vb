@@ -845,7 +845,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     lblAccountBalance.Text = "not loaded"
 
                     Dim getAccountBalanceTask = getAccountBalanceAsync(Rmb.CostCenter, StaffRmbFunctions.logonFromId(PortalId, UserId))
-                   
+
                     Dim DRAFT = Rmb.Status = RmbStatus.Draft
                     Dim MORE_INFO = (Rmb.MoreInfoRequested IsNot Nothing AndAlso Rmb.MoreInfoRequested = True)
                     Dim SUBMITTED = Rmb.Status = RmbStatus.Submitted Or Rmb.Status = RmbStatus.PendingDirectorApproval Or Rmb.Status = RmbStatus.PendingEDMSApproval
