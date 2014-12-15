@@ -891,6 +891,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                     Or ((Rmb.Status = RmbStatus.PendingDirectorApproval) And (UserId = directorId)) _
                                     Or ((Rmb.Status = RmbStatus.PendingEDMSApproval) And (UserId = EDMSId))
                     Dim isFinance = IsAccounts() And Not (isOwner Or isSpouse Or isApprover) And Not DRAFT
+                    Dim isAdmin = UserController.Instance.GetCurrentUserInfo.IsInRole("Administrators")
 
                     '--Ensure the user is authorized to view this reimbursement
                     Dim RmbRel As Integer
@@ -912,6 +913,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     '*** TITLE ***
                     lblRmbNo.Text = ZeroFill(Rmb.RID, 5)
+                    If isAdmin Then lblRmbNo.ToolTip = Rmb.RMBNo
                     Dim resetPostingDataTask = ResetPostingDataAsync()
                     imgAvatar.ImageUrl = GetProfileImage(Rmb.UserId)
                     staffInitials.Value = user.FirstName.Substring(0, 1) & user.LastName.Substring(0, 1)
