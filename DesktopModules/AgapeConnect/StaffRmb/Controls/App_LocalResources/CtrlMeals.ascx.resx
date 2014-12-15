@@ -210,4 +210,13 @@
   <data name="Error.NoElecReceipt" xml:space="preserve">
     <value>When you choose Electronic Receipts, you must attach your receipt by clicking the Add Receipt button</value>
   </data>
+  <data name="lblForWhom.Help" xml:space="preserve">
+    <value>Please specify the names of those you are reimbursing the costs of this meal for.</value>
+  </data>
+  <data name="lblForWhom.Text" xml:space="preserve">
+    <value>For whom? </value>
+  </data>
+  <data name="tbForWhom.Hint" xml:space="preserve">
+    <value>Meal Participants</value>
+  </data>
 </root>

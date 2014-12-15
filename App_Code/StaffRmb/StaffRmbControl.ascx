@@ -49,6 +49,18 @@
         <td colspan="2"><asp:TextBox ID="tbDesc" runat="server" maxlength="27" Width="15em" CssClass="required"></asp:TextBox></td>
     </tr>
     <tr>
+        <td><b><asp:label id="lblForWhom" runat="server" controlname="tbForWhom" ResourceKey="lblForWhom"  Visible="false" /></b>
+            <asp:LinkButton id="lbForWhom" TabIndex="-1" runat="server" CausesValidation="False" EnableViewState="False" CssClass="dnnFormHelp"  style="position:relative" Visible="false"/>
+            <asp:Panel runat="server" CssClass="dnnTooltip">
+                <div class="dnnFormHelpContent dnnClear">
+                    <asp:Label ID="hlpForWhom" runat="server" EnableViewState="False" class="dnnHelpText" />
+                    <a href="#" class="pinHelp"></a>
+               </div>   
+            </asp:Panel>
+        </td>
+        <td colspan="2"><asp:TextBox ID="tbForWhom" runat="server" CssClass="required" Visible="false"></asp:TextBox></td>
+    </tr>
+    <tr>
         <td><b><asp:label runat="server" id="lblDate" controlname="dtDate" ResourceKey="lblDate"  /></b>
             <asp:LinkButton id="lbDate" TabIndex="-1" runat="server" CausesValidation="False" EnableViewState="False" CssClass="dnnFormHelp"  style="position:relative"/>
             <asp:Panel runat="server" CssClass="dnnTooltip">
@@ -390,6 +402,7 @@
         // Help strings
         hlpSupplier.Text = DotNetNuke.Services.Localization.Localization.GetString("lblSupplier.Help", LocalResourceFile);
         hlpDesc.Text = DotNetNuke.Services.Localization.Localization.GetString("lblDesc.Help", LocalResourceFile);
+        hlpForWhom.Text = DotNetNuke.Services.Localization.Localization.GetString("lblForWhom.Help", LocalResourceFile);
         hlpDate.Text = DotNetNuke.Services.Localization.Localization.GetString("lblDate.Help", LocalResourceFile);
         hlpAmount.Text = DotNetNuke.Services.Localization.Localization.GetString("lblAmount.Help", LocalResourceFile);
         hlpProvince.Text = DotNetNuke.Services.Localization.Localization.GetString("lblProvince.Help", LocalResourceFile);
@@ -399,6 +412,7 @@
         tbDesc.Attributes.Add("Placeholder", DotNetNuke.Services.Localization.Localization.GetString("lblDesc.Hint", LocalResourceFile));
         tbOrigin.Attributes.Add("Placeholder", DotNetNuke.Services.Localization.Localization.GetString("tbOrigin.Hint", LocalResourceFile));
         tbDestination.Attributes.Add("Placeholder", DotNetNuke.Services.Localization.Localization.GetString("tbDestination.Hint", LocalResourceFile));
+        tbForWhom.Attributes.Add("Placeholder", DotNetNuke.Services.Localization.Localization.GetString("tbForWhom.Hint", LocalResourceFile));
     }
 
     #region Properties 
