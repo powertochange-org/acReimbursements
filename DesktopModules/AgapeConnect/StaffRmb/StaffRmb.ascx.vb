@@ -2138,6 +2138,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim allStaff = StaffBrokerFunctions.GetStaff()
                 TaskList.Add(buildAllApprovedTreeAsync(allStaff))
             End If
+            processingPlaceholder.Controls.AddAt(0, GenerateTreeControl("treeProcessing"))
             PostingData.RMBNo = CInt(hfRmbNo.Value)
             PostingData.Company = ddlCompany.SelectedValue
             Dim fmt = New DateTimeFormatInfo()
@@ -2166,7 +2167,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 tvFinance.Nodes.Item(0).ChildNodes.Item(3).Expand()
             End If
             Dim message = Translate("NextBatch")
-            ScriptManager.RegisterStartupScript(Page, Me.GetType(), "closePostData", "closePostDataDialog(); alert(""" & message & """);", True)
+            ScriptManager.RegisterStartupScript(Page, Me.GetType(), "closePostData", "closePostDataDialog();  alert(""" & message & """); loadAllProcessingTree();", True)
         End Sub
 
         Protected Sub btnDownload_Click(sender As Object, e As System.EventArgs) Handles btnDownload.Click
