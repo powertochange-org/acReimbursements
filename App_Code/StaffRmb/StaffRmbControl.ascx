@@ -21,8 +21,8 @@
                </div>   
             </asp:Panel>
         </td>
-        <td><asp:TextBox ID="tbOrigin" runat="server" CssClass="required" Visible="false"/>
-            <asp:TextBox ID="tbDestination" runat="server" CssClass="required" visible="false" style="border-left:10px;"/></td>
+        <td><asp:TextBox ID="tbOrigin" runat="server" CssClass="required" AutoCompleteType="None" Visible="false"/>
+            <asp:TextBox ID="tbDestination" runat="server" CssClass="required" AutoCompleteType="None" visible="false" style="border-left:10px;"/></td>
     </tr>
     <tr>
         <td ><b><asp:label ID="lblSupplier" runat="server" ControlName="tbSupplier" ResourceKey="lblSupplier" /></b>
@@ -34,7 +34,7 @@
                </div>   
             </asp:Panel>
         </td>
-        <td colspan="2"><asp:TextBox ID="tbSupplier" runat="server" Width="278px" CssClass="required"></asp:TextBox></td>
+        <td colspan="2"><asp:TextBox ID="tbSupplier" runat="server" Width="278px" CssClass="required" AutoCompleteType="None" ></asp:TextBox></td>
     </tr>
     <tr>
         <td style="width:200px"><b><asp:label id="lblDesc" runat="server" controlname="tbDesc" ResourceKey="lblDesc"  /></b>
@@ -46,7 +46,7 @@
                </div>   
             </asp:Panel>
         </td>
-        <td colspan="2"><asp:TextBox ID="tbDesc" runat="server" maxlength="27" Width="15em" CssClass="required"></asp:TextBox></td>
+        <td colspan="2"><asp:TextBox ID="tbDesc" runat="server" maxlength="27" Width="15em" CssClass="required" AutoCompleteType="None" ></asp:TextBox></td>
     </tr>
     <tr>
         <td><b><asp:label id="lblForWhom" runat="server" controlname="tbForWhom" ResourceKey="lblForWhom"  Visible="false" /></b>
@@ -58,7 +58,7 @@
                </div>   
             </asp:Panel>
         </td>
-        <td colspan="2"><asp:TextBox ID="tbForWhom" runat="server" CssClass="required" Visible="false"></asp:TextBox></td>
+        <td colspan="2"><asp:TextBox ID="tbForWhom" runat="server" CssClass="required" AutoCompleteType="None" Visible="false"></asp:TextBox></td>
     </tr>
     <tr>
         <td><b><asp:label runat="server" id="lblDate" controlname="dtDate" ResourceKey="lblDate"  /></b>
