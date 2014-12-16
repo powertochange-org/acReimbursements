@@ -14,7 +14,7 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
         tbForWhom.Visible = true;
     }
 
-    new public string Spare4
+    new public string Spare5
     {
         get { return tbForWhom.Text; }
         set { tbForWhom.Text = value; }
