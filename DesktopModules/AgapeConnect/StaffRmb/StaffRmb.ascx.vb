@@ -1157,10 +1157,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim accounting_currency = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)
             Dim ownerId = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.UserId).First
             Dim LineTypeName = d.AP_Staff_RmbLineTypes.Where(Function(c) c.LineTypeId = CInt(ddlLineTypes.SelectedValue)).First.TypeName.ToString()
-            Dim lineNo As Integer
-            Dim nextReceiptNo As Integer
-            Dim repeat As Integer
-            Dim insert As Boolean
+            Dim lineNo As Integer = Nothing
+            Dim nextReceiptNo As Integer = 1
+            Dim repeat As Integer = 1
+            Dim insert As Boolean = True
             Dim imageFiles As IQueryable(Of AP_Staff_RmbLine_File)
             Dim line As AP_Staff_RmbLine = Nothing
             If (btnSaveLine.CommandName = "Edit") Then
@@ -1170,16 +1170,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 imageFiles = (From lf In d.AP_Staff_RmbLine_Files Where lf.RMBNo = hfRmbNo.Value And lf.RmbLineNo = lineNo)
                 Dim q = From c In d.AP_Staff_RmbLines Where c.RmbNo = hfRmbNo.Value And c.Receipt Select c.ReceiptNo
                 nextReceiptNo = If(q.Max Is Nothing, 1, q.Max + 1)
-                repeat = 1
                 insert = False
             ElseIf (btnSaveLine.CommandName = "Save") Then
-                lineNo = Nothing
                 imageFiles = (From lf In d.AP_Staff_RmbLine_Files Where lf.RMBNo = hfRmbNo.Value And lf.RmbLineNo Is Nothing)
                 If (ucType.GetProperty("Repeat") IsNot Nothing) Then
                     repeat = ucType.GetProperty("Repeat").GetValue(theControl, Nothing)
                 End If
-                nextReceiptNo = 1
-                insert = True
             End If
 
             Dim transactionDate = CDate(ucType.GetProperty("theDate").GetValue(theControl, Nothing))
@@ -1206,8 +1202,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         line.Comment = CStr(ucType.GetProperty("Comment").GetValue(theControl, Nothing))
                         line.OrigCurrency = ucType.GetProperty("Currency").GetValue(theControl, Nothing)
                         line.ExchangeRate = ucType.GetProperty("ExchangeRate").GetValue(theControl, Nothing)
-                        line.OrigCurrencyAmount = ucType.GetProperty("Amount").GetValue(theControl, Nothing)
-                        line.GrossAmount = ucType.GetProperty("CADValue").GetValue(theControl, Nothing)
+                        line.OrigCurrencyAmount = CDbl(ucType.GetProperty("Amount").GetValue(theControl, Nothing))
+                        line.GrossAmount = CDbl(ucType.GetProperty("CADValue").GetValue(theControl, Nothing))
                         line.LargeTransaction = (line.GrossAmount >= Settings("TeamLeaderLimit"))
                         line.Taxable = (ddlOverideTax.SelectedIndex = 1)
                         line.Receipt = CBool(ucType.GetProperty("Receipt").GetValue(theControl, Nothing))
