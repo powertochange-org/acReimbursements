@@ -3592,16 +3592,32 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Function
 
         Public Function TypeHasOriginAndDestination(ByVal typeId As Integer) As Boolean
-            Dim typeName As String = GetLocalTypeName(typeId).ToLower()
-            Return (typeName.IndexOf("mileage") > -1 Or typeName.IndexOf("airfare") > -1)
+            Try
+                Dim tName = (From c In d.AP_Staff_RmbLineTypes Where c.LineTypeId = typeId Select c.TypeName).First().ToLower()
+                If (tName.Equals("airfare")) Then Return True
+                If (tName.Equals("mileage")) Then Return True
+            Catch
+            End Try
+            Return False
         End Function
 
         Public Function IsMileageType(ByVal typeId As Integer) As Boolean
-            Return GetLocalTypeName(typeId).ToLower().IndexOf("mileage") > -1
+            Try
+                Dim tName = (From c In d.AP_Staff_RmbLineTypes Where c.LineTypeId = typeId Select c.TypeName).First().ToLower()
+                If (tName.Equals("mileage")) Then Return True
+            Catch
+            End Try
+            Return False
         End Function
 
-        Public Function isPerDiemType(ByVal typeId As Integer) As Boolean
-            Return GetLocalTypeName(typeId).ToLower().IndexOf("per diem") > -1
+        Public Function showSecondTypeRow(ByVal typeId As Integer) As Boolean
+            Try
+                Dim tName = (From c In d.AP_Staff_RmbLineTypes Where c.LineTypeId = typeId Select c.TypeName).First().ToLower()
+                If (tName.Equals("per diem")) Then Return True
+                If (tName.Equals("meals")) Then Return True
+            Catch
+            End Try
+            Return False
         End Function
         Public Function differentExchangeRate(xRate1 As Double, xRate2 As Double) As Boolean
             'determine whether the 2 exchange rates differ by more than the fudge factor
