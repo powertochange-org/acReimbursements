@@ -845,7 +845,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     lblAccountBalance.Text = "not loaded"
 
                     Dim getAccountBalanceTask = getAccountBalanceAsync(Rmb.CostCenter, StaffRmbFunctions.logonFromId(PortalId, UserId))
-                   
+
                     Dim DRAFT = Rmb.Status = RmbStatus.Draft
                     Dim MORE_INFO = (Rmb.MoreInfoRequested IsNot Nothing AndAlso Rmb.MoreInfoRequested = True)
                     Dim SUBMITTED = Rmb.Status = RmbStatus.Submitted Or Rmb.Status = RmbStatus.PendingDirectorApproval Or Rmb.Status = RmbStatus.PendingEDMSApproval
@@ -891,6 +891,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                     Or ((Rmb.Status = RmbStatus.PendingDirectorApproval) And (UserId = directorId)) _
                                     Or ((Rmb.Status = RmbStatus.PendingEDMSApproval) And (UserId = EDMSId))
                     Dim isFinance = IsAccounts() And Not (isOwner Or isSpouse Or isApprover) And Not DRAFT
+                    Dim isAdmin = UserController.Instance.GetCurrentUserInfo.IsInRole("Administrators")
 
                     '--Ensure the user is authorized to view this reimbursement
                     Dim RmbRel As Integer
@@ -912,6 +913,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     '*** TITLE ***
                     lblRmbNo.Text = ZeroFill(Rmb.RID, 5)
+                    If isAdmin Then lblRmbNo.ToolTip = Rmb.RMBNo
                     Dim resetPostingDataTask = ResetPostingDataAsync()
                     imgAvatar.ImageUrl = GetProfileImage(Rmb.UserId)
                     staffInitials.Value = user.FirstName.Substring(0, 1) & user.LastName.Substring(0, 1)
@@ -1948,6 +1950,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim allStaff = StaffBrokerFunctions.GetStaff()
                 TaskList.Add(buildAllApprovedTreeAsync(allStaff))
             End If
+            processingPlaceholder.Controls.AddAt(0, GenerateTreeControl("treeProcessing"))
             PostingData.RMBNo = CInt(hfRmbNo.Value)
             PostingData.Company = ddlCompany.SelectedValue
             Dim fmt = New DateTimeFormatInfo()
@@ -1976,7 +1979,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 tvFinance.Nodes.Item(0).ChildNodes.Item(3).Expand()
             End If
             Dim message = Translate("NextBatch")
-            ScriptManager.RegisterStartupScript(Page, Me.GetType(), "closePostData", "closePostDataDialog(); alert(""" & message & """);", True)
+            ScriptManager.RegisterStartupScript(Page, Me.GetType(), "closePostData", "closePostDataDialog();  alert(""" & message & """); loadAllProcessingTree();", True)
         End Sub
 
         Protected Sub btnDownload_Click(sender As Object, e As System.EventArgs) Handles btnDownload.Click

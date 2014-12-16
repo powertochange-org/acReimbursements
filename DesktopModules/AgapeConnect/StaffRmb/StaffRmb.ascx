@@ -29,8 +29,7 @@
         previous_menu_item.style.fontSize = '10pt';
         $(previous_menu_item).parent().next().children().css('visibility', 'hidden');
     }
-
-    
+   
     function loadRmb(rmbno) {
         var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
         if (is_chrome) {
@@ -174,6 +173,88 @@
         return sign + (j ? i.substr(0, j) + thouSeparator : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thouSeparator) + (decPlaces ? decSeparator + Math.abs(n - i).toFixed(decPlaces).slice(2) : "");
     }
  
+    function loadAllSubmittedTree() {
+        $.getJSON(
+            "/DesktopModules/AgapeConnect/StaffRmb/WebService.asmx/AllRmbs?portalid="+$('#<%= hfPortalId.ClientID %>').val()+
+                        "&tabmoduleid="+$('#<%= hfTabModuleId.ClientID %>').val()+"&status=<%= StaffRmb.RmbStatus.Submitted%>",
+            function(data) {
+                $("#treeSubmitted").tree({
+                    data: data,
+                    onCreateLi: function(node, $li) {
+                        $li.find('.jqtree-title').not('.jqtree-title-folder').addClass('menu_link');
+                    }
+                });
+                $("#treeSubmitted").bind(
+                    'tree.click',
+                    function(event) {
+                        var node = event.node;
+                        if (node.rmbno) {
+                            loadRmb(node.rmbno);
+                        } else {
+                            $("#treeSubmitted").tree('toggle', node);
+                        }
+                    })
+            }
+        );
+    }
+
+    function loadAllProcessingTree() {
+        var total_processing = 0;
+        $.getJSON(
+            "/DesktopModules/AgapeConnect/StaffRmb/WebService.asmx/AllRmbs?portalid="+$('#<%= hfPortalId.ClientID %>').val()+
+                        "&tabmoduleid="+$('#<%= hfTabModuleId.ClientID %>').val()+"&status=<%= StaffRmb.RmbStatus.Processing%>",
+            function(data) {
+                $("#treeProcessing").tree({
+                    data: data,
+                    onCreateLi: function(node, $li) {
+                        $li.find('.jqtree-title').not('.jqtree-title-folder').addClass('menu_link');
+                        total_processing++;
+                    }
+                });
+                $("#treeProcessing").bind(
+                    'tree.click',
+                    function(event) {
+                        var node = event.node;
+                        if (node.rmbno) {
+                            loadRmb(node.rmbno);
+                        } else {
+                            $("#treeProcessing").tree('toggle', node);
+                        }
+                    })
+            }
+            ).done(function() {
+                <%If IsAccounts() Then%>
+                $('#lblProcessing').text('(' + total_processing + ')');
+                <%End If%>
+            }
+        );
+    }
+
+    function loadAllPaidTree() {
+        $.getJSON(
+            "/DesktopModules/AgapeConnect/StaffRmb/WebService.asmx/AllRmbs?portalid="+$('#<%= hfPortalId.ClientID %>').val()+
+                        "&tabmoduleid="+$('#<%= hfTabModuleId.ClientID %>').val()+"&status=<%= StaffRmb.RmbStatus.Paid%>",
+            function(data) {
+                $("#treePaid").tree({
+                    data: data,
+                    onCreateLi: function(node, $li) {
+                        $li.find('.jqtree-title').not('.jqtree-title-folder').addClass('menu_link');
+                    }
+                });
+                $("#treePaid").bind(
+                    'tree.click',
+                    function(event) {
+                        var node = event.node;
+                        if (node.rmbno) {
+                            loadRmb(node.rmbno);
+                        } else {
+                            $("#treePaid").tree('toggle', node);
+                        }
+                    })
+            }
+        );
+    }
+
     (function ($, Sys) {
         function setUpMyTabs() {
             var stop = false;
@@ -220,6 +301,8 @@
                 height: 240,
                 width: 500,
                 modal: true,
+                draggable: false,
+                dialogClass: 'draggable',
                 close: function () {}
             });
             $("#divWarningDialog").parent().appendTo($("form:first"));
@@ -229,6 +312,8 @@
                 width: 600,
                 position: ['middle', 230],
                 modal: true,
+                draggable: false,
+                dialogClass: 'draggable',
                 title: '<%= Translate("ClearAdvance") %>',
                 close: function () {
                     // allFields.val("").removeClass("ui-state-error");
@@ -242,6 +327,8 @@
                 width: 500,
                 position: ['middle', 230],
                 modal: true,
+                draggable: false,
+                dialogClass: 'draggable',
                 title: '<%= Translate("SplitTransaction") %>',
                 close: function () {
                     // allFields.val("").removeClass("ui-state-error");
@@ -268,6 +355,8 @@
                 position:['middle', 150],
                 width: 500,
                 modal: true,
+                draggable: false,
+                dialogClass: 'draggable',
                 title: '<%= Translate("CreateRmb") %>',
                 close: function () {
                     //  allFields.val("").removeClass("ui-state-error");
@@ -281,6 +370,8 @@
                 height: 400,
                 width: 600,
                 modal: true,
+                draggable: false,
+                dialogClass: 'draggable',
                 close: function () {
                     // allFields.val("").removeClass("ui-state-error");
                 }
@@ -293,6 +384,8 @@
                 height: 150,
                 width: 500,
                 modal: true,
+                draggable: false,
+                dialogClass: 'draggable',
                 title: '<%= Translate("AccountWarning")%>',
                 close: function () {
                     //  allFields.val("").removeClass("ui-state-error");
@@ -318,6 +411,8 @@
                 height: 235,
                 width: 625,
                 modal: true,
+                draggable: false,
+                dialogClass: 'draggable',
                 title: '<%= Translate("SuggestedPayments") %>',
                 close: function () {
                     //  allFields.val("").removeClass("ui-state-error");
@@ -383,79 +478,9 @@
         };
 
         function loadFinanceTrees() {
-            $.getJSON(
-                "/DesktopModules/AgapeConnect/StaffRmb/WebService.asmx/AllRmbs?portalid="+$('#<%= hfPortalId.ClientID %>').val()+
-                            "&tabmoduleid="+$('#<%= hfTabModuleId.ClientID %>').val()+"&status=<%= StaffRmb.RmbStatus.Submitted%>",
-                function(data) {
-                    $("#treeSubmitted").tree({
-                        data: data,
-                        onCreateLi: function(node, $li) {
-                            $li.find('.jqtree-title').not('.jqtree-title-folder').addClass('menu_link');
-                        }
-                    });
-                    $("#treeSubmitted").bind(
-                        'tree.click',
-                        function(event) {
-                            var node = event.node;
-                            if (node.rmbno) {
-                                loadRmb(node.rmbno);
-                            } else {
-                                $("#treeSubmitted").tree('toggle', node);
-                            }
-                        })
-                }
-            );
-            var total_processing = 0;
-            $.getJSON(
-                "/DesktopModules/AgapeConnect/StaffRmb/WebService.asmx/AllRmbs?portalid="+$('#<%= hfPortalId.ClientID %>').val()+
-                            "&tabmoduleid="+$('#<%= hfTabModuleId.ClientID %>').val()+"&status=<%= StaffRmb.RmbStatus.Processing%>",
-                function(data) {
-                    $("#treeProcessing").tree({
-                        data: data,
-                        onCreateLi: function(node, $li) {
-                            $li.find('.jqtree-title').not('.jqtree-title-folder').addClass('menu_link');
-                            total_processing++;
-                        }
-                    });
-                    $("#treeProcessing").bind(
-                        'tree.click',
-                        function(event) {
-                            var node = event.node;
-                            if (node.rmbno) {
-                                loadRmb(node.rmbno);
-                            } else {
-                                $("#treeProcessing").tree('toggle', node);
-                            }
-                        })
-                }
-                ).done(function() {
-                    <%If IsAccounts() Then%>
-                    $('#lblProcessing').text('(' + total_processing + ')');
-                    <%End If%>
-                }
-            );
-            $.getJSON(
-                "/DesktopModules/AgapeConnect/StaffRmb/WebService.asmx/AllRmbs?portalid="+$('#<%= hfPortalId.ClientID %>').val()+
-                            "&tabmoduleid="+$('#<%= hfTabModuleId.ClientID %>').val()+"&status=<%= StaffRmb.RmbStatus.Paid%>",
-                function(data) {
-                    $("#treePaid").tree({
-                        data: data,
-                        onCreateLi: function(node, $li) {
-                            $li.find('.jqtree-title').not('.jqtree-title-folder').addClass('menu_link');
-                        }
-                    });
-                    $("#treePaid").bind(
-                        'tree.click',
-                        function(event) {
-                            var node = event.node;
-                            if (node.rmbno) {
-                                loadRmb(node.rmbno);
-                            } else {
-                                $("#treePaid").tree('toggle', node);
-                            }
-                        })
-                }
-            );
+            loadAllSubmittedTree();
+            loadAllProcessingTree();
+            loadAllPaidTree();
         }
 
         function enableDraggable() {
@@ -505,10 +530,9 @@
 
  }
 
-    function expandReceipt(){
-        $("#<%= ifReceipt.ClientID %>").show();
-    }
-
+ function expandReceipt(){
+     $("#<%= ifReceipt.ClientID %>").show();
+ }
 
  function closeNewItemPopup()  {$("#divNewItem").dialog("close");}
  function closeNewRmbPopup() {$("#divNewRmb").dialog("close");}

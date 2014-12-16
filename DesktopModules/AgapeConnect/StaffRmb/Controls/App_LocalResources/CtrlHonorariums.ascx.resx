@@ -118,13 +118,13 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="lblDate.Help" xml:space="preserve">
-    <value>Enter the date of this transaction or the start date of the event.</value>
+    <value>Please enter the date you incurred this expense.</value>
   </data>
   <data name="lblDate.Text" xml:space="preserve">
     <value>Date of transaction:</value>
   </data>
   <data name="Explanation.Text" xml:space="preserve">
-    <value>...Non per diem meals, e.g., MPD meals, meetings, grocery items etc. Includes snacks, food and drinks.</value>
+    <value>FILLTHISIN</value>
   </data>
   <data name="lblDesc.Text" xml:space="preserve">
     <value>Description &amp; Min. Purpose:</value>
@@ -139,7 +139,7 @@
     <value>You are missing one or more required fields.</value>
   </data>
   <data name="lblAmount.Help" xml:space="preserve">
-    <value>Please enter the amount of this expense (including tax).</value>
+    <value>Please enter the total amount. (including tax and tip).</value>
   </data>
   <data name="lblAmount.Text" xml:space="preserve">
     <value>Amount:</value>
@@ -148,7 +148,7 @@
     <value>Please enter a brief description and ministry purpose for this meal</value>
   </data>
   <data name="lblProvince.Help" xml:space="preserve">
-    <value>Where was this expense incurred?  If outside of Canada, please select the last option.</value>
+    <value>Please select the province this meal was purchased in.</value>
   </data>
   <data name="lblProvince.Text" xml:space="preserve">
     <value>Province:</value>
@@ -209,14 +209,5 @@
   </data>
   <data name="Error.NoElecReceipt" xml:space="preserve">
     <value>When you choose Electronic Receipts, you must attach your receipt by clicking the Add Receipt button</value>
-  </data>
-  <data name="lblForWhom.Help" xml:space="preserve">
-    <value>Please specify the names of those you are reimbursing the costs of this meal for.</value>
-  </data>
-  <data name="lblForWhom.Text" xml:space="preserve">
-    <value>For whom? </value>
-  </data>
-  <data name="tbForWhom.Hint" xml:space="preserve">
-    <value>Meal Participants</value>
   </data>
 </root>

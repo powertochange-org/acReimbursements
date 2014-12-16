@@ -207,13 +207,13 @@
   <data name="lblExchangeRate.Text" xml:space="preserve">
     <value>exchange&amp;nbsp;rate:</value>
   </data>
-  <data name="lblDestination.Hint" xml:space="preserve">
+  <data name="tbDestination.Hint" xml:space="preserve">
     <value>destination</value>
   </data>
   <data name="lblOrigin.Help" xml:space="preserve">
     <value>Where did you begin / end this ministry trip?</value>
   </data>
-  <data name="lblOrigin.Hint" xml:space="preserve">
+  <data name="tbOrigin.Hint" xml:space="preserve">
     <value>origin</value>
   </data>
   <data name="lblOrigin.Text" xml:space="preserve">
