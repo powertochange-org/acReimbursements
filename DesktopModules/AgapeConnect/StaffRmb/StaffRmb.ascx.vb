@@ -3613,7 +3613,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Public Function showSecondTypeRow(ByVal typeId As Integer) As Boolean
             Try
                 Dim tName = (From c In d.AP_Staff_RmbLineTypes Where c.LineTypeId = typeId Select c.TypeName).First().ToLower()
-                If (tName.Equals("per diem")) Then Return True
+                If (tName.Equals("per diem")) And IsAccounts() Then Return True
                 If (tName.Equals("meals")) Then Return True
             Catch
             End Try
