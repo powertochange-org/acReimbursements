@@ -378,7 +378,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             Order By c.RMBNo Descending
                             Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId)
                 If userIsEDMS Then
-                    ApprovableRmbs.Concat(From c In d.AP_Staff_Rmbs
+                    ApprovableRmbs = ApprovableRmbs.Union(From c In d.AP_Staff_Rmbs
                                           Where c.Status = RmbStatus.PendingEDMSApproval And c.ApprDate Is Nothing And c.PortalId = PortalId
                                           Order By c.RMBNo Descending
                                           Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId)
@@ -1574,7 +1574,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 If NewStatus = RmbStatus.Submitted Then
                     SendApprovalEmail(rmb)
                 End If
-                Log(rmb.RID, LOG_LEVEL_INFO, "SUBMITTED")
+                Log(rmb.RID, LOG_LEVEL_INFO, "SUBMITTED to " & UserController.GetUserById(PortalId, rmb.ApprUserId).DisplayName)
 
                 'use an alert to switch back to the main window from the printout window
                 ScriptManager.RegisterStartupScript(Page, Me.GetType(), "popup_and_select", printable & " alert(""" & message & """); selectIndex(1)", True)
