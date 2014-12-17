@@ -646,7 +646,8 @@
                     return false;
                 }
             }
-            catch {
+            catch
+            {
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.Amount", LocalResourceFile);
                 return false;
             }
