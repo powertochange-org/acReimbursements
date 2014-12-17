@@ -378,7 +378,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             Order By c.RMBNo Descending
                             Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId)
                 If userIsEDMS Then
-                    ApprovableRmbs.Concat(From c In d.AP_Staff_Rmbs
+                    ApprovableRmbs = ApprovableRmbs.Union(From c In d.AP_Staff_Rmbs
                                           Where c.Status = RmbStatus.PendingEDMSApproval And c.ApprDate Is Nothing And c.PortalId = PortalId
                                           Order By c.RMBNo Descending
                                           Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId)
