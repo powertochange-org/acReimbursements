@@ -1338,7 +1338,7 @@
                                             <asp:Label ID="ttlWaitingApp" runat="server" resourcekey="AwaitingApproval"></asp:Label>
                                             <asp:Label ID="ttlApprovedBy" runat="server" resourcekey="ApprovedBy" Visible="false"></asp:Label>
                                         </td>
-                                        <td class="hdrValue" valign="top">
+                                        <td class="hdrValue" >
                                             <asp:DropDownList ID="ddlApprovedBy" AutoPostBack="true" runat="server" ></asp:DropDownList>
                                             <asp:Label ID="lblApprovedBy" runat="server" Visible="false"></asp:Label>
                                         </td>
