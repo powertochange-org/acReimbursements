@@ -1161,6 +1161,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim nextReceiptNo As Integer = 1
             Dim repeat As Integer = 1
             Dim insert As Boolean = True
+            Dim success As Boolean = False
             Dim imageFiles As IQueryable(Of AP_Staff_RmbLine_File)
             Dim line As AP_Staff_RmbLine = Nothing
             If (btnSaveLine.CommandName = "Edit") Then
@@ -1258,23 +1259,27 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             Next
                         End If
                         d.SubmitChanges()
+                        success = True
                     Else ' The form was not valid
                         ReloadInvalidForm()
+                        success = False
                     End If
                 End If
                 transactionDate = transactionDate.AddDays(1) 'add a day for each iteration of repeat
             Next
             ' Reset to 'save' mode
-            btnSaveLine.CommandName = "Save"
-            ' If these changes are being made by somebody other than the form owner or delegate
-            ' then mark the form as having been changed
-            Dim rmb = (From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value)).First
-            If (UserId <> rmb.UserId And (rmb.SpareField3 Is Nothing Or UserId <> CInt(rmb.SpareField3))) Then
-                rmb.Changed = True
-                d.SubmitChanges()
+            If (success) Then
+                btnSaveLine.CommandName = "Save"
+                ' If these changes are being made by somebody other than the form owner or delegate
+                ' then mark the form as having been changed
+                Dim rmb = (From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value)).First
+                If (UserId <> rmb.UserId And (rmb.SpareField3 Is Nothing Or UserId <> CInt(rmb.SpareField3))) Then
+                    rmb.Changed = True
+                    d.SubmitChanges()
+                End If
+                Await LoadRmbAsync(hfRmbNo.Value)
+                ScriptManager.RegisterClientScriptBlock(Page, Me.GetType(), "hide_expense_popup", "closeNewItemPopup();", True)
             End If
-            Await LoadRmbAsync(hfRmbNo.Value)
-            ScriptManager.RegisterClientScriptBlock(Page, Me.GetType(), "hide_expense_popup", "closeNewItemPopup();", True)
         End Sub
 
         Protected Sub btnCancelLine_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnCancelLine.Click
@@ -1297,11 +1302,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Private Sub ReloadInvalidForm()
             ' Need to check the current state of electronic receipts and currency conversions 
             ' and set the attribute to match; otherwise, it will get reset to the default state. 
-            If (hfOrigCurrency.Value <> StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)) Then
-                Dim jscript = "$('.exchangeRate').val('" & hfExchangeRate.Value + "');"
-                jscript &= "$('.equivalentCAD').val('" & hfOrigCurrencyValue.Value / hfExchangeRate.Value & "');"
-                ScriptManager.RegisterClientScriptBlock(Page, Me.GetType(), "fixCurrency", jscript, True)
-            End If
+            'Dim currency = theControl.GetType().GetProperty("Currency").GetValue(theControl, Nothing)
+            'If (currency <> StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)) Then
+            '    Dim jscript = "$('.exchangeRate').val('" & hfExchangeRate.Value + "');"
+            '    jscript &= "$('.equivalentCAD').val('" & hfOrigCurrencyValue.Value / hfExchangeRate.Value & "');"
+            '    ScriptManager.RegisterClientScriptBlock(Page, Me.GetType(), "fixCurrency", jscript, True)
+            'End If
+            btnSaveLine.Enabled = True
             theControl.GetType().GetMethod("Initialize").Invoke(theControl, New Object() {Settings})
             If (theControl.GetType().GetProperty("ReceiptType") IsNot Nothing) Then
                 If (CInt(theControl.GetType().GetProperty("ReceiptType").GetValue(theControl, Nothing) = RmbReceiptType.Electronic)) Then
@@ -1312,14 +1319,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     pnlElecReceipts.Attributes("style") = "display: none"
                 End If
             End If
-            Try
-                Dim method As System.Reflection.MethodInfo = theControl.GetType().GetMethod("SetupView")
-                If method IsNot Nothing Then
-                    method.Invoke(theControl, New Object() {Settings})
-                End If
-            Catch ex As Exception
-
-            End Try
         End Sub
 
         Protected Async Sub btnAddClearingItem_click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnAddClearingItem.Click

@@ -358,7 +358,8 @@
         {
             if (Page.IsPostBack)
             {
-                //Currency_Change(null, null);
+                // Hide currency converter, if it is not needed
+                Currency_Change(null, null);
             }
         }
         else
@@ -386,7 +387,11 @@
         if (NoReceiptItem.Enabled)
         {
             NoReceiptItem.Text = DotNetNuke.Services.Localization.Localization.GetString("NoReceipt", LocalResourceFile).Replace("[LIMIT]", LIMIT.ToString());
-            NoReceiptItem.Attributes.Add("disabled", (CADValue > LIMIT)?"disabled":"");
+            NoReceiptItem.Attributes.Remove("disabled");
+            if (CADValue > LIMIT)
+            {
+                NoReceiptItem.Attributes.Add("disabled", "disabled");
+            }
             ddlReceipt.Items.Add(NoReceiptItem);
         }
         ddlReceipt.Items.Add(StandardItem);
@@ -629,12 +634,13 @@
             try
             {
                 Double amount = Double.Parse(tbAmount.Text);
+                Double CAD = Double.Parse(tbCADAmount.Text);
                 if (amount <= 0)
                 {
                     ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.NegativeAmount", LocalResourceFile);
                     return false;
                 }
-                if (amount > 10000)
+                if (CAD > 10000)
                 {
                     ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.LargeAmount", LocalResourceFile);
                     return false;
