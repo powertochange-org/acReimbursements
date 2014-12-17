@@ -1768,7 +1768,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 If NewStatus = RmbStatus.Submitted Then
                     SendApprovalEmail(rmb)
                 End If
-                Log(rmb.RID, LOG_LEVEL_INFO, "SUBMITTED")
+                Log(rmb.RID, LOG_LEVEL_INFO, "SUBMITTED to " & UserController.GetUserById(PortalId, rmb.ApprUserId).DisplayName)
 
                 'use an alert to switch back to the main window from the printout window
                 ScriptManager.RegisterStartupScript(Page, Me.GetType(), "popup_and_select", printable & " alert(""" & message & """); selectIndex(1)", True)
