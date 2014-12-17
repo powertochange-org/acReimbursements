@@ -596,18 +596,20 @@
             try
             {
                 Double amount = Double.Parse(tbAmount.Text);
+                Double CAD = Double.Parse(tbCADAmount.Text);
                 if (amount <= 0)
                 {
                     ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.NegativeAmount", LocalResourceFile);
                     return false;
                 }
-                if (amount > 10000)
+                if (CAD > 10000)
                 {
                     ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.LargeAmount", LocalResourceFile);
                     return false;
                 }
             }
-            catch {
+            catch
+            {
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.Amount", LocalResourceFile);
                 return false;
             }
