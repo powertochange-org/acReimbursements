@@ -654,6 +654,10 @@
             try
             {
                 Double amount = Double.Parse(tbAmount.Text);
+                if (tbCADAmount.Text.Equals(String.Empty))
+                {
+                    tbCADAmount.Text = CADValue.ToString("n2", new CultureInfo("en-US"));
+                }
                 if (amount <= 0)
                 {
                     ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.NegativeAmount", LocalResourceFile);
