@@ -74,7 +74,8 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
         {
             tbSupper.Text = "0.00";
         }
-        ScriptManager.RegisterClientScriptBlock(cbBreakfast, typeof(CheckBox), "calculate", "updatePerDiem($('.pdbreakfast'),$('.pdbreakfast').is(':enabled'));", true);
+
+        
         // Set up help strings
         hlpDesc.Text = DotNetNuke.Services.Localization.Localization.GetString("lblDesc.Help", LocalResourceFile);
         hlpDate.Text = DotNetNuke.Services.Localization.Localization.GetString("lblDate.Help", LocalResourceFile);
@@ -141,13 +142,16 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
             {
                 double amount = double.Parse(value);
                 cbBreakfast.Checked = (amount > 0);
+                tbBreakfast.Enabled = (amount > 0);
                 tbBreakfast.Text = value;
             }
             catch
             {
                 cbBreakfast.Checked = false;
+                tbBreakfast.Enabled = false;
                 tbBreakfast.Text = "0";
             }
+            ScriptManager.RegisterClientScriptBlock(cbBreakfast, typeof(CheckBox), "calculate", "calculatePerDiemTotal();", true);
         }
     }
     new public string Spare3
@@ -173,13 +177,16 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
             {
                 double amount = double.Parse(value);
                 cbLunch.Checked = (amount > 0);
+                tbLunch.Enabled = (amount > 0);
                 tbLunch.Text = value;
             }
             catch
             {
                 cbLunch.Checked = false;
+                tbLunch.Enabled = false;
                 tbLunch.Text = "0";
             }
+            ScriptManager.RegisterClientScriptBlock(cbLunch, typeof(CheckBox), "calculate", "calculatePerDiemTotal();", true);
         }
     }
     new public string Spare4
@@ -205,13 +212,16 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
             {
                 double amount = double.Parse(value);
                 cbSupper.Checked = (amount > 0);
+                tbSupper.Enabled = (amount > 0);
                 tbSupper.Text = value;
             }
             catch
             {
                 cbSupper.Checked = false;
+                tbLunch.Enabled = false;
                 tbSupper.Text = "0";
             }
+            ScriptManager.RegisterClientScriptBlock(cbSupper, typeof(CheckBox), "calculate", "calculatePerDiemTotal();", true);
         }
     }
     new public string Spare5
