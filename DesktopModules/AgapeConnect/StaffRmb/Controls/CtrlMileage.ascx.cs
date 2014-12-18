@@ -79,7 +79,7 @@ public partial class ControlBase : StaffRmbControl {
         get {
             try
             {
-                return int.Parse(tbAmount.Text);
+                return Convert.ToInt32(double.Parse(tbAmount.Text));
             }
             catch { }
             return 0;
@@ -92,7 +92,8 @@ public partial class ControlBase : StaffRmbControl {
         {
             try { return decimal.Parse(ddlDistUnits.SelectedValue); }
             catch { }
-        return -1;}
+            return -1;
+        }
         set {}
     }
     new public bool Receipt

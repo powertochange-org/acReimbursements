@@ -1219,7 +1219,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         Dim mileageString = ""
                         If (LineTypeName.Equals("Mileage")) Then
                             line.Mileage = CInt(ucType.GetProperty("Mileage").GetValue(theControl, Nothing))
-                            line.MileageRate = ucType.GetProperty("MileageRage").GetValue(theControl, Nothing)
+                            line.MileageRate = ucType.GetProperty("MileageRate").GetValue(theControl, Nothing)
                             mileageString = GetMileageString(line.Mileage, line.MileageRate)
                         End If
                         ' Short Comment
