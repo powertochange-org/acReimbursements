@@ -44,7 +44,7 @@ public partial class ControlBase : StaffRmbControl {
             double value = 0;
             try
             {
-                value = Math.Round(double.Parse(tbAmount.Text) * double.Parse(ddlDistUnits.SelectedValue) * 100) / 100;
+                value = Math.Round(double.Parse(tbAmount.Text)) * double.Parse(ddlDistUnits.SelectedValue);
             }
             catch { }
             return value;
