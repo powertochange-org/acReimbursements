@@ -532,25 +532,6 @@
         }
         public double ExchangeRate
         {
-            get {
-                try
-                {
-                    return double.Parse(tbExchangeRate.Text);
-                }
-                catch
-                {
-                    return 1;
-                }
-            }
-            set { tbExchangeRate.Text = value.ToString(); }
-        }
-        public string Currency
-        {
-            get { return ddlCurrencies.SelectedValue; }
-            set { ddlCurrencies.SelectedValue = value; }
-        }
-        public double ExchangeRate
-        {
             get
             {
                 try
