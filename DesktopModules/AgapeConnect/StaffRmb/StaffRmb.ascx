@@ -208,7 +208,9 @@
                     data: data,
                     onCreateLi: function(node, $li) {
                         $li.find('.jqtree-title').not('.jqtree-title-folder').addClass('menu_link');
-                        total_processing++;
+                        if (node.rmbno) {
+                            total_processing++;
+                        }
                     }
                 });
                 $("#treeProcessing").bind(

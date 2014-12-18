@@ -58,7 +58,7 @@
                </div>   
             </asp:Panel>
         </td>
-        <td colspan="2"><asp:TextBox ID="tbForWhom" runat="server" CssClass="required" AutoCompleteType="None" Visible="false"></asp:TextBox></td>
+        <td colspan="2"><asp:TextBox ID="tbForWhom" runat="server" CssClass="required" MaxLength="80" AutoCompleteType="None" Visible="false"></asp:TextBox></td>
     </tr>
     <tr>
         <td><b><asp:label runat="server" id="lblDate" controlname="dtDate" ResourceKey="lblDate"  /></b>
