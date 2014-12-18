@@ -161,6 +161,10 @@ public partial class ControlBase : StaffRmbControl {
         try
         {
             Double amount = Double.Parse(tbAmount.Text);
+            if (tbCADAmount.Text.Equals(String.Empty))
+            {
+                tbCADAmount.Text = tbAmount.Text;
+            }
             if (amount <= 0)
             {
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.NegativeAmount", LocalResourceFile);

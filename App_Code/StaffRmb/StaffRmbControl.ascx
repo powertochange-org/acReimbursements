@@ -511,7 +511,10 @@
             set { 
                 hfCADValue.Value = value.ToString(); //this is used by javascript for some reason TODO:get rid of this
                 // disable "No Receipt" option, if above limit
-                ddlReceipt.Items.FindByValue(RmbReceiptType.No_Receipt.ToString()).Attributes.Add("disabled", (value <= double.Parse(hfNoReceiptLimit.Value))?"disabled":"");
+                if (ddlReceipt.Items.FindByValue(RmbReceiptType.No_Receipt.ToString()) != null)
+                {
+                    ddlReceipt.Items.FindByValue(RmbReceiptType.No_Receipt.ToString()).Attributes.Add("disabled", (value <= double.Parse(hfNoReceiptLimit.Value)) ? "disabled" : "");
+                }
                 if (value <= 0) return;
                 double xRate = (Amount / value);
                 tbExchangeRate.Text = string.Format("{0:f4}", xRate);
