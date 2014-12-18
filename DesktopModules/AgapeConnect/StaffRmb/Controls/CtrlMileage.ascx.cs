@@ -79,7 +79,7 @@ public partial class ControlBase : StaffRmbControl {
         get {
             try
             {
-                return int.Parse(tbAmount.Text);
+                return Convert.ToInt32(double.Parse(tbAmount.Text));
             }
             catch { }
             return 0;
