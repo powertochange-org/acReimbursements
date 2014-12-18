@@ -654,18 +654,12 @@
             try
             {
                 Double amount = Double.Parse(tbAmount.Text);
-                Double CAD = 0;
-                if (tbCADAmount.Text.Equals(String.Empty)) {
-                    CAD = amount * ExchangeRate;
-                } else {
-                    CAD = Double.Parse(tbCADAmount.Text);
-                }
                 if (amount <= 0)
                 {
                     ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.NegativeAmount", LocalResourceFile);
                     return false;
                 }
-                if (CAD > 10000)
+                if (CADValue > 10000)
                 {
                     ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.LargeAmount", LocalResourceFile);
                     return false;
