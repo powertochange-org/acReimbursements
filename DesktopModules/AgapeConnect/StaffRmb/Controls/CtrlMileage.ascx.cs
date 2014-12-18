@@ -44,7 +44,7 @@ public partial class ControlBase : StaffRmbControl {
             double value = 0;
             try
             {
-                value = Math.Round(double.Parse(tbAmount.Text) * double.Parse(ddlDistUnits.SelectedValue));
+                value = Math.Round(double.Parse(tbAmount.Text) * double.Parse(ddlDistUnits.SelectedValue) * 100) / 100;
             }
             catch { }
             return value;
@@ -155,6 +155,29 @@ public partial class ControlBase : StaffRmbControl {
         lblReceipt.Visible = false;
         ddlReceipt.Visible = false;
         lbReceipt.Visible = false;
+    }
+    public bool validate_amount()
+    {
+        try
+        {
+            Double amount = Double.Parse(tbAmount.Text);
+            if (amount <= 0)
+            {
+                ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.NegativeAmount", LocalResourceFile);
+                return false;
+            }
+            if (amount > 10000)
+            {
+                ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.LargeAmount", LocalResourceFile);
+                return false;
+            }
+        }
+        catch
+        {
+            ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.Amount", LocalResourceFile);
+            return false;
+        }
+        return true;
     }
 
 }
