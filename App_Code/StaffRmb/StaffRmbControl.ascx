@@ -544,6 +544,26 @@
             }
             set { tbExchangeRate.Text = value.ToString(); }
         }
+        public string Currency
+        {
+            get { return ddlCurrencies.SelectedValue; }
+            set { ddlCurrencies.SelectedValue = value; }
+        }
+        public double ExchangeRate
+        {
+            get
+            {
+                try
+                {
+                    return double.Parse(tbExchangeRate.Text);
+                }
+                catch
+                {
+                    return 1;
+                }
+            }
+            set { tbExchangeRate.Text = value.ToString(); }
+        }
     #endregion
 
     #region Currency functions
@@ -634,7 +654,12 @@
             try
             {
                 Double amount = Double.Parse(tbAmount.Text);
-                Double CAD = Double.Parse(tbCADAmount.Text);
+                Double CAD = 0;
+                if (tbCADAmount.Text.Equals(String.Empty)) {
+                    CAD = amount * ExchangeRate;
+                } else {
+                    CAD = Double.Parse(tbCADAmount.Text);
+                }
                 if (amount <= 0)
                 {
                     ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.NegativeAmount", LocalResourceFile);
