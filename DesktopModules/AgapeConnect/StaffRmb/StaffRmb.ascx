@@ -1297,7 +1297,7 @@
                                                 <legend class="AgapeH4">
                                                     <asp:Label ID="ttlYourComments" runat="server" CssClass="hdrTitle" resourcekey="YourComments" Visible="false" /><asp:Label
                                                         ID="ttlUserComments" runat="server" Text="User's Comments" /></legend>
-                                                <asp:Label ID="lblComments" runat="server" Height="60px" Visible="false"></asp:Label>
+                                                <asp:Label ID="lblComments" runat="server" Height="60px" Style="overflow-y:auto" Visible="false"></asp:Label>
                                                 <asp:TextBox ID="tbComments" runat="server" Height="55px" TextMode="MultiLine" Width="100%"
                                                     onKeyPress="showSaveButton();"></asp:TextBox>
                                             </fieldset>
@@ -1306,7 +1306,7 @@
                                             <fieldset>
                                                 <legend class="AgapeH4">
                                                     <asp:Label ID="Label26" runat="server" CssClass="hdrTitle" resourcekey="ApproversComments"></asp:Label></legend>
-                                                <asp:Label ID="lblApprComments" runat="server" Height="60px"></asp:Label>
+                                                <asp:Label ID="lblApprComments" runat="server" Height="60px" Style="overflow-y:auto"></asp:Label>
                                                 <asp:TextBox ID="tbApprComments" runat="server" Height="35px" TextMode="MultiLine"
                                                     Width="100%" Visible="false"  onKeyPress="showSaveButton();"></asp:TextBox>
                                                 <asp:CheckBox ID="cbApprMoreInfo" runat="server" AutoPostBack="true" resourcekey="btnMoreInfo" />
@@ -1316,7 +1316,7 @@
                                             <fieldset>
                                                 <legend class="AgapeH4">
                                                     <asp:Label ID="Label27" runat="server" CssClass="hdrTitle" resourcekey="AccountsComments"></asp:Label></legend>
-                                                <asp:Label ID="lblAccComments" runat="server" Height="60px"></asp:Label>
+                                                <asp:Label ID="lblAccComments" runat="server" Height="60px" Style="overflow-y:auto"></asp:Label>
                                                 <asp:TextBox ID="tbAccComments" runat="server" Height="35px" TextMode="MultiLine" Width="100%"
                                                     Visible="false"  onKeyPress="showSaveButton();"></asp:TextBox>
                                                 <asp:CheckBox ID="cbMoreInfo" runat="server" AutoPostBack="true" resourcekey="btnMoreInfo" onclick="more_info_clicked(this)" />
