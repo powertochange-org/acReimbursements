@@ -24,7 +24,16 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
     new public string Spare2
     {
         get { return (cbExtra.Checked ? "true" : "false"); }
-        set { cbExtra.Checked = value.Equals("true"); }
+        set {
+            if (value == null)
+            {
+                cbExtra.Checked = false;
+            }
+            else
+            {
+                cbExtra.Checked = value.Equals("true");
+            }
+        }
     }
   
 
