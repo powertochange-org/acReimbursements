@@ -467,7 +467,10 @@
             }
         }
         public int ReceiptType {
-            get { return int.Parse(ddlReceipt.SelectedValue); }
+            get { 
+                if (ddlReceipt.SelectedValue == "") return -1;
+                return int.Parse(ddlReceipt.SelectedValue); 
+            }
             set { ddlReceipt.SelectedValue = value.ToString(); }
         }
         public bool Taxable {

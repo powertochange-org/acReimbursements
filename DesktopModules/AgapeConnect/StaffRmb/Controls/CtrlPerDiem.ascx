@@ -9,7 +9,6 @@
             <table style="font-size:9pt">
                 <tr>
                     <td >
-                        <asp:TextBox ID="tbAmount2" runat="server" Visible="false" />
                         <asp:CheckBox ID="cbBreakfast" runat="server" CssClass="perdiem" OnClick="updatePerDiem($('.pdbreakfast'),$(this).is(':checked'));"/>
                         <b><asp:label runat="server" resourceKey="lblBreakfast" /></b> 
                     </td>
@@ -30,7 +29,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <asp:CheckBox ID="cbSupper" runat="server" CssClass="perdiem"  OnClick="updatePerDiem($('.pdsupper'),$(this).is(':checked'));"/>
+                        <asp:CheckBox ID="cbSupper" runat="server" CssClass="perdiem" OnClick="updatePerDiem($('.pdsupper'),$(this).is(':checked'));"/>
                         <b><asp:label runat="server" resourcekey="lblSupper" /></b>
                     </td>
                     <td>

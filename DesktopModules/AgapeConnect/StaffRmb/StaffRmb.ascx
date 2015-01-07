@@ -137,6 +137,9 @@
         control.attr('disabled', !enabled);
         if (enabled) {
             control.removeClass('aspNetDisabled');
+            if (control.hasClass('pdbreakfast') && control.val()==0) { control.val($("[id$='hfBreakfast']").val()); }
+            if (control.hasClass('pdlunch') && control.val()==0) { control.val($("[id$='hfLunch']").val()); }
+            if (control.hasClass('pdsupper') && control.val()==0) { control.val($("[id$='hfSupper']").val()); }
         } else {
             control.addClass('aspNetDisabled');
             control.text="0"

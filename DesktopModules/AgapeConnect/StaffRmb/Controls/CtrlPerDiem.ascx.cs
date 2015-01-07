@@ -19,7 +19,7 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
         lblReceipt.Visible = false;
         lbReceipt.Visible = false;
         lblAmount.Visible = false;
-        tbAmount.Visible = false;
+        tbAmount.Attributes.Add("style", "display:none");
         lbAmount.Visible = false;
         currencyUpdatePanel.Visible = false;
     }
@@ -264,6 +264,11 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
             tbRepeat.Visible = true;
             lblRepeat.Visible = true;
         }
+    }
+    new public double CADValue
+    {
+        get { return Amount; }
+        set { }
     }
 
     new public bool ValidateForm(int Userid)
