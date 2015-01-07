@@ -111,6 +111,11 @@ public partial class ControlBase : StaffRmbControl {
         get { return false; }
         set { }
     }
+    new public double CADValue
+    {
+        get { return Amount; }
+        set { }
+    }
 
     public bool ValidateForm(int UserId)
     {

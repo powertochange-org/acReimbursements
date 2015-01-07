@@ -515,7 +515,14 @@
             get {
                 try
                 {
-                    return double.Parse(tbCADAmount.Text);
+                    if (tbCADAmount.Text.Length > 0)
+                    {
+                        return double.Parse(tbCADAmount.Text);
+                    }
+                    else
+                    {
+                        return double.Parse(tbAmount.Text);
+                    }
                 } catch {
                     return 0;
                 }
