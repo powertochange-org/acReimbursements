@@ -1185,9 +1185,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim age = DateDiff(DateInterval.Day, transactionDate, Today)
 
                 If (line IsNot Nothing) Then
-                    If (ucType.GetProperty("ReceiptsAttached") IsNot Nothing) Then
-                        ucType.GetProperty("ReceiptsAttached").SetValue(theControl, imageFiles.Count() > 0, Nothing)
-                    End If
+                    Try
+                        If (ucType.GetProperty("ReceiptsAttached") IsNot Nothing) Then
+                            ucType.GetProperty("ReceiptsAttached").SetValue(theControl, imageFiles.Count() > 0, Nothing)
+                        End If
+                    Catch
+                    End Try
                     ' check validity
                     If ucType.GetMethod("ValidateForm").Invoke(theControl, New Object() {ownerId}) = True Then
                         If (insert) Then
@@ -1201,8 +1204,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         line.LineType = CInt(ddlLineTypes.SelectedValue)
                         line.Supplier = CStr(ucType.GetProperty("Supplier").GetValue(theControl, Nothing))
                         line.Comment = CStr(ucType.GetProperty("Comment").GetValue(theControl, Nothing))
-                        line.OrigCurrency = ucType.GetProperty("Currency").GetValue(theControl, Nothing)
-                        line.ExchangeRate = ucType.GetProperty("ExchangeRate").GetValue(theControl, Nothing)
+                        Try
+                            line.OrigCurrency = ucType.GetProperty("Currency").GetValue(theControl, Nothing)
+                            line.ExchangeRate = ucType.GetProperty("ExchangeRate").GetValue(theControl, Nothing)
+                        Catch
+                        End Try
                         line.OrigCurrencyAmount = CDbl(ucType.GetProperty("Amount").GetValue(theControl, Nothing))
                         line.GrossAmount = CDbl(ucType.GetProperty("CADValue").GetValue(theControl, Nothing))
                         line.LargeTransaction = (line.GrossAmount >= Settings("TeamLeaderLimit"))
@@ -2109,14 +2115,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         'hfOrigCurrencyValue.Value = CDbl(theLine.First.OrigCurrencyAmount)
                         jscript.Append(" $('#" & hfOrigCurrencyValue.ClientID & "').val(" & theLine.First.OrigCurrencyAmount & ");")
                     End If
-                    If (Not String.IsNullOrEmpty(theLine.First.OrigCurrency)) Then
-                        'hfOrigCurrency.Value = theLine.First.OrigCurrency
-                        ucType.GetMethod("Set_Currency").Invoke(theControl, New Object() {theLine.First.OrigCurrency})
-                        jscript.Append(" $('#" & hfOrigCurrency.ClientID & "').val('" & theLine.First.OrigCurrency & "');")
-                    Else
-                        'hfOrigCurrency.Value = ac
-                        jscript.Append(" $('#" & hfOrigCurrency.ClientID & "').val('" & ac & "');")
+                    Dim currency = ac
+                    If (theLine.First.OrigCurrency IsNot Nothing AndAlso theLine.First.OrigCurrency <> ac) Then
+                        currency = theLine.First.OrigCurrency
                     End If
+                    jscript.Append(" $('#" & hfOrigCurrency.ClientID & "').val('" & currency & "');")
+                    Try
+                        ucType.GetMethod("Set_Currency").Invoke(theControl, New Object() {theLine.First.OrigCurrency})
+                    Catch ex As Exception
+                        'Some controls may not have a Set_Currency method (ie. Advances)
+                    End Try
 
                     ucType.GetProperty("theDate").SetValue(theControl, theLine.First.TransDate, Nothing)
                     ucType.GetProperty("VAT").SetValue(theControl, theLine.First.VATReceipt, Nothing)
@@ -2128,14 +2136,18 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ucType.GetProperty("Spare5").SetValue(theControl, theLine.First.Spare5, Nothing)
 
                     Dim mileageString As String = ""
-                    If (ucType.GetProperty("Mileage") IsNot Nothing) Then
-                        If (theLine.First.Mileage IsNot Nothing) Then
-                            ucType.GetProperty("Mileage").SetValue(theControl, theLine.First.Mileage, Nothing)
-                            mileageString = GetMileageString(theLine.First.Mileage, theLine.First.MileageRate)
-                        Else
-                            ucType.GetProperty("Mileage").SetValue(theControl, 0, Nothing)
+                    Try
+                        If (ucType.GetProperty("Mileage") IsNot Nothing) Then
+                            If (theLine.First.Mileage IsNot Nothing) Then
+                                ucType.GetProperty("Mileage").SetValue(theControl, theLine.First.Mileage, Nothing)
+                                mileageString = GetMileageString(theLine.First.Mileage, theLine.First.MileageRate)
+                            Else
+                                ucType.GetProperty("Mileage").SetValue(theControl, 0, Nothing)
+                            End If
                         End If
-                    End If
+                    Catch
+                        'Some controls may not have a Mileage property
+                    End Try
 
                     Dim receiptMode = RmbReceiptType.Standard
                     If theLine.First.VATReceipt Then
@@ -2143,12 +2155,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         ' If we have any files matching this line, or our receiptImageId is valid
                     ElseIf (From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo = theLine.First.RmbLineNo And lf.RMBNo = theLine.First.RmbNo).Count > 0 Then
                         receiptMode = RmbReceiptType.Electronic
-                        If (ucType.GetProperty("ReceiptsAttached") IsNot Nothing) Then
-                            ucType.GetProperty("ReceiptsAttached").SetValue(theControl, True, Nothing)
-                        End If
+                        Try
+                            If (ucType.GetProperty("ReceiptsAttached") IsNot Nothing) Then
+                                ucType.GetProperty("ReceiptsAttached").SetValue(theControl, True, Nothing)
+                            End If
+                        Catch
+                        End Try
                         ' If we don't have a receipt
                     ElseIf Not theLine.First.Receipt Then
-                        receiptMode = RmbReceiptType.No_Receipt
+                            receiptMode = RmbReceiptType.No_Receipt
                     End If
                     Try
                         ucType.GetProperty("ReceiptType").SetValue(theControl, receiptMode, Nothing)
