@@ -604,13 +604,13 @@
     function update_CAD() {
         // update the equivalent CAD based on the (foreign) amount and exchange rate
         console.log('update_CAD()');
-        var exchange_rate = $('.exchangeRate').val();
+        var exchange_rate = parseFloat($('.exchangeRate').val().replace(',',''));
         if (exchange_rate==0) {
             exchange_rate==1;
             $('.exchangeRate').val('1.0000');
             console.log('0 exchange rate; set to 1');
         }
-        var amount = $('.rmbAmount').val();
+        var amount = parseFloat($('.rmbAmount').val().replace(',',''));
         if (amount==0) {
             $('.rmbAmount').val('0.00');
         }
@@ -624,8 +624,8 @@
     function adjust_exchange_rate() {
         // adjust the exchange rate based on foreign and CAD amounts
         console.log('adjust_exchange_rate()');
-        var amount = $('.rmbAmount').val();
-        var CAD = $('.equivalentCAD').val();
+        var amount = parseFloat($('.rmbAmount').val().replace(',',''));
+        var CAD = parseFloat($('.equivalentCAD').val().replace(',',''));
         var exchange_rate = 0;
         if (CAD <=0 ) {
             $('.equivalentCAD').val($('.rmbAmount').val());
@@ -635,7 +635,7 @@
             exchange_rate = Number(amount / CAD).toFixed(4);
         }
         $('.exchangeRate').val(exchange_rate);
-        console.log('--exchange rate set to: '+ exchange_rate);
+        console.log('--exchange rate set to: '+ exchange_rate + ' (' + amount + "/" + CAD + ')');
     }
 
     function display_foreign_exchange() {
@@ -656,23 +656,14 @@
         console.log('--currency: '+selected_currency + " - " + action);
     }
 
-    function reset_province_if_foreign_expenses() {
-        var local_currency = $("input[name$='hfAccountingCurrency']").val();
-        var selected_currency = $('.ddlCur').val();
-        if (selected_currency != local_currency) {
-            $(".ddlProvince").val("--");
-            console.log('reset province to Outside Canada due to foreign currency selection');
-        }
-    }
-
     function check_if_receipt_is_required() {
         // determine whether the "no receipt" option should be enabled
         console.log('check_if_receipt_is_required()');
-        var limit = $("#<%= hfNoReceiptLimit.ClientID%>").attr('value');
-        var amount = $("input.equivalentCAD").val();
+        var limit = parseFloat($("#<%= hfNoReceiptLimit.ClientID%>").attr('value').replace(',',''));
+        var amount = parseFloat($("input.equivalentCAD").val().replace(',',''));
         var disabled=false;
         try {
-            if (parseFloat(amount) > parseFloat(limit)) {
+            if (amount > limit) {
                 if ($('.ddlReceipt').val() == '<%=StaffRmb.RmbReceiptType.No_Receipt %>') {
                     $('.ddlReceipt').val(<%=StaffRmb.RmbReceiptType.Standard %>);
                 };

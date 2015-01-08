@@ -580,7 +580,7 @@
                         tbCADAmount.Text = "0.00";
                     }
                }
-            ScriptManager.RegisterClientScriptBlock(ddlCurrencies, ddlCurrencies.GetType(), "display_foreign_exchange", "display_foreign_exchange(); reset_province_if_foreign_expenses();", true);
+            ScriptManager.RegisterClientScriptBlock(ddlCurrencies, ddlCurrencies.GetType(), "display_foreign_exchange", "display_foreign_exchange();", true);
         }
 
     #endregion
