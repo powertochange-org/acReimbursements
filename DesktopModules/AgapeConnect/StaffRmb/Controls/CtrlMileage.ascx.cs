@@ -157,7 +157,7 @@ public partial class ControlBase : StaffRmbControl {
         lblSupplier.Visible = false;
         tbSupplier.Visible = false;
         lbSupplier.Visible = false;
-        currencyUpdatePanel.Visible = false;
+        currencyUpdatePanel.Attributes.Add("style", "display:none");
         lblReceipt.Visible = false;
         ddlReceipt.Visible = false;
         lbReceipt.Visible = false;

@@ -14,14 +14,13 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
         tbSupplier.Visible = false;
         lbSupplier.Visible = false;
         lblSupplier.Visible = false;
-        ddlCurrencies.Visible = false;
         ddlReceipt.Visible = false;
         lblReceipt.Visible = false;
         lbReceipt.Visible = false;
         lblAmount.Visible = false;
         tbAmount.Attributes.Add("style", "display:none");
         lbAmount.Visible = false;
-        currencyUpdatePanel.Visible = false;
+        currencyUpdatePanel.Attributes.Add("style", "display:none");
     }
 
     new public void Initialize(Hashtable settings)

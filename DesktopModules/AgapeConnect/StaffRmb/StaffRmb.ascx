@@ -650,11 +650,19 @@
             $('.curDetails').hide();
             action='hide()';
         } else {
-            $(".ddlProvince").val("--");
             $('.curDetails').show();
-            action='show() & location reset to Outside Canada';
+            action='show()';
         }
         console.log('--currency: '+selected_currency + " - " + action);
+    }
+
+    function reset_province_if_foreign_expenses() {
+        var local_currency = $("input[name$='hfAccountingCurrency']").val();
+        var selected_currency = $('.ddlCur').val();
+        if (selected_currency != local_currency) {
+            $(".ddlProvince").val("--");
+            console.log('reset province to Outside Canada due to foreign currency selection');
+        }
     }
 
     function check_if_receipt_is_required() {

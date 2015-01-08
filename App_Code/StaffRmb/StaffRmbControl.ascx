@@ -92,7 +92,7 @@
                                 <div id="dCurrency" class="divCur" >
                                     <table style="font-size:9pt"><tr>
                                     <td style="margin-left:30px">
-                                        <asp:DropDownList ID="ddlCurrencies" runat="server" CssClass="ddlCur" AutoPostBack="true" OnSelectedIndexChanged="Currency_Change" OnChange="display_foreign_exchange();">
+                                        <asp:DropDownList ID="ddlCurrencies" runat="server" CssClass="ddlCur" AutoPostBack="true" OnSelectedIndexChanged="Currency_Change" OnChange="display_foreign_exchange();" >
                                             <asp:ListItem Value="ALL">Albanian Lek</asp:ListItem>
                                             <asp:ListItem Value="DZD">Algerian Dinar</asp:ListItem>
                                             <asp:ListItem Value="ARS">Argentine Peso</asp:ListItem>
@@ -278,7 +278,7 @@
                </div>   
             </asp:Panel>
         </td>
-        <td colspan="2"><asp:DropDownList ID="ddlProvince" CssClass="ddlProvince" runat="server">
+        <td colspan="2"><asp:DropDownList ID="ddlProvince" CssClass="ddlProvince" runat="server" autocomplete="off">
                 <asp:ListItem Text="British Columbia" Value="BC" />
                 <asp:ListItem Text="Alberta" Value="AB" />
                 <asp:ListItem Text="Saskatchewan" Value="SK" />
@@ -580,7 +580,7 @@
                         tbCADAmount.Text = "0.00";
                     }
                }
-            ScriptManager.RegisterClientScriptBlock(ddlCurrencies, ddlCurrencies.GetType(), "display_foreign_exchange", "display_foreign_exchange();", true);
+            ScriptManager.RegisterClientScriptBlock(ddlCurrencies, ddlCurrencies.GetType(), "display_foreign_exchange", "display_foreign_exchange(); reset_province_if_foreign_expenses();", true);
         }
 
     #endregion
