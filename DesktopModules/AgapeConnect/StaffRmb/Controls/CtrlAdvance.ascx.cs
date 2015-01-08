@@ -112,7 +112,7 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
         lblSupplier.Visible = false;
         tbSupplier.Visible = false;
         lbSupplier.Visible = false;
-        currencyUpdatePanel.Visible = false;
+        currencyUpdatePanel.Attributes.Add("style", "display:none");
         lblProvince.Visible = false;
         lbProvince.Visible = false;
         ddlProvince.Visible = false;
