@@ -4564,13 +4564,24 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             'Returns entire text for the "balance" area of the form
             ' account balance for personal accounts or budget numbers for ministry accounts
             hfAccountBalance.Value = Nothing
-            hlpAccountBalance.Text = ""
-            If (account.Equals(String.Empty)) Then Return Translate("AccountBalance") & "<span title='Error: no account number provided'>" + BALANCE_INCONCLUSIVE + "</span>"
-            If (logon.Equals(String.Empty)) Then Return Translate("AccountBalance") & "<span title='Error: no logon provided'>" + BALANCE_INCONCLUSIVE + "</span>"
+            If (account.Equals(String.Empty)) Then
+                hlpAccountBalance.Text = "Error: no account number provided"
+                Return Translate("AccountBalance") & "<span title='Error: no account number provided'>" + BALANCE_INCONCLUSIVE + "</span>"
+            End If
+            If (logon.Equals(String.Empty)) Then
+                hlpAccountBalance.Text = "Error: no logon provided"
+                Return Translate("AccountBalance") & "<span title='Error: no logon provided'>" + BALANCE_INCONCLUSIVE + "</span>"
+            End If
 
             Dim service_result = Await StaffRmbFunctions.getAccountBalanceAsync(account, logon)
-            If service_result.Equals(StaffRmbFunctions.PERMISSION_DENIED_ERROR) Then Return Translate("AccountBalance") & BALANCE_PERMISSION_DENIED
-            If service_result.Equals(StaffRmbFunctions.WEB_SERVICE_ERROR) Then Return Translate("AccountBalance") & "<span title='" & service_result & " Try re-loading.'>Error</span>"
+            If service_result.Equals(StaffRmbFunctions.PERMISSION_DENIED_ERROR) Then
+                hlpAccountBalance.Text = Translate("PermissionDenied")
+                Return Translate("AccountBalance") & BALANCE_PERMISSION_DENIED
+            End If
+            If service_result.Equals(StaffRmbFunctions.WEB_SERVICE_ERROR) Then
+                hlpAccountBalance.Text = Translate("WebServiceError")
+                Return Translate("AccountBalance") & "<span title='" & service_result & " Try re-loading.'>Error</span>"
+            End If
             Try
                 If (StaffRmbFunctions.isStaffAccount(account)) Then
                     Dim bal = Double.Parse(service_result, NumberStyles.Currency)
@@ -4591,7 +4602,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         & Translate("ActualBalance") & "<span class='" & nega & "'>" & actual_string & "</span>"
                 End If
             Catch e As Exception
-                hlpAccountBalance.Text = "Try reloading the page"
+                hlpAccountBalance.Text = "Error: " + e.Message
                 Return Translate("AccountBalance") & "<span title='Error:" + e.Message + " accountBalance result:" + service_result + "'>" + BALANCE_INCONCLUSIVE + "</span>"
             End Try
         End Function
@@ -4640,7 +4651,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             lblAccountBalance.Text = accountBalance
             If (GridView1 IsNot Nothing AndAlso GridView1.FooterRow IsNot Nothing) Then
                 Dim control As Label = GridView1.FooterRow.FindControl("lblRemainingBalance")
-                If control IsNot Nothing Then control.Text = If(isStaffAccount(), Translate("lblRemainingBalance"), Translate("lblRemainingBudget")) & ": "
+                If control IsNot Nothing Then control.Text = If(isStaffAccount(), Translate("lblRemainingBalance"), Translate("lblRemainingBudget"))
             End If
         End Sub
 
