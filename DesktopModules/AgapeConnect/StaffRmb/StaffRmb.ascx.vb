@@ -4377,6 +4377,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             'Returns entire text for the "balance" area of the form
             ' account balance for personal accounts or budget numbers for ministry accounts
             hfAccountBalance.Value = Nothing
+            hlpAccountBalance.Text = ""
             If (account.Equals(String.Empty)) Then Return Translate("AccountBalance") & "<span title='Error: no account number provided'>" + BALANCE_INCONCLUSIVE + "</span>"
             If (logon.Equals(String.Empty)) Then Return Translate("AccountBalance") & "<span title='Error: no logon provided'>" + BALANCE_INCONCLUSIVE + "</span>"
 
@@ -4388,6 +4389,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim bal = Double.Parse(service_result, NumberStyles.Currency)
                     valueOrNull(hfAccountBalance, bal)
                     Dim neg = If(bal < 0, "NormalRed", "")
+                    hlpAccountBalance.Text = Services.Localization.Localization.GetString("lblAccountBalance.Help", LocalResourceFile)
                     Return Translate("AccountBalance") & "<span class='" & neg & "'>" & service_result & "</span>"
                 Else
                     Dim budget_string = service_result.Split(":")(0)
@@ -4397,10 +4399,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     valueOrNull(hfAccountBalance, act - bud)
                     Dim negb = If(bud < 0, "NormalRed", "")
                     Dim nega = If(act < 0, "NormalRed", "")
+                    hlpAccountBalance.Text = Services.Localization.Localization.GetString("lblBudgetBalance.Help", LocalResourceFile)
                     Return Translate("BudgetBalance") & "<span class='" & negb & "'>" & budget_string & "</span>&nbsp;&nbsp;&nbsp;&nbsp;" _
                         & Translate("ActualBalance") & "<span class='" & nega & "'>" & actual_string & "</span>"
                 End If
             Catch e As Exception
+                hlpAccountBalance.Text = "Try reloading the page"
                 Return Translate("AccountBalance") & "<span title='Error:" + e.Message + " accountBalance result:" + service_result + "'>" + BALANCE_INCONCLUSIVE + "</span>"
             End Try
         End Function
@@ -4447,8 +4451,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Private Sub updateBalanceLabel(accountBalance As String)
             lblAccountBalance.Text = accountBalance
-            Dim control As Label = GridView1.FindControl("lblRemainingBalance")
-            If control IsNot Nothing Then control.Text = If(isStaffAccount(), Translate("lblRemainingBalance"), Translate("lblRemainingBudget"))
+            If (GridView1 IsNot Nothing AndAlso GridView1.FooterRow IsNot Nothing) Then
+                Dim control As Label = GridView1.FooterRow.FindControl("lblRemainingBalance")
+                If control IsNot Nothing Then control.Text = If(isStaffAccount(), Translate("lblRemainingBalance"), Translate("lblRemainingBudget")) & ": "
+            End If
         End Sub
 
         Private Sub valueOrNull(hf As HiddenField, s As String)

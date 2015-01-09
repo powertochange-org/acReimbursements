@@ -527,13 +527,14 @@
 
     } (jQuery, window.Sys));
 
-    function GetAccountBalance(jsonQuery){
-        $.getJSON(jsonQuery, function(json){
-        var amountString = '<%=StaffBrokerFunctions.GetSetting("Currency", PortalId)  %>' + json ;
-        $("#<%= lblAccountBalance.ClientId %>").html(amountString) ;
-     });
+function GetAccountBalance(jsonQuery){
+    $.getJSON(jsonQuery, function(json){
+        var amountString = '<%=StaffBrokerFunctions.GetSetting("Currency", PortalId)  %>' + json;
+        $("#<%= lblAccountBalance.ClientId %>").html(amountString);
+        $("#<%= hlpAccountBalance.ClientId %>").text("<%=Translate("lblAccountBalance.Help") %>");
+    });
 
- }
+}
 
  function expandReceipt(){
      $("#<%= ifReceipt.ClientID %>").show();
@@ -912,6 +913,7 @@
     <asp:HiddenField ID="hfCurOpen" runat="server" Value="false" />
     <asp:HiddenField ID="hfChargeToValue" runat="server"  />
     <asp:HiddenField ID="hfTabModuleId" runat="server" Value="-1" />
+    <asp:HiddenField ID="hfAccountBalance" runat="server" />
 	<a target="_blank" style="position: relative; float: right; right: 50px; top: -50px;" href="https://wiki.powertochange.org/help/index.php/Online_Reimbursements">Help</a>
 
     <table width="100%">
@@ -1198,7 +1200,13 @@
                                     <div style="float: right; padding-right:10px; margin-right: 3px;">
                                         <div id="accountBalanceDiv">
                                             <asp:Label ID="lblAccountBalance" runat="server" Style="font-style: italic; font-size:13px;"></asp:Label>
-                                            <asp:HiddenField ID="hfAccountBalance" runat="server" />
+                                            <asp:LinkButton id="lbAccountBalance" TabIndex="-1" runat="server" CausesValidation="False" EnableViewState="False" CssClass="dnnFormHelp"  style="position:relative" Visible="true"/>
+                                                <asp:Panel runat="server" CssClass="dnnTooltip">
+                                                    <div class="dnnFormHelpContent dnnClear">
+                                                        <asp:Label ID="hlpAccountBalance" runat="server" EnableViewState="False" text='' class="dnnHelpText" />
+                                                        <a href="#" class="pinHelp"></a>
+                                                   </div>   
+                                                </asp:Panel>
                                         </div>
                                     </div>
                                 </div>
