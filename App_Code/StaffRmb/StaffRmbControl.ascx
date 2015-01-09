@@ -407,7 +407,7 @@
         hlpAmount.Text = DotNetNuke.Services.Localization.Localization.GetString("lblAmount.Help", LocalResourceFile);
         hlpProvince.Text = DotNetNuke.Services.Localization.Localization.GetString("lblProvince.Help", LocalResourceFile);
         hlpReceipt.Text = DotNetNuke.Services.Localization.Localization.GetString("lblReceipt.Help", LocalResourceFile).Replace("[LIMIT]", LIMIT.ToString());
-        hlpOrigin.Text = DotNetNuke.Services.Localization.Localization.GetString("hlpOrigin.Help", LocalResourceFile);
+        hlpOrigin.Text = DotNetNuke.Services.Localization.Localization.GetString("lblOrigin.Help", LocalResourceFile);
         // Hint strings
         tbDesc.Attributes.Add("Placeholder", DotNetNuke.Services.Localization.Localization.GetString("lblDesc.Hint", LocalResourceFile));
         tbOrigin.Attributes.Add("Placeholder", DotNetNuke.Services.Localization.Localization.GetString("tbOrigin.Hint", LocalResourceFile));

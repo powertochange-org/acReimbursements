@@ -822,4 +822,10 @@
   <data name="lblRemainingBudget.Text" xml:space="preserve">
     <value>Estimated Remaining Budget:</value>
   </data>
+  <data name="lblAccountBalance.Help" xml:space="preserve">
+    <value>This is the current balance of your personal account.</value>
+  </data>
+  <data name="lblBudgetBalance.Help" xml:space="preserve">
+    <value>The first number is the amount you have budgeted for this account, at this point in the fiscal year.  &lt;br/&gt;The second number is the amount you've actually spent from this account so far.  &lt;br/&gt;If the second number is smaller than the first, then you are under-budget by the difference.</value>
+  </data>
 </root>
