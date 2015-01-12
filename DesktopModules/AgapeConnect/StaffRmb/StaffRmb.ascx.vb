@@ -1397,8 +1397,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim payable As Double = 0
                 Try
                     Dim advance_balance = row.FindControl("lblAdvanceBalance").Text
-                    Dim advance_clearing = row.FindControl("tbAdvanceClearing").Text
                     outstanding = Double.Parse(advance_balance, NumberStyles.Currency)
+                Catch ex As Exception
+                    outstanding = 0
+                End Try
+                Try
+                    Dim advance_clearing = row.FindControl("tbAdvanceClearing").Text
                     payable = Double.Parse(advance_clearing, NumberStyles.Currency)
                 Catch ex As Exception
                     lblAdvanceClearError.Text = Translate("ErrorClearAdvance") & ": " & ex.Message
@@ -2163,7 +2167,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         End Try
                         ' If we don't have a receipt
                     ElseIf Not theLine.First.Receipt Then
-                            receiptMode = RmbReceiptType.No_Receipt
+                        receiptMode = RmbReceiptType.No_Receipt
                     End If
                     Try
                         ucType.GetProperty("ReceiptType").SetValue(theControl, receiptMode, Nothing)
