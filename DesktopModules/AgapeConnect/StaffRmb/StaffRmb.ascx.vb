@@ -808,7 +808,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim initials = Left(user.FirstName, 1) + Left(user.LastName, 1)
                 ddlCompany.SelectedIndex = -1
                 dtPostingDate.Text = Today.ToString("MM/dd/yyyy")
-                Dim batchIds = From c In d.AP_Staff_Rmb_Post_Extras Order By c.PostingDate Descending Select c.BatchId
+                Dim batchIds = From c In d.AP_Staff_Rmb_Post_Extras Where c.BatchId.Substring(6, 2).Equals(initials) Order By c.PostingDate Descending Select c.BatchId
                 If (batchIds.Count() > 0) Then
                     tbBatchId.Text = batchIds.First()
                 End If
