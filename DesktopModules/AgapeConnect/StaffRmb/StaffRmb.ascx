@@ -1202,7 +1202,7 @@ function GetAccountBalance(jsonQuery){
                                             <asp:HiddenField ID="hfAccountBalance" runat="server" />
                                             <asp:LinkButton id="lbAccountBalance" TabIndex="-1" runat="server" CausesValidation="False" EnableViewState="False" CssClass="dnnFormHelp"  style="position:relative" Visible="true"/>
                                                 <asp:Panel runat="server" CssClass="dnnTooltip">
-                                                    <div class="dnnFormHelpContent dnnClear">
+                                                    <div class="dnnFormHelpContent dnnClear" style="width:500px; left:-400px;">
                                                         <asp:Label ID="hlpAccountBalance" runat="server" EnableViewState="False" text='' class="dnnHelpText" />
                                                         <a href="#" class="pinHelp"></a>
                                                    </div>   
