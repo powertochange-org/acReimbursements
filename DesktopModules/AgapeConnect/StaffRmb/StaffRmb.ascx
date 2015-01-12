@@ -1859,7 +1859,7 @@ function GetAccountBalance(jsonQuery){
                                         </asp:TemplateField>
                                         <asp:TemplateField HeaderText="Outstanding Amount">
                                             <ItemTemplate>
-                                                <asp:Label ID="lblAdvanceBalance" runat="server" Text=<%# If(Eval("Spare2")="","Not Specified",FormatCurrency(Eval("Spare2"))) %>></asp:Label>
+                                                <asp:Label ID="lblAdvanceBalance" runat="server" Text=<%# If(Eval("Spare2") = "", "Not Specified", FormatCurrency(Eval("Spare2")))%>></asp:Label>
                                             </ItemTemplate>
                                             <ItemStyle HorizontalAlign="Right" Width="50px"  />
                                         </asp:TemplateField>

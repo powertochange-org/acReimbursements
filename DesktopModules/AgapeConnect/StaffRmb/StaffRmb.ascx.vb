@@ -1420,10 +1420,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     lblAdvanceClearError.Text = Translate("ErrorClearAdvanceAmount")
                     Return False
                 End If
-                If (payable > outstanding) Then
-                    lblAdvanceClearError.Text = Translate("ErrorClearAdvanceAmount")
-                    Return False
-                End If
             Next
             'ensure total is < rmb total
             Dim rmbTotal = GetTotal(hfRmbNo.Value)

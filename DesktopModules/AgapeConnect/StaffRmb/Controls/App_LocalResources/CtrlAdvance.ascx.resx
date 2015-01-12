@@ -165,4 +165,13 @@
   <data name="Error.DateTooFar" xml:space="preserve">
     <value>You must clear your advance within 60 days, unless you have special permission otherwise.</value>
   </data>
+  <data name="cbClearExternal.Text" xml:space="preserve">
+    <value>clear an advance created OUTSIDE this Reimbursement system.</value>
+  </data>
+  <data name="lblClearExternal.Help" xml:space="preserve">
+    <value>ONLY use this checkbox to clear advances that were NOTcreated using this Reimbursement system.  Advances requested using this system should be cleared using the 'Clear Advance' at the bottom of the form.</value>
+  </data>
+  <data name="lblClearExternal.Text" xml:space="preserve">
+    <value>Clear an EXTERNAL advance:</value>
+  </data>
 </root>
