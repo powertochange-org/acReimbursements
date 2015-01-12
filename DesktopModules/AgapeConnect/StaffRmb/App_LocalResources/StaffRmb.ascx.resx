@@ -826,11 +826,11 @@
     <value>This is the current balance of your personal account.</value>
   </data>
   <data name="lblBudgetBalance.Help" xml:space="preserve">
-    <value>&lt;b&gt;Fiscal YTD Budget surplus/deficit:&lt;/b&gt; This is the budgeted income minus budgeted expenses for the months from July to this now, for this ministry account. If the number is positive, it means more income was expected than expenses up to this point in the fiscal year.&lt;br/&gt;&lt;br/&gt;
+    <value>&lt;b&gt;Fiscal YTD Budget surplus/deficit:&lt;/b&gt; This is the budgeted income minus budgeted expenses for the months from July to now, for this ministry account. If the number is positive, it means more income was expected than expenses up to this point in the fiscal year.&lt;br/&gt;&lt;br/&gt;
 
 &lt;b&gt;Income minus Expenses: &lt;/b&gt;This is the actual amount of income received into the ministry account, minus the actual expenses incurred in the ministry account, for the months from July to now. It is NOT the same as the account balance, as it does not include any positive or negative balance carried forward from previous years. Instead, it is a number that can be directly compared to the budget surplus/deficit beside it. If the income minus expenses is higher than what was budgeted, great! If it is lower than what was budgeted, the account is not meeting the budgeted plan.&lt;br/&gt;&lt;br/&gt;
 
-To view more details about how these numbers were calculated, run a &lt;a href="https://staff.powertochange.org/reports/"&gt;Summary Income and Expense report&lt;/a&gt; on the Loop for this account from July up to the current month. You will be able to see the budget surplus/deficit and actual income minus expenses at the bottom of the report.</value>
+To view more details about how these numbers were calculated, run a Summary Income and Expense report on the Loop for this account from July up to the current month. You will be able to see the budget surplus/deficit and actual income minus expenses at the bottom of the report.</value>
   </data>
   <data name="PermissionDenied.Text" xml:space="preserve">
     <value>You are not authorized to view the balance of this account.</value>
