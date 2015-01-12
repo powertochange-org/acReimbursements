@@ -250,7 +250,7 @@
                                             </td>
                                             <td style="text-align:center;margin-left:20px">
                                                 <b><asp:Label runat="server" ResourceKey="lblEquivalentCAD"/></b><br />
-                                                <asp:TextBox ID="tbCADAmount" runat="server" cssclass="equivalentCAD" style="width:80px;" OnChange="adjust_exchange_rate();" onfocus="select();" onblur="format_number(this, 2);" />
+                                                <asp:TextBox ID="tbCADAmount" runat="server" cssclass="equivalentCAD" style="width:80px;" OnChange="check_if_receipt_is_required(); adjust_exchange_rate();" onfocus="select();" onblur="format_number(this, 2);" />
                                             </td>
                                             <tr><td colspan="2" class="footer"><asp:label runat="server" ResourceKey="lblExchangeFooter"></asp:label></td></tr>
                                         </tr></table>
