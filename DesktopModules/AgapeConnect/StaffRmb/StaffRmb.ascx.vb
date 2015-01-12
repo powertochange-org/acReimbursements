@@ -1335,15 +1335,20 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim outstanding As Double = 0
                     Dim payable As Double = 0
                     Try
+                        Dim advance_balance = row.FindControl("lblAdvanceBalance").Text
+                        outstanding = Double.Parse(advance_balance, NumberStyles.Currency)
+                    Catch ex As Exception
+                        outstanding = 0
+                    End Try
+                    Try
                         rmblineno = row.FindControl("hfRmbLineNo").Value
                         comment = row.FindControl("lblAdvanceComment").Text
-                        Dim advance_balance = row.FindControl("lblAdvanceBalance").Text
                         Dim advance_clearing = row.FindControl("tbAdvanceClearing").Text
-                        outstanding = Double.Parse(advance_balance, NumberStyles.Currency)
                         payable = Double.Parse(advance_clearing, NumberStyles.Currency)
                     Catch ex As Exception
                         lblAdvanceClearError.Text = Translate("ErrorClearAdvance") & ": " & ex.Message
                         lblAdvanceClearError.Visible = True
+                        ScriptManager.RegisterClientScriptBlock(btnAddClearingItem, btnAddClearingItem.GetType(), "hide_loading_spinner", "updateClearingTotal(); $('#loading').hide();", True)
                         Return
                     End Try
                     'lookup original line item
@@ -1353,6 +1358,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Catch ex As Exception
                         lblAdvanceClearError.Text = ex.Message
                         lblAdvanceClearError.Visible = True
+                        ScriptManager.RegisterClientScriptBlock(btnAddClearingItem, btnAddClearingItem.GetType(), "hide_loading_spinner", "updateClearingTotal(); $('#loading').hide();", True)
                         Return
                     End Try
                     If (payable > 0) Then
