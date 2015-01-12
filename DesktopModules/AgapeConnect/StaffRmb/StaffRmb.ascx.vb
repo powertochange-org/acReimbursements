@@ -4382,10 +4382,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Private Async Function getAccountBalanceAsync(account As String, logon As String) As Task(Of String)
             'Returns entire text for the "balance" area of the form
             ' account balance for personal accounts or budget numbers for ministry accounts
+            lbAccountBalance.Visible = True
             hfAccountBalance.Value = Nothing
             If (account.Equals(String.Empty)) Then
-                hlpAccountBalance.Text = "Error: no account number provided"
-                Return Translate("AccountBalance") & "<span title='Error: no account number provided'>" + BALANCE_INCONCLUSIVE + "</span>"
+                lbAccountBalance.Visible = False
+                Return ""
             End If
             If (logon.Equals(String.Empty)) Then
                 hlpAccountBalance.Text = "Error: no logon provided"
@@ -4394,8 +4395,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             Dim service_result = Await StaffRmbFunctions.getAccountBalanceAsync(account, logon)
             If service_result.Equals(StaffRmbFunctions.PERMISSION_DENIED_ERROR) Then
-                hlpAccountBalance.Text = Translate("PermissionDenied")
-                Return Translate("AccountBalance") & BALANCE_PERMISSION_DENIED
+                lbAccountBalance.Visible = False
+                Return ""
             End If
             If service_result.Equals(StaffRmbFunctions.WEB_SERVICE_ERROR) Then
                 hlpAccountBalance.Text = Translate("WebServiceError")
@@ -4470,7 +4471,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             lblAccountBalance.Text = accountBalance
             If (GridView1 IsNot Nothing AndAlso GridView1.FooterRow IsNot Nothing) Then
                 Dim control As Label = GridView1.FooterRow.FindControl("lblRemainingBalance")
-                If control IsNot Nothing Then control.Text = If(isStaffAccount(), Translate("lblRemainingBalance"), Translate("lblRemainingBudget"))
+                If control IsNot Nothing Then
+                    If (Trim(accountBalance).Length > 0) Then
+                        control.Text = If(isStaffAccount(), Translate("lblRemainingBalance"), Translate("lblRemainingBudget"))
+                    Else
+                        control.Text = ""
+                    End If
+                End If
             End If
         End Sub
 

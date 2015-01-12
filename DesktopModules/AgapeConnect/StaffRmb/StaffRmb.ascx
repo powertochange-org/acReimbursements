@@ -118,7 +118,7 @@
         var accBal = $("input[id$='StaffRmb_hfAccountBalance']:first").val();
         var formTot = $("span[id$='GridView1_lblTotalAmount']:last").text().replace("$","");
         if ((accBal == "") || (formTot == "")) {
-            result = "unknown";
+            result = "";
         } else {
             result = format_money(accBal - formTot);
         }
