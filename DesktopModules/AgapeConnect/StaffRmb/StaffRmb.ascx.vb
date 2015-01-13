@@ -1257,6 +1257,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         End Try
                         If (insert) Then
                             d.AP_Staff_RmbLines.InsertOnSubmit(line)
+                            d.SubmitChanges()
                             ' Rename the receipt image files and references
                             For Each image In imageFiles
                                 Dim file = FileManager.Instance.GetFile(image.FileId)

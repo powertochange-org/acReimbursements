@@ -72,6 +72,10 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
 
     End Function
 
+    Protected Function HasImages() As Boolean
+        Return RecNum > 0
+    End Function
+
     Protected Async Function CheckFolderPermissions(ByVal PortalId As Integer, ByVal theFolder As IFolderInfo, ByVal theUserId As Integer) As Threading.Tasks.Task
         ' Get the write permission
         Dim pc As New Permissions.PermissionController
