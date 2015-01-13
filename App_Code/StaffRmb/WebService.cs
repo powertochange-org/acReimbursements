@@ -136,7 +136,7 @@ public class WebService : System.Web.Services.WebService {
 
         String code = "<div id='staff-app-container' style='display:inline-block; position:relative; float:right; min-width:302px;'>" +
                "<a id='staffAppsButton' class='button related' onmouseout='staffAppsMenuHide();' onmouseover='staffAppsMenuShow();' style='background:#f58220; border:1px solid #eb8528; cursor:default;  z-index:910; position:relative; float:right; width:103px; height:21px; color:#000000; " +
-               "text-align:center; font-family:sans-serif; font-weight:300; font-size:13px;  padding:5px 0 5px; margin:10px 10px; border-radius:5px; border:1px solid rgb(235, 133, 40); background:rgb(245, 130, 32);'>Staff Apps</a>" +
+               "text-align:center; font-family:sans-serif; font-weight:300; font-size:13px;  padding-top:5px; padding-left:0; padding-bottom:5px; padding-right:0px; margin:10px 10px; border-radius:5px; border:1px solid rgb(235, 133, 40); background:rgb(245, 130, 32);'>Staff Apps</a>" +
                "<div id='staffAppsMenu' onmouseout='staffAppsMenuHide();' onmouseover='staffAppsMenuShow();' style='position:absolute; display:none; border:1px solid rgb(214, 215, 212); padding: 10px 40px; right:10px; top:37px; z-index:900; background-color: rgb(244, 244, 244);' >" +
                "<center><ul class='staffAppsPopupMenu' style='margin:15px 0; padding:15px 0; color:#adafb2; font-size:15px;'><table><tbody>" +
                "<tr><td style='border:0;'>" + ABSENCE_TRACKER + "</td>" +
