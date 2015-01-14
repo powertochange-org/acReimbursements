@@ -838,4 +838,7 @@ To view more details about how these numbers were calculated, run a Summary Inco
   <data name="WebServiceError.Text" xml:space="preserve">
     <value>There was an error fetching this information.  You can try again by re-loading this reimbursement.</value>
   </data>
+  <data name="ConfirmNegativeReimbursement.Text" xml:space="preserve">
+    <value>&lt;h5&gt;This reimbursement has a negative total.&lt;/h5&gt;&lt;br/&gt;That means that you MUST HAVE RECEIVED CASH equivalent to that total before processing it.&lt;br/&gt;&lt;br/&gt;Have you received the correct amount of cash for this reimbursement?</value>
+  </data>
 </root>

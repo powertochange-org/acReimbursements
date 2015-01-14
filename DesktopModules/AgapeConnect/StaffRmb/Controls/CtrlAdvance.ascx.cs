@@ -50,6 +50,14 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
         get { return ""; }
         set {}
     }
+    public string Spare2
+    {
+        get {
+            if (cbClearExternal.Checked) return "0";
+            else return Amount.ToString();
+        }
+        set { }
+    }
     public bool Receipt
     {
         get { return false; }

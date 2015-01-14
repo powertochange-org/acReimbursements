@@ -1041,7 +1041,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Catch
                         uncleared_amount = 0
                     End Try
-                    pnlAdvance.Visible = (uncleared_amount > 0) And (FORM_HAS_ITEMS) And (isOwner Or isSpouse) And Not (PROCESSING Or PAID Or APPROVED)
+                    pnlAdvance.Visible = (uncleared_amount > 0) And (((FORM_HAS_ITEMS) And (isOwner Or isSpouse) And (Not (PROCESSING Or PAID Or APPROVED))) Or (isFinance And APPROVED))
                     lblOutstandingAdvanceAmount.Text = uncleared_amount.ToString("C")
                     If (uncleared_amount > 0) Then
                         gvUnclearedAdvances.DataSource = (From c In uncleared_advances Order By c.TransDate)
@@ -1416,7 +1416,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Return False
                 End Try
                 clearingTotal += payable
-                'ensure no amount is < 0 or > outstanding balance
+                'ensure no amount is < 0 or > outstanding balance, unless it is Finance.
                 If (payable < 0 Or payable > outstanding) Then
                     lblAdvanceClearError.Text = Translate("ErrorClearAdvanceAmount")
                     Return False
@@ -1424,7 +1424,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Next
             'ensure total is < rmb total
             Dim rmbTotal = GetTotal(hfRmbNo.Value)
-            If (clearingTotal > rmbTotal) Then
+            If (clearingTotal > rmbTotal) And (Not IsAccounts()) Then
                 lblAdvanceClearError.Text = Translate("ErrorClearAdvanceTotal").Replace("[TOTAL]", rmbTotal)
                 Return False
             End If
@@ -1919,6 +1919,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim theRmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = CInt(hfRmbNo.Value)
             If theRmb.First.Status <> RmbStatus.Approved Then Return
 
+            'update the quick-total, in case it was changed after approval
+            Dim rmbTotal = CType((From t In d.AP_Staff_RmbLines Where t.RmbNo = theRmb.First.RMBNo Select t.GrossAmount).Sum(), Decimal?).GetValueOrDefault(0)
+            theRmb.First.SpareField1 = rmbTotal.ToString("C") ' currency formatted string
+
             Dim advancelines As IQueryable(Of AP_Staff_RmbLine) = From r In d.AP_Staff_RmbLines Where r.RmbNo = hfRmbNo.Value And r.GrossAmount < 0
             Dim clearAdvanceBalancesTask = updateAdvanceBalances(advancelines)
             Dim Extra = From c In d.AP_Staff_Rmb_Post_Extras Where c.RMBNo = CInt(hfRmbNo.Value)
@@ -1941,6 +1945,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Return
                 End If
             End If
+
 
             theRmb.First.Status = RmbStatus.PendingDownload
             theRmb.First.ProcDate = Today
@@ -2410,7 +2415,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             btnSubmit.Visible = True
             btnSubmit.Text = Translate("btnSubmit")
             enableSubmitButton(tbChargeTo.Text.Length = 6 And ddlApprovedBy.SelectedIndex > 0 And GridView1.Rows.Count > 0)
-            btnSubmit.ToolTip = Translate("btnSubmitHelp")
+            btnSubmit.ToolTip = If(Not btnSubmit.Attributes("class").Contains("aspNetDisabled"), "", Translate("btnSubmitHelp"))
         End Sub
 
 
@@ -4347,11 +4352,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Private Function getUnclearedAdvances(ByVal userid As Integer) As IQueryable(Of AP_Staff_RmbLine)
             Dim advance_line_type As Integer = Settings("AdvanceLineType")
-            Dim result = From line In d.AP_Staff_RmbLines
+            Dim result As IQueryable(Of AP_Staff_RmbLine) = From line In d.AP_Staff_RmbLines
                          Join rmb In d.AP_Staff_Rmbs On line.RmbNo Equals rmb.RMBNo
-                            Where line.LineType = advance_line_type And (line.Spare2 <> CLEARED) And line.Spare2 <> "0" _
-                            And rmb.Status <> RmbStatus.Draft And rmb.Status <> RmbStatus.Submitted And rmb.Status <> RmbStatus.PendingDirectorApproval And rmb.Status <> RmbStatus.PendingEDMSApproval And rmb.Status <> RmbStatus.Cancelled _
-                            And rmb.UserId = userid And rmb.PortalId = PortalId
+            Where line.LineType = advance_line_type And (line.Spare2 <> CLEARED) And line.Spare2 <> "0" _
+            And rmb.Status <> RmbStatus.Draft And rmb.Status <> RmbStatus.Submitted And rmb.Status <> RmbStatus.PendingDirectorApproval And rmb.Status <> RmbStatus.PendingEDMSApproval And rmb.Status <> RmbStatus.Cancelled _
+            And rmb.UserId = userid And rmb.PortalId = PortalId
                             Select line
             Return result
         End Function

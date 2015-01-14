@@ -585,7 +585,35 @@ function GetAccountBalance(jsonQuery){
  function showPopupSplit() {resetSplitPopup(); $("#divSplitPopup").dialog("open"); return false; }
  function showWarningDialog() {$("#divWarningDialog").dialog("open"); return false; }
  function showAccountWarning() { $("#divAccountWarning").dialog("open"); return false; }
- function showPostDataDialog() { $("#divGetPostingData").dialog("open"); return false; }
+ function showPostDataDialog() { 
+     if ($('.FormTotal').text().replace('$','') < 0) {
+         $('<div></div>').appendTo('body')
+             .html('<div><%=Translate("ConfirmNegativeReimbursement")%></div>')
+             .dialog({
+                 modal: true,
+                 title: 'Negative Reimbursement',
+                 zIndex: 10000,
+                 autoOpen: true,
+                 width: '500px',
+                 resizable: false,
+                 buttons: {
+                     Yes: function () {
+                         $("#divGetPostingData").dialog("open"); 
+                         $(this).dialog("close");
+                     },
+                     No: function () {
+                         $(this).dialog("close");
+                     }
+                 },
+                 close: function (event, ui) {
+                     $(this).remove();
+                 }
+             });
+     } else {
+         $("#divGetPostingData").dialog("open"); 
+     }
+     return false;
+ }
 
      
  function showSuggestedPayments() {
@@ -1416,7 +1444,7 @@ function GetAccountBalance(jsonQuery){
                                                         </asp:Panel>
                                                     </ItemTemplate>
                                                     <FooterTemplate>
-                                                        <asp:Label ID="lblTotalAmount" runat="server" Text='<%# StaffBrokerFunctions.GetSetting("Currency", PortalId) & GetTotal(-1).ToString("F2") %>'></asp:Label>
+                                                        <asp:Label ID="lblTotalAmount" runat="server" CssClass="FormTotal" Text='<%# StaffBrokerFunctions.GetSetting("Currency", PortalId) & GetTotal(-1).ToString("F2") %>'></asp:Label>
                                                         <asp:Panel ID="pnlRemBal2" runat="server" Visible='<%# Settings("ShowRemBal") = "True"%>'>
                                                             <asp:Label ID="lblRemainingBalanceAmount" runat="server" Font-Size="xx-small" Text=''></asp:Label>
                                                         </asp:Panel>
