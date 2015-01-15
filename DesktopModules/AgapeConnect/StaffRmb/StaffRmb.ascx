@@ -1361,6 +1361,22 @@ function GetAccountBalance(jsonQuery){
                                             </fieldset>
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td colspan="4"></td>
+                                        <td colspan="2" style="font-size: 8pt; width: 33%;">
+                                            <asp:Panel id="pnlPrivateComments" runat="server">
+                                                <fieldset>
+                                                    <div style="float:right">
+                                                        <asp:button id="btnPrivAccComments" runat="server" resourcekey="btnPrivateAccountsComments" />
+                                                    </div>
+                                                    <legend class="AgapeH4">
+                                                        <asp:Label ID="lblPrivAccComments" runat="server" CssClass="hdrTitle privAccComments" resourcekey="PrivateAccountsComments" Visible="false"/>
+                                                    </legend>
+                                                    <asp:TextBox ID="tbPrivAccComments" runat="server" Height="55px" TextMode="MultiLine" CssClass="privAccComments" Width="100%" visible="false" onKeyPress="showSaveButton();"/>
+                                                </fieldset>
+                                            </asp:Panel>
+                                        </td>
+                                    </tr>
                                     <tr valign="top">
                                         <td colspan="6">
                                             <asp:Button ID="btnDelete" runat="server" resourcekey="btnDelete" class="aButton" OnClientClick='if (! window.confirm("Are you sure?")) return;' OnClick="btnDelete_Click" style="float:left"/>

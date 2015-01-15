@@ -3,6 +3,8 @@
 ' SpareField1: total for the reimbursement
 ' SpareField2: Submitter's Director's id - in case of special approval
 ' SpareField3: DelegateId, when filling out a form on behalf of someone else
+' SpareField4:
+' SpareField5: Private Finance comments
 
 ' AP_Rmb_Line
 '-------------
@@ -992,6 +994,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     tbAccComments.Enabled = isFinance
                     tbAccComments.Text = If(Rmb.AcctComment Is Nothing, "", Rmb.AcctComment)
 
+                    pnlPrivateComments.Visible = isFinance
+                    tbPrivAccComments.Text = Rmb.SpareField5
+                    btnPrivAccComments.Visible = (Not tbPrivAccComments.Text.Trim().Length > 0)
+                    lblPrivAccComments.Visible = (tbPrivAccComments.Text.Trim().Length > 0)
+                    tbPrivAccComments.Visible = (tbPrivAccComments.Text.Trim().Length > 0)
+
                     cbMoreInfo.Visible = (isFinance And APPROVED)
                     cbMoreInfo.Checked = If(Rmb.MoreInfoRequested, Rmb.MoreInfoRequested, False)
 
@@ -1747,10 +1755,18 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
         End Sub
 
+        Protected Async Sub btnPrivAccComments_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnPrivAccComments.Click
+            btnPrivAccComments.Visible = False
+            lblPrivAccComments.Visible = True
+            tbPrivAccComments.Visible = True
+        End Sub
+
         Protected Async Sub btnSave_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSave.Click
+            If (IsAccounts()) Then
+                savePrivateComments()
+            End If
             Dim State As Integer = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.Status).First()
             If (State = RmbStatus.Processing Or State = RmbStatus.PendingDownload Or State = RmbStatus.DownloadFailed Or State = RmbStatus.Paid) Then Return
-
             saveIfNecessary()
         End Sub
 
@@ -2943,6 +2959,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 save_necessary = True
                 Rmb.AcctComment = tbAccComments.Text
             End If
+            If (Rmb.SpareField5 <> tbPrivAccComments.Text) Then
+                save_necessary = True
+                Rmb.SpareField5 = tbPrivAccComments.Text
+            End If
             If ((Rmb.MoreInfoRequested Is Nothing And (cbMoreInfo.Checked Or cbApprMoreInfo.Checked)) Or
                 Rmb.MoreInfoRequested <> (cbMoreInfo.Checked Or cbApprMoreInfo.Checked)) Then
                 save_necessary = True
@@ -2953,6 +2973,29 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If (save_necessary) Then
                 SubmitChanges()
             End If
+        End Sub
+
+        Protected Sub SavePrivateComments()
+            Dim Rmb As AP_Staff_Rmb
+            Try
+                Dim RmbNo As Integer
+                Dim PortalId As Integer
+                RmbNo = CInt(hfRmbNo.Value)
+                PortalId = CInt(hfPortalId.Value)
+                Dim rmbs = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo And c.PortalId = PortalId
+                If rmbs.Count > 0 Then
+                    Rmb = rmbs.First
+                Else
+                    Return
+                End If
+            Catch
+                Return
+            End Try
+            If (Rmb.SpareField5 <> tbPrivAccComments.Text) Then
+                Rmb.SpareField5 = tbPrivAccComments.Text
+                SubmitChanges()
+            End If
+
         End Sub
 
         Protected Sub Log(ByVal RID As Integer, ByVal logType As Integer, ByVal Message As String)

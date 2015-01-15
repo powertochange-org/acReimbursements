@@ -841,4 +841,10 @@ To view more details about how these numbers were calculated, run a Summary Inco
   <data name="ConfirmNegativeReimbursement.Text" xml:space="preserve">
     <value>&lt;h5&gt;This reimbursement has a negative total.&lt;/h5&gt;&lt;br/&gt;That means that you MUST HAVE RECEIVED CASH equivalent to that total before processing it.&lt;br/&gt;&lt;br/&gt;Have you received the correct amount of cash for this reimbursement?</value>
   </data>
+  <data name="btnPrivateAccountsComments.Text" xml:space="preserve">
+    <value>Add Private Comments</value>
+  </data>
+  <data name="PrivateAccountsComments.Text" xml:space="preserve">
+    <value>Private Finance Comments</value>
+  </data>
 </root>
