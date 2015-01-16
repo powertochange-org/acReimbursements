@@ -2389,6 +2389,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     If (rmb.First.Status <> RmbStatus.Draft) Then
                         Undelete_Current_Rmb()
                         rmb.First.Status = RmbStatus.Draft
+                        rmb.First.ApprDate = Nothing
                         rmb.First.ApprUserId = Nothing
                         SubmitChanges()
                         TaskList.Add(LoadMenuAsync())
@@ -2416,6 +2417,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 rmb.First.ApprUserId = Nothing
             End Try
             Dim refreshMenu = (Not rmb.First.Status = RmbStatus.Draft)
+            rmb.First.ApprDate = Nothing
             rmb.First.Status = RmbStatus.Draft
             SubmitChanges()
             Undelete_Current_Rmb()
