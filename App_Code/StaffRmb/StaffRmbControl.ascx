@@ -684,7 +684,7 @@
                 limit = Double.Parse(hfNoReceiptLimit.Value);
             }
             catch { }
-            if ((ddlReceipt.SelectedValue.Equals(RmbReceiptType.No_Receipt.ToString())) && (Double.Parse(tbAmount.Text) > limit))
+            if ((ddlReceipt.SelectedValue.Equals(RmbReceiptType.No_Receipt.ToString())) && (CADValue > limit))
             {
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.NoReceipt", LocalResourceFile).Replace("[LIMIT]", hfNoReceiptLimit.Value);
                 return false;
