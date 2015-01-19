@@ -2996,7 +2996,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If (Rmb.AcctComment <> tbAccComments.Text) Or (Rmb.SpareField5 <> tbPrivAccComments.Text) Then
                 Rmb.AcctComment = tbAccComments.Text
                 Rmb.SpareField5 = tbPrivAccComments.Text
-                SubmitChanges()            End If
+                SubmitChanges()
+            End If
         End Sub
 
         Protected Sub Log(ByVal RID As Integer, ByVal logType As Integer, ByVal Message As String)
