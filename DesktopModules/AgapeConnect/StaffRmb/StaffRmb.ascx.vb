@@ -1763,7 +1763,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Protected Async Sub btnSave_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSave.Click
             If (IsAccounts()) Then
-                savePrivateComments()
+                saveFinanceComments()
             End If
             Dim State As Integer = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.Status).First()
             If (State = RmbStatus.Processing Or State = RmbStatus.PendingDownload Or State = RmbStatus.DownloadFailed Or State = RmbStatus.Paid) Then Return
@@ -2977,7 +2977,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
         End Sub
 
-        Protected Sub SavePrivateComments()
+        Protected Sub SaveFinanceComments()
             Dim Rmb As AP_Staff_Rmb
             Try
                 Dim RmbNo As Integer
@@ -2993,11 +2993,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Catch
                 Return
             End Try
-            If (Rmb.SpareField5 <> tbPrivAccComments.Text) Then
+            If (Rmb.AcctComment <> tbAccComments.Text) Or (Rmb.SpareField5 <> tbPrivAccComments.Text) Then
+                Rmb.AcctComment = tbAccComments.Text
                 Rmb.SpareField5 = tbPrivAccComments.Text
-                SubmitChanges()
-            End If
-
+                SubmitChanges()            End If
         End Sub
 
         Protected Sub Log(ByVal RID As Integer, ByVal logType As Integer, ByVal Message As String)
