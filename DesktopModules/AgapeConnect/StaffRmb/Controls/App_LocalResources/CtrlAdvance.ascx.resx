@@ -174,4 +174,7 @@
   <data name="lblClearExternal.Text" xml:space="preserve">
     <value>Clear an EXTERNAL advance:</value>
   </data>
+  <data name="Error.ClearingDate" xml:space="preserve">
+    <value>If you are clearing an external advance, the clearing date cannot be in the future.</value>
+  </data>
 </root>

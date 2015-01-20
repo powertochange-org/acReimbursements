@@ -3190,7 +3190,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                 VAT = CStr(ucTypeOld.GetProperty("VAT").GetValue(theControl, Nothing))
                                 Receipt = CStr(ucTypeOld.GetProperty("Receipt").GetValue(theControl, Nothing))
                                 Province = CStr(ucTypeOld.GetProperty("Spare1").GetValue(theControl, Nothing))
-                                taxable = If(Province.Equals("--"), 0, 1) 'Default is taxable, unless outside canada
+                                taxable = CStr(ucTypeOld.GetProperty("Taxable").GetValue(theControl, Nothing))
                                 currency = hfOrigCurrency.Value
                                 If (ucTypeOld.GetProperty("ReceiptsAttached") IsNot Nothing) Then
                                     receiptsAttached = CBool(ucTypeOld.GetProperty("ReceiptsAttached").GetValue(theControl, Nothing))
@@ -3207,21 +3207,22 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         owner = UserId
                     End Try
 
-                    If (Province Is Nothing) Then
-                        Province = StaffRmbFunctions.GetDefaultProvince(owner)
-                        taxable = If(Province.Equals("--"), 0, 1) 'Default is taxable, unless outside canada
-                    End If
-                    phLineDetail.Controls.Clear()
-                    ddlOverideTax.SelectedIndex = taxable
-                    theControl = LoadControl(lt.First.ControlPath)
-
                     hfOrigCurrency.Value = currency
                     hfOrigCurrencyValue.Value = 0
 
+                    phLineDetail.Controls.Clear()
+                    theControl = LoadControl(lt.First.ControlPath)
+
                     theControl.ID = "theControl"
                     phLineDetail.Controls.Add(theControl)
-
                     Dim ucType As Type = theControl.GetType()
+
+                    If (Province Is Nothing) Then
+                        Province = StaffRmbFunctions.GetDefaultProvince(owner)
+                        taxable = CBool(ucType.GetProperty("Taxable").GetValue(theControl, Nothing))
+                    End If
+                    ddlOverideTax.SelectedIndex = taxable
+
                     ucType.GetMethod("Initialize").Invoke(theControl, New Object() {Settings})
 
                     ucType.GetProperty("Supplier").SetValue(theControl, Supplier, Nothing)
