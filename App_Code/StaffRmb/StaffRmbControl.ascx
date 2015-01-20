@@ -474,7 +474,7 @@
             set { ddlReceipt.SelectedValue = value.ToString(); }
         }
         public bool Taxable {
-            get { return ddlProvince.SelectedValue == "--"; }
+            get { return ddlProvince.SelectedValue != "--"; }
             set { }
         }
         public string Spare1 {
