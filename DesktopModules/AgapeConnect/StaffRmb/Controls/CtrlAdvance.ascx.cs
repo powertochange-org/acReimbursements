@@ -88,10 +88,21 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
         try
         {
             DateTime date = DateTime.Parse(dtDate.Text);
-            if (date <= DateTime.Today)
+            if (cbClearExternal.Checked)
             {
-                ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.FutureDate", LocalResourceFile);
-                return false;
+                if (date > DateTime.Today)
+                {
+                    ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.ClearingDate", LocalResourceFile);
+                    return false;
+                }
+            }
+            else
+            {
+                if (date <= DateTime.Today)
+                {
+                    ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.FutureDate", LocalResourceFile);
+                    return false;
+                }
             }
             if (date > DateTime.Today.AddDays(365))
             {
