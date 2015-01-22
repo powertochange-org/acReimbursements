@@ -1204,6 +1204,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         If (insert) Then
                             line.RmbNo = hfRmbNo.Value
                             line.Split = False
+                            ddlOverideTax.SelectedIndex = If(ucType.GetProperty("Taxable").GetValue(theControl, Nothing), 1, 0)
                         End If
                         line.TransDate = transactionDate
                         line.OutOfDate = (age > Settings("Expire"))
@@ -3190,7 +3191,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                 VAT = CStr(ucTypeOld.GetProperty("VAT").GetValue(theControl, Nothing))
                                 Receipt = CStr(ucTypeOld.GetProperty("Receipt").GetValue(theControl, Nothing))
                                 Province = CStr(ucTypeOld.GetProperty("Spare1").GetValue(theControl, Nothing))
-                                taxable = CInt(ucTypeOld.GetProperty("Taxable").GetValue(theControl, Nothing))
                                 currency = hfOrigCurrency.Value
                                 If (ucTypeOld.GetProperty("ReceiptsAttached") IsNot Nothing) Then
                                     receiptsAttached = CBool(ucTypeOld.GetProperty("ReceiptsAttached").GetValue(theControl, Nothing))
@@ -3219,8 +3219,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     If (Province Is Nothing) Then
                         Province = StaffRmbFunctions.GetDefaultProvince(owner)
-                        taxable = CInt(ucType.GetProperty("Taxable").GetValue(theControl, Nothing))
                     End If
+                    taxable = CInt(ucType.GetProperty("Taxable").GetValue(theControl, Nothing))
                     ddlOverideTax.SelectedIndex = taxable
 
                     ucType.GetMethod("Initialize").Invoke(theControl, New Object() {Settings})
