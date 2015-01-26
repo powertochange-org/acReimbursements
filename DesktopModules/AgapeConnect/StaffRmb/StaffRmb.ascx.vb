@@ -1548,6 +1548,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If rmbs.Count > 0 Then
                 updateOutOfDateFlag()
                 Dim rmb = rmbs.First
+                updateReceiptPermissions(rmb)
                 Dim NewStatus As Integer = rmb.Status
                 Dim rmbTotal = CType((From t In d.AP_Staff_RmbLines Where t.RmbNo = rmb.RMBNo Select t.GrossAmount).Sum(), Decimal?).GetValueOrDefault(0)
                 Dim requires_receipts = ((From b In rmb.AP_Staff_RmbLines Where b.Receipt = True And ((From f In d.AP_Staff_RmbLine_Files Where f.RmbLineNo = b.RmbLineNo).Count = 0)).Count > 0)
@@ -4565,6 +4566,30 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Next
             d.SubmitChanges()
         End Function
+
+        Private Sub updateReceiptPermissions(ByRef theRmb As AP_Staff_Rmb)
+            Dim hasReceipts = (From c In theRmb.AP_Staff_RmbLines Where c.Receipt = True And ((From f In d.AP_Staff_RmbLine_Files Where f.RmbLineNo = c.RmbLineNo).Count = 0)).Count > 0
+            If (hasReceipts) Then
+                Dim pc As New Permissions.PermissionController
+                Dim path = "/_RmbReceipts/" & theRmb.UserId
+                Dim theFolder = FolderManager.Instance.GetFolder(PortalId, path)
+
+                DataCache.ClearFolderCache(PortalId) ' Clear the folder cache, to ensure we're getting the most up-to-date folder info
+                If FolderManager.Instance.FolderExists(PortalId, path) Then
+                    ' Add read permissions for the current approver
+                    Dim permission As New Permissions.FolderPermissionInfo()
+                    permission.FolderID = theFolder.FolderID
+                    permission.PortalID = PortalId
+                    permission.PermissionID = pc.GetPermissionByCodeAndKey("SYSTEM_FOLDER", "READ")(0).PermissionID
+                    permission.AllowAccess = 1
+                    permission.UserID = theRmb.ApprUserId
+
+                    Dim folderPermissions = theFolder.FolderPermissions 'load current permissions
+                    folderPermissions.Add(permission, True) 'True prevents duplicates
+                    Permissions.FolderPermissionController.SaveFolderPermissions(theFolder)
+                End If
+            End If
+        End Sub
 
         Private Async Function LoadAddressAsync(UserId As Integer) As Task
 
