@@ -3168,7 +3168,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim Comment As String = ""
                     Dim Amount As Double = 0.0
                     Dim theDate As Date = Today
-                    Dim taxable As Integer = 1
+                    Dim taxable As Integer
                     Dim VAT As Boolean = False
                     Dim Receipt As Boolean = True
                     Dim Province As String = Nothing
@@ -3191,6 +3191,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                 Amount = CDbl(ucTypeOld.GetProperty("Amount").GetValue(theControl, Nothing))
                                 VAT = CStr(ucTypeOld.GetProperty("VAT").GetValue(theControl, Nothing))
                                 Receipt = CStr(ucTypeOld.GetProperty("Receipt").GetValue(theControl, Nothing))
+                                taxable = If(ucTypeOld.GetProperty("Taxable").GetValue(theControl, Nothing), 1, 0)
                                 Province = CStr(ucTypeOld.GetProperty("Spare1").GetValue(theControl, Nothing))
                                 currency = hfOrigCurrency.Value
                                 If (ucTypeOld.GetProperty("ReceiptsAttached") IsNot Nothing) Then
@@ -3221,7 +3222,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     If (Province Is Nothing) Then
                         Province = StaffRmbFunctions.GetDefaultProvince(owner)
                     End If
-                    taxable = CInt(ucType.GetProperty("Taxable").GetValue(theControl, Nothing))
+                    If (blankValues) Then
+                        taxable = If(ucType.GetProperty("Taxable").GetValue(theControl, Nothing), 1, 0)
+                    End If
                     ddlOverideTax.SelectedIndex = taxable
 
                     ucType.GetMethod("Initialize").Invoke(theControl, New Object() {Settings})

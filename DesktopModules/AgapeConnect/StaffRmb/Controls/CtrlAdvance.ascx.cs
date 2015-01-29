@@ -139,7 +139,7 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
             //    ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Warn.NegativeAmount", LocalResourceFile);
             //    return false;
             //}
-            if (CADValue > 10000)
+            if (CADValue > 40000)
             {
                 ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.LargeAmount", LocalResourceFile);
                 return false;
