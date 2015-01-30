@@ -41,7 +41,7 @@ public class WebService : System.Web.Services.WebService {
     {
         term = term.ToLower();
         var result = new DotNetNuke.Security.Roles.RoleController().GetUsersByRole(portalid, "Staff")
-            .Where(w => w.DisplayName.ToLower().Contains(term))
+            .Where(w => w.DisplayName.ToLower().Contains(term) && w.IsDeleted==false)
             .Select(s => new { label = s.DisplayName, value = s.UserID })
             .OrderBy(o => o.label);            
         string json = JsonConvert.SerializeObject(result);
