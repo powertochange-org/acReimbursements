@@ -41,6 +41,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Implements Entities.Modules.IActionable
         Dim BALANCE_INCONCLUSIVE As String = "unknown"
         Dim BALANCE_PERMISSION_DENIED As String = "**hidden**"
+        Dim EDMS_APPROVAL_LOG_MESSAGE As String = "APPROVED by EDMS"
         Dim CLEARED As String = "CLEARED"
         Dim LOG_LEVEL_DEBUG As Integer = 1
         Dim LOG_LEVEL_INFO As Integer = 2
@@ -894,6 +895,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                     Or ((Rmb.Status = RmbStatus.PendingEDMSApproval) And (UserId = EDMSId))
                     Dim isFinance = IsAccounts() And Not (isOwner Or isSpouse Or isApprover) And Not DRAFT
                     Dim isAdmin = UserController.Instance.GetCurrentUserInfo.IsInRole("Administrators")
+                    Dim hasHadExtraApproval = (From c In d.AP_Staff_Rmb_Logs Where c.RID = Rmb.RID And c.Message.Equals(EDMS_APPROVAL_LOG_MESSAGE)).Count() > 0
 
                     '--Ensure the user is authorized to view this reimbursement
                     Dim RmbRel As Integer
@@ -948,6 +950,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ddlApprovedBy.Visible = DRAFT Or CANCELLED Or ((isApprover Or isOwner Or isSpouse) And SUBMITTED)
                     ddlApprovedBy.Enabled = DRAFT Or CANCELLED Or ((isApprover Or isOwner Or isSpouse) And SUBMITTED)
                     lblApprovedBy.Visible = Not ddlApprovedBy.Visible
+                    lblExtraApproval.Visible = hasHadExtraApproval
                     Dim approverName As String = If(Rmb.ApprUserId Is Nothing Or Rmb.ApprUserId = -1, "", UserController.GetUserById(PortalId, Rmb.ApprUserId).DisplayName)
                     Dim updateApproverListTask As New Task(Sub()
                                                                lblApprovedBy.Text = approverName
@@ -1728,7 +1731,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         shouldSendApprovalEmail = False
                         SendApprovedEmail(rmb.First)
                         message += Translate("RmbApprovedEDMS").Replace("[RMBNO]", rmb.First.RID)
-                        Log(rmb.First.RID, LOG_LEVEL_INFO, "APPROVED by EDMS")
+                        Log(rmb.First.RID, LOG_LEVEL_INFO, EDMS_APPROVAL_LOG_MESSAGE)
                     End If
                 End If
                 If shouldSendApprovalEmail Then SendApprovalEmail(rmb.First)

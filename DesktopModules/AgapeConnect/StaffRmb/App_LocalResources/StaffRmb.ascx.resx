@@ -847,4 +847,7 @@ To view more details about how these numbers were calculated, run a Summary Inco
   <data name="PrivateAccountsComments.Text" xml:space="preserve">
     <value>Private Finance Comments</value>
   </data>
+  <data name="lblExtraApproval.Text" xml:space="preserve">
+    <value>Additional Approval by EDMS granted.</value>
+  </data>
 </root>

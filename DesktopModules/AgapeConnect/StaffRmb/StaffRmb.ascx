@@ -1292,7 +1292,7 @@ function GetAccountBalance(jsonQuery){
 
 
                                     <tr class="Agape_SubTitle">
-                                        <td colspan="4">
+                                        <td colspan="2">
                                             <table><tr class="Agape_SubTitle">
                                             <td class="hdrTitle" width="10%">
                                                 <asp:Label ID="Label23" runat="server" resourcekey="YourRef"></asp:Label>
@@ -1302,6 +1302,9 @@ function GetAccountBalance(jsonQuery){
                                             </td>
                                             </tr>
                                             </table>
+                                        </td>
+                                        <td colspan="2">
+                                            <asp:Label id="lblExtraApproval" runat="server" cssclass="extra_approval" resourcekey="lblExtraApproval" Visible="false" />
                                         </td>
                                         <td id="pnlPeriodYear" colspan="2" runat="server" style="white-space: nowrap; color: Gray;">
                                             <asp:Label ID="Label24" runat="server" resourcekey="Period"></asp:Label>
