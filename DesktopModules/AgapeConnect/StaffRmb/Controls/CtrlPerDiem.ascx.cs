@@ -94,11 +94,6 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
         get { return false; }
         set { }
     }
-    new public bool Taxable
-    {
-        get { return false; }
-        set { }
-    }
     new public double Amount
     {
         get
