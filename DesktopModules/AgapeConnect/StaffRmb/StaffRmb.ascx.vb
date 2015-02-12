@@ -1252,7 +1252,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             line.ShortComment = GetLineComment(line.Comment, line.OrigCurrency, line.OrigCurrencyAmount, "", False, Nothing, mileageString)
                         End If
                         ' Receipts
-                        If (CInt(ucType.GetProperty("ReceiptType").GetValue(theControl, Nothing) = RmbReceiptType.Electronic) And imageFiles.Count > 0) Then
+                        If (CInt(ucType.GetProperty("ReceiptType").GetValue(theControl, Nothing)) = RmbReceiptType.Electronic And imageFiles.Count > 0) Then
                             line.ReceiptNo = Nothing
                         Else
                             line.ReceiptNo = If(line.Receipt, nextReceiptNo, Nothing)
