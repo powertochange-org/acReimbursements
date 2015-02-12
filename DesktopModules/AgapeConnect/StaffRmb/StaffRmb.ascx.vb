@@ -1176,7 +1176,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim ownerId = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.UserId).First
             Dim LineTypeName = d.AP_Staff_RmbLineTypes.Where(Function(c) c.LineTypeId = CInt(ddlLineTypes.SelectedValue)).First.TypeName.ToString()
             Dim lineNo As Integer = Nothing
-            Dim nextReceiptNo As Integer = 1
             Dim repeat As Integer = 1
             Dim insert As Boolean = True
             Dim success As Boolean = False
@@ -1187,8 +1186,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim lines = From c In d.AP_Staff_RmbLines Where c.RmbLineNo = lineNo
                 If (lines.Count > 0) Then line = lines.First
                 imageFiles = (From lf In d.AP_Staff_RmbLine_Files Where lf.RMBNo = hfRmbNo.Value And lf.RmbLineNo = lineNo)
-                Dim q = From c In d.AP_Staff_RmbLines Where c.RmbNo = hfRmbNo.Value And c.Receipt Select c.ReceiptNo
-                nextReceiptNo = If(q.Max Is Nothing, 1, q.Max + 1)
                 insert = False
             ElseIf (btnSaveLine.CommandName = "Save") Then
                 imageFiles = (From lf In d.AP_Staff_RmbLine_Files Where lf.RMBNo = hfRmbNo.Value And lf.RmbLineNo Is Nothing)
@@ -1197,6 +1194,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 End If
             End If
 
+            Dim q = From c In d.AP_Staff_RmbLines Where c.RmbNo = hfRmbNo.Value And c.Receipt Select c.ReceiptNo
+            Dim nextReceiptNo = If(q.Max Is Nothing, 1, q.Max + 1)
             Dim transactionDate = CDate(ucType.GetProperty("theDate").GetValue(theControl, Nothing))
             For I = 1 To repeat 'for controls that allow multiple insertions
                 If (insert) Then line = New AP_Staff_RmbLine
@@ -1233,7 +1232,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         line.LargeTransaction = (line.GrossAmount >= Settings("TeamLeaderLimit"))
                         line.Taxable = (ddlOverideTax.SelectedIndex = 1)
                         line.Receipt = CBool(ucType.GetProperty("Receipt").GetValue(theControl, Nothing))
-                        line.ReceiptNo = If(line.Receipt, nextReceiptNo, Nothing)
                         line.VATReceipt = CBool(ucType.GetProperty("VAT").GetValue(theControl, Nothing))
                         line.Spare1 = CStr(ucType.GetProperty("Spare1").GetValue(theControl, Nothing))
                         line.Spare2 = CStr(ucType.GetProperty("Spare2").GetValue(theControl, Nothing))
@@ -1255,7 +1253,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         End If
                         ' Receipts
                         If (CInt(ucType.GetProperty("ReceiptType").GetValue(theControl, Nothing) = RmbReceiptType.Electronic) And imageFiles.Count > 0) Then
+                            line.ReceiptNo = Nothing
                         Else
+                            line.ReceiptNo = If(line.Receipt, nextReceiptNo, Nothing)
                             ' Since we aren't supposed to have any receipt images with this,
                             ' we should force-remove any receipts associated with this line
                             Dim imagesToRemove As New List(Of IFileInfo)
