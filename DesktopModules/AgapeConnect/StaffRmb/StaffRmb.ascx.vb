@@ -816,7 +816,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     tbBatchId.Text = batchIds.First()
                 End If
 
-                Dim linetypes = (From t In d.AP_Staff_RmbLines Where t.RmbNo = hfRmbNo.Vlaue And t.GrossAmount > 0 Select t.LineType).Distinct()
+                Dim linetypes = (From t In d.AP_Staff_RmbLines Where t.RmbNo = hfRmbNo.Value And t.GrossAmount > 0 Select t.LineType).Distinct()
                 Dim isAdvanceRequest = linetypes.Count() = 1 And linetypes.Contains(Settings("AdvanceLineType"))
                 If (isAdvanceRequest) Then
                     tbPostingReference.Text = "Adv-" & ownerName
