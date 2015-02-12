@@ -91,6 +91,7 @@
       <Column Name="DownloadMode" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
       <Column Name="MoreInfoRequested" Type="System.Boolean" DbType="bit" CanBeNull="true" />
       <Column Name="ProcUserId" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Member="PrivComment" Type="System.String" CanBeNull="true" />
       <Association Name="AP_Staff_Rmb_AP_Staff_RmbLine" Member="AP_Staff_RmbLines" ThisKey="RMBNo" OtherKey="RmbNo" Type="AP_Staff_RmbLine" />
       <Association Name="AP_Staff_Rmb_AP_Staff_Rmb_Post_Extra" Member="AP_Staff_Rmb_Post_Extras" ThisKey="RMBNo" OtherKey="RMBNo" Type="AP_Staff_Rmb_Post_Extra" />
       <Association Name="AP_Staff_Rmb_AP_Staff_RmbLine_File" Member="AP_Staff_RmbLine_Files" ThisKey="RMBNo" OtherKey="RMBNo" Type="AP_Staff_RmbLine_File" />

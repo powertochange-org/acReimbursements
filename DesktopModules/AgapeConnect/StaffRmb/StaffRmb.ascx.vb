@@ -4,7 +4,7 @@
 ' SpareField2: Submitter's Director's id - in case of special approval
 ' SpareField3: DelegateId, when filling out a form on behalf of someone else
 ' SpareField4:
-' SpareField5: Private Finance comments
+' SpareField5: 
 
 ' AP_Rmb_Line
 '-------------
@@ -1005,7 +1005,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     tbAccComments.Text = If(Rmb.AcctComment Is Nothing, "", Rmb.AcctComment)
 
                     pnlPrivateComments.Visible = isFinance
-                    tbPrivAccComments.Text = Rmb.SpareField5
+                    tbPrivAccComments.Text = Rmb.PrivComment
                     btnPrivAccComments.Visible = (Not tbPrivAccComments.Text.Trim().Length > 0)
                     lblPrivAccComments.Visible = (tbPrivAccComments.Text.Trim().Length > 0)
                     tbPrivAccComments.Visible = (tbPrivAccComments.Text.Trim().Length > 0)
@@ -2973,9 +2973,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 save_necessary = True
                 Rmb.AcctComment = tbAccComments.Text
             End If
-            If (Rmb.SpareField5 <> tbPrivAccComments.Text) Then
+            If (Rmb.PrivComment <> tbPrivAccComments.Text) Then
                 save_necessary = True
-                Rmb.SpareField5 = tbPrivAccComments.Text
+                Rmb.PrivComment = tbPrivAccComments.Text
             End If
             If ((Rmb.MoreInfoRequested Is Nothing And (cbMoreInfo.Checked Or cbApprMoreInfo.Checked)) Or
                 Rmb.MoreInfoRequested <> (cbMoreInfo.Checked Or cbApprMoreInfo.Checked)) Then
@@ -3005,9 +3005,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Catch
                 Return
             End Try
-            If (Rmb.AcctComment <> tbAccComments.Text) Or (Rmb.SpareField5 <> tbPrivAccComments.Text) Then
+            If (Rmb.AcctComment <> tbAccComments.Text) Or (Rmb.PrivComment <> tbPrivAccComments.Text) Then
                 Rmb.AcctComment = tbAccComments.Text
-                Rmb.SpareField5 = tbPrivAccComments.Text
+                Rmb.PrivComment = tbPrivAccComments.Text
                 SubmitChanges()
             End If
         End Sub
