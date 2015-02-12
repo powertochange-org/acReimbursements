@@ -816,8 +816,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     tbBatchId.Text = batchIds.First()
                 End If
 
-                tbPostingReference.Text = "Reimb-" & ownerName
-                tbInvoiceNumber.Text = "REIMB" & lblRmbNo.Text
+                Dim linetypes = (From t In d.AP_Staff_RmbLines Where t.RmbNo = hfRmbNo.Vlaue And t.GrossAmount > 0 Select t.LineType).Distinct()
+                Dim isAdvanceRequest = linetypes.Count() = 1 And linetypes.Contains(Settings("AdvanceLineType"))
+                If (isAdvanceRequest) Then
+                    tbPostingReference.Text = "Adv-" & ownerName
+                    tbInvoiceNumber.Text = "ADV" & lblRmbNo.Text
+                Else
+                    tbPostingReference.Text = "Reimb-" & ownerName
+                    tbInvoiceNumber.Text = "REIMB" & lblRmbNo.Text
+                End If
                 tbVendorId.Text = ""
                 tbVendorId.Enabled = ddlCompany.SelectedIndex > 0
                 If (tbVendorId.Enabled) Then
