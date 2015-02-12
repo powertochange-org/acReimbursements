@@ -271,25 +271,29 @@ Partial Class DesktopModules_StaffRmb_RmbPrintout
                 Dim images = (From c In d.AP_Staff_RmbLine_Files Where c.RmbLineNo = row.RmbLineNo)
                 For Each receipt_image In images
                     Dim theFile = DotNetNuke.Services.FileSystem.FileManager.Instance.GetFile(receipt_image.FileId)
-                    ER &= "<div style='align: center; float: left; margin: 5px; ' >"
-                    If theFile.Extension.ToLower = "pdf" Then
+                    If (theFile IsNot Nothing) Then
+                        ER &= "<div style='align: center; float: left; margin: 5px; ' >"
+                        If theFile.Extension.ToLower = "pdf" Then
 
-                        ER &= "<iframe style='width: 747px; height: 1000px;' src='" & DotNetNuke.Services.FileSystem.FileManager.Instance.GetUrl(theFile) & "' ></iframe>"
+                            ER &= "<iframe style='width: 747px; height: 1000px;' src='" & DotNetNuke.Services.FileSystem.FileManager.Instance.GetUrl(theFile) & "' ></iframe>"
+                        Else
+                            ER &= "<img src='" & DotNetNuke.Services.FileSystem.FileManager.Instance.GetUrl(theFile) & "'/>"
+
+                        End If
+                        ER &= "<div style='font-style: italic; color: #AAA; font-size: small; width: 100%; text-align: center;'>" & Translate("ReceiptNo") & ": " & receipt_image.RecNum
+                        Dim amount = row.GrossAmount.ToString("0.00")
+                        Dim cr = Cur
+                        If Not row.OrigCurrency Is Nothing And Not row.OrigCurrencyAmount Is Nothing Then
+                            amount = row.OrigCurrencyAmount.Value.ToString("0.00")
+                            cr = row.OrigCurrency
+                        End If
+                        ER &= "&nbsp;&nbsp;" & cr & amount
+                        ER &= "&nbsp;&nbsp;<a href='" & DotNetNuke.Services.FileSystem.FileManager.Instance.GetUrl(theFile) & "' target='_blank'>(Click here to open in new tab/window)</a> "
+                        ER &= "</div>"
+                        ER &= " </div><div style='clear: both;' />"
                     Else
-                        ER &= "<img src='" & DotNetNuke.Services.FileSystem.FileManager.Instance.GetUrl(theFile) & "'/>"
-
+                        ER = "File not found"
                     End If
-                    ER &= "<div style='font-style: italic; color: #AAA; font-size: small; width: 100%; text-align: center;'>" & Translate("ReceiptNo") & ": " & receipt_image.RecNum
-                    Dim amount = row.GrossAmount.ToString("0.00")
-                    Dim cr = Cur
-                    If Not row.OrigCurrency Is Nothing And Not row.OrigCurrencyAmount Is Nothing Then
-                        amount = row.OrigCurrencyAmount.Value.ToString("0.00")
-                        cr = row.OrigCurrency
-                    End If
-                    ER &= "&nbsp;&nbsp;" & cr & amount
-                    ER &= "&nbsp;&nbsp;<a href='" & DotNetNuke.Services.FileSystem.FileManager.Instance.GetUrl(theFile) & "' target='_blank'>(Click here to open in new tab/window)</a> "
-                    ER &= "</div>"
-                    ER &= " </div><div style='clear: both;' />"
                 Next
             Next
             output = output.Replace("[ELECTRONIC_RECEIPTS]", ER)
