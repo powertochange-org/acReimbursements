@@ -96,6 +96,19 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
         ' has the same PermissionID, UserID, and RoleID as a pre-existing one, and not add it if it is a duplicate
         folderPermissions.Add(permission, True)
 
+        ' if the form is being filled out by a delegate, give them permission also
+        If (theRmb.SpareField3 IsNot Nothing) Then
+            Try
+                Dim delegateId = Integer.Parse(theRmb.SpareField3)
+                permission = New Permissions.FolderPermissionInfo()
+                initFolderPermission(permission, theFolder.FolderID, PortalId, w.PermissionID)
+                permission.UserID = delegateId
+                folderPermissions.Add(permission, True)
+            Catch ex As Exception
+                ' invalid delegateId
+            End Try
+        End If
+
         ' Get all the possible approvers for this reimbursement
         For Each approver In (Await StaffRmbFunctions.getApproversAsync(theRmb)).UserIds
             ' Create a new permission for this approver
@@ -267,13 +280,12 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
 
                 Dim theFolder As IFolderInfo
                 Dim path = "/_RmbReceipts/" & theRmb.UserId
-                ' ensure the physical directory is there
-                If Not Directory.Exists(Server.MapPath("~/portals/" & PS.PortalId & path)) Then
-                    Directory.CreateDirectory(Server.MapPath("~/portals/" & PS.PortalId & path))
-                End If
                 ' Clear the folder cache, to ensure we're getting the most up-to-date folder info
                 DataCache.ClearFolderCache(PS.PortalId)
                 If FolderManager.Instance.FolderExists(PS.PortalId, path) Then
+                    If Not Directory.Exists(Server.MapPath("~/portals/" & PS.PortalId & path)) Then
+                        Directory.CreateDirectory(Server.MapPath("~/portals/" & PS.PortalId & path))
+                    End If
                     theFolder = FolderManager.Instance.GetFolder(PS.PortalId, path)
                 Else
                     theFolder = FolderManager.Instance.AddFolder(fm, path)
