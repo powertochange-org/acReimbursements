@@ -1384,12 +1384,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     If (payable > 0) Then
                         'add line(s) to form
                         Dim insert As New AP_Staff_RmbLine()
-                        insert.RmbNo = hfRmbNo.Value
+                        insert.RmbNo = hfRmbNo.Value.ToString()
                         insert.LineType = line.LineType
                         insert.GrossAmount = 0 - payable
                         insert.TransDate = Today
                         insert.Comment = "Clear Advance:" & comment
-                        insert.ShortComment = insert.Comment
+                        insert.ShortComment = insert.Comment.Substring(0, 25)
                         insert.Taxable = False
                         insert.Receipt = False
                         insert.VATReceipt = False
@@ -1398,8 +1398,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         insert.OutOfDate = False
                         insert.Department = line.Department
                         insert.Spare2 = "0" 'Outstanding balance
-                        insert.Spare4 = line.RmbNo ' original reimbursement number
-                        insert.Spare5 = line.RmbLineNo ' original line number
+                        insert.Spare4 = line.RmbNo.ToString() ' original reimbursement number
+                        insert.Spare5 = line.RmbLineNo.ToString() ' original line number
                         insert.AccountCode = Settings("AdvanceLineType")
                         insert.CostCenter = line.CostCenter
                         insert.Supplier = ""
