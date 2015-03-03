@@ -150,9 +150,8 @@ public class WebService : System.Web.Services.WebService {
                "<td style='border:0;'>" + HELPDESK + "</td>" +
                "<td style='border:0;'>" + WIKI + "</td>" +
                "<td style='border:0;'>" + LINK_SHORTENER + "</td>" +
-               "<td style='border:0;'></td>" +
-               "<td style='border:0;'>" + SETTINGS + "</td>" +
                "<td style='border:0;'>" + EGENCIA + "</td>" +
+               "<td style='border:0;'>" + SETTINGS + "</td>" +
                "</tr></tbody></table></ul></center></div>" +
                 STYLE + SCRIPT + "</div>";
         HttpContext.Current.Response.ContentType = "application/json";
