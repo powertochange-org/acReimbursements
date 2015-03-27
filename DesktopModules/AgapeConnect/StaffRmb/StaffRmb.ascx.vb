@@ -1215,8 +1215,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             line.Split = False
                             ddlOverideTax.SelectedIndex = If(ucType.GetProperty("Taxable").GetValue(theControl, Nothing), 1, 0)
                         End If
-                        line.TransDate = transactionDate
-                        line.OutOfDate = (age > Settings("Expire"))
+                        ' Only recalculate OutOfDate if the date was changed
+                        If (insert Or (transactionDate <> line.TransDate)) Then
+                            line.TransDate = transactionDate
+                            line.OutOfDate = (age > Settings("Expire"))
+                        End If
                         line.AccountCode = ddlAccountCode.SelectedValue
                         line.CostCenter = tbCostcenter.Text
                         line.LineType = CInt(ddlLineTypes.SelectedValue)
@@ -2184,7 +2187,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Catch ex As Exception
                         'Some controls may not have a Set_Currency method (ie. Advances)
                     End Try
-
+                    If (theLine.First.OutOfDate) Then
+                        jscript.Append("check_expense_date(); ")
+                    End If
                     ucType.GetProperty("theDate").SetValue(theControl, theLine.First.TransDate, Nothing)
                     ucType.GetProperty("VAT").SetValue(theControl, theLine.First.VATReceipt, Nothing)
                     ucType.GetProperty("Receipt").SetValue(theControl, theLine.First.Receipt, Nothing)
