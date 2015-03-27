@@ -2049,7 +2049,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 'If the reimbursement has already been downloaded, a warning should be displayed - but hte reimbursement can be simply unprocessed
                 theRmb.Status = RmbStatus.Approved
                 'Remove any posting data associated with this rmb
-                d.AP_Staff_Rmb_Post_Extras.DeleteOnSubmit(From c In d.AP_Staff_Rmb_Post_Extras Where c.RMBNo = theRmb.RMBNo)
+                If ((From c In d.AP_Staff_Rmb_Post_Extras Where c.RMBNo = theRmb.RMBNo) IsNot Nothing) Then
+                    d.AP_Staff_Rmb_Post_Extras.DeleteOnSubmit((From c In d.AP_Staff_Rmb_Post_Extras Where c.RMBNo = theRmb.RMBNo).Single)
+                End If
                 SubmitChanges()
                 Log(theRmb.RID, LOG_LEVEL_WARNING, "UNPROCESSED, after it had been fully processed")
             Else
@@ -2070,12 +2072,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     theRmb.Year = Nothing
                     theRmb.ProcDate = Nothing
                     'Remove any posting data associated with this rmb
-                    d.AP_Staff_Rmb_Post_Extras.DeleteOnSubmit(From c In d.AP_Staff_Rmb_Post_Extras Where c.RMBNo = theRmb.RMBNo)
+                    If ((From c In d.AP_Staff_Rmb_Post_Extras Where c.RMBNo = theRmb.RMBNo) IsNot Nothing) Then
+                        d.AP_Staff_Rmb_Post_Extras.DeleteOnSubmit((From c In d.AP_Staff_Rmb_Post_Extras Where c.RMBNo = theRmb.RMBNo).Single)
+                    End If
                     SubmitChanges()
                     'Then release the lock.
                     StaffBrokerFunctions.SetSetting("Datapump", "Unlocked", PortalId)
                     Log(theRmb.RID, LOG_LEVEL_INFO, "UNPROCESSED - before it was downloaded")
-                End If
+                    End If
             End If
             TaskList.Add(LoadRmbAsync(hfRmbNo.Value))
             TaskList.Add(loadBasicApprovedPaneAsync())
