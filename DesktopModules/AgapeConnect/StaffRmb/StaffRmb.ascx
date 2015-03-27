@@ -937,7 +937,6 @@ function GetAccountBalance(jsonQuery){
     <asp:HiddenField ID="hfExchangeRate" runat="server" Value="1" />
     <asp:HiddenField ID="hfOrigCurrency" runat="server" Value="" />
     <asp:HiddenField ID="hfOrigCurrencyValue" runat="server" Value="" />
-    <asp:HiddenField ID="staffInitials" runat="server" Value="" />
     <asp:HiddenField ID="hfCurOpen" runat="server" Value="false" />
     <asp:HiddenField ID="hfChargeToValue" runat="server"  />
     <asp:HiddenField ID="hfTabModuleId" runat="server" Value="-1" />
@@ -1393,7 +1392,7 @@ function GetAccountBalance(jsonQuery){
                                     <asp:Label ID="lblTest" runat="server" Text="Label" Visible="false"></asp:Label>
                                     <div style="padding: 0 20px 0 20px;">
                                         <asp:GridView ID="GridView1" class="rmbDetails" runat="server" AutoGenerateColumns="False" DataKeyNames="RmbLineNo"
-                                            CellPadding="4" ForeColor="#333333" GridLines="None" Width="100%" ShowFooter="True">
+                                            CellPadding="4" ForeColor="#333333" GridLines="None" Width="100%" ShowFooter="True" AllowSorting="true">
                                             <RowStyle CssClass="dnnGridItem" />
                                             <AlternatingRowStyle CssClass="dnnGridAltItem" />
                                             <Columns>
@@ -1407,7 +1406,7 @@ function GetAccountBalance(jsonQuery){
                                                     <ItemStyle HorizontalAlign="Left" Width="50px" />
                                                 </asp:TemplateField>
 
-                                                <asp:TemplateField HeaderText="Extra" SortExpression="Spare1">
+                                                <asp:TemplateField HeaderText="Extra">
                                                     <EditItemTemplate>
                                                     </EditItemTemplate>
                                                     <ItemTemplate>
@@ -1416,7 +1415,7 @@ function GetAccountBalance(jsonQuery){
                                                     <ItemStyle HorizontalAlign="Center" />
                                                 </asp:TemplateField>
 
-                                                <asp:TemplateField HeaderText="Line Type" SortExpression="LineType" ItemStyle-Width="110px">
+                                                <asp:TemplateField HeaderText="Line Type" ItemStyle-Width="110px">
                                                     <EditItemTemplate>
                                                         <asp:TextBox ID="TextBox1" runat="server" Text='<%# Bind("LineType") %>'></asp:TextBox>
                                                     </EditItemTemplate>
@@ -1430,7 +1429,7 @@ function GetAccountBalance(jsonQuery){
                                                     <ItemStyle HorizontalAlign="Left" />
                                                 </asp:TemplateField>
 
-                                                <asp:TemplateField HeaderText="Comment" SortExpression="Comment">
+                                                <asp:TemplateField HeaderText="Comment" >
                                                     <EditItemTemplate>
                                                     </EditItemTemplate>
                                                     <ItemTemplate>
@@ -1450,7 +1449,7 @@ function GetAccountBalance(jsonQuery){
                                                     <FooterStyle HorizontalAlign="Right" />
                                                 </asp:TemplateField>
 
-                                                <asp:TemplateField HeaderText="Amount" SortExpression="GrossAmount" ItemStyle-Width="75px">
+                                                <asp:TemplateField HeaderText="Amount" SortExpression="Amount" ItemStyle-Width="75px">
                                                     <EditItemTemplate>
                                                     </EditItemTemplate>
                                                     <ItemTemplate>
@@ -1582,6 +1581,7 @@ function GetAccountBalance(jsonQuery){
                         </asp:Panel>
 
                         <asp:HiddenField ID="hfRmbNo" runat="server" />
+                        <asp:HiddenField ID="staffInitials" runat="server" Value="" />
                     </ContentTemplate>
                     <Triggers>
                         <asp:PostBackTrigger ControlID="btnDownload" />

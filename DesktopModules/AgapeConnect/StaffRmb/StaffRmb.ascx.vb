@@ -1025,7 +1025,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     pnlTaxable.Visible = isFinance And (From c In Rmb.AP_Staff_RmbLines Where c.Taxable = True).Count > 0
 
                     '--grid
-                    GridView1.DataSource = (From c In Rmb.AP_Staff_RmbLines Order By c.RmbLineNo)
+                    GridView1.DataSource = From c In Rmb.AP_Staff_RmbLines Order By c.RmbLineNo
                     GridView1.DataBind()
 
                     '--buttons
@@ -2086,6 +2086,17 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 TaskList.Add(buildAllApprovedTreeAsync(allStaff))
             End If
             Await Task.WhenAll(TaskList)
+        End Sub
+
+        Protected Sub GridView1_Sorting(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.GridViewSortEventArgs) Handles GridView1.Sorting
+            Select Case e.SortExpression
+                Case "TransDate"
+                    GridView1.DataSource = (From c In d.AP_Staff_RmbLines Where c.RmbNo = hfRmbNo.Value Order By c.TransDate)
+                    GridView1.DataBind()
+                Case "Amount"
+                    GridView1.DataSource = (From c In d.AP_Staff_RmbLines Where c.RmbNo = hfRmbNo.Value Order By c.GrossAmount)
+                    GridView1.DataBind()
+            End Select
         End Sub
 
         Protected Async Sub GridView1_RowCommand(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.GridViewCommandEventArgs) Handles GridView1.RowCommand
