@@ -2048,6 +2048,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If theRmb.Status = RmbStatus.Processing Then
                 'If the reimbursement has already been downloaded, a warning should be displayed - but hte reimbursement can be simply unprocessed
                 theRmb.Status = RmbStatus.Approved
+                'Remove any posting data associated with this rmb
+                d.AP_Staff_Rmb_Post_Extras.DeleteOnSubmit(From c In d.AP_Staff_Rmb_Post_Extras Where c.RMBNo = theRmb.RMBNo)
                 SubmitChanges()
                 Log(theRmb.RID, LOG_LEVEL_WARNING, "UNPROCESSED, after it had been fully processed")
             Else
@@ -2067,6 +2069,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     theRmb.Period = Nothing
                     theRmb.Year = Nothing
                     theRmb.ProcDate = Nothing
+                    'Remove any posting data associated with this rmb
+                    d.AP_Staff_Rmb_Post_Extras.DeleteOnSubmit(From c In d.AP_Staff_Rmb_Post_Extras Where c.RMBNo = theRmb.RMBNo)
                     SubmitChanges()
                     'Then release the lock.
                     StaffBrokerFunctions.SetSetting("Datapump", "Unlocked", PortalId)
