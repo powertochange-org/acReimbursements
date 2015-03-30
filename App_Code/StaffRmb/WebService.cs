@@ -104,10 +104,11 @@ public class WebService : System.Web.Services.WebService {
                     string firstLetter = staffMember.LastName.ToUpper().Substring(0, 1);
                     Item letter = tree.Needs(firstLetter);
                     Item staff = letter.Needs(staffMember.DisplayName);
-                    string id = rmb.RID.ToString().PadLeft(5, '0'); 
-                    Item reimbursement = staff.Needs(id + " : " + (rmb.RmbDate == null ? "" : rmb.RmbDate.Value.ToShortDateString()) + " : " + rmb.SpareField1);
+                    string id = rmb.RID.ToString().PadLeft(5, '0');
+                    if (rmb.PrivComment != null)
+                        id = id;
+                    Item reimbursement = staff.Needs((rmb.PrivComment == null ? "  " : "* ") + id + " : " + (rmb.RmbDate == null ? "" : rmb.RmbDate.Value.ToShortDateString()) + " : " + rmb.SpareField1);
                     reimbursement.setRmbNo(rmb.RMBNo.ToString());
-                    reimbursement.setStyle("font-size: 6.5pt; color: #999999;");
                 }
             }
             var result = new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(new Item[] { tree });
