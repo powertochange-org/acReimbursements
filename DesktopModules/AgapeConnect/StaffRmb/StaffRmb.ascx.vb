@@ -1405,7 +1405,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         insert.Spare2 = "0" 'Outstanding balance
                         insert.Spare4 = line.RmbNo.ToString() ' original reimbursement number
                         insert.Spare5 = line.RmbLineNo.ToString() ' original line number
-                        insert.AccountCode = (From c In d.AP_StaffRmb_PortalLineTypes Where c.PortalId = PortalId And c.LineTypeId = Settings("AdvanceLineType") Select c.PCode).Single
+                        Dim advancelinetype As Integer = Settings("AdvanceLineType")
+                        insert.AccountCode = (From c In d.AP_StaffRmb_PortalLineTypes Where c.PortalId = PortalId And c.LineTypeId = advancelinetype Select c.PCode).Single
                         insert.CostCenter = line.CostCenter
                         insert.Supplier = ""
                         d.AP_Staff_RmbLines.InsertOnSubmit(insert)
