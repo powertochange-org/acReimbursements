@@ -1390,6 +1390,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         insert.RmbNo = hfRmbNo.Value.ToString()
                         insert.LineType = line.LineType
                         insert.GrossAmount = 0 - payable
+                        insert.OrigCurrency = StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)
+                        insert.OrigCurrencyAmount = 0 - payable
                         insert.TransDate = Today
                         insert.Comment = "Clear Advance:" & comment
                         insert.ShortComment = insert.Comment.Substring(0, 25)
@@ -1403,7 +1405,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         insert.Spare2 = "0" 'Outstanding balance
                         insert.Spare4 = line.RmbNo.ToString() ' original reimbursement number
                         insert.Spare5 = line.RmbLineNo.ToString() ' original line number
-                        insert.AccountCode = Settings("AdvanceLineType")
+                        insert.AccountCode = (From c In d.AP_StaffRmb_PortalLineTypes Where c.PortalId = PortalId And c.LineTypeId = Settings("AdvanceLineType") Select c.PCode).Single
                         insert.CostCenter = line.CostCenter
                         insert.Supplier = ""
                         d.AP_Staff_RmbLines.InsertOnSubmit(insert)
@@ -2527,7 +2529,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             Else
                 If Not String.IsNullOrEmpty(Currency) Then
-                    If Currency <> StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId) Then
+                    If Currency <> StaffBrokerFunctions.GetSetting("            ", PortalId) Then
                         CurString = Currency & CurrencyValue.ToString("f2")
                         CurString = CurString.Replace(".00", "")
 
