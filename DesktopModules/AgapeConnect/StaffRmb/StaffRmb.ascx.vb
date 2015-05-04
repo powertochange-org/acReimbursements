@@ -1790,7 +1790,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Protected Async Sub addLinebtn2_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles addLinebtn2.Click
             Dim State As Integer = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.Status).First()
-            If (State = RmbStatus.Processing Or State = RmbStatus.PendingDownload Or State = RmbStatus.DownloadFailed Or State = RmbStatus.Paid Or State = RmbStatus.Cancelled) Then Return
+            If (State = RmbStatus.Processing Or State = RmbStatus.PendingDownload Or State = RmbStatus.DownloadFailed Or State = RmbStatus.Paid) Then Return
 
             'ddlLineTypes_SelectedIndexChanged(Me, Nothing)
             'ddlCostcenter.SelectedValue = ddlChargeTo.SelectedValue
