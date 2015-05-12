@@ -178,7 +178,7 @@ public class WebService : System.Web.Services.WebService {
                "function staffAppsMenuHide() {$('#staffAppsMenu').hide(); var e = document.getElementById('staffAppsButton');e.style.background = '#f58220';e.style.border = '1px solid #eb8528';}</script>";
 
         String code = "<link href='https://apps.powertochange.org/portals/_default/skins/carmel/staff-apps-button.css' type='text/css' rel='stylesheet'><div id='staff-app-container'>" +
-               "<a id='staffAppsButton' class='button related' onmouseout='staffAppsMenuHide();' onmouseover='staffAppsMenuShow();' style='background:#f58220; border:1px solid #eb8528; cursor:default;  z-index:910; position:relative; float:right; width:103px; height:21px; color:#000000; " +
+               "<a id='staffAppsButton' class='button related' onmouseout='staffAppsMenuHide();' onmouseover='staffAppsMenuShow();' style='background:#f58220; border:1px solid #eb8528; cursor:default; position:relative; float:right; width:103px; height:21px; color:#000000; " +
                "text-align:center; font-family:sans-serif; font-weight:300; font-size:13px;  padding-top:6px; padding-left:0; padding-bottom:4px; padding-right:0px; margin:10px 10px; border-radius:5px; border:1px solid rgb(235, 133, 40); background:rgb(245, 130, 32);'>Staff Apps</a>" +
                "<div id='staffAppsMenu' onmouseout='staffAppsMenuHide();' onmouseover='staffAppsMenuShow();' class='staff-apps-button' >" +
                "<center><ul class='staffAppsPopupMenu' id='staff-apps-popup-menu'><div><div>" +
