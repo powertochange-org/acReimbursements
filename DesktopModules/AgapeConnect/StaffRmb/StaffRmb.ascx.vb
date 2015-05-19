@@ -1688,7 +1688,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value
             If rmb.Count > 0 Then
                 Dim State As Integer = rmb.First.Status
-                If Not (State = RmbStatus.Submitted Or State = RmbStatus.PendingDirectorApproval Or State = RmbStatus.PendingEDMSApproval) Then Return
+                If Not (State = RmbStatus.Submitted Or State = RmbStatus.PendingDirectorApproval Or State = RmbStatus.PendingEDMSApproval) Then
+                    ScriptManager.RegisterStartupScript(btnApprove, btnApprove.GetType(), "not_approved", "alert('" + Translate("ErrorApprovalState") + "');", True)
+                    Return
+                End If
 
                 Dim message As String = ""
                 Dim rmbTotal = CType((From a In d.AP_Staff_RmbLines Where a.RmbNo = rmb.First.RMBNo Select a.GrossAmount).Sum(), Decimal?).GetValueOrDefault(0)

@@ -856,4 +856,7 @@ To view more details about how these numbers were calculated, run a Summary Inco
   <data name="ApproverChangedSubject.Text" xml:space="preserve">
     <value>New approver selected for Reimbursement #[RMBNO]</value>
   </data>
+  <data name="ErrorApprovalState.Text" xml:space="preserve">
+    <value>ERROR: This reimbursement is not awaiting your approval.</value>
+  </data>
 </root>
