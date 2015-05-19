@@ -448,7 +448,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim Complete = (From c In d.AP_Staff_Rmbs
                                 Where c.Status = RmbStatus.Paid And ((c.UserId = UserId) Or c.SpareField3.Equals(userstr)) And c.PortalId = PortalId
                                 Order By c.RID Descending
-                                Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
+                                Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId)
                 dlPaid.DataSource = Complete
                 dlPaid.DataBind()
                 PaidUpdatePanel.Update()
