@@ -2450,14 +2450,24 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Protected Async Sub ddlApprovedBy_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles ddlApprovedBy.SelectedIndexChanged
             Dim RmbNo = CInt(hfRmbNo.Value)
             Dim rmb = From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo And c.PortalId = PortalId
-            'If the form is awaiting approval, notifiy the original approver that they are no longer needed
-            If (rmb.First.Status = RmbStatus.Submitted & rmb.First.ApprUserId <> ddlApprovedBy.SelectedValue) Then
-                Dim fromEmail = UserController.Instance.GetCurrentUserInfo.Email
-                Dim oldApprover = UserController.GetUserById(PortalId, rmb.First.ApprUserId)
-                Dim subject As String = Translate("ApproverChangedSubject").Replace("[RMBNO]", rmb.First.RID)
-                Dim body As String = Translate("ApproverChangedEmail").Replace("[RMBNO]", rmb.First.RID)
-                SendEmail(fromEmail, oldApprover.Email, "", subject, body) '
-                ScriptManager.RegisterStartupScript(ddlApprovedBy, ddlApprovedBy.GetType(), "notify_approver", "alert('" + oldApprover.DisplayName + " was notified that they are no longer required to approve this reimbursement');", True)
+            Dim oldApprover = UserController.GetUserById(PortalId, rmb.First.ApprUserId)
+            If (oldApprover IsNot Nothing) Then
+                Dim newApproverName As String
+                Try
+                    newApproverName = UserController.GetUserById(PortalId, ddlApprovedBy.SelectedValue).DisplayName
+                Catch
+                    newApproverName = ""
+                End Try
+
+                'If the form is awaiting approval, notifiy the original approver that they are no longer needed
+                If (rmb.First.Status = RmbStatus.Submitted & rmb.First.ApprUserId <> ddlApprovedBy.SelectedValue) Then
+                    Dim fromEmail = UserController.Instance.GetCurrentUserInfo.Email
+                    Dim subject As String = Translate("ApproverChangedSubject").Replace("[RMBNO]", rmb.First.RID)
+                    Dim body As String = Translate("ApproverChangedEmail").Replace("[RMBNO]", rmb.First.RID)
+                    SendEmail(fromEmail, oldApprover.Email, "", subject, body)
+                    ScriptManager.RegisterStartupScript(ddlApprovedBy, ddlApprovedBy.GetType(), "notify_approver", "alert('" + oldApprover.DisplayName + " was notified that they are no longer required to approve this reimbursement');", True)
+                End If
+                Log(rmb.First.RID, LOG_LEVEL_INFO, "Approver changed from " + oldApprover.DisplayName + " to " + newApproverName)
             End If
             Try
                 rmb.First.ApprUserId = ddlApprovedBy.SelectedValue
