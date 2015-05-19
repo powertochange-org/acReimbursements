@@ -2463,7 +2463,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 End Try
 
                 'If the form is awaiting approval, notifiy the original approver that they are no longer needed
-                If (rmb.First.Status = RmbStatus.Submitted & rmb.First.ApprUserId <> ddlApprovedBy.SelectedValue) Then
+                If (rmb.First.Status = RmbStatus.Submitted AndAlso rmb.First.ApprUserId <> ddlApprovedBy.SelectedValue) Then
                     Dim fromEmail = UserController.Instance.GetCurrentUserInfo.Email
                     Dim subject As String = Translate("ApproverChangedSubject").Replace("[RMBNO]", rmb.First.RID)
                     Dim body As String = Translate("ApproverChangedEmail").Replace("[RMBNO]", rmb.First.RID)
