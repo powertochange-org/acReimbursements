@@ -850,4 +850,10 @@ To view more details about how these numbers were calculated, run a Summary Inco
   <data name="lblExtraApproval.Text" xml:space="preserve">
     <value>Additional Approval by EDMS granted.</value>
   </data>
+  <data name="ApproverChangedEmail.Text" xml:space="preserve">
+    <value>Please note that the selected approver for Reimbursement #[RMBNO] has been changed, and you are no longer required to approve this reimbursement.</value>
+  </data>
+  <data name="ApproverChangedSubject.Text" xml:space="preserve">
+    <value>New approver selected for Reimbursement #[RMBNO]</value>
+  </data>
 </root>
