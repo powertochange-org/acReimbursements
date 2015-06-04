@@ -3256,7 +3256,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                 Amount = CDbl(ucTypeOld.GetProperty("Amount").GetValue(theControl, Nothing))
                                 VAT = CStr(ucTypeOld.GetProperty("VAT").GetValue(theControl, Nothing))
                                 Receipt = CStr(ucTypeOld.GetProperty("Receipt").GetValue(theControl, Nothing))
-                                taxable = If(ucTypeOld.GetProperty("Taxable").GetValue(theControl, Nothing), 1, 0)
+                                taxable = ddlOverideTax.SelectedIndex
                                 Province = CStr(ucTypeOld.GetProperty("Spare1").GetValue(theControl, Nothing))
                                 currency = hfOrigCurrency.Value
                                 If (ucTypeOld.GetProperty("ReceiptsAttached") IsNot Nothing) Then
