@@ -3234,6 +3234,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim Amount As Double = 0.0
                     Dim theDate As Date = Today
                     Dim taxable As Integer
+                    Dim exchangerate As Double = 1
                     Dim VAT As Boolean = False
                     Dim Receipt As Boolean = True
                     Dim Province As String = Nothing
@@ -3257,6 +3258,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                 VAT = CStr(ucTypeOld.GetProperty("VAT").GetValue(theControl, Nothing))
                                 Receipt = CStr(ucTypeOld.GetProperty("Receipt").GetValue(theControl, Nothing))
                                 taxable = ddlOverideTax.SelectedIndex
+                                exchangerate = CDbl(ucTypeOld.GetProperty("ExchangeRate").GetValue(theControl, Nothing))
                                 Province = CStr(ucTypeOld.GetProperty("Spare1").GetValue(theControl, Nothing))
                                 currency = hfOrigCurrency.Value
                                 If (ucTypeOld.GetProperty("ReceiptsAttached") IsNot Nothing) Then
@@ -3296,6 +3298,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     ucType.GetProperty("Supplier").SetValue(theControl, Supplier, Nothing)
                     ucType.GetProperty("Comment").SetValue(theControl, Comment, Nothing)
+                    ucType.GetProperty("ExchangeRate").SetValue(theControl, exchangerate, Nothing)
                     ucType.GetProperty("Amount").SetValue(theControl, Amount, Nothing)
                     ucType.GetProperty("theDate").SetValue(theControl, theDate, Nothing)
                     ucType.GetProperty("VAT").SetValue(theControl, VAT, Nothing)
