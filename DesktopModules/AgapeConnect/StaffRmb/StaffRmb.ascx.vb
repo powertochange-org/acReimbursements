@@ -1025,7 +1025,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     pnlTaxable.Visible = isFinance And (From c In Rmb.AP_Staff_RmbLines Where c.Taxable = True).Count > 0
 
                     '--grid
-                    GridView1.DataSource = From c In Rmb.AP_Staff_RmbLines Order By c.RmbLineNo
+                    ViewState("SortOrder") = "RmbLineNo"
+                    GridView1.DataSource = getExpenseLines()
                     GridView1.DataBind()
 
                     '--buttons
@@ -1306,7 +1307,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     rmb.Changed = True
                     d.SubmitChanges()
                 End If
-                Await LoadRmbAsync(hfRmbNo.Value)
+                'Await LoadRmbAsync(hfRmbNo.Value)
+                GridView1.DataSource = getExpenseLines()
+                GridView1.DataBind()
+
                 ScriptManager.RegisterClientScriptBlock(Page, Me.GetType(), "hide_expense_popup", "closeNewItemPopup();", True)
             End If
         End Sub
@@ -1589,6 +1593,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     rmb.Locked = False
                 End If
 
+                rmb.ApprDate = Nothing
                 rmb.Status = NewStatus
                 rmb.SpareField1 = rmbTotal.ToString("C") ' currency formatted string
                 lblStatus.Text = RmbStatus.StatusName(NewStatus)
@@ -2105,15 +2110,21 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Await Task.WhenAll(TaskList)
         End Sub
 
-        Protected Sub GridView1_Sorting(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.GridViewSortEventArgs) Handles GridView1.Sorting
-            Select Case e.SortExpression
+        Private Function getExpenseLines() As IEnumerable
+            Select Case ViewState("SortOrder")
+                Case "RmbLineNo"
+                    Return (From c In d.AP_Staff_RmbLines Where c.RmbNo = hfRmbNo.Value Order By c.RmbLineNo)
                 Case "TransDate"
-                    GridView1.DataSource = (From c In d.AP_Staff_RmbLines Where c.RmbNo = hfRmbNo.Value Order By c.TransDate)
-                    GridView1.DataBind()
+                    Return (From c In d.AP_Staff_RmbLines Where c.RmbNo = hfRmbNo.Value Order By c.TransDate)
                 Case "Amount"
-                    GridView1.DataSource = (From c In d.AP_Staff_RmbLines Where c.RmbNo = hfRmbNo.Value Order By c.GrossAmount)
-                    GridView1.DataBind()
+                    Return (From c In d.AP_Staff_RmbLines Where c.RmbNo = hfRmbNo.Value Order By c.GrossAmount)
             End Select
+        End Function
+
+        Protected Sub GridView1_Sorting(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.GridViewSortEventArgs) Handles GridView1.Sorting
+            ViewState("SortOrder") = e.SortExpression
+            GridView1.DataSource = getExpenseLines()
+            GridView1.DataBind()
         End Sub
 
         Protected Async Sub GridView1_RowCommand(ByVal sender As Object, ByVal e As System.Web.UI.WebControls.GridViewCommandEventArgs) Handles GridView1.RowCommand
@@ -3233,6 +3244,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim Amount As Double = 0.0
                     Dim theDate As Date = Today
                     Dim taxable As Integer
+                    Dim exchangerate As Double = 1
                     Dim VAT As Boolean = False
                     Dim Receipt As Boolean = True
                     Dim Province As String = Nothing
@@ -3255,7 +3267,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                 Amount = CDbl(ucTypeOld.GetProperty("Amount").GetValue(theControl, Nothing))
                                 VAT = CStr(ucTypeOld.GetProperty("VAT").GetValue(theControl, Nothing))
                                 Receipt = CStr(ucTypeOld.GetProperty("Receipt").GetValue(theControl, Nothing))
-                                taxable = If(ucTypeOld.GetProperty("Taxable").GetValue(theControl, Nothing), 1, 0)
+                                taxable = ddlOverideTax.SelectedIndex
+                                exchangerate = CDbl(ucTypeOld.GetProperty("ExchangeRate").GetValue(theControl, Nothing))
                                 Province = CStr(ucTypeOld.GetProperty("Spare1").GetValue(theControl, Nothing))
                                 currency = hfOrigCurrency.Value
                                 If (ucTypeOld.GetProperty("ReceiptsAttached") IsNot Nothing) Then
@@ -3295,6 +3308,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                     ucType.GetProperty("Supplier").SetValue(theControl, Supplier, Nothing)
                     ucType.GetProperty("Comment").SetValue(theControl, Comment, Nothing)
+                    ucType.GetProperty("ExchangeRate").SetValue(theControl, exchangerate, Nothing)
                     ucType.GetProperty("Amount").SetValue(theControl, Amount, Nothing)
                     ucType.GetProperty("theDate").SetValue(theControl, theDate, Nothing)
                     ucType.GetProperty("VAT").SetValue(theControl, VAT, Nothing)

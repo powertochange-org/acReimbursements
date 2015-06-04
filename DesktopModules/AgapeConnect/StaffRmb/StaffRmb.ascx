@@ -1392,7 +1392,7 @@ function GetAccountBalance(jsonQuery){
                                     <asp:Label ID="lblTest" runat="server" Text="Label" Visible="false"></asp:Label>
                                     <div style="padding: 0 20px 0 20px;">
                                         <asp:GridView ID="GridView1" class="rmbDetails" runat="server" AutoGenerateColumns="False" DataKeyNames="RmbLineNo"
-                                            CellPadding="4" ForeColor="#333333" GridLines="None" Width="100%" ShowFooter="True" AllowSorting="true">
+                                            CellPadding="4" ForeColor="#333333" GridLines="None" Width="100%" ShowFooter="True" AllowSorting="true" >
                                             <RowStyle CssClass="dnnGridItem" />
                                             <AlternatingRowStyle CssClass="dnnGridAltItem" />
                                             <Columns>
