@@ -1589,6 +1589,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     rmb.Locked = False
                 End If
 
+                rmb.ApprDate = Nothing
                 rmb.Status = NewStatus
                 rmb.SpareField1 = rmbTotal.ToString("C") ' currency formatted string
                 lblStatus.Text = RmbStatus.StatusName(NewStatus)
