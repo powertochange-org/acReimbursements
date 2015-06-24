@@ -1918,6 +1918,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     insert.Supplier = theLine.First.Supplier
                     insert.Comment = RowDesc
                     insert.GrossAmount = CDbl(RowAmount)
+                    insert.OrigCurrency = theLine.First.OrigCurrency
+                    insert.ExchangeRate = theLine.First.ExchangeRate
+                    Dim originalAmount As Decimal
+                    If (insert.ExchangeRate Is Nothing) Then
+                        originalAmount = insert.GrossAmount
+                    Else : originalAmount = insert.GrossAmount * insert.ExchangeRate
+                    End If
+                    insert.OrigCurrencyAmount = Math.Round(originalAmount, 2)
                     insert.LargeTransaction = RowAmount > CDbl(Settings("TeamLeaderLimit"))
                     insert.LineType = theLine.First.LineType
                     insert.Mileage = theLine.First.Mileage
