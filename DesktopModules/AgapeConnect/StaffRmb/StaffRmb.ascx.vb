@@ -1903,6 +1903,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             Dim theLine = From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(hfSplitLineId.Value)
             If theLine.Count > 0 Then
+                Dim receipts As List(Of AP_Staff_RmbLine_File) = (From c In d.AP_Staff_RmbLine_Files Where c.RmbLineNo = theLine.First.RmbLineNo).ToList()
+                Dim rownumber = 1
                 For Each row As TableRow In tblSplit.Rows
                     Dim RowAmount = CType(row.Cells(1).Controls(0), TextBox).Text
                     Dim RowDesc = CType(row.Cells(0).Controls(0), TextBox).Text
@@ -1946,8 +1948,44 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     insert.CostCenter = theLine.First.CostCenter
                     insert.AccountCode = theLine.First.AccountCode
                     d.AP_Staff_RmbLines.InsertOnSubmit(insert)
+                    d.SubmitChanges()
+                    'Duplicate any receipts (and receiptImageId)
+                    If (receipts.Count > 0) Then
+                        Dim receiptnumber = 1
+                        For Each receipt In receipts
+                            Dim file = FileManager.Instance.GetFile(receipt.FileId)
+                            Dim filename = "R" & insert.RmbNo & "L" & insert.RmbLineNo & "Rec" & receiptnumber & "." & file.Extension
+                            Dim stream = FileManager.Instance.GetFileContent(file)
+                            Dim copy = FileManager.Instance.AddFile(FolderManager.Instance.GetFolder(file.FolderId), filename, stream, False)
+                            stream.Close()
+                            stream.Dispose()
+                            insert.ReceiptImageId = copy.FileId
+                            Dim linefile As AP_Staff_RmbLine_File = New AP_Staff_RmbLine_File() With {
+                                .RMBNo = insert.RmbNo,
+                                .RmbLineNo = insert.RmbLineNo,
+                                .RecNum = receiptnumber,
+                                .FileId = copy.FileId,
+                                .URL = FileManager.Instance.GetUrl(copy)
+                            }
+                            d.AP_Staff_RmbLine_Files.InsertOnSubmit(linefile)
+                            receiptnumber = receiptnumber + 1
+                        Next
+                    End If
+                    rownumber = rownumber + 1
+                Next
+                d.SubmitChanges()
+                ' now Delete the original receipts
+                For Each receipt In receipts
+                    Dim fileId = receipt.FileId
+                    Try
+                        Dim file = FileManager.Instance.GetFile(fileId)
+                        FileManager.Instance.DeleteFile(file)
+                    Catch ex As Exception
+                    End Try
+                    d.AP_Staff_RmbLine_Files.DeleteAllOnSubmit(From c In d.AP_Staff_RmbLine_Files Where c.FileId = fileId)
                 Next
             End If
+            d.AP_Staff_RmbLine_Files.DeleteAllOnSubmit(From c In d.AP_Staff_RmbLine_Files Where c.RmbLineNo = theLine.First.RmbLineNo)
             d.AP_Staff_RmbLines.DeleteAllOnSubmit(theLine)
             d.SubmitChanges()
             lblSplitError.Visible = False
