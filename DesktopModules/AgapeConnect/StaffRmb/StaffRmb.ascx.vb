@@ -3056,6 +3056,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             hfChargeToValue.Value = tbChargeTo.Text
             ' Never change costcenter once a reimbursement has been processed
             If (Rmb.CostCenter <> tbChargeTo.Text) And (Rmb.ProcDate Is Nothing) Then
+                Log(Rmb.RID, LOG_LEVEL_INFO, "CostCenter changed from: " + Rmb.CostCenter + " to: " + tbChargeTo.Text)
                 save_necessary = True
                 Rmb.CostCenter = tbChargeTo.Text
                 For Each row In (From c In Rmb.AP_Staff_RmbLines Where c.CostCenter = Rmb.CostCenter)
@@ -3064,32 +3065,43 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
             ' Never change approver once a reimbursement has been approved
             If (ddlApprovedBy.SelectedValue <> Nothing) AndAlso (Rmb.ApprUserId <> ddlApprovedBy.SelectedValue) AndAlso (Rmb.ApprDate Is Nothing) Then
+                Log(Rmb.RID, LOG_LEVEL_INFO, "Approver changed from: " + UserController.GetUserById(Rmb.PortalId, Rmb.ApprUserId).DisplayName + " to: " + UserController.GetUserById(PortalId, ddlApprovedBy.SelectedValue).DisplayName)
                 save_necessary = True
                 Rmb.ApprUserId = ddlApprovedBy.SelectedValue
             End If
             If (Rmb.UserRef <> tbYouRef.Text) Then
+                Log(Rmb.RID, LOG_LEVEL_INFO, "UserRef changed from: " + Rmb.UserRef + " to: " + tbYouRef.Text)
                 save_necessary = True
                 Rmb.UserRef = tbYouRef.Text
             End If
             If (Rmb.UserComment <> tbComments.Text) Then
+                Log(Rmb.RID, LOG_LEVEL_INFO, "User Comment changed to: " + tbComments.Text)
                 save_necessary = True
                 Rmb.UserComment = tbComments.Text
             End If
             If (Rmb.ApprComment <> tbApprComments.Text) Then
+                Log(Rmb.RID, LOG_LEVEL_INFO, "Approver Comment changed to: " + tbApprComments.Text)
                 save_necessary = True
                 Rmb.ApprComment = tbApprComments.Text
                 enableRejectButton(tbApprComments.Text <> "")
             End If
             If (Rmb.AcctComment <> tbAccComments.Text) Then
+                Log(Rmb.RID, LOG_LEVEL_INFO, "Finance Comment changed to: " + tbAccComments.Text)
                 save_necessary = True
                 Rmb.AcctComment = tbAccComments.Text
             End If
             If (Rmb.PrivComment <> tbPrivAccComments.Text) Then
+                Log(Rmb.RID, LOG_LEVEL_INFO, "Private Finance comment updated")
                 save_necessary = True
                 Rmb.PrivComment = tbPrivAccComments.Text
             End If
             If ((Rmb.MoreInfoRequested Is Nothing And (cbMoreInfo.Checked Or cbApprMoreInfo.Checked)) Or
                 Rmb.MoreInfoRequested <> (cbMoreInfo.Checked Or cbApprMoreInfo.Checked)) Then
+                If (Rmb.MoreInfoRequested Is Nothing Or Rmb.MoreInfoRequested = False) Then
+                    Log(Rmb.RID, LOG_LEVEL_INFO, "MoreInfoFlag set")
+                Else
+                    Log(Rmb.RID, LOG_LEVEL_INFO, "MoreInfoFlag cleared")
+                End If
                 save_necessary = True
                 Rmb.Locked = False
                 Rmb.MoreInfoRequested = (cbMoreInfo.Checked Or cbApprMoreInfo.Checked)
@@ -3116,9 +3128,18 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Catch
                 Return
             End Try
-            If (Rmb.AcctComment <> tbAccComments.Text) Or (Rmb.PrivComment <> tbPrivAccComments.Text) Then
+            Dim changed = False
+            If (Rmb.AcctComment <> tbAccComments.Text) Then
                 Rmb.AcctComment = tbAccComments.Text
+                Log(Rmb.RID, LOG_LEVEL_INFO, "Finance comment changed to: " + tbAccComments.Text)
+                changed = True
+            End If
+            If (Rmb.PrivComment <> tbPrivAccComments.Text) Then
                 Rmb.PrivComment = tbPrivAccComments.Text
+                Log(Rmb.RID, LOG_LEVEL_INFO, "Private Finance comment updated")
+                changed = True
+            End If
+            If changed Then
                 SubmitChanges()
             End If
         End Sub
