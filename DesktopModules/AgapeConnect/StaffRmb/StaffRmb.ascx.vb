@@ -1566,8 +1566,26 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             Dim rmbs = From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value
             If rmbs.Count > 0 Then
-                updateOutOfDateFlag()
                 Dim rmb = rmbs.First
+                If (rmb.ApprUserId Is Nothing) Then Return
+                ' Ensure approver has sufficient permissions
+                Dim approvers As StaffRmbFunctions.Approvers
+                approvers = Await StaffRmbFunctions.getApproversAsync(rmb)
+                Dim authorized = False
+                For Each User In approvers.UserIds
+                    If User.UserID = rmb.ApprUserId Then authorized = True
+                Next
+                If Not authorized Then
+                    Await updateApproversListAsync(rmb)
+                    lblError.Text = "Please select a new approver and click Submit again"
+                    lblError.Visible = True
+                    Return
+                Else
+                    lblError.Text = ""
+                    lblError.Visible = False
+                End If
+
+                updateOutOfDateFlag()
                 updateReceiptPermissions(rmb)
                 Dim NewStatus As Integer = rmb.Status
                 Dim rmbTotal = CType((From t In d.AP_Staff_RmbLines Where t.RmbNo = rmb.RMBNo Select t.GrossAmount).Sum(), Decimal?).GetValueOrDefault(0)
