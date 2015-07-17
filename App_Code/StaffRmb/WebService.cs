@@ -129,6 +129,7 @@ public class WebService : System.Web.Services.WebService {
         String LINK_SHORTENER = "<a href='https://staff.powertochange.org/sh'><img src='https://staff.powertochange.org/wp-content/images/Link-Shortener-Icon.png' alt='Link Shortener'></a>";
         String WIKI = "<a href='https://wiki.powertochange.org/help'><img src='https://staff.powertochange.org/wp-content/images/Self-Help-Wiki-Icon.png' alt='Self-Help Wiki'></a>";
         String EGENCIA = "<a href='https://staff.powertochange.org/egencia-login/'><img src='https://staff.powertochange.org/wp-content/images/Egencia-Icon.png' alt='Egencia'></a>";
+        String MY_HR = "<a href='https://sso.dayforcehcm.com/p2c'><img src='https://staff.powertochange.org/wp-content/images/MyHR-Icon.png' alt='My HR'></a>";
         String SETTINGS = "<a href='https://staff.powertochange.org/staff-directory/?page=profile'><img src='https://staff.powertochange.org/wp-content/images/My-Settings-Icon.png' alt='Settings' /></a>";
 
         String STYLE = "<style type='text/css' scoped>#staffAppsButton:hover, #staffAppsButton:active, #staffAppsButton:focus {color: #000000!important;text-decoration: none;}#staffAppsMenu table td{background:transparent;}</style>";
@@ -141,15 +142,17 @@ public class WebService : System.Web.Services.WebService {
                "<div id='staffAppsMenu' onmouseout='staffAppsMenuHide();' onmouseover='staffAppsMenuShow();' style='position:absolute; display:none; border:1px solid rgb(214, 215, 212); padding: 10px 40px; right:10px; top:37px; z-index:900; background-color: rgb(244, 244, 244);' >" +
                "<center><ul class='staffAppsPopupMenu' style='margin:15px 0; padding:15px 0; color:#adafb2; font-size:15px;'><table><tbody>" +
                "<tr><td style='border:0;'>" + ABSENCE_TRACKER + "</td>" +
-               "<td style='border:0;'>" + AUTHORIZATION_MGR + "</td>" +
                "<td style='border:0;'>" + REPORTS + "</td>" +
                "<td style='border:0;'>" + STAFF_DIRECTORY + "</td>" +
                "<td style='border:0;'>" + REIMBURSEMENTS + "</td>" +
                "</tr><tr>" +
                "<td style='border:0;'>" + HELPDESK + "</td>" +
-               "<td style='border:0;'>" + WIKI + "</td>" +
-               "<td style='border:0;'>" + LINK_SHORTENER + "</td>" +
+               "<td style='border:0;'>" + MY_HR + "</td>" +
                "<td style='border:0;'>" + EGENCIA + "</td>" +
+               "<td style='border:0;'>" + LINK_SHORTENER + "</td>" +
+               "</tr><tr>" +
+               "<td style='border:0;'>" + AUTHORIZATION_MGR + "</td>" +
+               "<td style='border:0;'>" + WIKI + "</td>" +
                "<td style='border:0;'>" + SETTINGS + "</td>" +
                "</tr></tbody></table></ul></center></div>" +
                 STYLE + SCRIPT + "</div>";
@@ -171,6 +174,7 @@ public class WebService : System.Web.Services.WebService {
         String LINK_SHORTENER = "<a href='https://staff.powertochange.org/sh'><img src='https://staff.powertochange.org/wp-content/images/Link-Shortener-Icon.png' alt='Link Shortener'></a>";
         String WIKI = "<a href='https://wiki.powertochange.org/help'><img src='https://staff.powertochange.org/wp-content/images/Self-Help-Wiki-Icon.png' alt='Self-Help Wiki'></a>";
         String EGENCIA = "<a href='https://staff.powertochange.org/egencia-login/'><img src='https://staff.powertochange.org/wp-content/images/Egencia-Icon.png' alt='Egencia'></a>";
+        String MY_HR = "<a href='https://sso.dayforcehcm.com/p2c'><img src='https://staff.powertochange.org/wp-content/images/MyHR-Icon.png' alt='My HR'></a>";
         String SETTINGS = "<a href='https://staff.powertochange.org/staff-directory/?page=profile'><img src='https://staff.powertochange.org/wp-content/images/My-Settings-Icon.png' alt='Settings' /></a>";
 
         String STYLE = "<style type='text/css' scoped>#staffAppsButton:hover, #staffAppsButton:active, #staffAppsButton:focus {color: #000000!important;text-decoration: none;}#staffAppsMenu table td{background:transparent;}</style>";
@@ -183,15 +187,17 @@ public class WebService : System.Web.Services.WebService {
                "<div id='staffAppsMenu' onmouseout='staffAppsMenuHide();' onmouseover='staffAppsMenuShow();' class='staff-apps-button' >" +
                "<center><ul class='staffAppsPopupMenu' id='staff-apps-popup-menu'><div><div>" +
                "<div><div class='staff-app-button-styling'>" + ABSENCE_TRACKER + "</div>" +
-               "<div class='staff-app-button-styling'>" + AUTHORIZATION_MGR + "</div>" +
                "<div class='staff-app-button-styling'>" + REPORTS + "</div>" +
                "<div class='staff-app-button-styling'>" + STAFF_DIRECTORY + "</div>" +
                "<div class='staff-app-button-styling'>" + REIMBURSEMENTS + "</div>" +
                "</div><div>" +
                "<div class='staff-app-button-styling'>" + HELPDESK + "</div>" +
-               "<div class='staff-app-button-styling'>" + WIKI + "</div>" +
-               "<div class='staff-app-button-styling'>" + LINK_SHORTENER + "</div>" +
+               "<div class='staff-app-button-styling'>" + MY_HR + "</div>" +
                "<div class='staff-app-button-styling'>" + EGENCIA + "</div>" +
+               "<div class='staff-app-button-styling'>" + LINK_SHORTENER + "</div>" +
+               "</div><div>" +
+               "<div class='staff-app-button-styling'>" + AUTHORIZATION_MGR + "</div>" +
+               "<div class='staff-app-button-styling'>" + WIKI + "</div>" +
                "<div class='staff-app-button-styling'>" + SETTINGS + "</div>" +
                "</div></div></div></ul></center></div>" +
                 STYLE + SCRIPT + "</div>";
