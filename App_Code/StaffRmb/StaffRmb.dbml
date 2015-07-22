@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8"?><Database Name="AgapeConnect" Class="StaffRmbDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
-  <Connection Mode="WebSettings" ConnectionString="Data Source=localhost\SQLEXPRESS;Initial Catalog=PTC_Staff;User ID=PTC_Staff" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="SiteSqlServer" Provider="System.Data.SqlClient" />
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="Reimbursements" Class="StaffRmbDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="WebSettings" ConnectionString="Data Source=localhost\SQLEXPRESS;Initial Catalog=Reimbursements;User ID=ModuleDev" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="SiteSqlServer" Provider="System.Data.SqlClient" />
   <Table Name="dbo.AP_Staff_RmbLineType" Member="AP_Staff_RmbLineTypes">
     <Type Name="AP_Staff_RmbLineType">
       <Column Name="LineTypeId" Type="System.Int16" DbType="SmallInt NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -91,7 +91,7 @@
       <Column Name="DownloadMode" Type="System.String" DbType="NVarChar(20)" CanBeNull="true" />
       <Column Name="MoreInfoRequested" Type="System.Boolean" DbType="bit" CanBeNull="true" />
       <Column Name="ProcUserId" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Member="PrivComment" Type="System.String" CanBeNull="true" />
+      <Column Name="PrivComment" Type="System.String" CanBeNull="true" />
       <Association Name="AP_Staff_Rmb_AP_Staff_RmbLine" Member="AP_Staff_RmbLines" ThisKey="RMBNo" OtherKey="RmbNo" Type="AP_Staff_RmbLine" />
       <Association Name="AP_Staff_Rmb_AP_Staff_Rmb_Post_Extra" Member="AP_Staff_Rmb_Post_Extras" ThisKey="RMBNo" OtherKey="RMBNo" Type="AP_Staff_Rmb_Post_Extra" />
       <Association Name="AP_Staff_Rmb_AP_Staff_RmbLine_File" Member="AP_Staff_RmbLine_Files" ThisKey="RMBNo" OtherKey="RMBNo" Type="AP_Staff_RmbLine_File" />
@@ -200,6 +200,13 @@
       <Column Name="RID" Type="System.Int32" CanBeNull="false" />
       <Column Name="Username" Type="System.String" CanBeNull="true" />
       <Column Name="Message" Type="System.String" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.AP_ExchangeRates" Member="AP_ExchangeRates">
+    <Type Name="AP_ExchangeRate">
+      <Column Name="Date" Type="System.DateTime" DbType="Date NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Currency" Type="System.String" DbType="NVarChar(3) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Rate" Type="System.Decimal" DbType="Decimal(19,9) NOT NULL" CanBeNull="false" />
     </Type>
   </Table>
 </Database>

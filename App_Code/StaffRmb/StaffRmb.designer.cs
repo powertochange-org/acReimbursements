@@ -22,7 +22,7 @@ namespace StaffRmb
 	using System;
 	
 	
-	[global::System.Data.Linq.Mapping.DatabaseAttribute(Name="AgapeConnect")]
+	[global::System.Data.Linq.Mapping.DatabaseAttribute(Name="Reimbursements")]
 	public partial class StaffRmbDataContext : System.Data.Linq.DataContext
 	{
 		
@@ -66,6 +66,9 @@ namespace StaffRmb
     partial void InsertAP_Staff_Rmb_Log(AP_Staff_Rmb_Log instance);
     partial void UpdateAP_Staff_Rmb_Log(AP_Staff_Rmb_Log instance);
     partial void DeleteAP_Staff_Rmb_Log(AP_Staff_Rmb_Log instance);
+    partial void InsertAP_ExchangeRate(AP_ExchangeRate instance);
+    partial void UpdateAP_ExchangeRate(AP_ExchangeRate instance);
+    partial void DeleteAP_ExchangeRate(AP_ExchangeRate instance);
     #endregion
 		
 		public StaffRmbDataContext() : 
@@ -191,6 +194,14 @@ namespace StaffRmb
 			get
 			{
 				return this.GetTable<AP_Staff_Rmb_Log>();
+			}
+		}
+		
+		public System.Data.Linq.Table<AP_ExchangeRate> AP_ExchangeRates
+		{
+			get
+			{
+				return this.GetTable<AP_ExchangeRate>();
 			}
 		}
 	}
@@ -4427,6 +4438,116 @@ namespace StaffRmb
 					this._Message = value;
 					this.SendPropertyChanged("Message");
 					this.OnMessageChanged();
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.AP_ExchangeRates")]
+	public partial class AP_ExchangeRate : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private System.DateTime _Date;
+		
+		private string _Currency;
+		
+		private decimal _Rate;
+		
+    #region Extensibility Method Definitions
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnDateChanging(System.DateTime value);
+    partial void OnDateChanged();
+    partial void OnCurrencyChanging(string value);
+    partial void OnCurrencyChanged();
+    partial void OnRateChanging(decimal value);
+    partial void OnRateChanged();
+    #endregion
+		
+		public AP_ExchangeRate()
+		{
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Date", DbType="Date NOT NULL", IsPrimaryKey=true)]
+		public System.DateTime Date
+		{
+			get
+			{
+				return this._Date;
+			}
+			set
+			{
+				if ((this._Date != value))
+				{
+					this.OnDateChanging(value);
+					this.SendPropertyChanging();
+					this._Date = value;
+					this.SendPropertyChanged("Date");
+					this.OnDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Currency", DbType="NVarChar(3) NOT NULL", CanBeNull=false, IsPrimaryKey=true)]
+		public string Currency
+		{
+			get
+			{
+				return this._Currency;
+			}
+			set
+			{
+				if ((this._Currency != value))
+				{
+					this.OnCurrencyChanging(value);
+					this.SendPropertyChanging();
+					this._Currency = value;
+					this.SendPropertyChanged("Currency");
+					this.OnCurrencyChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Rate", DbType="Decimal(19,9) NOT NULL")]
+		public decimal Rate
+		{
+			get
+			{
+				return this._Rate;
+			}
+			set
+			{
+				if ((this._Rate != value))
+				{
+					this.OnRateChanging(value);
+					this.SendPropertyChanging();
+					this._Rate = value;
+					this.SendPropertyChanged("Rate");
+					this.OnRateChanged();
 				}
 			}
 		}

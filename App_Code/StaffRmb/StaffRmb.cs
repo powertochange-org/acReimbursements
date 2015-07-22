@@ -152,6 +152,16 @@ namespace StaffRmb
             
         }
 
+        public static void updateExchangeRates()
+        {
+            StaffRmbDataContext ctx = new StaffRmbDataContext();
+            DateTime lastDate = ctx.AP_ExchangeRates.Select(a => a.Date).OrderByDescending(o => o.Date).First();
+            if (DateTime.Today > lastDate)
+            {
+                // Update exchange rate tables
+            }
+        }
+
         static public String GetDefaultProvince(int StaffId) {
             //Get the last province used by this person,
             //otherwise return their home province.
