@@ -916,7 +916,7 @@ function GetAccountBalance(jsonQuery){
 <div id="loading" class="loading_overlay" style="display:none" >
     &nbsp;
 </div>
-
+<asp:Label ID="lblVersion" runat="server" CssClass="left hint" style="margin-top:-50px; margin-left:250px" />
 <div style="position:relative; text-align: center; width: 100%;">
     <asp:UpdatePanel ID="ErrorUpdatePanel" runat="server" >
         <ContentTemplate>
@@ -1834,7 +1834,7 @@ function GetAccountBalance(jsonQuery){
                     <tr><td><asp:Label ID="lblPostingDate" runat="server" resourcekey="PostingDate" /></td>
                         <td><asp:TextBox ID="dtPostingDate" runat="server" Width="90px" class="datepicker" /></td></tr>
                     <tr><td><asp:Label ID="lblBatchId" runat="server" resourcekey="BatchId" /></td>
-                        <td><asp:TextBox ID="tbBatchId" runat="server" AutoCompleteType="none"/></td></tr>
+                        <td><asp:TextBox ID="tbBatchId" runat="server" MaxLength="15" AutoCompleteType="none"/></td></tr>
                     <tr><td><asp:Label ID="lblPostingReference" runat="server" resourcekey="PostingReference" /></td>
                         <td><asp:TextBox ID="tbPostingReference" runat="server" /></td></tr>
                     <tr><td><asp:Label ID="lblInvoiceNumber" runat="server" resourcekey="InvoiceNumber" /></td>

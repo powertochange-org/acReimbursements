@@ -63,6 +63,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             hfPortalId.Value = PortalId
             hfTabModuleId.Value = TabModuleId
             lblMovedMenu.Visible = IsEditable
+            ' set versioning info
+            lblVersion.Visible = UserController.Instance.GetCurrentUserInfo().IsSuperUser
+            lblVersion.Text = String.Format("Version: {0}<br>Dated: {1}",
+                System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(),
+                System.IO.File.GetLastWriteTime(System.Reflection.Assembly.GetExecutingAssembly().Location).ToShortDateString())
 
             For i As Integer = 2 To hfRows.Value
                 Dim insert As New TableRow()
