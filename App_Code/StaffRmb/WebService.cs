@@ -199,6 +199,7 @@ public class WebService : System.Web.Services.WebService {
                "<div class='staff-app-button-styling'>" + AUTHORIZATION_MGR + "</div>" +
                "<div class='staff-app-button-styling'>" + WIKI + "</div>" +
                "<div class='staff-app-button-styling'>" + SETTINGS + "</div>" +
+               "<div class='staff-app-button-styling'></div>" +
                "</div></div></div></ul></center></div>" +
                 STYLE + SCRIPT + "</div>";
         HttpContext.Current.Response.ContentType = "application/json";
