@@ -176,6 +176,7 @@ public class WebService : System.Web.Services.WebService {
         String EGENCIA = "<a href='https://staff.powertochange.org/egencia-login/'><img src='https://staff.powertochange.org/wp-content/images/Egencia-Icon.png' alt='Egencia'></a>";
         String MY_HR = "<a href='https://sso.dayforcehcm.com/p2c'><img src='https://staff.powertochange.org/wp-content/images/MyHR-Icon.png' alt='My HR'></a>";
         String SETTINGS = "<a href='https://staff.powertochange.org/staff-directory/?page=profile'><img src='https://staff.powertochange.org/wp-content/images/My-Settings-Icon.png' alt='Settings' /></a>";
+		String PLACEHOLDER = "<div style='width:63px; height:100px'></div>";
 
         String STYLE = "<style type='text/css' scoped>#staffAppsButton:hover, #staffAppsButton:active, #staffAppsButton:focus {color: #000000!important;text-decoration: none;}#staffAppsMenu table td{background:transparent;}</style>";
         String SCRIPT = "<script type='text/javascript'>function staffAppsMenuShow() {$('#staffAppsMenu').show();var e = document.getElementById('staffAppsButton');e.style.background = '#f4f4f4';e.style.border = '1px solid #d6d7d4';e.style.borderBottom = '1px solid #f4f4f4';}" +
@@ -199,7 +200,7 @@ public class WebService : System.Web.Services.WebService {
                "<div class='staff-app-button-styling'>" + AUTHORIZATION_MGR + "</div>" +
                "<div class='staff-app-button-styling'>" + WIKI + "</div>" +
                "<div class='staff-app-button-styling'>" + SETTINGS + "</div>" +
-               "<div class='staff-app-button-styling'></div>" +
+               "<div class='staff-app-button-styling'>" + PLACEHOLDER + "</div>" +
                "</div></div></div></ul></center></div>" +
                 STYLE + SCRIPT + "</div>";
         HttpContext.Current.Response.ContentType = "application/json";
