@@ -855,8 +855,8 @@ function GetAccountBalance(jsonQuery){
             source:  function(request, response) {
                 var term = request.term;
                 if (term in usercache) {
-                    console.info('users from cache');
-                    response(cache[term]);
+                    console.info('users from usercache');
+                    response(usercache[term]);
                     return;
                 }
                 console.info('looking up users');
