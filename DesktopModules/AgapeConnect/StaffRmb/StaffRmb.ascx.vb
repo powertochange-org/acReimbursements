@@ -977,6 +977,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     lblProcessedBy.Text = If(Rmb.ProcUserId Is Nothing, "", UserController.GetUserById(PortalId, Rmb.ProcUserId).DisplayName)
 
                     '--reference / period / year
+                    lblYouRef.Visible = Not IsAccounts()
+                    tbYouRef.Visible = Not IsAccounts()
                     tbYouRef.Enabled = Rmb.Status = RmbStatus.Draft
                     tbYouRef.Text = If(Rmb.UserRef Is Nothing, "", Rmb.UserRef)
 
