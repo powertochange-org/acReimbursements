@@ -1141,6 +1141,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End Try
             Try
                 ddlApprovedBy.SelectedValue = approverId
+                btnSubmit.Visible = True
                 enableSubmitButton(approverId >= 0)
                 lblApprovedBy.Text = ddlApprovedBy.SelectedItem.ToString
             Catch ex As Exception
@@ -1151,6 +1152,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Function
 
         Private Sub enableSubmitButton(enable As Boolean)
+            If (enable) Then btnSubmit.Visible = True
             btnSubmit.Enabled = True
             Dim classes = btnSubmit.Attributes("class")
             If enable Then
@@ -1317,6 +1319,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 'Await LoadRmbAsync(hfRmbNo.Value)
                 GridView1.DataSource = getExpenseLines()
                 GridView1.DataBind()
+                btnSubmit.Visible = True
                 enableSubmitButton(btnSubmit.Visible And tbChargeTo.Text.Length = 6 And ddlApprovedBy.SelectedIndex > 0 And GridView1.Rows.Count > 0)
                 ScriptManager.RegisterClientScriptBlock(Page, Me.GetType(), "hide_expense_popup", "closeNewItemPopup();", True)
             End If
