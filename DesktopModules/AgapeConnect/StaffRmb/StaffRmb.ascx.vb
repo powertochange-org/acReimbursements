@@ -90,9 +90,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 tblSplit.Rows.Add(insert)
             Next
             StaffRmbFunctions.setPresidentId(CInt(Settings("PresidentId")))
-            If (Not IsPostBack) Then
-                StaffRmbFunctions.updateExchangeRates()
-            End If
         End Sub
 
         Private Async Sub Page_Init(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Me.Init
