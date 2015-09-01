@@ -1313,7 +1313,7 @@ function GetAccountBalance(jsonQuery){
                                         <td colspan="2">
                                             <table><tr class="Agape_SubTitle">
                                             <td class="hdrTitle" width="10%">
-                                                <asp:Label ID="Label23" runat="server" resourcekey="YourRef"></asp:Label>
+                                                <asp:Label ID="lblYouRef" runat="server" resourcekey="YourRef"></asp:Label>
                                             </td>
                                             <td class="hdrValue">
                                                 <asp:TextBox ID="tbYouRef" runat="server" Width="150px" onKeyPress="showSaveButton();"></asp:TextBox>
