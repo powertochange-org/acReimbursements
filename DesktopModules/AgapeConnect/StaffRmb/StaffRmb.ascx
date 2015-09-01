@@ -177,6 +177,7 @@
     }
  
     function loadAllSubmittedTree() {
+        var total_submitted = 0;
         $.getJSON(
             "/DesktopModules/AgapeConnect/StaffRmb/WebService.asmx/AllRmbs?portalid="+$('#<%= hfPortalId.ClientID %>').val()+
                         "&tabmoduleid="+$('#<%= hfTabModuleId.ClientID %>').val()+"&status=<%= StaffRmb.RmbStatus.Submitted%>",
@@ -185,6 +186,9 @@
                     data: data,
                     onCreateLi: function(node, $li) {
                         $li.find('.jqtree-title').not('.jqtree-title-folder').addClass('menu_link');
+                        if (node.rmbno) {
+                            total_submitted++;
+                        }
                     }
                 });
                 $("#treeSubmitted").bind(
@@ -197,6 +201,11 @@
                             $("#treeSubmitted").tree('toggle', node);
                         }
                     })
+            }
+            ).done(function() {
+                <%If IsAccounts() Then%>
+                $('#treeSubmitted span.jqtree-title:first').text("All Staff ("+total_submitted+")");
+                <%End If%>
             }
         );
     }
@@ -230,12 +239,14 @@
             ).done(function() {
                 <%If IsAccounts() Then%>
                 $('#lblProcessing').text('(' + total_processing + ')');
+                $('#treeProcessing span.jqtree-title:first').text("All Staff ("+total_processing+")");
                 <%End If%>
             }
         );
     }
 
     function loadAllPaidTree() {
+        var total_paid=0;
         $.getJSON(
             "/DesktopModules/AgapeConnect/StaffRmb/WebService.asmx/AllRmbs?portalid="+$('#<%= hfPortalId.ClientID %>').val()+
                         "&tabmoduleid="+$('#<%= hfTabModuleId.ClientID %>').val()+"&status=<%= StaffRmb.RmbStatus.Paid%>",
@@ -244,6 +255,9 @@
                     data: data,
                     onCreateLi: function(node, $li) {
                         $li.find('.jqtree-title').not('.jqtree-title-folder').addClass('menu_link');
+                        if (node.rmbno) {
+                            total_paid++;
+                        }
                     }
                 });
                 $("#treePaid").bind(
@@ -256,6 +270,11 @@
                             $("#treePaid").tree('toggle', node);
                         }
                     })
+            }
+            ).done(function() {
+                <%If IsAccounts() Then%>
+                $('#treePaid span.jqtree-title:first').text("All Staff ("+total_paid+")");
+                <%End If%>
             }
         );
     }
