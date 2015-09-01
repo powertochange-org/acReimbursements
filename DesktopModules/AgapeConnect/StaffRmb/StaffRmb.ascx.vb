@@ -1044,7 +1044,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     btnPrint.OnClientClick = "window.open('/DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & RmbNo & "&UID=" & Rmb.UserId & "', '_blank'); "
                     btnSubmit.Visible = (isOwner Or isSpouse) And (DRAFT Or MORE_INFO Or CANCELLED) And FORM_HAS_ITEMS
                     btnSubmit.Text = If(DRAFT, Translate("btnSubmit"), Translate("btnResubmit"))
-                    enableSubmitButton(btnSubmit.Visible And tbChargeTo.Text.Length = 6 And (ddlApprovedBy.SelectedValue IsNot Nothing AndAlso (Not ddlApprovedBy.SelectedValue.Equals(String.Empty)) AndAlso ddlApprovedBy.SelectedValue >= 0))
+                    enableSubmitButton(btnSubmit.Visible And tbChargeTo.Text.Length = 6 And ddlApprovedBy.SelectedIndex > 0 And GridView1.Rows.Count > 0)
                     btnReject.Visible = isApprover And SUBMITTED
                     enableRejectButton(isApprover And SUBMITTED And tbApprComments.Text <> "")
                     btnApprove.Visible = isApprover And SUBMITTED
@@ -1317,7 +1317,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 'Await LoadRmbAsync(hfRmbNo.Value)
                 GridView1.DataSource = getExpenseLines()
                 GridView1.DataBind()
-
+                enableSubmitButton(btnSubmit.Visible And tbChargeTo.Text.Length = 6 And ddlApprovedBy.SelectedIndex > 0 And GridView1.Rows.Count > 0)
                 ScriptManager.RegisterClientScriptBlock(Page, Me.GetType(), "hide_expense_popup", "closeNewItemPopup();", True)
             End If
         End Sub
@@ -2580,7 +2580,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             btnDelete.Visible = True
             btnSubmit.Visible = True
             btnSubmit.Text = Translate("btnSubmit")
-            enableSubmitButton(tbChargeTo.Text.Length = 6 And ddlApprovedBy.SelectedIndex > 0 And GridView1.Rows.Count > 0)
+            enableSubmitButton(btnSubmit.Visible And tbChargeTo.Text.Length = 6 And ddlApprovedBy.SelectedIndex > 0 And GridView1.Rows.Count > 0)
             btnSubmit.ToolTip = If(Not btnSubmit.Attributes("class").Contains("aspNetDisabled"), "", Translate("btnSubmitHelp"))
         End Sub
 
