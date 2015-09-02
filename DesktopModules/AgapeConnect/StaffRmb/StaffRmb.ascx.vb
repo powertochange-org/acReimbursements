@@ -1176,7 +1176,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Protected Async Sub btnSaveLine_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSaveLine.Click
 
-            'never allow changes to reimbursements after they have been processed
+            'never allow changes to reimbursements after they have been processedf
             Dim State As Integer = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.Status).First
             If State = RmbStatus.Paid Or State = RmbStatus.Processing Or State = RmbStatus.PendingDownload Or State = RmbStatus.DownloadFailed Then Return
 
