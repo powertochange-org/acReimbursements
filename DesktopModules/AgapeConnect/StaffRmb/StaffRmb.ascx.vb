@@ -897,7 +897,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim hasDelegate = (delegateId >= 0)
                     Dim delegateName = If(hasDelegate, UserController.GetUserById(PortalId, delegateId).DisplayName, "")
                     Dim staff_member = StaffBrokerFunctions.GetStaffMember(Rmb.UserId)
-                    Dim PACMode = (String.IsNullOrEmpty(staff_member.CostCenter) And StaffBrokerFunctions.GetStaffProfileProperty(staff_member.StaffId, "PersonalAccountCode") <> "")
 
                     Dim isDelegate = (UserId = delegateId)
                     Dim isOwner = (UserId = Rmb.UserId) Or isDelegate
@@ -4768,22 +4767,33 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Sub
 
         Private Async Function LoadAddressAsync(UserId As Integer) As Task
-
-            Dim User = StaffBrokerFunctions.GetStaffMember(UserId)
-            Dim tooltip = Translate("AddressOnFile") & " " & User.DisplayName + Environment.NewLine
-            lblAddressName.Text = User.DisplayName
-            lblAddressLine1.Text = StaffBrokerFunctions.GetStaffProfileProperty(User, "Address1")
-            tooltip += lblAddressLine1.Text & Environment.NewLine
-            lblAddressLine2.Text = StaffBrokerFunctions.GetStaffProfileProperty(User, "Address2")
-            tooltip += lblAddressLine2.Text & Environment.NewLine
-            lblCity.Text = StaffBrokerFunctions.GetStaffProfileProperty(User, "City")
-            tooltip += lblCity.Text & ", "
-            lblProvince.Text = StaffBrokerFunctions.GetStaffProfileProperty(User, "Province")
-            tooltip += lblProvince.Text & ", "
-            lblCountry.Text = StaffBrokerFunctions.GetStaffProfileProperty(User, "Country")
-            tooltip += lblCountry.Text & Environment.NewLine
-            lblPostalCode.Text = StaffBrokerFunctions.GetStaffProfileProperty(User, "PostalCode")
-            tooltip += lblPostalCode.Text
+            Dim tooltip As String
+            Try
+                Dim User = StaffBrokerFunctions.GetStaffMember(UserId)
+                tooltip = Translate("AddressOnFile") & " " & User.DisplayName + Environment.NewLine
+                lblAddressName.Text = User.DisplayName
+                lblAddressLine1.Text = StaffBrokerFunctions.GetStaffProfileProperty(User, "Address1")
+                tooltip += lblAddressLine1.Text & Environment.NewLine
+                lblAddressLine2.Text = StaffBrokerFunctions.GetStaffProfileProperty(User, "Address2")
+                tooltip += lblAddressLine2.Text & Environment.NewLine
+                lblCity.Text = StaffBrokerFunctions.GetStaffProfileProperty(User, "City")
+                tooltip += lblCity.Text & ", "
+                lblProvince.Text = StaffBrokerFunctions.GetStaffProfileProperty(User, "Province")
+                tooltip += lblProvince.Text & ", "
+                lblCountry.Text = StaffBrokerFunctions.GetStaffProfileProperty(User, "Country")
+                tooltip += lblCountry.Text & Environment.NewLine
+                lblPostalCode.Text = StaffBrokerFunctions.GetStaffProfileProperty(User, "PostalCode")
+                tooltip += lblPostalCode.Text
+            Catch
+                lblAddressName.Text = ""
+                lblAddressLine1.Text = ""
+                lblAddressLine2.Text = ""
+                lblCity.Text = ""
+                lblProvince.Text = ""
+                lblCountry.Text = ""
+                lblPostalCode.Text = ""
+                tooltip = "<no address found>"
+            End Try
             If (lblBehalf.Visible) Then
                 lblBehalf.ToolTip = tooltip
             Else
