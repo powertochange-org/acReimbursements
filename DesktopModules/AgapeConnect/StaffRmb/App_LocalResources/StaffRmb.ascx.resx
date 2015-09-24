@@ -601,7 +601,7 @@
     <value>Warning</value>
   </data>
   <data name="WarningLowBalance.Text" xml:space="preserve">
-    <value>Warning: There are insufficient funds in account#[ACCT] to fulfil this reimbursement.  You may still approve this reimbursement, but overspending could result in stricter oversight on this account.</value>
+    <value>Warning: The income minus expenses in account #[ACCT] so far this fiscal year is less than what was budgeted. You may still approve this reimbursement, but overspending could result in stricter oversight on this account. To see more information about the actual income and expenses compared to the budget, you can run a Summary Income and Expense report on the Loop for this account from July up to the current month.</value>
   </data>
   <data name="btnSubmitHelp.Text" xml:space="preserve">
     <value>Please select both an account and an approver to enable the Submit button.</value>
