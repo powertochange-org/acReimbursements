@@ -304,7 +304,7 @@ namespace StaffRmb
         static public async Task<int[]> getSupervisors(int id, int levels)
         // Returns the <levels># of upline supervisors ids for a staff member
         {
-            int[] result = new int[0];
+            List<int> result = new List<int>();
             try
             {
                 if (id < 0 || levels <= 0) return new int[0];
@@ -313,12 +313,14 @@ namespace StaffRmb
                 StaffBroker.StaffBrokerDataContext d = new StaffBroker.StaffBrokerDataContext();
                 var leaderIds = from l in d.AP_StaffBroker_LeaderMetas where l.UserId == id select l.LeaderId;
                 foreach (int leaderId in leaderIds) {
-                    result = new int[1] { leaderId };
-                    result = combineArrays(result, await getSupervisors(leaderId, (levels - 1)));
+                    result.Add(leaderId);
+                    foreach (int supervisor in await getSupervisors(leaderId, (levels-1))) {
+                        result.Add(supervisor);
+                    }
                 }
             }
             catch { }
-            return result;
+            return result.ToArray<int>();
         }
 
         static public async Task<int[]> ELT()
