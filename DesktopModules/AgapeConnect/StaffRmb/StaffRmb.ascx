@@ -1855,7 +1855,7 @@ function GetAccountBalance(jsonQuery){
                     <tr><td><asp:Label ID="lblCompany" runat="server" resourcekey="Company" /></td>
                         <td style="width:100%"><asp:DropDownList ID="ddlCompany" runat="server" AutoPostBack="True" /></td></tr>
                     <tr><td><asp:Label ID="lblPostingDate" runat="server" resourcekey="PostingDate" /></td>
-                        <td><asp:TextBox ID="dtPostingDate" type="date" runat="server" Width="90px" /></td></tr>
+                        <td><asp:TextBox ID="dtPostingDate" type="date" runat="server" /></td></tr>
                     <tr><td><asp:Label ID="lblBatchId" runat="server" resourcekey="BatchId" /></td>
                         <td><asp:TextBox ID="tbBatchId" runat="server" MaxLength="15" AutoCompleteType="none"/></td></tr>
                     <tr><td><asp:Label ID="lblPostingReference" runat="server" resourcekey="PostingReference" /></td>
