@@ -1175,7 +1175,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Protected Async Sub btnSaveLine_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSaveLine.Click
 
-            'never allow changes to reimbursements after they have been processedf
+            'never allow changes to reimbursements after they have been processed
             Dim State As Integer = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.Status).First
             If State = RmbStatus.Paid Or State = RmbStatus.Processing Or State = RmbStatus.PendingDownload Or State = RmbStatus.DownloadFailed Then Return
 
@@ -4730,7 +4730,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Private Function hasOldExpenses() As Boolean
             Dim oldest_allowable_date = Today.AddDays(-Settings("Expire"))
-            Dim old_lines = (From c In d.AP_Staff_RmbLines Where c.RmbNo = hfRmbNo.Value And c.TransDate < oldest_allowable_date Select c.TransDate).Count()
+            Dim advance_line_type As Integer = Settings("AdvanceLineType")
+            Dim old_lines = (From c In d.AP_Staff_RmbLines Where c.RmbNo = hfRmbNo.Value And c.LineType <> advance_line_type And c.TransDate < oldest_allowable_date Select c.TransDate).Count()
             Return old_lines > 0
         End Function
 
