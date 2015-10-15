@@ -70,7 +70,7 @@
                </div>   
             </asp:Panel>
         </td>
-        <td  colspan="2"><asp:TextBox ID="dtDate" type="date" runat="server" Width="90px" onChange="check_expense_date();"></asp:TextBox><span id="olddatetext"></span></td>
+        <td  colspan="2"><asp:TextBox ID="dtDate" type="date" runat="server" onChange="check_expense_date();"></asp:TextBox><span id="olddatetext"></span></td>
     </tr>
     <tr>
         <td><b><asp:label runat="server" id="lblAmount" controlname="tbAmount" ResourceKey="lblAmount"  /></b>
