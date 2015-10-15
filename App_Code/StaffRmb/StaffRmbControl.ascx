@@ -70,7 +70,7 @@
                </div>   
             </asp:Panel>
         </td>
-        <td  colspan="2"><asp:TextBox ID="dtDate" runat="server" Width="90px" class="datepicker" onChange="check_expense_date();"></asp:TextBox><span id="olddatetext"></span></td>
+        <td  colspan="2"><asp:TextBox ID="dtDate" type="date" runat="server" Width="90px" onChange="check_expense_date();"></asp:TextBox><span id="olddatetext"></span></td>
     </tr>
     <tr>
         <td><b><asp:label runat="server" id="lblAmount" controlname="tbAmount" ResourceKey="lblAmount"  /></b>
@@ -85,7 +85,7 @@
         <td>
             <table style="font-size:9pt">
                 <tr>
-                    <td><asp:TextBox ID="tbAmount" runat="server" Width="90px" class="required numeric rmbAmount" onKeyUp="update_CAD();" onFocus="select();" onblur="format_number(this, 2);" ></asp:TextBox></td>
+                    <td><asp:TextBox ID="tbAmount" type="number" step="0.01" runat="server" Width="90px" class="required rmbAmount" onKeyUp="update_CAD();" onFocus="select();" onblur="format_number(this, 2);" ></asp:TextBox></td>
                     <td colspan="2">
                         <asp:UpdatePanel ID="currencyUpdatePanel" runat="server">
                             <ContentTemplate>

@@ -1,17 +1,18 @@
 ﻿<%@ Control Language="VB" AutoEventWireup="false" CodeFile="StaffRmb.ascx.vb" Inherits="DotNetNuke.Modules.StaffRmbMod.ViewStaffRmb" %>
 <%@ Register TagPrefix="dnn" TagName="Label" Src="~/controls/LabelControl.ascx" %>
 
-<script src="/js/gplus-youtubeembed.js" type="text/javascript"></script>
-
-<script src="/js/jquery.numeric.js" type="text/javascript"></script>
+<script src="/js/modernizr-custom.js" type="text/javascript"></script>
 <script src="/js/jquery.watermarkinput.js" type="text/javascript"></script>
 
 <script src="/js/tree.jquery.js"></script>
 <link rel="stylesheet" href="/js/jqtree.css" />
-
+<style>
+    input[type="number"] { text-align:right; }
+    .abutton.delete { background-image:none; color:white; background-color:rgba(255,0,0,0.5); }
+    .abutton.go {background-image:none; background-color:#A1D490;}
+</style>
 
 <script type="text/javascript">
-    optimizeYouTubeEmbeds();
 
     var previous_menu_item = null;
     function selectMenuItem(menu_item) {
@@ -51,7 +52,7 @@
 
     function check_expense_date() {
         var control = $("[name$='$theControl$dtDate']");
-        var date = control.datepicker('getDate');
+        var date = new Date($(control).val());
         var expiry = new Date((new Date()).getTime() - <%= Settings("Expire") %>*24*3600000); //Number of days is set in Reimbursement settings
         if (date < expiry) {
             control.addClass("old_date");
@@ -280,6 +281,7 @@
     }
 
     (function ($, Sys) {
+
         function setUpMyTabs() {
             var stop = false;
 
@@ -448,14 +450,11 @@
             $('.Excel').button({ icons: { primary: 'myExcel'} });
 
 
-            var pickerOpts = {
-                dateFormat: '<%= GetDateFormat() %>'
-            };
-
-
-            $('.datepicker').datepicker(pickerOpts);
-
-            $('.numeric').numeric();
+            if (!Modernizr.inputtypes.date) {
+                $('input[type=date]').datepicker({
+                    dateFormat: '<%= GetDateFormat() %>'
+                });
+            }
             $('.Description').Watermark('<%= Translate("Description") %>');
             $('.Amount').Watermark('<%= Translate("Amount") %>');
         };
@@ -589,6 +588,11 @@ function GetAccountBalance(jsonQuery){
      $('#<%= tbNewComments.ClientID%>').val('');
      $('#<%= tbNewOnBehalfOf.ClientID%>').val('');
      $('#<%= hfOnBehalfOf.ClientID%>').val('');
+     if (!Modernizr.inputtypes.date) {
+         $('input[type=date]').datepicker({
+             dateFormat: '<%= GetDateFormat() %>'
+         });
+     }
  }
 
     function resetSplitPopup() {
@@ -1400,7 +1404,7 @@ function GetAccountBalance(jsonQuery){
                                     </tr>
                                     <tr valign="top">
                                         <td colspan="6">
-                                            <asp:Button ID="btnDelete" runat="server" resourcekey="btnDelete" class="aButton" OnClientClick='if (! window.confirm("Are you sure?")) return;' OnClick="btnDelete_Click" style="float:left"/>
+                                            <asp:Button ID="btnDelete" runat="server" resourcekey="btnDelete" class="aButton delete" OnClientClick='if (! window.confirm("Are you sure?")) return;' OnClick="btnDelete_Click" style="float:left"/>
                                             <asp:Button ID="btnSave" runat="server" resourcekey="btnSaved" class="aButton" style="float:right"/>
                                         </td>
                                     </tr>
@@ -1547,7 +1551,7 @@ function GetAccountBalance(jsonQuery){
                                     </div>
                                     <div style="clear:both;"></div>
                                     <div style="float:left; margin-left:20px">
-                                        <asp:Button ID="addLinebtn2" runat="server" resourcekey="btnAddExpenseItem" class="aButton" />
+                                        <asp:Button ID="addLinebtn2" runat="server" resourcekey="btnAddExpenseItem" class="aButton go" />
                                         <asp:Panel ID="pnlAdvance" runat="server" Visible="false" style="display:inline-block" >
                                             <input type="button" ID="btnClearAdvance" value='<%=Translate("btnClearAdvance") %>' class="aButton" onclick="showClearAdvancePopup();" />
                                             (<asp:Label runat="server" resourcekey="lblOutstandingAdvances" font-size="Smaller" font-weight="bold"/>
@@ -1724,7 +1728,7 @@ function GetAccountBalance(jsonQuery){
                                             <asp:Label ID="Label30" runat="server" resourcekey="RecoverVATRate"></asp:Label>
                                         </td>
                                         <td>
-                                            <asp:TextBox ID="tbVatRate" runat="server" Width="50" CssClass="numeric"></asp:TextBox>
+                                            <asp:TextBox ID="tbVatRate" type="number" step="0.0001" runat="server" Width="50" ></asp:TextBox>
                                         </td>
                                     </tr>
                                 </asp:Panel>
@@ -1851,7 +1855,7 @@ function GetAccountBalance(jsonQuery){
                     <tr><td><asp:Label ID="lblCompany" runat="server" resourcekey="Company" /></td>
                         <td style="width:100%"><asp:DropDownList ID="ddlCompany" runat="server" AutoPostBack="True" /></td></tr>
                     <tr><td><asp:Label ID="lblPostingDate" runat="server" resourcekey="PostingDate" /></td>
-                        <td><asp:TextBox ID="dtPostingDate" runat="server" Width="90px" class="datepicker" /></td></tr>
+                        <td><asp:TextBox ID="dtPostingDate" type="date" runat="server" Width="90px" /></td></tr>
                     <tr><td><asp:Label ID="lblBatchId" runat="server" resourcekey="BatchId" /></td>
                         <td><asp:TextBox ID="tbBatchId" runat="server" MaxLength="15" AutoCompleteType="none"/></td></tr>
                     <tr><td><asp:Label ID="lblPostingReference" runat="server" resourcekey="PostingReference" /></td>
@@ -1931,7 +1935,7 @@ function GetAccountBalance(jsonQuery){
                                         </asp:TemplateField>
                                         <asp:TemplateField HeaderText="Amount to clear">
                                             <ItemTemplate>
-                                                <asp:TextBox ID="tbAdvanceClearing" runat="server" Text='<%# Bind("Spare3") %>' CssClass="clearAdvance numeric" Style="text-align:right" value="0.00" 
+                                                <asp:TextBox ID="tbAdvanceClearing" type="number" step="0.01" runat="server" Text='<%# Bind("Spare3") %>' CssClass="clearAdvance" Style="text-align:right" value="0.00" 
                                                      onkeyup="updateClearingTotal();" onfocus="$(this).select();"></asp:TextBox>
                                             </ItemTemplate>
                                             <ItemStyle HorizontalAlign="Right" Width="50px"  />
@@ -1988,7 +1992,7 @@ function GetAccountBalance(jsonQuery){
                                     <asp:TextBox ID="tbSplitDesc" runat="server" Width="100%" CssClass="Description"></asp:TextBox>
                                 </asp:TableCell>
                                 <asp:TableCell>
-                                    <asp:TextBox ID="tbSplitAmt" runat="server" Width="100px" CssClass="Amount numeric"></asp:TextBox>
+                                    <asp:TextBox ID="tbSplitAmt" type="number" step="0.01" runat="server" Width="100px" CssClass="Amount"></asp:TextBox>
                                 </asp:TableCell>
                             </asp:TableRow>
                         </asp:Table>
