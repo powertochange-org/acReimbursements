@@ -931,7 +931,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     If isAdmin Then lblRmbNo.ToolTip = Rmb.RMBNo
                     Dim resetPostingDataTask = ResetPostingDataAsync()
                     imgAvatar.ImageUrl = GetProfileImage(Rmb.UserId)
-                    staffInitials.Value = user.FirstName.Substring(0, 1) & user.LastName.Substring(0, 1)
+                    Try
+                        staffInitials.Value = user.FirstName.Substring(0, 1) & user.LastName.Substring(0, 1)
+                    Catch
+                        lblErrorMessage.Text = "There is an error with your user profile.  Please contact helpdesk to fix."
+                        pnlError.Visible = True
+                    End Try
                     tbChargeTo.Text = If(Rmb.CostCenter Is Nothing, "", Rmb.CostCenter)
                     tbChargeTo.Enabled = DRAFT Or MORE_INFO Or CANCELLED Or (SUBMITTED And (isOwner Or isSpouse))
                     tbChargeTo.Attributes.Add("placeholder", Translate("tbChargeToHint"))
