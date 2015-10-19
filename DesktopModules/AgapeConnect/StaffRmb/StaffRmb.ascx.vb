@@ -1690,14 +1690,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim DelegateEmail = If(delegateId >= 0, UserController.GetUserById(PortalId, delegateId).Email, "")
                     Dim comments As String = ""
                     If (UserInfo.UserID = rmb.First.ApprUserId) And (tbApprComments.Text.Trim().Length > 0) Then
-                        comments = Translate("CommentLeft").Replace("[FIRSTNAME]", UserInfo.FirstName).Replace("[COMMENT]", tbApprComments.Text)
+                        comments = Translate("CommentLeft").Replace("[FIRSTNAME]", firstName(UserInfo)).Replace("[COMMENT]", tbApprComments.Text)
                     ElseIf IsAccounts() And (tbAccComments.Text.Trim().Length > 0) Then
-                        comments = Translate("CommentLeft").Replace("[FIRSTNAME]", UserInfo.FirstName).Replace("[COMMENT]", tbAccComments.Text)
+                        comments = Translate("CommentLeft").Replace("[FIRSTNAME]", firstName(UserInfo)).Replace("[COMMENT]", tbAccComments.Text)
                     End If
 
-                    Message = Message.Replace("[STAFFNAME]", If(delegateId >= 0, DelegateName & " (" & Translate("OnBehalfOf") & StaffMbr.DisplayName & ")", StaffMbr.FirstName))
-                    Message = Message.Replace("[APPRNAME]", UserInfo.FirstName & " " & UserInfo.LastName)
-                    Message = Message.Replace("[APPRFIRSTNAME]", UserInfo.FirstName)
+                    Message = Message.Replace("[STAFFNAME]", If(delegateId >= 0, DelegateName & " (" & Translate("OnBehalfOf") & StaffMbr.DisplayName & ")", firstName(StaffMbr)))
+                    Message = Message.Replace("[APPRNAME]", firstName(UserInfo) & " " & lastName(UserInfo))
+                    Message = Message.Replace("[APPRFIRSTNAME]", firstName(UserInfo))
                     Message = Message.Replace("[COMMENTS]", comments)
 
                     SendEmail("P2C Reimbursements <" & from_email & ">", StaffMbr.Email, DelegateEmail, Translate("EmailCancelledSubject").Replace("[RMBNO]", rmb.First.RID).Replace("[USERREF]", rmb.First.UserRef), Message)
@@ -3492,7 +3492,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim amount = theRmb.SpareField1
                 Dim extra = If(StaffBrokerFunctions.MinistryRequiresExtraApproval(theRmb.RMBNo), Translate("ExtraApproval"), "")
                 Dim toEmail = approver.Email
-                Dim toName = approver.FirstName
+                Dim toName = firstName(approver)
                 Dim hasReceipts = (From c In theRmb.AP_Staff_RmbLines
                                    Where c.Receipt = True And ((From f In d.AP_Staff_RmbLine_Files Where f.RmbLineNo = c.RmbLineNo).Count = 0)).Count > 0
 
@@ -3503,15 +3503,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim director = UserController.GetUserById(PortalId, StaffBrokerFunctions.getDirectorFor(theRmb.CostCenter, CType(Settings("EDMSId"), Integer)))
                     ownerMessage = ownerMessage.Replace("[APPROVER]", director.DisplayName)
                     toEmail = director.Email
-                    toName = director.FirstName
+                    toName = firstName(director)
                 ElseIf theRmb.Status = RmbStatus.PendingEDMSApproval Then
                     Dim edms = UserController.GetUserById(PortalId, CType(Settings("EDMSId"), Integer))
                     ownerMessage = ownerMessage.Replace("[APPROVER]", edms.DisplayName)
                     toEmail = edms.Email
-                    toName = edms.FirstName
+                    toName = firstName(edms)
                 End If
                 ownerMessage = ownerMessage.Replace("[EXTRA]", "").Replace("[STAFFACTION]", "")
-                ownerMessage = ownerMessage.Replace("[STAFFNAME]", If(delegateId >= 0, DelegateName & " (" & Translate("OnBehalfOf") & " " & owner.DisplayName & ")", owner.FirstName))
+                ownerMessage = ownerMessage.Replace("[STAFFNAME]", If(delegateId >= 0, DelegateName & " (" & Translate("OnBehalfOf") & " " & owner.DisplayName & ")", firstName(owner)))
                 ownerMessage = ownerMessage.Replace("[RMBNO]", theRmb.RID).Replace("[USERREF]", theRmb.UserRef)
                 ownerMessage = ownerMessage.Replace("[PRINTOUT]", "<a href='" & Request.Url.Scheme & "://" & Request.Url.Authority & Request.ApplicationPath & "DesktopModules/AgapeConnect/StaffRmb/RmbPrintout.aspx?RmbNo=" & theRmb.RMBNo & "&UID=" & theRmb.UserId & "' target-'_blank' style='width: 134px; display:block;)'><div style='text-align: center; width: 122px; margin: 10px;'><img src='" _
                     & Request.Url.Scheme & "://" & Request.Url.Authority & Request.ApplicationPath & "DesktopModules/AgapeConnect/StaffRmb/Images/PrintoutIcon.jpg' /><br />Printout</div></a><style> a div:hover{border: solid 1px blue;}</style>")
@@ -4814,6 +4814,22 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             result = result & user.DisplayName.Substring(user.DisplayName.IndexOf(" ") + 1, 1)
             Return result
         End Function
+
+        Private Function firstName(user As UserInfo) As String
+            If (Not String.IsNullOrEmpty(user.FirstName)) Then Return user.FirstName
+            If (String.IsNullOrEmpty(user.DisplayName)) Then Return ""
+            If (Not user.DisplayName.Contains(" ")) Then Return user.DisplayName
+            Return user.DisplayName.Substring(0, user.DisplayName.IndexOf(" ") - 1)
+        End Function
+
+        Private Function lastName(user As UserInfo) As String
+            If (Not String.IsNullOrEmpty(user.LastName)) Then Return user.LastName
+            If (String.IsNullOrEmpty(user.DisplayName)) Then Return ""
+            If (Not user.DisplayName.Contains(" ")) Then Return ""
+            If (Len(user.DisplayName) > user.DisplayName.IndexOf(" ")) Then Return user.DisplayName.Substring(user.DisplayName.IndexOf(" "))
+        End Function
+
+
 
     End Class
 End Namespace
