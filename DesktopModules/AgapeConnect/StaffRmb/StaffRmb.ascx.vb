@@ -732,7 +732,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim rmbTotal = If(rmb.SpareField1 Is Nothing, "unknown", rmb.SpareField1)
                     Dim flag As Boolean = (rmb.MoreInfoRequested IsNot Nothing AndAlso rmb.MoreInfoRequested)
                     Dim owner = UserController.GetUserById(PortalId, rmb.UserId)
-                    Dim initials = (Left(owner.FirstName, 1) & Left(owner.LastName, 1)).ToLower()
+                    Dim initials = (getInitials(owner)).ToLower()
                     rmb_node.Text = GetRmbTitleFinance(initials, rmb.RID, rmb.ApprDate, rmbTotal, flag)
                     rmb_node.SelectAction = TreeNodeSelectAction.Select
                     rmb_node.Value = rmb.RMBNo
@@ -813,7 +813,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Catch ex As Exception
                     ownerName = ""
                 End Try
-                Dim initials = Left(user.FirstName, 1) + Left(user.LastName, 1)
+                Dim initials = getInitials(user)
                 ddlCompany.SelectedIndex = -1
                 dtPostingDate.Text = Today.ToString("MM/dd/yyyy")
                 Dim batchIds = From c In d.AP_Staff_Rmb_Post_Extras Where c.BatchId.Substring(6, 2).Equals(initials) Order By c.PostingDate Descending Select c.BatchId
@@ -931,12 +931,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     If isAdmin Then lblRmbNo.ToolTip = Rmb.RMBNo
                     Dim resetPostingDataTask = ResetPostingDataAsync()
                     imgAvatar.ImageUrl = GetProfileImage(Rmb.UserId)
-                    Try
-                        staffInitials.Value = user.FirstName.Substring(0, 1) & user.LastName.Substring(0, 1)
-                    Catch
-                        lblErrorMessage.Text = "There is an error with your user profile.  Please contact helpdesk to fix."
-                        pnlError.Visible = True
-                    End Try
+                    staffInitials.Value = getInitials(user)
                     tbChargeTo.Text = If(Rmb.CostCenter Is Nothing, "", Rmb.CostCenter)
                     tbChargeTo.Enabled = DRAFT Or MORE_INFO Or CANCELLED Or (SUBMITTED And (isOwner Or isSpouse))
                     tbChargeTo.Attributes.Add("placeholder", Translate("tbChargeToHint"))
@@ -2680,7 +2675,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Public Function GetRmbTitleTeam(ByVal RID As Integer, ByVal UID As Integer, ByVal RmbDate As Date) As String
             Dim Sm = UserController.GetUserById(PortalId, UID)
 
-            Dim rtn = Left(Sm.FirstName & " " & Sm.LastName, 20) & "<br />" & "<span style=""font-size: 6.5pt; color: #999999;"">#" & ZeroFill(RID.ToString, 5)
+            Dim rtn = Left(Sm.DisplayName, 20) & "<br />" & "<span style=""font-size: 6.5pt; color: #999999;"">#" & ZeroFill(RID.ToString, 5)
             If (RmbDate > (New Date(2010, 1, 1))) Then
                 rtn = rtn & ": " & RmbDate.ToShortDateString & "</span>"
             Else
@@ -3726,7 +3721,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Else
                         Credit = -line.GrossAmount.ToString("0.00")
                     End If
-                    Dim shortComment = GetLineComment(line.Comment, line.OrigCurrency, line.OrigCurrencyAmount, line.ShortComment, True, Left(theUser.FirstName, 1) & Left(theUser.LastName, 1), If(line.AP_Staff_RmbLineType.TypeName = "Mileage", GetMileageString(line.Mileage, line.MileageRate), ""))
+                    Dim shortComment = GetLineComment(line.Comment, line.OrigCurrency, line.OrigCurrencyAmount, line.ShortComment, True, getInitials(theUser), If(line.AP_Staff_RmbLineType.TypeName = "Mileage", GetMileageString(line.Mileage, line.MileageRate), ""))
                     rtn &= GetOrderedString(shortComment,
                                          Debit, Credit)
 
@@ -3787,7 +3782,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             End If
 
                             'rtn &= Left(theUser.FirstName, 1) & Left(theUser.LastName, 1) & "-Payment for " & ref & vbNewLine
-                            rtn &= GetOrderedString(Left(theUser.FirstName, 1) & Left(theUser.LastName, 1) & "-Payment for " & ref,
+                            rtn &= GetOrderedString(getInitials(theUser) & "-Payment for " & ref,
                                                     Debit, Credit)
 
 
@@ -3816,7 +3811,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             End If
 
                             'rtn &= Left(theUser.FirstName, 1) & Left(theUser.LastName, 1) & "-Payment for " & ref & vbNewLine
-                            rtn &= GetOrderedString(Left(theUser.FirstName, 1) & Left(theUser.LastName, 1) & "-Payment for " & ref,
+                            rtn &= GetOrderedString(getInitials(theUser) & "-Payment for " & ref,
                                                     Debit, Credit)
 
 
@@ -4805,6 +4800,19 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Else
                 lblSubBy.ToolTip = tooltip
             End If
+        End Function
+
+        Private Function getInitials(user As UserInfo) As String
+            Dim result As String = ""
+            'empty name
+            If (String.IsNullOrEmpty(user.DisplayName)) Then Return result
+            result = result & user.DisplayName.Substring(0, 1)
+            'single character name
+            If (Len(user.DisplayName) = 1) Then Return result
+            'single word name
+            If (Not user.DisplayName.Contains(" ")) Then Return result & user.DisplayName.Substring(1, 1)
+            result = result & user.DisplayName.Substring(user.DisplayName.IndexOf(" ") + 1, 1)
+            Return result
         End Function
 
     End Class
