@@ -3446,7 +3446,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Try
                 DotNetNuke.Services.Mail.Mail.SendMail(sender, recipient, cc, "", Services.Mail.MailPriority.Normal, subject, Services.Mail.MailFormat.Html, System.Text.Encoding.ASCII, body, "", "", "", "", "")
             Catch ex As Exception
-                lblErrorMessage.Text = "ERROR sending email"
+                lblErrorMessage.Text = "Error: An email could not be sent" + If(String.IsNullOrEmpty(recipient), "", " to " + recipient)
                 pnlError.Visible = True
                 Log(lblRmbNo.Text, LOG_LEVEL_ERROR, "ERROR sending email: " + ex.Message)
             End Try
