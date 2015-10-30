@@ -2732,14 +2732,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End Try
         End Function
 
-        Public Function GetDateFormat() As String
-            Dim sdp As String = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern.ToLower
-            If sdp.IndexOf("d") < sdp.IndexOf("m") Then
-                Return "dd/mm/yy"
-            Else
-                Return "mm/dd/yy"
-            End If
-        End Function
 
 #End Region
 

@@ -438,7 +438,8 @@
                     return DateTime.Today;
                 }
             }
-            set { dtDate.Text = value.ToShortDateString(); }
+            set {
+                dtDate.Text = value.ToString("o").Split('T')[0]; }
         }
         public double Amount {
             get {

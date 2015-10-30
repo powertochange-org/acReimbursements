@@ -452,7 +452,7 @@
 
             if (!Modernizr.inputtypes.date) {
                 $('input[type=date]').datepicker({
-                    dateFormat: '<%= GetDateFormat() %>'
+                    dateFormat: 'yy-mm-dd'
                 });
             }
             $('.Description').Watermark('<%= Translate("Description") %>');
@@ -590,7 +590,7 @@ function GetAccountBalance(jsonQuery){
      $('#<%= hfOnBehalfOf.ClientID%>').val('');
      if (!Modernizr.inputtypes.date) {
          $('input[type=date]').datepicker({
-             dateFormat: '<%= GetDateFormat() %>'
+             dateFormat: 'yy-mm-dd'
          });
      }
  }
