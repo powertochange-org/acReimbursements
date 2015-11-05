@@ -93,7 +93,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Sub
 
         Private Async Sub Page_Init(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Me.Init
-            Threading.Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture
             lblError.Visible = False
 
             Dim TaskList As New List(Of Task)
