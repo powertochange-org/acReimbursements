@@ -201,7 +201,7 @@ namespace StaffRmb
             if (rmb.CostCenter == null || rmb.CostCenter.Length == 0) return result; //empty result
 
             Decimal amount = (from line in rmb.AP_Staff_RmbLines select line.GrossAmount).Sum(); 
-            Task<String[]> signingAuthorityTask = staffWithSigningAuthorityAsync(rmb.CostCenter, amount, "#"+rmb.RID.ToString());
+            Task<String[]> signingAuthorityTask = staffWithSigningAuthorityAsync(rmb.CostCenter, amount, rmb.RID);
             if (isStaffAccount(rmb.CostCenter))
             {
                 if (!accountBelongsToStaffMember(rmb.CostCenter, rmb.UserId))
@@ -288,14 +288,14 @@ namespace StaffRmb
             return false;
         }
 
-        static public async Task<string[]> managersInDepartmentAsync(string logon, string logDetails="")
+        static public async Task<string[]> managersInDepartmentAsync(string logon, int RID)
         // Returns a list of staff who supervise other staff in the same department.
         {
             string cacheKey = "managersFor"+logon;
             if (logon.Equals("")) return new string[0];
             string result = (string)HttpContext.Current.Cache.Get(cacheKey);
             if (result == null) {
-                string postData = string.Format("logon={0}&client={1}&details={2}", logon, "Reimbursements", logDetails);
+                string postData = string.Format("logon={0}&client={1}&details={2}", logon, "Reimbursements", "#"+RID.ToString());
                 string url = "https://staffapps.powertochange.org/AuthManager/webservice/get_department_supervisors";
                 result = await getResultFromWebServiceAsync(url, postData);
                 if (result.Length == 0 || result.Equals(WEB_SERVICE_ERROR))
@@ -303,14 +303,10 @@ namespace StaffRmb
                 else
                 {
                     HttpContext.Current.Cache.Add(cacheKey, result, null, DateTime.Now.Add(CACHE_FOR), Cache.NoSlidingExpiration, CacheItemPriority.Default, null);
-                    StaffRmbDataContext d = new StaffRmbDataContext();
-                    d.AP_Staff_Rmb_Logs.InsertOnSubmit(new AP_Staff_Rmb_Log() { Timestamp = DateTime.Now, LogType = 0, Message = "Added Managers to cache: " + logon + ": " + result });
-                    d.SubmitChanges();
+                    Log(RID, "Added to cache " + cacheKey + ": " + result);
                 }
             } else {
-                StaffRmbDataContext d = new StaffRmbDataContext();
-                d.AP_Staff_Rmb_Logs.InsertOnSubmit(new AP_Staff_Rmb_Log() { Timestamp = DateTime.Now, LogType = 0, Message = "Retrieved Managers from cache: " + logon + ": " + result });
-                d.SubmitChanges();
+                Log(RID, "Retrieved Managers from cache: " + logon + ": " + result);
             }
             return JsonConvert.DeserializeObject<string[]>(result);
         }
@@ -371,28 +367,24 @@ namespace StaffRmb
             return candidates.First().id;
         }
 
-        static private async Task<string[]> staffWithSigningAuthorityAsync(string account, Decimal amount, string logDetails)
+        static private async Task<string[]> staffWithSigningAuthorityAsync(string account, Decimal amount, int RID)
         // Returns a list of staff with signing authority for a certain amount or greater on a given account
         {
             string cacheKey = "signatoriesFor" + account + amount.ToString();
             string result = (string)HttpContext.Current.Cache.Get(cacheKey);
             if (result == null)
             {
-                string postData = string.Format("account={0}&amount={1}&exclude_administrators={2}&client={3}&details={4}", account, amount, "true", "Reimbursements", logDetails);
+                string postData = string.Format("account={0}&amount={1}&exclude_administrators={2}&client={3}&details={4}", account, amount, "true", "Reimbursements", "#"+RID.ToString());
                 string url = "https://staffapps.powertochange.org/AuthManager/webservice/get_signatories";
                 result = await getResultFromWebServiceAsync(url, postData);
                 if (result.Length == 0 || result.Equals(WEB_SERVICE_ERROR))
                     result = "[\"ERR\"]"; //this will not produce a visible error, just an empty dropdown
                 else {
                     HttpContext.Current.Cache.Add(cacheKey, result, null, DateTime.Now.Add(CACHE_FOR), Cache.NoSlidingExpiration, CacheItemPriority.Default, null);
-                    StaffRmbDataContext d = new StaffRmbDataContext();
-                    d.AP_Staff_Rmb_Logs.InsertOnSubmit(new AP_Staff_Rmb_Log() { Timestamp = DateTime.Now, LogType = 0, Message = "Added signatories to Cache: " + account + "/"+amount.ToString()+": " + result });
-                    d.SubmitChanges();
+                    Log( RID, "Added signatories to Cache: " + account + "/"+amount.ToString()+": " + result );
                 }
             } else {
-                StaffRmbDataContext d = new StaffRmbDataContext();
-                d.AP_Staff_Rmb_Logs.InsertOnSubmit(new AP_Staff_Rmb_Log() { Timestamp = DateTime.Now, LogType = 0, Message = "Retrieved signatories from cache: " + account+"/"+amount.ToString() + ": " + result });
-                d.SubmitChanges();
+                Log(RID, "Retrieved signatories from cache: " + account+"/"+amount.ToString() + ": " + result );
             }
             return JsonConvert.DeserializeObject<string[]>(result);
         }
@@ -422,14 +414,10 @@ namespace StaffRmb
                 else
                 {
                     HttpContext.Current.Cache.Add(cacheKey, result, null, DateTime.Now.Add(CACHE_FOR), Cache.NoSlidingExpiration, CacheItemPriority.Default, null);
-                    StaffRmbDataContext d = new StaffRmbDataContext();
-                    d.AP_Staff_Rmb_Logs.InsertOnSubmit(new AP_Staff_Rmb_Log() { Timestamp = DateTime.Now, LogType = 0, Message = "Added companies to Cache: " + result });
-                    d.SubmitChanges();
+                    Log(-1, "Added companies to Cache: " + result );
                 }
             } else {
-                StaffRmbDataContext d = new StaffRmbDataContext();
-                d.AP_Staff_Rmb_Logs.InsertOnSubmit(new AP_Staff_Rmb_Log() { Timestamp = DateTime.Now, LogType = 0, Message = "Retrieved companies from cache: " + result });
-                d.SubmitChanges();
+                Log(-1, "Retrieved companies from cache: " + result );
             }
             return JsonConvert.DeserializeObject(result);
         }
@@ -448,14 +436,10 @@ namespace StaffRmb
                     result = "[{\"AddressID\":\"ERR\",\"DefaultRemitToAddress\":\"N\",\"Address1\":\"Oops, No addresses!  Re-select the vendor to try again.\"}]";
                 else {
                     HttpContext.Current.Cache.Add(cacheKey, result, null, DateTime.Now.Add(CACHE_FOR), Cache.NoSlidingExpiration, CacheItemPriority.Default, null);
-                    StaffRmbDataContext d = new StaffRmbDataContext();
-                    d.AP_Staff_Rmb_Logs.InsertOnSubmit(new AP_Staff_Rmb_Log() { Timestamp = DateTime.Now, LogType = 0, Message = "Added addresses to Cache "+ cacheKey + ": " + result });
-                    d.SubmitChanges();
+                    Log(-1, "Added addresses to Cache "+ cacheKey + ": " + result );
                 }
             } else {
-                StaffRmbDataContext d = new StaffRmbDataContext();
-                d.AP_Staff_Rmb_Logs.InsertOnSubmit(new AP_Staff_Rmb_Log() { Timestamp = DateTime.Now, LogType = 0, Message = "Retrieved addresses from cache "+cacheKey +": " + result });
-                d.SubmitChanges();
+                Log(-1, "Retrieved addresses from cache "+cacheKey +": " + result );
             }
             return JsonConvert.DeserializeObject(result);
         }
@@ -793,6 +777,17 @@ namespace StaffRmb
 
             }
             return RmbAccess.Denied;
+        }
+
+        static private void Log(int RID, string Message)
+        {
+            short verbose = 0;
+            StaffRmbDataContext d = new StaffRmbDataContext();
+            string username = "";
+            try { username = UserController.Instance.GetCurrentUserInfo().DisplayName; }
+            catch { }
+            d.AP_Staff_Rmb_Logs.InsertOnSubmit(new AP_Staff_Rmb_Log() { Timestamp = DateTime.Now, LogType = verbose, RID = RID, Username=username, Message = Message });
+            d.SubmitChanges();
         }
 
     }
