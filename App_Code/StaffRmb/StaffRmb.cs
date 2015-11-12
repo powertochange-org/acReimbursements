@@ -291,9 +291,9 @@ namespace StaffRmb
         static public async Task<string[]> managersInDepartmentAsync(string logon, string logDetails="")
         // Returns a list of staff who supervise other staff in the same department.
         {
-            string cachePrefix = "managersFor";
+            string cacheKey = "managersFor"+logon;
             if (logon.Equals("")) return new string[0];
-            string result = (string)HttpContext.Current.Cache.Get(cachePrefix+logon);
+            string result = (string)HttpContext.Current.Cache.Get(cacheKey);
             if (result == null) {
                 string postData = string.Format("logon={0}&client={1}&details={2}", logon, "Reimbursements", logDetails);
                 string url = "https://staffapps.powertochange.org/AuthManager/webservice/get_department_supervisors";
@@ -302,11 +302,15 @@ namespace StaffRmb
                     result = "[\"ERR\"]"; //this will not produce a visible error, just an empty dropdown
                 else
                 {
-                    HttpContext.Current.Cache.Add(cachePrefix + logon, result, null, DateTime.Now.Add(CACHE_FOR), Cache.NoSlidingExpiration, CacheItemPriority.Default, null);
+                    HttpContext.Current.Cache.Add(cacheKey, result, null, DateTime.Now.Add(CACHE_FOR), Cache.NoSlidingExpiration, CacheItemPriority.Default, null);
                     StaffRmbDataContext d = new StaffRmbDataContext();
-                    d.AP_Staff_Rmb_Logs.InsertOnSubmit(new AP_Staff_Rmb_Log() { Timestamp = DateTime.Now, LogType = 0, Message = "Retrieved Managers From Cache: " + logon + ": " + result });
+                    d.AP_Staff_Rmb_Logs.InsertOnSubmit(new AP_Staff_Rmb_Log() { Timestamp = DateTime.Now, LogType = 0, Message = "Added Managers to cache: " + logon + ": " + result });
                     d.SubmitChanges();
                 }
+            } else {
+                StaffRmbDataContext d = new StaffRmbDataContext();
+                d.AP_Staff_Rmb_Logs.InsertOnSubmit(new AP_Staff_Rmb_Log() { Timestamp = DateTime.Now, LogType = 0, Message = "Retrieved Managers from cache: " + logon + ": " + result });
+                d.SubmitChanges();
             }
             return JsonConvert.DeserializeObject<string[]>(result);
         }
@@ -370,12 +374,25 @@ namespace StaffRmb
         static private async Task<string[]> staffWithSigningAuthorityAsync(string account, Decimal amount, string logDetails)
         // Returns a list of staff with signing authority for a certain amount or greater on a given account
         {
-            string postData = string.Format("account={0}&amount={1}&exclude_administrators={2}&client={3}&details={4}", account, amount, "true", "Reimbursements", logDetails);
-            string url = "https://staffapps.powertochange.org/AuthManager/webservice/get_signatories";
-            string result = await getResultFromWebServiceAsync(url, postData);
-            if (result.Length == 0 || result.Equals(WEB_SERVICE_ERROR))
+            string cacheKey = "signatoriesFor" + account + amount.ToString();
+            string result = (string)HttpContext.Current.Cache.Get(cacheKey);
+            if (result == null)
             {
-                result = "[\"ERR\"]"; //this will not produce a visible error, just an empty dropdown
+                string postData = string.Format("account={0}&amount={1}&exclude_administrators={2}&client={3}&details={4}", account, amount, "true", "Reimbursements", logDetails);
+                string url = "https://staffapps.powertochange.org/AuthManager/webservice/get_signatories";
+                result = await getResultFromWebServiceAsync(url, postData);
+                if (result.Length == 0 || result.Equals(WEB_SERVICE_ERROR))
+                    result = "[\"ERR\"]"; //this will not produce a visible error, just an empty dropdown
+                else {
+                    HttpContext.Current.Cache.Add(cacheKey, result, null, DateTime.Now.Add(CACHE_FOR), Cache.NoSlidingExpiration, CacheItemPriority.Default, null);
+                    StaffRmbDataContext d = new StaffRmbDataContext();
+                    d.AP_Staff_Rmb_Logs.InsertOnSubmit(new AP_Staff_Rmb_Log() { Timestamp = DateTime.Now, LogType = 0, Message = "Added signatories to Cache: " + account + "/"+amount.ToString()+": " + result });
+                    d.SubmitChanges();
+                }
+            } else {
+                StaffRmbDataContext d = new StaffRmbDataContext();
+                d.AP_Staff_Rmb_Logs.InsertOnSubmit(new AP_Staff_Rmb_Log() { Timestamp = DateTime.Now, LogType = 0, Message = "Retrieved signatories from cache: " + account+"/"+amount.ToString() + ": " + result });
+                d.SubmitChanges();
             }
             return JsonConvert.DeserializeObject<string[]>(result);
         }
@@ -393,20 +410,53 @@ namespace StaffRmb
         static public async Task<object> getCompanies()
         // Returns a list of companies
         {
-            string postData = "";
-            string url = "http://gpapp/gpimport/webservice/GetCompanies";
-            string result = await getResultFromWebServiceAsync(url, postData);
-            if (result.Length == 0 || result.Equals(WEB_SERVICE_ERROR)) result = "[{\"CompanyID\":\"ERR\",\"CompanyName\":\"Oops, No companies!  Press F5 to reload the page.\"}]";
+            string cacheKey = "RmbCompanies";
+            string result = (string)HttpContext.Current.Cache.Get(cacheKey);
+            if (result == null)
+            {
+                string postData = "";
+                string url = "http://gpapp/gpimport/webservice/GetCompanies";
+                result = await getResultFromWebServiceAsync(url, postData);
+                if (result.Length == 0 || result.Equals(WEB_SERVICE_ERROR)) 
+                    result = "[{\"CompanyID\":\"ERR\",\"CompanyName\":\"Oops, No companies!  Press F5 to reload the page.\"}]";
+                else
+                {
+                    HttpContext.Current.Cache.Add(cacheKey, result, null, DateTime.Now.Add(CACHE_FOR), Cache.NoSlidingExpiration, CacheItemPriority.Default, null);
+                    StaffRmbDataContext d = new StaffRmbDataContext();
+                    d.AP_Staff_Rmb_Logs.InsertOnSubmit(new AP_Staff_Rmb_Log() { Timestamp = DateTime.Now, LogType = 0, Message = "Added companies to Cache: " + result });
+                    d.SubmitChanges();
+                }
+            } else {
+                StaffRmbDataContext d = new StaffRmbDataContext();
+                d.AP_Staff_Rmb_Logs.InsertOnSubmit(new AP_Staff_Rmb_Log() { Timestamp = DateTime.Now, LogType = 0, Message = "Retrieved companies from cache: " + result });
+                d.SubmitChanges();
+            }
             return JsonConvert.DeserializeObject(result);
         }
 
         static public async Task<object> getRemitToAddresses(String company, String vendorId)
             // Returns a list of addresses for a given company and vendor
         {
-            string postData = string.Format("company={0}&vendorId={1}", company, vendorId);
-            string url = "http://gpapp/gpimport/webservice/GetRemitToAddresses";
-            string result = await getResultFromWebServiceAsync(url, postData);
-            if (result.Length == 0 || result.Equals(WEB_SERVICE_ERROR) ) result = "[{\"AddressID\":\"ERR\",\"DefaultRemitToAddress\":\"N\",\"Address1\":\"Oops, No addresses!  Re-select the vendor to try again.\"}]";
+            string cacheKey = "addressesFor" + company + "/" + vendorId;
+            string result = (string)HttpContext.Current.Cache.Get(cacheKey);
+            if (result == null)
+            {
+                string postData = string.Format("company={0}&vendorId={1}", company, vendorId);
+                string url = "http://gpapp/gpimport/webservice/GetRemitToAddresses";
+                result = await getResultFromWebServiceAsync(url, postData);
+                if (result.Length == 0 || result.Equals(WEB_SERVICE_ERROR)) 
+                    result = "[{\"AddressID\":\"ERR\",\"DefaultRemitToAddress\":\"N\",\"Address1\":\"Oops, No addresses!  Re-select the vendor to try again.\"}]";
+                else {
+                    HttpContext.Current.Cache.Add(cacheKey, result, null, DateTime.Now.Add(CACHE_FOR), Cache.NoSlidingExpiration, CacheItemPriority.Default, null);
+                    StaffRmbDataContext d = new StaffRmbDataContext();
+                    d.AP_Staff_Rmb_Logs.InsertOnSubmit(new AP_Staff_Rmb_Log() { Timestamp = DateTime.Now, LogType = 0, Message = "Added addresses to Cache "+ cacheKey + ": " + result });
+                    d.SubmitChanges();
+                }
+            } else {
+                StaffRmbDataContext d = new StaffRmbDataContext();
+                d.AP_Staff_Rmb_Logs.InsertOnSubmit(new AP_Staff_Rmb_Log() { Timestamp = DateTime.Now, LogType = 0, Message = "Retrieved addresses from cache "+cacheKey +": " + result });
+                d.SubmitChanges();
+            }
             return JsonConvert.DeserializeObject(result);
         }
 
