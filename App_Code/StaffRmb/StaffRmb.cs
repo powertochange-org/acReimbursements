@@ -13,6 +13,7 @@ using DotNetNuke.Services.Log.EventLog;
 using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
+using System.Web.Caching;
 
 /// <summary>
 /// Summary description for StaffRmb
@@ -133,7 +134,7 @@ namespace StaffRmb
         private static DotNetNuke.Entities.Portals.PortalSettings portalSettings = new DotNetNuke.Framework.UserControlBase().PortalSettings;
         private static int userId = new DotNetNuke.Entities.Modules.PortalModuleBase().UserId;
         private static int PRESIDENTID = -1;
-
+        private static TimeSpan CACHE_FOR = new TimeSpan(0, 20, 0); //cache for 20 minutes
 
         public StaffRmbFunctions()
         {
@@ -287,16 +288,25 @@ namespace StaffRmb
             return false;
         }
 
-        static public async Task<string[]> managersInDepartmentAsync(string logon)
+        static public async Task<string[]> managersInDepartmentAsync(string logon, string logDetails="")
         // Returns a list of staff who supervise other staff in the same department.
         {
+            string cachePrefix = "managersFor";
             if (logon.Equals("")) return new string[0];
-            string postData = string.Format("logon={0}&client={1}", logon, "Reimbursements");
-            string url = "https://staffapps.powertochange.org/AuthManager/webservice/get_department_supervisors";
-            string result = await getResultFromWebServiceAsync(url, postData);
-            if (result.Length == 0 || result.Equals(WEB_SERVICE_ERROR))
-            {
-                result = "[\"ERR\"]"; //this will not produce a visible error, just an empty dropdown
+            string result = (string)HttpContext.Current.Cache.Get(cachePrefix+logon);
+            if (result == null) {
+                string postData = string.Format("logon={0}&client={1}&details={2}", logon, "Reimbursements", logDetails);
+                string url = "https://staffapps.powertochange.org/AuthManager/webservice/get_department_supervisors";
+                result = await getResultFromWebServiceAsync(url, postData);
+                if (result.Length == 0 || result.Equals(WEB_SERVICE_ERROR))
+                    result = "[\"ERR\"]"; //this will not produce a visible error, just an empty dropdown
+                else
+                {
+                    HttpContext.Current.Cache.Add(cachePrefix + logon, result, null, DateTime.Now.Add(CACHE_FOR), Cache.NoSlidingExpiration, CacheItemPriority.Default, null);
+                    StaffRmbDataContext d = new StaffRmbDataContext();
+                    d.AP_Staff_Rmb_Logs.InsertOnSubmit(new AP_Staff_Rmb_Log() { Timestamp = DateTime.Now, LogType = 0, Message = "Retrieved Managers From Cache: " + logon + ": " + result });
+                    d.SubmitChanges();
+                }
             }
             return JsonConvert.DeserializeObject<string[]>(result);
         }
@@ -357,10 +367,10 @@ namespace StaffRmb
             return candidates.First().id;
         }
 
-        static private async Task<string[]> staffWithSigningAuthorityAsync(string account, Decimal amount, string purpose)
+        static private async Task<string[]> staffWithSigningAuthorityAsync(string account, Decimal amount, string logDetails)
         // Returns a list of staff with signing authority for a certain amount or greater on a given account
         {
-            string postData = string.Format("account={0}&amount={1}&exclude_administrators={2}&client={3}&details={4}", account, amount, "true", "Reimbursements", purpose);
+            string postData = string.Format("account={0}&amount={1}&exclude_administrators={2}&client={3}&details={4}", account, amount, "true", "Reimbursements", logDetails);
             string url = "https://staffapps.powertochange.org/AuthManager/webservice/get_signatories";
             string result = await getResultFromWebServiceAsync(url, postData);
             if (result.Length == 0 || result.Equals(WEB_SERVICE_ERROR))

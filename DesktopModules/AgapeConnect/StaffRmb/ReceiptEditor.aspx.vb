@@ -122,7 +122,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
         Next
 
         ' Get the supervisors for this staff member
-        Await StaffRmbFunctions.managersInDepartmentAsync(StaffRmbFunctions.logonFromId(PortalId, theUserId))
+        Await StaffRmbFunctions.managersInDepartmentAsync(StaffRmbFunctions.logonFromId(PortalId, theUserId), "#" + theRmb.RID.ToString())
         For Each leaderId In (StaffBrokerFunctions.GetLeaders(theUserId, False))
             ' Create a new permission for this leader
             permission = New Permissions.FolderPermissionInfo()
