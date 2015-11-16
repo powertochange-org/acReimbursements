@@ -1671,7 +1671,7 @@ function GetAccountBalance(jsonQuery){
                             <table style="font-size: 9pt;">
                                 <tr valign="top">
                                     <td width="150px;"><b>
-                                        <dnn:Label ID="lblElectronicReceipts" runat="server"  ResourceKey="lblElectronicReceipts" />
+                                        <dnn:Label ID="lblElectronicReceipts" ClientIDMode="static" runat="server"  ResourceKey="lblElectronicReceipts" />
                                     </b></td>
                                     <td>
                                   

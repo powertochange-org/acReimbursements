@@ -177,4 +177,10 @@
   <data name="Error.ClearingDate" xml:space="preserve">
     <value>If you are clearing an external advance, the clearing date cannot be in the future.</value>
   </data>
+  <data name="lblReceipt.Help" xml:space="preserve">
+    <value>Attach any documentation that may be helpful in approving this advance request.</value>
+  </data>
+  <data name="lblReceipt.Text" xml:space="preserve">
+    <value>Documentation (optional):</value>
+  </data>
 </root>

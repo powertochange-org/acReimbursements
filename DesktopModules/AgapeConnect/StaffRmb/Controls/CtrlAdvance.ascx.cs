@@ -22,6 +22,9 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
         hlpAmount.Text = DotNetNuke.Services.Localization.Localization.GetString("lblAmount.Help", LocalResourceFile);
         // Hint strings
         tbDesc.Attributes.Add("Placeholder", DotNetNuke.Services.Localization.Localization.GetString("lblDesc.Hint", LocalResourceFile));
+        string script = "$('.electronic_receipts_panel').show();";
+        script += "$('#lblLabel').text('" + DotNetNuke.Services.Localization.Localization.GetString("lblReceipt.Text", LocalResourceFile) + "');";
+        ScriptManager.RegisterStartupScript(Page, Page.GetType(), "relabel_receipt", script, true);
     }
 
     #region Properties
@@ -37,7 +40,7 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
     }
     public int ReceiptType
     {
-        get { return StaffRmb.RmbReceiptType.No_Receipt; }
+        get { return StaffRmb.RmbReceiptType.Electronic; }
         set {}
     }
     public bool Taxable
@@ -60,7 +63,7 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
     }
     public bool Receipt
     {
-        get { return false; }
+        get { return ReceiptsAttached; }
         set {}
     }
     #endregion
@@ -162,9 +165,9 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
         lblProvince.Visible = false;
         lbProvince.Visible = false;
         ddlProvince.Visible = false;
-        lblReceipt.Visible = false;
         ddlReceipt.Visible = false;
         lbReceipt.Visible = false;
+        lblReceipt.Visible = false;
     }
 
 }
