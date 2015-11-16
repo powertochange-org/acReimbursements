@@ -3083,7 +3083,19 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
             ' Never change approver once a reimbursement has been approved
             If (ddlApprovedBy.SelectedValue <> Nothing) AndAlso (Rmb.ApprUserId <> ddlApprovedBy.SelectedValue) AndAlso (Rmb.ApprDate Is Nothing) Then
-                Log(Rmb.RID, LOG_LEVEL_INFO, "Approver changed from: " + UserController.GetUserById(Rmb.PortalId, Rmb.ApprUserId).DisplayName + " to: " + UserController.GetUserById(PortalId, ddlApprovedBy.SelectedValue).DisplayName)
+                Dim from_appr As String
+                Dim to_appr As String
+                Try
+                    from_appr = UserController.GetUserById(Rmb.PortalId, Rmb.ApprUserId).DisplayName
+                Catch ex As Exception
+                    from_appr = "unknown"
+                End Try
+                Try
+                    to_appr = UserController.GetUserById(PortalId, ddlApprovedBy.SelectedValue).DisplayName
+                Catch ex As Exception
+                    to_appr = "unknown"
+                End Try
+                Log(Rmb.RID, LOG_LEVEL_INFO, "Approver changed from: " + from_appr + " to: " + to_appr)
                 save_necessary = True
                 Rmb.ApprUserId = ddlApprovedBy.SelectedValue
             End If
