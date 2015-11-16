@@ -104,6 +104,16 @@
                         <asp:CheckBox ID="cbElectronicReceipts" runat="server" Checked="False" />
                     </td>
                 </tr>
+                <tr>
+                    <td>
+                        <b>
+                            <dnn:Label ID="lblQRReceipts" runat="server" ControlName="cbQRReceipts" ResourceKey ="lblQRReceipts" />
+                        </b>
+                    </td>
+                    <td>
+                        <asp:CheckBox ID="cbQRReceipts" runat="server" Checked="false" />
+                    </td>
+                </tr>
                 <tr style="opacity: 0.4; filter: alpha(opacity=40);">
                     <td>
                         <b>

@@ -390,4 +390,7 @@
   <data name="AdvanceLineType.Text" xml:space="preserve">
     <value>Advance Line Type</value>
   </data>
+  <data name="lblQRReceipts.Text" xml:space="preserve">
+    <value>Use QR Codes to upload receipts?</value>
+  </data>
 </root>

@@ -63,6 +63,9 @@ Namespace DotNetNuke.Modules.StaffRmb
                     If CType(TabModuleSettings("ElectronicReceipts"), String) <> "" Then
                         cbElectronicReceipts.Checked = CType(TabModuleSettings("ElectronicReceipts"), Boolean)
                     End If
+                    If CType(TabModuleSettings("QRReceipts"), String) <> "" Then
+                        cbQRReceipts.Checked = CType(TabModuleSettings("QRReceipts"), Boolean)
+                    End If
                     If CType(TabModuleSettings("VatAttrib"), String) <> "" Then
                         cbVAT.Checked = CType(TabModuleSettings("VatAttrib"), Boolean)
                     End If
@@ -338,6 +341,7 @@ Namespace DotNetNuke.Modules.StaffRmb
             objModules.UpdateTabModuleSetting(TabModuleId, "NoReceipt", tbNoReceipt.Text)
 
             objModules.UpdateTabModuleSetting(TabModuleId, "ElectronicReceipts", cbElectronicReceipts.Checked)
+            objModules.UpdateTabModuleSetting(TabModuleId, "QRReceipts", cbQRReceipts.Checked)
             objModules.UpdateTabModuleSetting(TabModuleId, "VatAttrib", cbVAT.Checked)
             objModules.UpdateTabModuleSetting(TabModuleId, "Expire", tbExpire.Text)
             objModules.UpdateTabModuleSetting(TabModuleId, "BudgetTolerance", tbBudgetTolerance.Text)
