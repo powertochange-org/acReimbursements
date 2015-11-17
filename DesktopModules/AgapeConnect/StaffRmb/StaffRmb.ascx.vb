@@ -3,7 +3,7 @@
 ' SpareField1: total for the reimbursement
 ' SpareField2: Submitter's Director's id - in case of special approval
 ' SpareField3: DelegateId, when filling out a form on behalf of someone else
-' SpareField4:
+' SpareField4: qr key for new line
 ' SpareField5: 
 
 ' AP_Rmb_Line
@@ -35,6 +35,9 @@ Imports DotNetNuke.Security
 Imports StaffRmb
 Imports StaffBroker
 Imports DotNetNuke.Services.FileSystem
+
+Imports PowerToChange.Modules.StaffRmb.Presenters
+
 Namespace DotNetNuke.Modules.StaffRmbMod
     Partial Class ViewStaffRmb
         Inherits Entities.Modules.PortalModuleBase
@@ -1295,6 +1298,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                 image.RmbLineNo = line.RmbLineNo.ToString
                             Next
                         End If
+                        ' erase QR key when closing
+                        Try
+                            Dim rmb = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value).Single()
+                            rmb.SpareField4 = Nothing
+                        Catch
+                        End Try
                         d.SubmitChanges()
                         success = True
                     Else ' The form was not valid
@@ -1327,6 +1336,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Try
                 Dim rmbs = (From r In d.AP_Staff_Rmbs Where r.RMBNo = hfRmbNo.Value)
                 If (rmbs.Count > 0) Then
+                    rmbs.First.SpareField4 = Nothing
                     Dim path = "/_RmbReceipts/" & rmbs.First.UserId
                     Dim theFolder As IFolderInfo = FolderManager.Instance.GetFolder(rmbs.First.PortalId, path)
                     Dim deletable = From item In d.AP_Staff_RmbLine_Files Select item Where item.RMBNo = hfRmbNo.Value And item.RmbLineNo Is Nothing
@@ -1335,6 +1345,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         FileManager.Instance.DeleteFile(theFile)
                     Next
                 End If
+                d.SubmitChanges()
             Catch ex As Exception
                 Log(lblRmbNo.Text, LOG_LEVEL_ERROR, "ERROR: removing receipts upon cancel: " & ex.Message)
             End Try
@@ -1861,6 +1872,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             btnSaveLine.CommandName = "Save"
 
+            If (Settings("QRReceipts")) Then
+                Dim key As String = ReceiptUploaderPresenter.encodeToken(DateTime.Now, hfRmbNo.Value, -1)
+                Try
+                    Dim rmb = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value).Single()
+                    rmb.SpareField4 = key
+                    d.SubmitChanges()
+                Catch
+                End Try
+            End If
+
             ifReceipt.Attributes("src") = Request.Url.Scheme & "://" & Request.Url.Authority & "/DesktopModules/AgapeConnect/StaffRmb/ReceiptEditor.aspx?RmbNo=" & hfRmbNo.Value & "&RmbLine=New"
             pnlElecReceipts.Attributes("style") = "display: none;"
             ScriptManager.RegisterStartupScript(addLinebtn2, addLinebtn2.GetType(), "popupAdd", "showNewLinePopup();", True)
@@ -2349,7 +2370,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     btnSaveLine.CommandArgument = CInt(e.CommandArgument)
                     tbCostcenter.Text = theLine.First.CostCenter
                     ddlAccountCode.SelectedValue = theLine.First.AccountCode
-
+                    If (Settings("QRReceipts")) Then
+                        Dim key As String = ReceiptUploaderPresenter.encodeToken(DateTime.Now, theLine.First.RmbNo, theLine.First.RmbLineNo)
+                        Try
+                            Dim rmb = (From c In d.AP_Staff_Rmbs Where c.RMBNo = theLine.First.RmbNo).Single()
+                            rmb.SpareField4 = key
+                            d.SubmitChanges()
+                        Catch
+                        End Try
+                    End If
                     ifReceipt.Attributes("src") = Request.Url.Scheme & "://" & Request.Url.Authority & "/DesktopModules/AgapeConnect/StaffRmb/ReceiptEditor.aspx?RmbNo=" & theLine.First.RmbNo & "&RmbLine=" & theLine.First.RmbLineNo
                     ' Check to see if we have any images
                     If receiptMode = RmbReceiptType.Electronic Then
