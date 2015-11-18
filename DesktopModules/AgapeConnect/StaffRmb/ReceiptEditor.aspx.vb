@@ -453,7 +453,11 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
                 ' Add each of the files to the page
                 AddImage(file)
             Next
-
+            If (theRmb.SpareField4 <> Nothing) Then
+                Dim strPathAndQuery As String = HttpContext.Current.Request.Url.PathAndQuery
+                Dim strUrl As String = HttpContext.Current.Request.Url.AbsoluteUri.Replace(strPathAndQuery, "/DesktopModules/AgapeConnect/StaffRmb/ReceiptUploader.aspx?id=" + theRmb.SpareField4)
+                hfQR.Value = strUrl
+            End If
         Catch ex As Exception
 
         End Try

@@ -9,7 +9,9 @@
     <title></title>
     <script src="/Resources/Shared/Scripts/jquery/jquery.min.js?cdv=34" type="text/javascript"></script>
     <script src="/Resources/Shared/Scripts/jquery/jquery-ui.min.js?cdv=34" type="text/javascript"></script>
+    <script src="/DesktopModules/AgapeConnect/StaffRmb/js/qrcode.min.js" type="text/javascript" ></script>
     <link href="/Portals/_default/Skins/AgapeBlue/skinPopup.css?cdv=34" type="text/css" rel="stylesheet">
+
     <script>
         $(function () {
 
@@ -37,10 +39,18 @@
             top:43px;
             left:45px;
         }
+
+        #qrcode {
+            display:inline-block; 
+            padding:5px; 
+            float:right; 
+            margin-top:-36px;
+        }
     </style>
 </head>
 <body>
     <form id="form1" runat="server">
+        <asp:ScriptManager runat="server" />
         <span id="rotate_instructions">Please rotate images right-side-up.</span>
         <div>
             <div style="width: 100%; text-align: left;">
@@ -48,10 +58,33 @@
                 <asp:FileUpload ID="fuReceipt" runat="server" style="display:none" OnChange="$('#btnUploadReceipt').click();" />
                 <asp:Button ID="btnUploadReceipt" runat="server" Text="Upload Selected File" CssClass="aButton" Style="display:none" Font-Size="small" />
                 <div id="currentReceipts" runat="server">
-		</div>
+                    <div id="qrcode" ></div>
+		        </div>
                 <asp:Label ID="lblError" runat="server" ForeColor="Red"></asp:Label>
             </div>
         </div>
+        <asp:UpdatePanel runat="server" >
+            <ContentTemplate>
+                <asp:HiddenField ID="hfQR" ClientIDMode="Static" runat="server" />
+            </ContentTemplate>
+        </asp:UpdatePanel>
     </form>
+    <script type="text/javascript">
+        var qrcode;
+        function generateQRCode() {
+            var link = $('#hfQR').val();
+            if (link == "") return;
+            if (qrcode) {
+                qrcode.clear();
+                qrcode.makeCode(link);
+            } else {
+                $('#qrcode').empty();
+                qrcode = new QRCode('qrcode', { width:128, height:128 }).makeCode(link);
+            }
+        }
+        $(document).ready(function () {
+            generateQRCode();
+        })
+    </script>
 </body>
 </html>

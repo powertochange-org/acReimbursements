@@ -5,7 +5,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="/DesktopModules/AgapeConnect/StaffRmb/ReceiptUploader.css" />
+    <link rel="stylesheet" type="text/css" href="/DesktopModules/AgapeConnect/StaffRmb/css/ReceiptUploader.css" />
     <title></title>
 </head>
 <body onload="document.getElementById('fuCamera').click();">
