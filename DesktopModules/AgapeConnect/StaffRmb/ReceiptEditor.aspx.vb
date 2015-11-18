@@ -453,10 +453,12 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
                 ' Add each of the files to the page
                 AddImage(file)
             Next
+            hfQR.Value = ""
             If (theRmb.SpareField4 <> Nothing) Then
                 Dim strPathAndQuery As String = HttpContext.Current.Request.Url.PathAndQuery
                 Dim strUrl As String = HttpContext.Current.Request.Url.AbsoluteUri.Replace(strPathAndQuery, "/DesktopModules/AgapeConnect/StaffRmb/ReceiptUploader.aspx?id=" + theRmb.SpareField4)
                 hfQR.Value = strUrl
+                Response.AddHeader("Refresh", 5) 'refresh the receipts every 5 seconds
             End If
         Catch ex As Exception
 
