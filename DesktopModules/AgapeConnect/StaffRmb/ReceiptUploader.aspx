@@ -27,7 +27,7 @@
                         <asp:HiddenField ID="hfShutterState" ClientIDMode="Static" runat="server" />
                         <asp:Label ID="lblMessage" ClientIDMode="static" runat="server" CssClass="middle center message" style="width:50%; display:none"/>
                         <asp:panel ID="pnlShutter" ClientIDMode="Static" runat="server" CssClass="middle center">
-                            <asp:ImageButton ID="btnShutter" runat="server" ImageUrl="../Resources/images/shutter.png" AlternateText="Take Picture" OnClientClick="shutter_click(); return false;" style="margin-bottom:-30px"/>
+                            <asp:ImageButton ID="btnShutter" runat="server" ImageUrl="../StaffRmb/images/shutter.png" AlternateText="Take Picture" OnClientClick="shutter_click(); return false;" style="margin-bottom:-30px"/>
                             <h4><asp:Label ID="lblShutter" runat="server" text="Launch Camera"  /></h4>
                         </asp:panel>
                         <asp:Panel ID="divOverlay" runat="server" CssClass="overlay" style="display:none"/>

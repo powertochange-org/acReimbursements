@@ -434,31 +434,25 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
             DataCache.ClearFolderCache(PS.PortalId)
             ' Try to get the folder; if this fails, we'll throw an exception and break out of this block
             theFolder = FolderManager.Instance.GetFolder(PS.PortalId, "/_RmbReceipts/" & theRmb.UserId)
-        Catch
-        End Try
-        If (Page.IsPostBack) Then
-            Await load_images()
-        Else
-            Try
+            If (Not Page.IsPostBack) Then
                 ' Set the proper folder permissions
                 Await CheckFolderPermissions(PS.PortalId, theFolder, theRmb.UserId)
-                Await load_images()
+                load_images(Nothing, Nothing)
                 hfQR.Value = ""
                 If (theRmb.SpareField4 <> Nothing) Then
                     Dim strPathAndQuery As String = HttpContext.Current.Request.Url.PathAndQuery
                     Dim strUrl As String = HttpContext.Current.Request.Url.AbsoluteUri.Replace(strPathAndQuery, "/DesktopModules/AgapeConnect/StaffRmb/ReceiptUploader.aspx?id=" + theRmb.SpareField4)
-                    hfQR.Value =
-                        strUrl
+                    hfQR.Value = strUrl
                 Else
                     refresh_timer.Enabled = False
                 End If
-            Catch ex As Exception
+            End If
+        Catch ex As Exception
 
-            End Try
-        End If
+        End Try
     End Sub
 
-    Private Async Function load_images() As Threading.Tasks.Task
+    Protected Sub load_images(sender As Object, e As System.EventArgs)
         Dim theFiles As Object
         ' If this isn't a new line we're creating
         If (RmbLine <> "New") Then
@@ -477,5 +471,5 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
             ' Add each of the files to the page
             AddImage(file)
         Next
-    End Function
+    End Sub
 End Class

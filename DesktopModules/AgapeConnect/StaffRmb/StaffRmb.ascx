@@ -477,7 +477,6 @@
         function setUpReceiptPreviews() {
             var url = ""
             $(".viewReceipt").hover(function(e){
-                console.log(this.id);
                 var html;
                 // Force IE to reload image every time, to keep up with any rotations
                 if (window.navigator.userAgent.indexOf("MSIE ") > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {

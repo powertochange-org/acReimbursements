@@ -61,7 +61,7 @@
                     <ContentTemplate>
                         <div id="currentReceipts" runat="server"></div>
                         <asp:Label ID="lblError" runat="server" ForeColor="Red"></asp:Label>
-                        <asp:Timer ID="refresh_timer" runat="server" interval="7000" />
+                        <asp:Timer ID="refresh_timer" runat="server" interval="5000" OnTick="load_images" />
                     </ContentTemplate>
                 </asp:UpdatePanel>
                 <div id="qrcode" ></div>
