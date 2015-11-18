@@ -18,12 +18,10 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
     Private theFolder As IFolderInfo
     Private theRmb As AP_Staff_Rmb 
     ' The data context
-    Dim d As New StaffRmb.StaffRmbDataContext
+    Dim d As StaffRmb.StaffRmbDataContext
     Protected Sub Page_Init(sender As Object, e As System.EventArgs) Handles Me.Init
         Dim PS = CType(HttpContext.Current.Items("PortalSettings"), PortalSettings)
-
-
-
+        d = New StaffRmb.StaffRmbDataContext()
 
         Dim FileName As String = "StaffRmb"
 
