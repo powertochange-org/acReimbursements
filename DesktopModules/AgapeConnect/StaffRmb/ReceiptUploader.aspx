@@ -43,7 +43,7 @@
             <div class="footer row">
                 <asp:UpdatePanel runat="server">
                     <ContentTemplate>
-                        <asp:Timer ID="tmTimer" runat="server" Interval="1000" OnTick="TimerTick"/>
+                        <asp:Timer ID="tmTimer" runat="server" Interval="5000" OnTick="TimerTick"/>
                         <asp:Label ID="lblTimer" runat="server" CssClass="center"/>
                     </ContentTemplate>
                 </asp:UpdatePanel>
