@@ -80,15 +80,13 @@ namespace PowerToChange.Modules.StaffRmb.Presenters
                 rmb = _rmbs.Where(a => a.SpareField4==args.token).Single();
                 if (rmb.RMBNo != rmbNo) throw new Exception();
                 line = _lines.Where(a => a.RmbLineNo == lineNo && a.RmbNo == rmbNo).Single(); 
-            } catch { 
-                _view.Message = "The correct reimbursement line could not be found";
-                return;
-            }
+            } 
+            catch { }
             try // Upload
             {
                 // initialize folder/permissions
                 int recnum;
-                try { recnum = _images.Where(a => a.RmbLineNo==lineNo).Select(a => a.RecNum).Max() + 1; }
+                try { recnum = _images.Where(a => a.RmbLineNo==lineNo && a.RMBNo == rmbNo).Select(a => a.RecNum).Max() + 1; }
                 catch { recnum = 1; }
                 IFileInfo file;
                 string strUrl = "";
@@ -102,7 +100,7 @@ namespace PowerToChange.Modules.StaffRmb.Presenters
                     Filesystem.ensureFolderExists(PS.PortalId);
                     IFolderInfo imageFolder = Filesystem.getImageFolder(rmb.UserId, PS.PortalId);
                     Filesystem.checkFolderPermissions(PS.PortalId, imageFolder, rmb.UserId, null);  //no approvers list sent because it is an async function
-                    string filename = "R" + rmbNo.ToString()+"L"+lineNo.ToString() + "Rec" + recnum.ToString() + ".png";
+                    string filename = "R" + rmbNo.ToString()+"L"+(lineNo<0?"New":lineNo.ToString()) + "Rec" + recnum.ToString() + ".png";
                     // save file to DNN database
                     string base64Data = Regex.Match(_view.ImageData, @"data:image/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
                     byte[] image_data = Convert.FromBase64String(base64Data);
