@@ -199,6 +199,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
         link.Controls.Add(img)
         div.Controls.Add(createButton("✖", file.FileName))
         div.Controls.Add(link)
+        div.ID = file.FileName
         currentReceipts.Controls.Add(div)
     End Sub
 
@@ -424,48 +425,53 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
         RmbLine = Request.QueryString("RmbLine")
         ' Set the receipt number to 0 (We don't have any yet)
         RecNum = 0
-        Try
-            Dim PS = CType(HttpContext.Current.Items("PortalSettings"), PortalSettings)
+        If (Page.IsPostBack) Then
+            load_images()
+        Else
+            Try
+                Dim PS = CType(HttpContext.Current.Items("PortalSettings"), PortalSettings)
 
-            ' Set the rmb for this receipt
-            theRmb = (From c In d.AP_Staff_Rmbs Where c.PortalId = PS.PortalId And c.RMBNo = RmbNo).First
-            ' Clear folder cache, to make sure we're getting the up-to-date folder info
-            DataCache.ClearFolderCache(PS.PortalId)
-            ' Try to get the folder; if this fails, we'll throw an exception and break out of this block
-            theFolder = FolderManager.Instance.GetFolder(PS.PortalId, "/_RmbReceipts/" & theRmb.UserId)
-            ' Set the proper folder permissions
-            Await CheckFolderPermissions(PS.PortalId, theFolder, theRmb.UserId)
-            Dim theFiles As Object
-            ' If this isn't a new line we're creating
-            If (RmbLine <> "New") Then
-                ' Get all of the files associated with this existing rmb line
-                theFiles = (From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo = RmbLine And lf.RMBNo = RmbNo Order By RecNum)
-            Else
-                ' Get all of the ones for this reimbursement that don't have a line yet
-                theFiles = (From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo Is Nothing And lf.RMBNo = RmbNo Order By RecNum)
-            End If
+                ' Set the rmb for this receipt
+                theRmb = (From c In d.AP_Staff_Rmbs Where c.PortalId = PS.PortalId And c.RMBNo = RmbNo).First
+                ' Clear folder cache, to make sure we're getting the up-to-date folder info
+                DataCache.ClearFolderCache(PS.PortalId)
+                ' Try to get the folder; if this fails, we'll throw an exception and break out of this block
+                theFolder = FolderManager.Instance.GetFolder(PS.PortalId, "/_RmbReceipts/" & theRmb.UserId)
+                ' Set the proper folder permissions
+                Await CheckFolderPermissions(PS.PortalId, theFolder, theRmb.UserId)
+                load_images()
+                hfQR.Value = ""
+                If (theRmb.SpareField4 <> Nothing) Then
+                    Dim strPathAndQuery As String = HttpContext.Current.Request.Url.PathAndQuery
+                    Dim strUrl As String = HttpContext.Current.Request.Url.AbsoluteUri.Replace(strPathAndQuery, "/DesktopModules/AgapeConnect/StaffRmb/ReceiptUploader.aspx?id=" + theRmb.SpareField4)
+                    hfQR.Value = strUrl
+                Else
+                    refresh_timer.Enabled = False
+                End If
+            Catch ex As Exception
 
-            For Each line_file As AP_Staff_RmbLine_File In theFiles
-                ' Keep re-setting the receipt number to the latest one
-                RecNum = line_file.RecNum
-                ' Get the actual file
-                Dim file = FileManager.Instance.GetFile(line_file.FileId)
-                ' Add each of the files to the page
-                AddImage(file)
-            Next
-            hfQR.Value = ""
-            If (theRmb.SpareField4 <> Nothing) Then
-                Dim strPathAndQuery As String = HttpContext.Current.Request.Url.PathAndQuery
-                Dim strUrl As String = HttpContext.Current.Request.Url.AbsoluteUri.Replace(strPathAndQuery, "/DesktopModules/AgapeConnect/StaffRmb/ReceiptUploader.aspx?id=" + theRmb.SpareField4)
-                hfQR.Value = strUrl
-                Response.AddHeader("Refresh", 5) 'refresh the receipts every 5 seconds
-            End If
-        Catch ex As Exception
+            End Try
+        End If
+    End Sub
 
-        End Try
+    Protected Sub load_images()
+        Dim theFiles As Object
+        ' If this isn't a new line we're creating
+        If (RmbLine <> "New") Then
+            ' Get all of the files associated with this existing rmb line
+            theFiles = (From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo = RmbLine And lf.RMBNo = RmbNo Order By RecNum)
+        Else
+            ' Get all of the ones for this reimbursement that don't have a line yet
+            theFiles = (From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo Is Nothing And lf.RMBNo = RmbNo Order By RecNum)
+        End If
 
-
-
-
+        For Each line_file As AP_Staff_RmbLine_File In theFiles
+            ' Keep re-setting the receipt number to the latest one
+            RecNum = line_file.RecNum
+            ' Get the actual file
+            Dim file = FileManager.Instance.GetFile(line_file.FileId)
+            ' Add each of the files to the page
+            AddImage(file)
+        Next
     End Sub
 End Class

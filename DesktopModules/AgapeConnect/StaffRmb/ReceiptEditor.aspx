@@ -42,9 +42,9 @@
 
         #qrcode {
             display:inline-block; 
+            position:fixed;
+            right:5px;
             padding:5px; 
-            float:right; 
-            margin-top:-36px;
         }
     </style>
 </head>
@@ -57,10 +57,14 @@
                 <input type="button" class="aButton" onclick="fuReceipt.click()" value="Add receipt..." style="font-size:small" />
                 <asp:FileUpload ID="fuReceipt" runat="server" style="display:none" OnChange="$('#btnUploadReceipt').click();" />
                 <asp:Button ID="btnUploadReceipt" runat="server" Text="Upload Selected File" CssClass="aButton" Style="display:none" Font-Size="small" />
-                <div id="currentReceipts" runat="server">
-                    <div id="qrcode" ></div>
-		        </div>
-                <asp:Label ID="lblError" runat="server" ForeColor="Red"></asp:Label>
+                <asp:UpdatePanel ID="receipts" runat="server" style="position:absolute">
+                    <ContentTemplate>
+                        <div id="currentReceipts" runat="server"></div>
+                        <asp:Label ID="lblError" runat="server" ForeColor="Red"></asp:Label>
+                        <asp:Timer ID="refresh_timer" runat="server" interval="5000" />
+                    </ContentTemplate>
+                </asp:UpdatePanel>
+                <div id="qrcode" ></div>
             </div>
         </div>
         <asp:UpdatePanel runat="server" >
