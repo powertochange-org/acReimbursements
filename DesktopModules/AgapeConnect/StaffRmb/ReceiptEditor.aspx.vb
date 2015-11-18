@@ -420,31 +420,35 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
     End Sub
 
     Protected Async Sub Page_Load(sender As Object, e As System.EventArgs) Handles Me.Load
-        ' Get the reimbursement and line number
-        RmbNo = Request.QueryString("RmbNo")
-        RmbLine = Request.QueryString("RmbLine")
-        ' Set the receipt number to 0 (We don't have any yet)
-        RecNum = 0
+        Dim PS As PortalSettings
+        Try
+            PS = CType(HttpContext.Current.Items("PortalSettings"), PortalSettings)
+            ' Get the reimbursement and line number
+            RmbNo = Request.QueryString("RmbNo")
+            RmbLine = Request.QueryString("RmbLine")
+            ' Set the receipt number to 0 (We don't have any yet)
+            RecNum = 0
+            ' Set the rmb for this receipt
+            theRmb = (From c In d.AP_Staff_Rmbs Where c.PortalId = PS.PortalId And c.RMBNo = RmbNo).First
+            ' Clear folder cache, to make sure we're getting the up-to-date folder info
+            DataCache.ClearFolderCache(PS.PortalId)
+            ' Try to get the folder; if this fails, we'll throw an exception and break out of this block
+            theFolder = FolderManager.Instance.GetFolder(PS.PortalId, "/_RmbReceipts/" & theRmb.UserId)
+        Catch
+        End Try
         If (Page.IsPostBack) Then
-            load_images()
+            Await load_images()
         Else
             Try
-                Dim PS = CType(HttpContext.Current.Items("PortalSettings"), PortalSettings)
-
-                ' Set the rmb for this receipt
-                theRmb = (From c In d.AP_Staff_Rmbs Where c.PortalId = PS.PortalId And c.RMBNo = RmbNo).First
-                ' Clear folder cache, to make sure we're getting the up-to-date folder info
-                DataCache.ClearFolderCache(PS.PortalId)
-                ' Try to get the folder; if this fails, we'll throw an exception and break out of this block
-                theFolder = FolderManager.Instance.GetFolder(PS.PortalId, "/_RmbReceipts/" & theRmb.UserId)
                 ' Set the proper folder permissions
                 Await CheckFolderPermissions(PS.PortalId, theFolder, theRmb.UserId)
-                load_images()
+                Await load_images()
                 hfQR.Value = ""
                 If (theRmb.SpareField4 <> Nothing) Then
                     Dim strPathAndQuery As String = HttpContext.Current.Request.Url.PathAndQuery
                     Dim strUrl As String = HttpContext.Current.Request.Url.AbsoluteUri.Replace(strPathAndQuery, "/DesktopModules/AgapeConnect/StaffRmb/ReceiptUploader.aspx?id=" + theRmb.SpareField4)
-                    hfQR.Value = strUrl
+                    hfQR.Value =
+                        strUrl
                 Else
                     refresh_timer.Enabled = False
                 End If
@@ -454,15 +458,15 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
         End If
     End Sub
 
-    Protected Sub load_images()
+    Private Async Function load_images() As Threading.Tasks.Task
         Dim theFiles As Object
         ' If this isn't a new line we're creating
         If (RmbLine <> "New") Then
             ' Get all of the files associated with this existing rmb line
-            theFiles = (From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo = RmbLine And lf.RMBNo = RmbNo Order By RecNum)
+            theFiles = (From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo = RmbLine And lf.RMBNo = RmbNo Order By lf.RecNum)
         Else
             ' Get all of the ones for this reimbursement that don't have a line yet
-            theFiles = (From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo Is Nothing And lf.RMBNo = RmbNo Order By RecNum)
+            theFiles = (From lf In d.AP_Staff_RmbLine_Files Where lf.RmbLineNo Is Nothing And lf.RMBNo = RmbNo Order By lf.RecNum)
         End If
 
         For Each line_file As AP_Staff_RmbLine_File In theFiles
@@ -473,5 +477,5 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
             ' Add each of the files to the page
             AddImage(file)
         Next
-    End Sub
+    End Function
 End Class
