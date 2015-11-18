@@ -438,14 +438,14 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
                 ' Set the proper folder permissions
                 Await CheckFolderPermissions(PS.PortalId, theFolder, theRmb.UserId)
                 load_images(Nothing, Nothing)
-            End If
-            hfQR.Value = ""
-            If (theRmb.SpareField4 <> Nothing) Then
-                Dim strPathAndQuery As String = HttpContext.Current.Request.Url.PathAndQuery
-                Dim strUrl As String = HttpContext.Current.Request.Url.AbsoluteUri.Replace(strPathAndQuery, "/DesktopModules/AgapeConnect/StaffRmb/ReceiptUploader.aspx?id=" + theRmb.SpareField4)
-                hfQR.Value = strUrl
-            Else
-                refresh_timer.Enabled = False
+                hfQR.Value = ""
+                If (theRmb.SpareField4 <> Nothing) Then
+                    Dim strPathAndQuery As String = HttpContext.Current.Request.Url.PathAndQuery
+                    Dim strUrl As String = HttpContext.Current.Request.Url.AbsoluteUri.Replace(strPathAndQuery, "/DesktopModules/AgapeConnect/StaffRmb/ReceiptUploader.aspx?id=" + theRmb.SpareField4)
+                    hfQR.Value = strUrl
+                Else
+                    refresh_timer.Enabled = False
+                End If
             End If
         Catch ex As Exception
 

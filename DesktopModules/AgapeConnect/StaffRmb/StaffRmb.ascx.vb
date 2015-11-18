@@ -1878,7 +1878,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim rmb = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value).Single()
                     rmb.SpareField4 = key
                     d.SubmitChanges()
-                Catch
+                Catch ex As Exception
+                    Log(-1, 4, "Error saving QR key:" + ex.Message + ex.StackTrace)
                 End Try
             End If
 
@@ -2376,7 +2377,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             Dim rmb = (From c In d.AP_Staff_Rmbs Where c.RMBNo = theLine.First.RmbNo).Single()
                             rmb.SpareField4 = key
                             d.SubmitChanges()
-                        Catch
+                        Catch ex As Exception
+                            Log(-1, 4, "Error saving QR-key:" + ex.Message + ex.StackTrace)
                         End Try
                     End If
                     ifReceipt.Attributes("src") = Request.Url.Scheme & "://" & Request.Url.Authority & "/DesktopModules/AgapeConnect/StaffRmb/ReceiptEditor.aspx?RmbNo=" & theLine.First.RmbNo & "&RmbLine=" & theLine.First.RmbLineNo
