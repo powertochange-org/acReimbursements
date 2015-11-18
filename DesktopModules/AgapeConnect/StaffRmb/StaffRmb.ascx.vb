@@ -1841,6 +1841,17 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             'ddlCostcenter.SelectedValue = ddlChargeTo.SelectedValue
 
             saveIfNecessary()
+            If (Settings("QRReceipts")) Then
+                Dim key As String = ReceiptUploaderPresenter.encodeToken(DateTime.Now, hfRmbNo.Value, -1)
+                Try
+                    Dim rmb = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value).Single()
+                    rmb.SpareField4 = key
+                    d.SubmitChanges()
+                Catch ex As Exception
+                    Log(-1, 4, "Error saving QR key:" + ex.Message + ex.StackTrace)
+                End Try
+            End If
+
             tbCostcenter.Text = hfChargeToValue.Value
 
             ddlLineTypes.Items.Clear()
@@ -1871,17 +1882,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             tbShortComment.Text = ""
 
             btnSaveLine.CommandName = "Save"
-
-            If (Settings("QRReceipts")) Then
-                Dim key As String = ReceiptUploaderPresenter.encodeToken(DateTime.Now, hfRmbNo.Value, -1)
-                Try
-                    Dim rmb = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value).Single()
-                    rmb.SpareField4 = key
-                    d.SubmitChanges()
-                Catch ex As Exception
-                    Log(-1, 4, "Error saving QR key:" + ex.Message + ex.StackTrace)
-                End Try
-            End If
 
             ifReceipt.Attributes("src") = Request.Url.Scheme & "://" & Request.Url.Authority & "/DesktopModules/AgapeConnect/StaffRmb/ReceiptEditor.aspx?RmbNo=" & hfRmbNo.Value & "&RmbLine=New"
             pnlElecReceipts.Attributes("style") = "display: none;"
@@ -2244,6 +2244,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     'End If
                     'theControl = Nothing
 
+                    If (Settings("QRReceipts")) Then
+                        Dim key As String = ReceiptUploaderPresenter.encodeToken(DateTime.Now, theLine.First.RmbNo, theLine.First.RmbLineNo)
+                        Try
+                            Dim rmb = (From c In d.AP_Staff_Rmbs Where c.RMBNo = theLine.First.RmbNo).Single()
+                            rmb.SpareField4 = key
+                            d.SubmitChanges()
+                        Catch ex As Exception
+                            Log(-1, 4, "Error saving QR-key:" + ex.Message + ex.StackTrace)
+                        End Try
+                    End If
 
                     ddlLineTypes.Items.Clear()
                     Dim lineTypes = From c In d.AP_StaffRmb_PortalLineTypes Where c.PortalId = PortalId Order By c.ViewOrder Select c.AP_Staff_RmbLineType.LineTypeId, c.LocalName, c.PCode, c.DCode
@@ -2371,16 +2381,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     btnSaveLine.CommandArgument = CInt(e.CommandArgument)
                     tbCostcenter.Text = theLine.First.CostCenter
                     ddlAccountCode.SelectedValue = theLine.First.AccountCode
-                    If (Settings("QRReceipts")) Then
-                        Dim key As String = ReceiptUploaderPresenter.encodeToken(DateTime.Now, theLine.First.RmbNo, theLine.First.RmbLineNo)
-                        Try
-                            Dim rmb = (From c In d.AP_Staff_Rmbs Where c.RMBNo = theLine.First.RmbNo).Single()
-                            rmb.SpareField4 = key
-                            d.SubmitChanges()
-                        Catch ex As Exception
-                            Log(-1, 4, "Error saving QR-key:" + ex.Message + ex.StackTrace)
-                        End Try
-                    End If
+
                     ifReceipt.Attributes("src") = Request.Url.Scheme & "://" & Request.Url.Authority & "/DesktopModules/AgapeConnect/StaffRmb/ReceiptEditor.aspx?RmbNo=" & theLine.First.RmbNo & "&RmbLine=" & theLine.First.RmbLineNo
                     ' Check to see if we have any images
                     If receiptMode = RmbReceiptType.Electronic Then
