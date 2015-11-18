@@ -71,6 +71,7 @@
     </form>
     <script type="text/javascript">
         var qrcode;
+        var isMobile = navigator.userAgent.match(/Android|iPhone|iPad|iPod/i);
         function generateQRCode() {
             var link = $('#hfQR').val();
             if (link == "") return;
@@ -83,7 +84,11 @@
             }
         }
         $(document).ready(function () {
-            generateQRCode();
+            if (isMobile) {
+                $('#qrcode').empty();
+            } else {
+                generateQRCode();
+            }
         })
     </script>
 </body>
