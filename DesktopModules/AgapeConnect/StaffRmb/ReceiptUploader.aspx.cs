@@ -24,6 +24,7 @@ namespace PowerToChange.Modules.StaffRmb.Views
 
         //Testing
         public IEnumerable<AP_Staff_RmbLine> Lines { set { _lines = value; } }
+
         public string RID { set { lblTitle.Text = lblTitle.Text.Replace("[RID]", value); } }
         public string LineNo { set { } }
         public string Message
@@ -46,7 +47,6 @@ namespace PowerToChange.Modules.StaffRmb.Views
                 }
             }
         }
-
         public byte[] ImageFile { get { if (fuCamera.HasFile) return fuCamera.FileBytes; else return null; } }
         public string ImageData { get { return image_data.Value; } }
 

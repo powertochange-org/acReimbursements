@@ -39,7 +39,7 @@ namespace PowerToChange.Modules.StaffRmb.Presenters
         public ReceiptUploaderPresenter(IReceiptUploader view)
         {
             _view = view;
-            _view.InitializeEvent += DisplayEvent;
+            _view.InitializeEvent += InitializeEvent;
             _view.UploadEvent += UploadEvent;
             StaffRmbDataContext d = new StaffRmbDataContext();
             _rmbs = d.AP_Staff_Rmbs;
@@ -48,16 +48,19 @@ namespace PowerToChange.Modules.StaffRmb.Presenters
             _log = d.AP_Staff_Rmb_Logs;
         }
 
-        public void DisplayEvent(object sender, MobileEventArgs args)
+        public void InitializeEvent(object sender, MobileEventArgs args)
         {
             AP_Staff_Rmb rmb = null;
             try { 
-                _rmbs.Where(a => a.SpareField4 == args.token).Single(); 
-            } catch {
+                rmb = _rmbs.Where(a => a.SpareField4 == args.token).Single();
+                _view.RID = rmb.RID.ToString("D5");
+            }
+            catch
+            {
+                _view.RID = "unknown";
                 _view.Message = "The correct Reimbursement could not be found.";
                 return;
             }
-            _view.RID = rmb.RID.ToString("D5"); 
         }
 
         public void UploadEvent(object sender, MobileEventArgs args)
