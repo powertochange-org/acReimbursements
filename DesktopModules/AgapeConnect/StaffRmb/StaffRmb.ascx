@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="/js/jqtree.css" />
 <style>
     input[type="number"] { text-align:right; }
-    .abutton.delete { background-image:none; color:white; background-color:rgba(255,0,0,0.5); }
+    .abutton.delete:hover  { background-image:none; color:white; background-color:rgba(255,0,0,0.5); }
     .abutton.go {background-image:none; background-color:#A1D490;}
 </style>
 
