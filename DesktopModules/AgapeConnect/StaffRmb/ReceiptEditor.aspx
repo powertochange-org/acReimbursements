@@ -6,11 +6,12 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
+    <meta http-equiv="CACHE-CONTROL" content="NO-CACHE" />
     <title></title>
     <script src="/Resources/Shared/Scripts/jquery/jquery.min.js?cdv=34" type="text/javascript"></script>
     <script src="/Resources/Shared/Scripts/jquery/jquery-ui.min.js?cdv=34" type="text/javascript"></script>
     <script src="/DesktopModules/AgapeConnect/StaffRmb/js/qrcode.min.js" type="text/javascript" ></script>
-    <link href="/Portals/_default/Skins/AgapeBlue/skinPopup.css?cdv=34" type="text/css" rel="stylesheet">
+    <link href="/Portals/_default/Skins/AgapeBlue/skinPopup.css?cdv=34" type="text/css" rel="stylesheet"/>
 
     <script>
         $(function () {
