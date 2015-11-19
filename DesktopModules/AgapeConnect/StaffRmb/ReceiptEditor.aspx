@@ -64,7 +64,7 @@
                     <ContentTemplate>
                         <div id="currentReceipts" runat="server"></div>
                         <asp:Label ID="lblError" runat="server" ForeColor="Red"></asp:Label>
-                        <asp:Timer ID="refresh_timer" runat="server" interval="5000" OnTick="load_images" />
+                        <asp:Timer ID="refresh_timer" runat="server" interval="5000" />
                     </ContentTemplate>
                 </asp:UpdatePanel>
                 <img id="qrcode" runat="server" src="#" width="128" height="128"/>
@@ -77,8 +77,9 @@
         $(document).ready(function () {
             if (isMobile) {
                 $('#qrcode').remove();
-            } 
+            }
         })
+        function pageLoad() { $('.aButton').button();}
     </script>
 </body>
 </html>

@@ -402,7 +402,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
             myMemoryStream.Dispose()
             ' A little hack to force internet explorer to reload the image; otherwise, it 
             ' won't show the rotation
-            If (Request.Browser.Browser = "InternetExplorer" OrElse Request.Browser.Browser = "IE") Then
+            If (True) Then
                 Try
                     ' Get the html image
                     Dim htmlImage = CType(b.Parent.Controls.Item(3).Controls.Item(0), HtmlImage)
@@ -437,7 +437,6 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
             If (Not Page.IsPostBack) Then
                 ' Set the proper folder permissions
                 Await CheckFolderPermissions(PS.PortalId, theFolder, theRmb.UserId)
-                load_images(Nothing, Nothing)
                 qrcode.Src = Nothing
                 If (Not String.IsNullOrEmpty(RmbKey)) Then
                     Dim strPathAndQuery As String = HttpContext.Current.Request.Url.PathAndQuery
@@ -450,12 +449,13 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
                     refresh_timer.Enabled = False
                 End If
             End If
+            load_images()
         Catch ex As Exception
 
         End Try
     End Sub
 
-    Protected Sub load_images(sender As Object, e As System.EventArgs)
+    Private Sub load_images()
         Dim theFiles As Object
         ' If this isn't a new line we're creating
         If (RmbLine <> "New") Then
@@ -474,5 +474,9 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
             ' Add each of the files to the page
             AddImage(file)
         Next
+    End Sub
+
+    Protected Sub Page_Unload(sender As Object, e As System.EventArgs) Handles Me.Unload
+        refresh_timer.Enabled = False
     End Sub
 End Class
