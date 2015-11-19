@@ -446,6 +446,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
                     bmp.Save(ms, ImageFormat.Gif)
                     qrcode.Src = "data:image/gif;base64, " + Convert.ToBase64String(ms.ToArray)
                 Else
+                    qrcode.Visible = False
                     refresh_timer.Enabled = False
                 End If
             End If
