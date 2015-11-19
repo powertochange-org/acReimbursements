@@ -425,7 +425,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
             ' Get the reimbursement and line number and upload key
             RmbNo = Request.QueryString("RmbNo")
             RmbLine = Request.QueryString("RmbLine")
-            RmbKey = Request.QueryString("RmbKey");
+            RmbKey = Request.QueryString("RmbKey")
             ' Set the receipt number to 0 (We don't have any yet)
             RecNum = 0
             ' Set the rmb for this receipt
@@ -438,11 +438,14 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
                 ' Set the proper folder permissions
                 Await CheckFolderPermissions(PS.PortalId, theFolder, theRmb.UserId)
                 load_images(Nothing, Nothing)
-                hfQR.Value = ""
+                qrcode.Src = Nothing
                 If (Not String.IsNullOrEmpty(RmbKey)) Then
                     Dim strPathAndQuery As String = HttpContext.Current.Request.Url.PathAndQuery
                     Dim strUrl As String = HttpContext.Current.Request.Url.AbsoluteUri.Replace(strPathAndQuery, "/DesktopModules/AgapeConnect/StaffRmb/ReceiptUploader.aspx?id=" + RmbKey)
-                    hfQR.Value = strUrl
+                    Dim bmp = New MessagingToolkit.QRCode.Codec.QRCodeEncoder().Encode(strUrl)
+                    Dim ms = New MemoryStream()
+                    bmp.Save(ms, ImageFormat.Gif)
+                    qrcode.Src = "data:image/gif;base64, " + Convert.ToBase64String(ms.ToArray)
                 Else
                     refresh_timer.Enabled = False
                 End If

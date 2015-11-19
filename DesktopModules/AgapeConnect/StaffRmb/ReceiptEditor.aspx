@@ -13,7 +13,6 @@
     <title></title>
     <script src="/Resources/Shared/Scripts/jquery/jquery.min.js?cdv=34" type="text/javascript"></script>
     <script src="/Resources/Shared/Scripts/jquery/jquery-ui.min.js?cdv=34" type="text/javascript"></script>
-    <script src="/DesktopModules/AgapeConnect/StaffRmb/js/qrcode.min.js" type="text/javascript" ></script>
     <link href="/Portals/_default/Skins/AgapeBlue/skinPopup.css?cdv=34" type="text/css" rel="stylesheet"/>
 
     <script>
@@ -68,35 +67,17 @@
                         <asp:Timer ID="refresh_timer" runat="server" interval="5000" OnTick="load_images" />
                     </ContentTemplate>
                 </asp:UpdatePanel>
-                <div id="qrcode" ></div>
+                <img id="qrcode" runat="server" src="#" width="128" height="128"/>
             </div>
         </div>
-        <asp:UpdatePanel runat="server" >
-            <ContentTemplate>
-                <asp:HiddenField ID="hfQR" ClientIDMode="Static" runat="server" />
-            </ContentTemplate>
-        </asp:UpdatePanel>
     </form>
     <script type="text/javascript">
         var qrcode;
         var isMobile = navigator.userAgent.match(/Android|iPhone|iPad|iPod/i);
-        function generateQRCode() {
-            var link = $('#hfQR').val();
-            if (link == "") return;
-            if (qrcode) {
-                qrcode.clear();
-                qrcode.makeCode(link);
-            } else {
-                $('#qrcode').empty();
-                qrcode = new QRCode('qrcode', { width:128, height:128 }).makeCode(link);
-            }
-        }
         $(document).ready(function () {
             if (isMobile) {
-                $('#qrcode').empty();
-            } else {
-                generateQRCode();
-            }
+                $('#qrcode').remove();
+            } 
         })
     </script>
 </body>
