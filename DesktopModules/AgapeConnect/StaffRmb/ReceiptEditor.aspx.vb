@@ -14,6 +14,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
     ' Variables for file saving
     Private RmbNo As String
     Private RmbLine As String
+    Private RmbKey As String
     Private RecNum As String
     Private theFolder As IFolderInfo
     Private theRmb As AP_Staff_Rmb 
@@ -421,9 +422,10 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
         Dim PS As PortalSettings
         Try
             PS = CType(HttpContext.Current.Items("PortalSettings"), PortalSettings)
-            ' Get the reimbursement and line number
+            ' Get the reimbursement and line number and upload key
             RmbNo = Request.QueryString("RmbNo")
             RmbLine = Request.QueryString("RmbLine")
+            RmbKey = Request.QueryString("RmbKey");
             ' Set the receipt number to 0 (We don't have any yet)
             RecNum = 0
             ' Set the rmb for this receipt
@@ -437,9 +439,9 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
                 Await CheckFolderPermissions(PS.PortalId, theFolder, theRmb.UserId)
                 load_images(Nothing, Nothing)
                 hfQR.Value = ""
-                If (theRmb.SpareField4 <> Nothing) Then
+                If (Not String.IsNullOrEmpty(RmbKey)) Then
                     Dim strPathAndQuery As String = HttpContext.Current.Request.Url.PathAndQuery
-                    Dim strUrl As String = HttpContext.Current.Request.Url.AbsoluteUri.Replace(strPathAndQuery, "/DesktopModules/AgapeConnect/StaffRmb/ReceiptUploader.aspx?id=" + theRmb.SpareField4)
+                    Dim strUrl As String = HttpContext.Current.Request.Url.AbsoluteUri.Replace(strPathAndQuery, "/DesktopModules/AgapeConnect/StaffRmb/ReceiptUploader.aspx?id=" + RmbKey)
                     hfQR.Value = strUrl
                 Else
                     refresh_timer.Enabled = False
