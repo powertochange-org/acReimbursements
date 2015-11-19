@@ -444,13 +444,13 @@
         public double Amount {
             get {
                 try {
-                    return Double.Parse(tbAmount.Text, new CultureInfo("en-US").NumberFormat);
+                    return Double.Parse(tbAmount.Text);
                 } catch {
                     return 0;
                 }
             }
             set { 
-                tbAmount.Text = value.ToString("n2", new CultureInfo("en-US"));
+                tbAmount.Text = value.ToString("0.00");
                 double exchangeRate;
                 try { exchangeRate = double.Parse(tbExchangeRate.Text); }
                 catch { tbExchangeRate.Text = "1.0000"; exchangeRate = 1; }
@@ -530,7 +530,7 @@
             }
             set { 
                 hfCADValue.Value = value.ToString(); //this is used by javascript for some reason TODO:get rid of this
-                tbCADAmount.Text = value.ToString("n2", new CultureInfo("en-US"));
+                tbCADAmount.Text = value.ToString("0.00");
                 string script = "check_if_receipt_is_required(); ";
                 if (!tbAmount.Text.Equals(string.Empty)) { script += "adjust_exchange_rate(); display_foreign_exchange(); "; }
                 ScriptManager.RegisterClientScriptBlock(tbCADAmount, tbCADAmount.GetType(), "set_CAD_amount", script, true);
@@ -648,7 +648,7 @@
                 Double amount = Double.Parse(tbAmount.Text);
                 if (tbCADAmount.Text.Equals(String.Empty))
                 {
-                    tbCADAmount.Text = CADValue.ToString("n2", new CultureInfo("en-US"));
+                    tbCADAmount.Text = CADValue.ToString("0.00");
                 }
                 if (amount <= 0)
                 {

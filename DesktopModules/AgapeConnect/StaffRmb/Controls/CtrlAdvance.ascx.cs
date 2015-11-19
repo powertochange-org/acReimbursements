@@ -135,7 +135,7 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
             Double amount = Double.Parse(tbAmount.Text);
             if (tbCADAmount.Text.Equals(String.Empty))
             {
-                tbCADAmount.Text = CADValue.ToString("n2", new System.Globalization.CultureInfo("en-US"));
+                tbCADAmount.Text = CADValue.ToString("0.00");
             }
             //if (amount <= 0)
             //{

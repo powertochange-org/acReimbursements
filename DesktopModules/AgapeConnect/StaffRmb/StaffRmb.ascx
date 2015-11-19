@@ -150,9 +150,9 @@
 
     function calculatePerDiemTotal() {
         var total = 0;
-        if ($('.pdbreakfast').is(':enabled')) { total += parseFloat($('.pdbreakfast').val()) };
-        if ($('.pdlunch').is(':enabled')) { total += parseFloat($('.pdlunch').val()) };
-        if ($('.pdsupper').is(':enabled')) { total += parseFloat($('.pdsupper').val()) };
+        if ($('.pdbreakfast').is(':enabled')) { total += parseFloat($('.pdbreakfast').val().replace(',','')) };
+        if ($('.pdlunch').is(':enabled')) { total += parseFloat($('.pdlunch').val().replace(',','')) };
+        if ($('.pdsupper').is(':enabled')) { total += parseFloat($('.pdsupper').val().replace(',','')) };
         $('#tbPDTotal').text(total.toFixed(2));
     }
 
@@ -732,12 +732,12 @@ function GetAccountBalance(jsonQuery){
         var total = 0.00;
 
         $(".Amount").each(function() {
-            if (!isNaN(this.value) && this.value.length != 0) {total += parseFloat(this.value);}
+            if (!isNaN(this.value) && this.value.length != 0) {total += parseFloat(this.value.replace(',',''));}
         });
        
         var orig = $("#<%= lblOriginalAmt.ClientId %>").html();
 
-        if(total== parseFloat(orig.substring(0,orig.Length)))
+        if(total== parseFloat(orig.substring(0,orig.Length).replace(',','')))
         {
             $("#<%= btnOK.ClientId %>").prop('disabled', false).removeClass('aspNetDisabled');
         }
