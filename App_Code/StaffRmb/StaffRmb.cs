@@ -521,6 +521,10 @@ namespace StaffRmb
                 {
                     var reader = new StreamReader(response.GetResponseStream());
                     String response_string = await reader.ReadToEndAsync();
+                    if (response_string.StartsWith("ERROR")) {
+                        Log(-1, "WEB SERVICE ERROR: " + response_string);
+                        return WEB_SERVICE_ERROR;
+                    }
                     return response_string;
                 }
                 eventLog.AddLog("getResultFromWebServiceAsync()", "No data returned", portalSettings, userId, EventLogController.EventLogType.ADMIN_ALERT);
