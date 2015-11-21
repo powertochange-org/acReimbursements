@@ -521,7 +521,7 @@ namespace StaffRmb
                 {
                     var reader = new StreamReader(response.GetResponseStream());
                     String response_string = await reader.ReadToEndAsync();
-                    if (response_string.StartsWith("ERROR")) {
+                    if (response_string.Contains("ERROR")) {
                         Log(-1, "WEB SERVICE ERROR: " + response_string);
                         return WEB_SERVICE_ERROR;
                     }
