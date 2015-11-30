@@ -101,9 +101,9 @@ public class WebService : System.Web.Services.WebService {
                                              select c)
                 {
                     DotNetNuke.Entities.Users.UserInfo staffMember = DotNetNuke.Entities.Users.UserController.GetUserById(portalid, rmb.UserId);
-                    string firstLetter = staffMember.LastName.ToUpper().Substring(0, 1);
+                    string firstLetter = (staffMember.LastName!=null?staffMember.LastName.ToUpper().Substring(0, 1):"-");
                     Item letter = tree.Needs(firstLetter);
-                    Item staff = letter.Needs(staffMember.LastName + ", " + staffMember.FirstName);
+                    Item staff = letter.Needs(staffMember.LastName!=null?(staffMember.LastName + ", " + staffMember.FirstName):staffMember.DisplayName);
                     string id = rmb.RID.ToString().PadLeft(5, '0');
                     Item reimbursement = staff.Needs((rmb.PrivComment == null ? "  " : "* ") + id + " : " + (rmb.RmbDate == null ? "" : rmb.RmbDate.Value.ToShortDateString()) + " : " + rmb.SpareField1);
                     reimbursement.setRmbNo(rmb.RMBNo.ToString());
