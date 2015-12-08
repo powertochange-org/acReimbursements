@@ -126,7 +126,7 @@ namespace PowerToChange.Modules.StaffRmb.Presenters
             catch (Exception ex)
             {
                 StaffRmbDataContext d = new StaffRmbDataContext();
-                d.AP_Staff_Rmb_Logs.InsertOnSubmit(new AP_Staff_Rmb_Log() { Timestamp = DateTime.Now, LogType = 4, RID = rmb.RID, Message = "Error saving receipt image via mobile page" });
+                d.AP_Staff_Rmb_Logs.InsertOnSubmit(new AP_Staff_Rmb_Log() { Timestamp = DateTime.Now, LogType = 4, RID = rmb.RID, Message = "Error saving receipt image via mobile page" + ex.Message + ex.StackTrace });
                 d.SubmitChanges();
                 _view.Message = "Image Upload Failed";
             }

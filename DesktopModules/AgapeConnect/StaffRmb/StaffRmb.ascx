@@ -90,7 +90,7 @@
                 });               
             },
             error: function(a, b, c) {
-                console.error('failure :'+b);
+                console.error('failure: '+a.responseText);
                 $("#<%= tbVendorId.ClientID %>").prop('disabled', true);
                 $("#<%= tbVendorId.ClientID%>").autocomplete({
                     source: ""
