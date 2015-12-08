@@ -86,8 +86,13 @@ namespace PowerToChange.Modules.StaffRmb.Presenters
             {
                 // initialize folder/permissions
                 int recnum;
-                try { recnum = _images.Where(a => a.RmbLineNo==lineNo && a.RMBNo == rmbNo).Select(a => a.RecNum).Max() + 1; }
-                catch { recnum = 1; }
+                try { recnum = _images.Where(a => a.RmbLineNo == lineNo && a.RMBNo == rmbNo).Select(a => a.RecNum).Max() + 1; }
+                catch
+                {
+                    // The above will fail for new lines.  This statement should catch those
+                    try { recnum = _images.Where(a => a.RmbLineNo == null && a.RMBNo == rmbNo).Select(a => a.RecNum).Max() + 1; }
+                    catch { recnum = 1; }
+                }
                 IFileInfo file;
                 string strUrl = "";
                 if (_testing)
