@@ -255,6 +255,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 End If
                 tbNewChargeTo.Attributes.Add("onkeypress", "return disableSubmitOnEnter();")
             End If
+            hlAdvanceAdjust.Visible = IsAccounts()
+            hlAdvanceAdjust.NavigateUrl = DotNetNuke.Common.Globals.NavigateURL(Me.TabId, "AdvanceView", "mid=" + Me.ModuleId.ToString())
             Await Task.WhenAll(TaskList)
         End Sub
 
