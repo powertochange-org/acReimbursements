@@ -50,6 +50,8 @@
                     </asp:TemplateField>
                 </Columns>
             </asp:GridView>
+            <asp:Label ID="lblWarning" runat="server" CssClass="AgapeWarning" />
+            <asp:HiddenField ID="hfLog" runat="server" />
         </ContentTemplate>
     </asp:UpdatePanel>
 </form>

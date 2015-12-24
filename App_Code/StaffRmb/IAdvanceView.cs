@@ -11,7 +11,8 @@ namespace PowerToChange.Modules.StaffRmb.Presenters
     {
         IEnumerable<OutstandingAdvance> OutstandingAdvances { set; }
         StaffRmbDataContext DataContext { get; }
-        
+        string Warning { set; }
+        string Log { set; }
 
         event EventHandler<ModuleLoadEventArgs> ModuleLoad;
 

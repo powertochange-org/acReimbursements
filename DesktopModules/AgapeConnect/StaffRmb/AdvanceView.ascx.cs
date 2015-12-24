@@ -35,6 +35,8 @@ namespace PowerToChange.Modules.StaffRmb.Views
             }
         }
         public StaffRmbDataContext DataContext { get { return d; } }
+        public string Warning { set { lblWarning.Text = value; } }
+        public string Log { set { hfLog.Value = value; } }
 
         public event EventHandler<ModuleLoadEventArgs> ModuleLoad;
 
