@@ -7,6 +7,7 @@ using System.Web;
 
 namespace PowerToChange.Modules.StaffRmb.Presenters
 {
+
     public interface IAdvanceView : IModuleView<AP_Staff_RmbLine>
     {
         IEnumerable<OutstandingAdvance> OutstandingAdvances { set; }

@@ -43,6 +43,7 @@ namespace PowerToChange.Modules.StaffRmb.Presenters
                         && a.GrossAmount > 0
                         && a.Spare2.Length > 0
                         && !a.Spare2.Equals("0")
+                        && !a.Spare2.Equals("CLEARED")
                         && a.AP_Staff_Rmb.Status >= RmbStatus.Approved)
                         .Select(b => new OutstandingAdvance()
                         {
