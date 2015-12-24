@@ -58,7 +58,8 @@ namespace PowerToChange.Modules.StaffRmb.Presenters
         private bool isAccounts()
         {
             UserInfo currentUser = DotNetNuke.Entities.Users.UserController.Instance.GetCurrentUserInfo();
-            String[] accountRoles = ((string)ModuleContext.Settings["AccountRoles"]).Split(';');
+            String accountRoleSetting = ((string)ModuleContext.Settings["AccountRoles"]);
+            String[] accountRoles = accountRoleSetting.Split(';');
             foreach (String role in accountRoles) {
                 if (currentUser.Roles.Contains(role)) return true;
             }
