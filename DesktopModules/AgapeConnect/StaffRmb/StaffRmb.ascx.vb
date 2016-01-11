@@ -1835,7 +1835,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Protected Async Sub btnSave_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSave.Click
             If (IsAccounts()) Then
-                saveFinanceComments()
+                SaveFinanceComments()
             End If
             Dim State As Integer = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.Status).First()
             If (State = RmbStatus.Processing Or State = RmbStatus.PendingDownload Or State = RmbStatus.DownloadFailed Or State = RmbStatus.Paid) Then Return
@@ -2198,7 +2198,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     'Then release the lock.
                     StaffBrokerFunctions.SetSetting("Datapump", "Unlocked", PortalId)
                     Log(theRmb.RID, LOG_LEVEL_INFO, "UNPROCESSED - before it was downloaded")
-                    End If
+                End If
             End If
             TaskList.Add(LoadRmbAsync(hfRmbNo.Value))
             TaskList.Add(loadBasicApprovedPaneAsync())
