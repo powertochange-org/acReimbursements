@@ -1273,7 +1273,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         If (CInt(ucType.GetProperty("ReceiptType").GetValue(theControl, Nothing)) = RmbReceiptType.Electronic And imageFiles.Count > 0) Then
                             line.ReceiptNo = Nothing
                         Else
-                            line.ReceiptNo = If(line.Receipt, nextReceiptNo, Nothing)
+                            If ((line.ReceiptNo Is Nothing) And line.Receipt) Then
+                                line.ReceiptNo = nextReceiptNo
+                            End If
                             ' Since we aren't supposed to have any receipt images with this,
                             ' we should force-remove any receipts associated with this line
                             Dim imagesToRemove As New List(Of IFileInfo)
