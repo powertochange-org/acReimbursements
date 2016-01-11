@@ -120,7 +120,6 @@ public class WebService : System.Web.Services.WebService {
     [ScriptMethod(ResponseFormat = ResponseFormat.Json, UseHttpGet=true)]
     public void getStaffAppsButton()
     {
-        String ABSENCE_TRACKER = "<a href='https://absences.powertochange.org'> <img src='https://staff.powertochange.org/wp-content/images/Absence-Tracker-Icon.png' alt='Absence Tracker'></a>";
         String AUTHORIZATION_MGR = "<a href='https://staffapps.powertochange.org/authmanager'> <img src='https://staff.powertochange.org/wp-content/images/AuthorizationMgr-Icon.png' alt='Authorization Manager'></a>";
         String REPORTS = "<a href='https://staff.powertochange.org/reports/'> <img src='https://staff.powertochange.org/wp-content/images/Reports-Icon.png' alt='Reports'></a>";
         String STAFF_DIRECTORY = "<a href='https://staff.powertochange.org/staff-directory/'> <img src='https://staff.powertochange.org/wp-content/images/Staff-Directory-Icon.png' alt='Staff Directory'></a>";
@@ -141,7 +140,7 @@ public class WebService : System.Web.Services.WebService {
                "text-align:center; font-family:sans-serif; font-weight:300; font-size:13px;  padding-top:5px; padding-left:0; padding-bottom:5px; padding-right:0px; margin:10px 10px; border-radius:5px; border:1px solid rgb(235, 133, 40); background:rgb(245, 130, 32);'>Staff Apps</a>" +
                "<div id='staffAppsMenu' onmouseout='staffAppsMenuHide();' onmouseover='staffAppsMenuShow();' style='position:absolute; display:none; border:1px solid rgb(214, 215, 212); padding: 10px 40px; right:10px; top:37px; z-index:900; background-color: rgb(244, 244, 244);' >" +
                "<center><ul class='staffAppsPopupMenu' style='margin:15px 0; padding:15px 0; color:#adafb2; font-size:15px;'><table><tbody>" +
-               "<tr><td style='border:0;'>" + ABSENCE_TRACKER + "</td>" +
+               "<tr><td style='border:0;'>" + SETTINGS + "</td>" +
                "<td style='border:0;'>" + REPORTS + "</td>" +
                "<td style='border:0;'>" + STAFF_DIRECTORY + "</td>" +
                "<td style='border:0;'>" + REIMBURSEMENTS + "</td>" +
@@ -153,7 +152,6 @@ public class WebService : System.Web.Services.WebService {
                "</tr><tr>" +
                "<td style='border:0;'>" + AUTHORIZATION_MGR + "</td>" +
                "<td style='border:0;'>" + WIKI + "</td>" +
-               "<td style='border:0;'>" + SETTINGS + "</td>" +
                "</tr></tbody></table></ul></center></div>" +
                 STYLE + SCRIPT + "</div>";
         HttpContext.Current.Response.ContentType = "application/json";
