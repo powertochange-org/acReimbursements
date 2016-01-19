@@ -960,8 +960,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim loadAddressTask = LoadAddressAsync(Rmb.UserId)
 
                     lblApprovedDate.Text = If(Rmb.ApprDate Is Nothing, "", Rmb.ApprDate.Value.ToShortDateString)
-                    ttlWaitingApp.Visible = Rmb.ApprDate Is Nothing
-                    ttlApprovedBy.Visible = Not Rmb.ApprDate Is Nothing
+                    ttlWaitingApp.Visible = Rmb.ApprDate Is Nothing And Rmb.Status <> RmbStatus.PendingDirectorApproval And Rmb.Status <> RmbStatus.PendingEDMSApproval
+                    ttlApprovedBy.Visible = Not ttlWaitingApp.Visible
                     ddlApprovedBy.Visible = DRAFT Or CANCELLED Or ((isApprover Or isOwner Or isSpouse) And SUBMITTED)
                     ddlApprovedBy.Enabled = DRAFT Or CANCELLED Or ((isApprover Or isOwner Or isSpouse) And SUBMITTED)
                     lblApprovedBy.Visible = Not ddlApprovedBy.Visible

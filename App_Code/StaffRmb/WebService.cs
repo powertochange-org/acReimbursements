@@ -120,7 +120,6 @@ public class WebService : System.Web.Services.WebService {
     [ScriptMethod(ResponseFormat = ResponseFormat.Json, UseHttpGet=true)]
     public void getStaffAppsButton()
     {
-        //String ABSENCE_TRACKER = "<a href='https://absences.powertochange.org'> <img src='https://staff.powertochange.org/wp-content/images/Absence-Tracker-Icon.png' alt='Absence Tracker'></a>";
         String AUTHORIZATION_MGR = "<a href='https://staffapps.powertochange.org/authmanager'> <img src='https://staff.powertochange.org/wp-content/images/AuthorizationMgr-Icon.png' alt='Authorization Manager'></a>";
         String REPORTS = "<a href='https://staff.powertochange.org/reports/'> <img src='https://staff.powertochange.org/wp-content/images/Reports-Icon.png' alt='Reports'></a>";
         String STAFF_DIRECTORY = "<a href='https://staff.powertochange.org/staff-directory/'> <img src='https://staff.powertochange.org/wp-content/images/Staff-Directory-Icon.png' alt='Staff Directory'></a>";
