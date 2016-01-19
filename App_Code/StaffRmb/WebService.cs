@@ -129,7 +129,7 @@ public class WebService : System.Web.Services.WebService {
         String WIKI = "<a href='https://wiki.powertochange.org/help'><img src='https://staff.powertochange.org/wp-content/images/Self-Help-Wiki-Icon.png' alt='Self-Help Wiki'></a>";
         String EGENCIA = "<a href='https://staff.powertochange.org/egencia-login/'><img src='https://staff.powertochange.org/wp-content/images/Egencia-Icon.png' alt='Egencia'></a>";
         String DAYFORCE = "<a href='https://sso.dayforcehcm.com/p2c'><img src='https://staff.powertochange.org/wp-content/images/Dayforce-Icon.png' alt='Dayforce'></a>";
-        String SETTINGS = "<a href='https://staff.powertochange.org/staff-directory/?page=profile'><img src='https://staff.powertochange.org/wp-content/images/My-Settings-Icon.png' alt='Settings' /></a>";
+        String SETTINGS = "<a href='https://staff.powertochange.org/my-settings'><img src='https://staff.powertochange.org/wp-content/images/My-Settings-Icon.png' alt='Settings' /></a>";
 
         String STYLE = "<style type='text/css' scoped>#staffAppsButton:hover, #staffAppsButton:active, #staffAppsButton:focus {color: #000000!important;text-decoration: none;}#staffAppsMenu table td{background:transparent;}</style>";
         String SCRIPT = "<script type='text/javascript'>function staffAppsMenuShow() {$('#staffAppsMenu').show();var e = document.getElementById('staffAppsButton');e.style.background = '#f4f4f4';e.style.border = '1px solid #d6d7d4';e.style.borderBottom = '1px solid #f4f4f4';}" +
@@ -140,7 +140,7 @@ public class WebService : System.Web.Services.WebService {
                "text-align:center; font-family:sans-serif; font-weight:300; font-size:13px;  padding-top:5px; padding-left:0; padding-bottom:5px; padding-right:0px; margin:10px 10px; border-radius:5px; border:1px solid rgb(235, 133, 40); background:rgb(245, 130, 32);'>Staff Apps</a>" +
                "<div id='staffAppsMenu' onmouseout='staffAppsMenuHide();' onmouseover='staffAppsMenuShow();' style='position:absolute; display:none; border:1px solid rgb(214, 215, 212); padding: 10px 40px; right:10px; top:37px; z-index:900; background-color: rgb(244, 244, 244);' >" +
                "<center><ul class='staffAppsPopupMenu' style='margin:15px 0; padding:15px 0; color:#adafb2; font-size:15px;'><table><tbody>" +
-               "<tr><td style='border:0;'>" + SETTINGS + "</td>" +
+               "<tr><td style='border:0;'>" + AUTHORIZATION_MGR + "</td>" +
                "<td style='border:0;'>" + REPORTS + "</td>" +
                "<td style='border:0;'>" + STAFF_DIRECTORY + "</td>" +
                "<td style='border:0;'>" + REIMBURSEMENTS + "</td>" +
@@ -150,8 +150,8 @@ public class WebService : System.Web.Services.WebService {
                "<td style='border:0;'>" + EGENCIA + "</td>" +
                "<td style='border:0;'>" + LINK_SHORTENER + "</td>" +
                "</tr><tr>" +
-               "<td style='border:0;'>" + AUTHORIZATION_MGR + "</td>" +
                "<td style='border:0;'>" + WIKI + "</td>" +
+               "<td style='border:0;'>" + SETTINGS + "</td>" +
                "</tr></tbody></table></ul></center></div>" +
                 STYLE + SCRIPT + "</div>";
         HttpContext.Current.Response.ContentType = "application/json";
@@ -163,7 +163,7 @@ public class WebService : System.Web.Services.WebService {
     [ScriptMethod(ResponseFormat = ResponseFormat.Json, UseHttpGet=true)]
     public void getStaffAppsButtonResponsive()
     {
-        String ABSENCE_TRACKER = "<a href='https://absences.powertochange.org'> <img src='https://staff.powertochange.org/wp-content/images/Absence-Tracker-Icon.png' alt='Absence Tracker'></a>";
+        //String ABSENCE_TRACKER = "<a href='https://absences.powertochange.org'> <img src='https://staff.powertochange.org/wp-content/images/Absence-Tracker-Icon.png' alt='Absence Tracker'></a>";
         String AUTHORIZATION_MGR = "<a href='https://staffapps.powertochange.org/authmanager'> <img src='https://staff.powertochange.org/wp-content/images/AuthorizationMgr-Icon.png' alt='Authorization Manager'></a>";
         String REPORTS = "<a href='https://staff.powertochange.org/reports/'> <img src='https://staff.powertochange.org/wp-content/images/Reports-Icon.png' alt='Reports'></a>";
         String STAFF_DIRECTORY = "<a href='https://staff.powertochange.org/staff-directory/'> <img src='https://staff.powertochange.org/wp-content/images/Staff-Directory-Icon.png' alt='Staff Directory'></a>";
@@ -173,7 +173,7 @@ public class WebService : System.Web.Services.WebService {
         String WIKI = "<a href='https://wiki.powertochange.org/help'><img src='https://staff.powertochange.org/wp-content/images/Self-Help-Wiki-Icon.png' alt='Self-Help Wiki'></a>";
         String EGENCIA = "<a href='https://staff.powertochange.org/egencia-login/'><img src='https://staff.powertochange.org/wp-content/images/Egencia-Icon.png' alt='Egencia'></a>";
         String DAYFORCE = "<a href='https://sso.dayforcehcm.com/p2c'><img src='https://staff.powertochange.org/wp-content/images/Dayforce-Icon.png' alt='Dayforce'></a>";
-        String SETTINGS = "<a href='https://staff.powertochange.org/staff-directory/?page=profile'><img src='https://staff.powertochange.org/wp-content/images/My-Settings-Icon.png' alt='Settings' /></a>";
+        String SETTINGS = "<a href='https://staff.powertochange.org/my-settings'><img src='https://staff.powertochange.org/wp-content/images/My-Settings-Icon.png' alt='Settings' /></a>";
 		String PLACEHOLDER = "<div style='width:63px; height:100px'></div>";
 
         String STYLE = "<style type='text/css' scoped>#staffAppsButton:hover, #staffAppsButton:active, #staffAppsButton:focus {color: #000000!important;text-decoration: none;}#staffAppsMenu table td{background:transparent;}</style>";
@@ -185,7 +185,7 @@ public class WebService : System.Web.Services.WebService {
                "text-align:center; font-family:sans-serif; font-weight:300; font-size:13px;  padding-top:6px; padding-left:0; padding-bottom:4px; padding-right:0px; margin:10px 10px; border-radius:5px; border:1px solid rgb(235, 133, 40); background:rgb(245, 130, 32);'>Staff Apps</a>" +
                "<div id='staffAppsMenu' onmouseout='staffAppsMenuHide();' onmouseover='staffAppsMenuShow();' class='staff-apps-button' >" +
                "<center><ul class='staffAppsPopupMenu' id='staff-apps-popup-menu'><div><div>" +
-               "<div><div class='staff-app-button-styling'>" + ABSENCE_TRACKER + "</div>" +
+               "<div><div class='staff-app-button-styling'>" + AUTHORIZATION_MGR + "</div>" +
                "<div class='staff-app-button-styling'>" + REPORTS + "</div>" +
                "<div class='staff-app-button-styling'>" + STAFF_DIRECTORY + "</div>" +
                "<div class='staff-app-button-styling'>" + REIMBURSEMENTS + "</div>" +
@@ -195,9 +195,9 @@ public class WebService : System.Web.Services.WebService {
                "<div class='staff-app-button-styling'>" + EGENCIA + "</div>" +
                "<div class='staff-app-button-styling'>" + LINK_SHORTENER + "</div>" +
                "</div><div>" +
-               "<div class='staff-app-button-styling'>" + AUTHORIZATION_MGR + "</div>" +
                "<div class='staff-app-button-styling'>" + WIKI + "</div>" +
                "<div class='staff-app-button-styling'>" + SETTINGS + "</div>" +
+               "<div class='staff-app-button-styling'>" + PLACEHOLDER + "</div>" +
                "<div class='staff-app-button-styling'>" + PLACEHOLDER + "</div>" +
                "</div></div></div></ul></center></div>" +
                 STYLE + SCRIPT + "</div>";
