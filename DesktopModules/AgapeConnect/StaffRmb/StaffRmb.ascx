@@ -515,6 +515,12 @@
             })
         }
 
+        function setUpNumbers() {
+            $("input[type='number']").click(function () {
+                $(this).select();
+            });
+        }
+
         function setUpHelpLink() {
             $("#help-link").attr("href", "https://wiki.powertochange.org/help/index.php/Online_Reimbursements").attr("target", "_blank");        
         }
@@ -525,6 +531,7 @@
             setUpAccordion();
             checkForMinistryAccount();
             loadFinanceTrees();
+            setUpNumbers();
             setUpConfirms();
             setUpHelpLink();
                          
@@ -535,6 +542,7 @@
                 checkForMinistryAccount();
                 setUpReceiptPreviews();
                 enableDraggable();
+                setUpNumbers();
                 setUpConfirms();
             });
 
@@ -1214,6 +1222,7 @@ function GetAccountBalance(jsonQuery){
                         </div>
                     </div>
                 </div>
+                <asp:hyperlink ID="hlAdvanceAdjust" runat="server" Text="Advance Adjustment" style="margin-left:50px"/>
             </td>
             <td width="100%" style="padding-left: 20px;">
 

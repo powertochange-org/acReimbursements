@@ -255,6 +255,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 End If
                 tbNewChargeTo.Attributes.Add("onkeypress", "return disableSubmitOnEnter();")
             End If
+            hlAdvanceAdjust.Visible = IsAccounts()
+            hlAdvanceAdjust.NavigateUrl = DotNetNuke.Common.Globals.NavigateURL(Me.TabId, "AdvanceView", "mid=" + Me.ModuleId.ToString())
             Await Task.WhenAll(TaskList)
         End Sub
 
@@ -958,10 +960,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim loadAddressTask = LoadAddressAsync(Rmb.UserId)
 
                     lblApprovedDate.Text = If(Rmb.ApprDate Is Nothing, "", Rmb.ApprDate.Value.ToShortDateString)
-                    ttlWaitingApp.Visible = Rmb.ApprDate Is Nothing
-                    ttlApprovedBy.Visible = Not Rmb.ApprDate Is Nothing
-                    ddlApprovedBy.Visible = DRAFT Or CANCELLED Or ((isApprover Or isOwner Or isSpouse) And SUBMITTED)
-                    ddlApprovedBy.Enabled = DRAFT Or CANCELLED Or ((isApprover Or isOwner Or isSpouse) And SUBMITTED)
+                    ttlWaitingApp.Visible = Rmb.ApprDate Is Nothing And Rmb.Status <> RmbStatus.PendingDirectorApproval And Rmb.Status <> RmbStatus.PendingEDMSApproval
+                    ttlApprovedBy.Visible = Not ttlWaitingApp.Visible
+                    ddlApprovedBy.Visible = DRAFT Or CANCELLED Or ((isApprover Or isOwner Or isSpouse) And Rmb.Status = RmbStatus.Submitted)
+                    ddlApprovedBy.Enabled = DRAFT Or CANCELLED Or ((isApprover Or isOwner Or isSpouse) And Rmb.Status = RmbStatus.Submitted)
                     lblApprovedBy.Visible = Not ddlApprovedBy.Visible
                     lblExtraApproval.Visible = hasHadExtraApproval
                     Dim approverName As String = If(Rmb.ApprUserId Is Nothing Or Rmb.ApprUserId = -1, "", UserController.GetUserById(PortalId, Rmb.ApprUserId).DisplayName)
