@@ -13,6 +13,7 @@ namespace PowerToChange.Modules.StaffRmb.Views
         string RID { set; }
         string LineNo { set; }
         string Message { set; }
+        TimeSpan RemainingTime { set; }
         byte[] ImageFile { get; }
         string ImageData { get; }
 

@@ -35,22 +35,20 @@
                         <asp:Button class="hidden" id="btnSubmit" ClientIDMode="Static" runat="server" OnClick="Upload" />
                         <asp:HiddenField ID="image_data" ClientIDMode="static" runat="server" />
                     </ContentTemplate>
-                    <Triggers>
-                        <asp:AsyncPostBackTrigger ControlID="tmTimer" />
-                    </Triggers>
                 </asp:UpdatePanel>
             </div>
             <div class="footer row">
                 <asp:UpdatePanel runat="server">
                     <ContentTemplate>
-                        <asp:Timer ID="tmTimer" runat="server" Interval="5000" OnTick="TimerTick"/>
-                        <asp:Label ID="lblTimer" runat="server" CssClass="center"/>
+                        <asp:HiddenField ID="hfTimer" ClientIDMode="Static" runat="server"/>
+                        <asp:Label ID="lblTimer" ClientIDMode="Static" runat="server" CssClass="center"/>
                     </ContentTemplate>
                 </asp:UpdatePanel>
             </div>
         </div>
     </form>
     <script type="text/javascript">
+        var timer;
         function shutter_click() {
             document.getElementById('fuCamera').click();
         }
@@ -73,6 +71,32 @@
                 reader.readAsDataURL(input.files[0]);
             }
         }
+        function expire() {
+            clearInterval(timer);
+            document.getElementById('lblMessage').innerHTML = "Expired";
+            document.getElementById('lblTimer').innerHTML = "This link has expired.<br/>Re-open the popup to generate a fresh QR Code.";
+            document.getElementById('pnlShutter').style.display = 'none';
+            document.getElementById('hfShutterState').value = "hidden";
+        }
+        function initializeTimer() {
+            var totalSec = Number(document.getElementById('hfTimer').value);
+            if (totalSec < 0) expire();
+            else {
+                timer = setInterval(function () {
+                    var hours = parseInt(totalSec / 3600);
+                    var minutes = parseInt(totalSec / 60) % 60;
+                    var seconds = totalSec % 60;
+
+                    document.getElementById('lblTimer').innerHTML = "Remaining time: " + ('00' + hours).slice(-2) + ":" + ('00' + minutes).slice(-2) + ":" + ('00' + seconds).slice(-2);
+
+                    if (--totalSec < 0) {
+                        expire();
+                    }
+                }, 1000);
+            }
+        }
+        //on load
+        initializeTimer();
     </script>
 </body>
 </html>

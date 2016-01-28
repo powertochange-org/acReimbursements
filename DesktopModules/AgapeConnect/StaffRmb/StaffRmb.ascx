@@ -1222,7 +1222,7 @@ function GetAccountBalance(jsonQuery){
                         </div>
                     </div>
                 </div>
-                <asp:hyperlink ID="hlAdvanceAdjust" runat="server" Text="Advance Adjustment" style="margin-left:50px"/>
+                <asp:hyperlink ID="hlAdvanceAdjust" runat="server" Text="Advance Adjustment" style="margin-left:50px" Target="_blank"/>
             </td>
             <td width="100%" style="padding-left: 20px;">
 

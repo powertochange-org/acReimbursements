@@ -42,6 +42,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
     Partial Class ViewStaffRmb
         Inherits Entities.Modules.PortalModuleBase
         Implements Entities.Modules.IActionable
+        Dim VERSION_STRING As String = "1.2.3"
         Dim BALANCE_INCONCLUSIVE As String = "unknown"
         Dim BALANCE_PERMISSION_DENIED As String = "**hidden**"
         Dim EDMS_APPROVAL_LOG_MESSAGE As String = "APPROVED by EDMS"
@@ -69,7 +70,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             ' set versioning info
             lblVersion.Visible = UserController.Instance.GetCurrentUserInfo().IsSuperUser
             lblVersion.Text = String.Format("Version: {0}<br>Dated: {1}",
-                System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(),
+                VERSION_STRING,
                 System.IO.File.GetLastWriteTime(System.Reflection.Assembly.GetExecutingAssembly().Location).ToShortDateString())
 
             For i As Integer = 2 To hfRows.Value

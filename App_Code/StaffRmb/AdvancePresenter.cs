@@ -44,7 +44,8 @@ namespace PowerToChange.Modules.StaffRmb.Presenters
                         && a.Spare2.Length > 0
                         && !a.Spare2.Equals("0")
                         && !a.Spare2.Equals("CLEARED")
-                        && a.AP_Staff_Rmb.Status >= RmbStatus.Approved)
+                        && a.AP_Staff_Rmb.Status >= RmbStatus.Approved
+                        && a.AP_Staff_Rmb.Status != RmbStatus.Cancelled)
                         .Select(b => new OutstandingAdvance()
                         {
                             LineNo = b.RmbLineNo,
