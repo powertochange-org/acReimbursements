@@ -35,9 +35,6 @@
                         <asp:Button class="hidden" id="btnSubmit" ClientIDMode="Static" runat="server" OnClick="Upload" />
                         <asp:HiddenField ID="image_data" ClientIDMode="static" runat="server" />
                     </ContentTemplate>
-                    <Triggers>
-                        <asp:AsyncPostBackTrigger ControlID="tmTimer" />
-                    </Triggers>
                 </asp:UpdatePanel>
             </div>
             <div class="footer row">
