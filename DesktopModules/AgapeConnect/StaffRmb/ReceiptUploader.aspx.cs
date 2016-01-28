@@ -47,6 +47,7 @@ namespace PowerToChange.Modules.StaffRmb.Views
                 }
             }
         }
+        public TimeSpan RemainingTime { set { hfTimer.Value = Math.Round(value.TotalSeconds).ToString(); } }
         public byte[] ImageFile { get { if (fuCamera.HasFile) return fuCamera.FileBytes; else return null; } }
         public string ImageData { get { return image_data.Value; } }
 
@@ -54,7 +55,6 @@ namespace PowerToChange.Modules.StaffRmb.Views
         {
             Message = "Expired";
             lblTimer.Text = EXPIRED;
-            tmTimer.Enabled = false;
             pnlShutter.Visible = false;
             hfShutterState.Value = "hidden";
         }
@@ -97,16 +97,6 @@ namespace PowerToChange.Modules.StaffRmb.Views
             catch { Message = "Upload Failed with token:" + this.Page.Request.QueryString["id"]; }
         }
 
-        protected void TimerTick(object sender, EventArgs e)
-        {
-            DateTime expireTime = ReceiptUploaderPresenter.getTimeFromToken(this.Page.Request.QueryString["id"]).AddMinutes(ReceiptUploaderPresenter.EXPIRE_MINUTES);
-            TimeSpan remainingTime = (expireTime - DateTime.Now);
-            if (remainingTime > TimeSpan.Zero)
-            {
-                lblTimer.Text = "Remaining time: " + remainingTime.Hours.ToString("D2") + ":" + remainingTime.Minutes.ToString("D2") + ":" + remainingTime.Seconds.ToString("D2");
-            }
-            else Expire();
-        }
     }
 
 }

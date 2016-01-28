@@ -61,6 +61,8 @@ namespace PowerToChange.Modules.StaffRmb.Presenters
                 _view.Message = "The correct Reimbursement could not be found.";
                 return;
             }
+            DateTime expireTime = getTimeFromToken(args.token).AddMinutes(EXPIRE_MINUTES);
+            _view.RemainingTime = (expireTime - DateTime.Now);
         }
 
         public void UploadEvent(object sender, MobileEventArgs args)
