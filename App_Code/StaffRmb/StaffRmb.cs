@@ -796,11 +796,11 @@ namespace StaffRmb
 
         static public String urlEncode(String text)
         {
-            return text.Replace("+", "-").Replace("/", "_").Replace("=", ",");
+            return text.Replace("+", "-").Replace("/", "_").Replace("=", ".");
         }
         static public String urlDecode(String text)
         {
-            return text.Replace("-", "+").Replace("_", "/").Replace(",", "=");
+            return text.Replace("-", "+").Replace("_", "/").Replace(".", "=");
         }
     }
 }
