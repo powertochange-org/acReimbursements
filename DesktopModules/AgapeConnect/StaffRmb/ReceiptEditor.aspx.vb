@@ -441,7 +441,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
                 qrcode.Src = Nothing
                 If (Not String.IsNullOrEmpty(RmbKey)) Then
                     Dim strPathAndQuery As String = HttpContext.Current.Request.Url.PathAndQuery
-                    Dim strUrl As String = HttpContext.Current.Request.Url.AbsoluteUri.Replace(strPathAndQuery, "/DesktopModules/AgapeConnect/StaffRmb/ReceiptUploader.aspx?id=" + RmbKey)
+                    Dim strUrl As String = HttpContext.Current.Request.Url.AbsoluteUri.Replace(strPathAndQuery, "/DesktopModules/AgapeConnect/StaffRmb/ReceiptUploader.aspx?id=" + StaffRmbFunctions.urlEncode(RmbKey))
                     Dim bmp = New MessagingToolkit.QRCode.Codec.QRCodeEncoder().Encode(strUrl)
                     Dim ms = New MemoryStream()
                     bmp.Save(ms, ImageFormat.Gif)

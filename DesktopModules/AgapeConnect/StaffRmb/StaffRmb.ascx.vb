@@ -1897,7 +1897,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
 
             ifReceipt.Attributes("src") = Request.Url.Scheme & "://" & Request.Url.Authority & "/DesktopModules/AgapeConnect/StaffRmb/ReceiptEditor.aspx?RmbNo=" _
-                                                             & hfRmbNo.Value & "&RmbLine=New" & "&RmbKey=" & key
+                                                             & hfRmbNo.Value & "&RmbLine=New" & "&RmbKey=" & StaffRmbFunctions.urlEncode(key)
             pnlElecReceipts.Attributes("style") = "display: none;"
             ScriptManager.RegisterStartupScript(addLinebtn2, addLinebtn2.GetType(), "popupAdd", "showNewLinePopup();", True)
         End Sub
@@ -2400,7 +2400,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
 
                     ifReceipt.Attributes("src") = Request.Url.Scheme & "://" & Request.Url.Authority & "/DesktopModules/AgapeConnect/StaffRmb/ReceiptEditor.aspx?RmbNo=" _
-                                                    & theLine.First.RmbNo & "&RmbLine=" & theLine.First.RmbLineNo & "&RmbKey=" & key
+                                                    & theLine.First.RmbNo & "&RmbLine=" & theLine.First.RmbLineNo & "&RmbKey=" & StaffRmbFunctions.urlEncode(key)
                     ' Check to see if we have any images
                     If receiptMode = RmbReceiptType.Electronic Then
                         pnlElecReceipts.Attributes("style") = ""
@@ -4881,8 +4881,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If (Not user.DisplayName.Contains(" ")) Then Return ""
             If (Len(user.DisplayName) > user.DisplayName.IndexOf(" ")) Then Return user.DisplayName.Substring(user.DisplayName.IndexOf(" "))
         End Function
-
-
 
     End Class
 End Namespace
