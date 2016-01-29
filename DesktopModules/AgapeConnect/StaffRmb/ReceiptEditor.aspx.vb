@@ -434,13 +434,14 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
             DataCache.ClearFolderCache(PS.PortalId)
             ' Try to get the folder; if this fails, we'll throw an exception and break out of this block
             theFolder = FolderManager.Instance.GetFolder(PS.PortalId, "/_RmbReceipts/" & theRmb.UserId)
+
             If (Not Page.IsPostBack) Then
                 ' Set the proper folder permissions
                 Await CheckFolderPermissions(PS.PortalId, theFolder, theRmb.UserId)
                 qrcode.Src = Nothing
                 If (Not String.IsNullOrEmpty(RmbKey)) Then
                     Dim strPathAndQuery As String = HttpContext.Current.Request.Url.PathAndQuery
-                    Dim strUrl As String = HttpContext.Current.Request.Url.AbsoluteUri.Replace(strPathAndQuery, "/DesktopModules/AgapeConnect/StaffRmb/ReceiptUploader.aspx?id=" + RmbKey)
+                    Dim strUrl As String = HttpContext.Current.Request.Url.AbsoluteUri.Replace(strPathAndQuery, "/DesktopModules/AgapeConnect/StaffRmb/ReceiptUploader.aspx?id=" + StaffRmbFunctions.urlEncode(RmbKey))
                     Dim bmp = New MessagingToolkit.QRCode.Codec.QRCodeEncoder().Encode(strUrl)
                     Dim ms = New MemoryStream()
                     bmp.Save(ms, ImageFormat.Gif)
@@ -452,7 +453,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
             End If
             load_images()
         Catch ex As Exception
-
+            'ScriptManager.RegisterStartupScript(Page, Page.GetType(), "test", "alert('" + ex.Message + "');", True)
         End Try
     End Sub
 

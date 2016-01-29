@@ -1885,6 +1885,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             saveIfNecessary()
             If (Settings("QRReceipts")) Then
                 key = ReceiptUploaderPresenter.encodeToken(DateTime.Now, hfRmbNo.Value, -1)
+                Dim rid = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value).FirstOrDefault().RID
+                Log(rid, 0, "QR Token encoded for " + hfRmbNo.Value + " at " + DateTime.Now.ToString() + " : " + key)
                 Try
                     Dim rmb = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value).Single()
                     rmb.SpareField4 = key
@@ -1895,7 +1897,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End If
 
             ifReceipt.Attributes("src") = Request.Url.Scheme & "://" & Request.Url.Authority & "/DesktopModules/AgapeConnect/StaffRmb/ReceiptEditor.aspx?RmbNo=" _
-                                                             & hfRmbNo.Value & "&RmbLine=New" & "&RmbKey=" & key
+                                                             & hfRmbNo.Value & "&RmbLine=New" & "&RmbKey=" & StaffRmbFunctions.urlEncode(key)
             pnlElecReceipts.Attributes("style") = "display: none;"
             ScriptManager.RegisterStartupScript(addLinebtn2, addLinebtn2.GetType(), "popupAdd", "showNewLinePopup();", True)
         End Sub
@@ -2386,6 +2388,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim key As String = ""
                     If (Settings("QRReceipts")) Then
                         key = ReceiptUploaderPresenter.encodeToken(DateTime.Now, theLine.First.RmbNo, theLine.First.RmbLineNo)
+                        Dim rid = (From c In d.AP_Staff_Rmbs Where c.RMBNo = theLine.First.RmbNo).FirstOrDefault().RID
+                        Log(rid, 0, "QR Token encoded for " & theLine.First.RmbNo & "/" & theLine.First.RmbLineNo & " at " & DateTime.Now.ToString() & " : " & key)
                         Try
                             Dim rmb = (From c In d.AP_Staff_Rmbs Where c.RMBNo = theLine.First.RmbNo).Single()
                             rmb.SpareField4 = key
@@ -2396,7 +2400,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
 
                     ifReceipt.Attributes("src") = Request.Url.Scheme & "://" & Request.Url.Authority & "/DesktopModules/AgapeConnect/StaffRmb/ReceiptEditor.aspx?RmbNo=" _
-                                                    & theLine.First.RmbNo & "&RmbLine=" & theLine.First.RmbLineNo & "&RmbKey=" & key
+                                                    & theLine.First.RmbNo & "&RmbLine=" & theLine.First.RmbLineNo & "&RmbKey=" & StaffRmbFunctions.urlEncode(key)
                     ' Check to see if we have any images
                     If receiptMode = RmbReceiptType.Electronic Then
                         pnlElecReceipts.Attributes("style") = ""
@@ -4877,8 +4881,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If (Not user.DisplayName.Contains(" ")) Then Return ""
             If (Len(user.DisplayName) > user.DisplayName.IndexOf(" ")) Then Return user.DisplayName.Substring(user.DisplayName.IndexOf(" "))
         End Function
-
-
 
     End Class
 End Namespace

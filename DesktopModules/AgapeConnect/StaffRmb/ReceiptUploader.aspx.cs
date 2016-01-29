@@ -75,7 +75,7 @@ namespace PowerToChange.Modules.StaffRmb.Views
         {
             if (!this.Page.IsPostBack)
             {
-                MobileEventArgs args = new MobileEventArgs() { token = this.Page.Request.QueryString["id"].Replace(" ", "+") };
+                MobileEventArgs args = new MobileEventArgs() { token = StaffRmbFunctions.urlDecode(this.Page.Request.QueryString["id"]) };
                 try { if (InitializeEvent != null) InitializeEvent(this, args); }
                 catch { Message = "Error displaying mobile page"; }
             }
@@ -92,9 +92,9 @@ namespace PowerToChange.Modules.StaffRmb.Views
             fuCamera.Visible = false; //prevent autolaunching
             pnlShutter.Visible = false; //prevent re-clicking
             imgPreview.ImageUrl = image_data.Value;
-            MobileEventArgs args = new MobileEventArgs() { token = this.Page.Request.QueryString["id"] };
+            MobileEventArgs args = new MobileEventArgs() { token = StaffRmbFunctions.urlDecode(this.Page.Request.QueryString["id"]) };
             try { if (UploadEvent != null) UploadEvent(this, args); }
-            catch { Message = "Upload Failed with token:" + this.Page.Request.QueryString["id"]; }
+            catch { Message = "Upload Failed with token:" + StaffRmbFunctions.urlDecode(this.Page.Request.QueryString["id"]); }
         }
 
     }
