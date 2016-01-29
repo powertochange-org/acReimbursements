@@ -1885,6 +1885,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             saveIfNecessary()
             If (Settings("QRReceipts")) Then
                 key = ReceiptUploaderPresenter.encodeToken(DateTime.Now, hfRmbNo.Value, -1)
+                Dim rid = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value).FirstOrDefault().RID
+                Log(rid, 0, "QR Token encoded for " + hfRmbNo.Value + " at " + DateTime.Now.ToString() + " : " + key)
                 Try
                     Dim rmb = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value).Single()
                     rmb.SpareField4 = key
@@ -2386,6 +2388,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim key As String = ""
                     If (Settings("QRReceipts")) Then
                         key = ReceiptUploaderPresenter.encodeToken(DateTime.Now, theLine.First.RmbNo, theLine.First.RmbLineNo)
+                        Dim rid = (From c In d.AP_Staff_Rmbs Where c.RMBNo = theLine.First.RmbNo).FirstOrDefault().RID
+                        Log(rid, 0, "QR Token encoded for " & theLine.First.RmbNo & "/" & theLine.First.RmbLineNo & " at " & DateTime.Now.ToString() & " : " & key)
                         Try
                             Dim rmb = (From c In d.AP_Staff_Rmbs Where c.RMBNo = theLine.First.RmbNo).Single()
                             rmb.SpareField4 = key

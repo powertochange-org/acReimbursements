@@ -434,6 +434,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
             DataCache.ClearFolderCache(PS.PortalId)
             ' Try to get the folder; if this fails, we'll throw an exception and break out of this block
             theFolder = FolderManager.Instance.GetFolder(PS.PortalId, "/_RmbReceipts/" & theRmb.UserId)
+
             If (Not Page.IsPostBack) Then
                 ' Set the proper folder permissions
                 Await CheckFolderPermissions(PS.PortalId, theFolder, theRmb.UserId)
@@ -452,7 +453,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
             End If
             load_images()
         Catch ex As Exception
-
+            'ScriptManager.RegisterStartupScript(Page, Page.GetType(), "test", "alert('" + ex.Message + "');", True)
         End Try
     End Sub
 

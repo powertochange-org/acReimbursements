@@ -59,6 +59,7 @@ namespace PowerToChange.Modules.StaffRmb.Presenters
             {
                 _view.RID = "unknown";
                 _view.Message = "The correct Reimbursement could not be found.";
+                LogThis(-1, 0, "Rmb with token:" + args.token + "(rmb #"+getRmbNoFromToken(args.token)+") was not located");
                 return;
             }
             DateTime expireTime = getTimeFromToken(args.token).AddMinutes(EXPIRE_MINUTES);
@@ -68,12 +69,14 @@ namespace PowerToChange.Modules.StaffRmb.Presenters
         public void UploadEvent(object sender, MobileEventArgs args)
         {
             DateTime tokenTime = getTimeFromToken(args.token);
+            int rmbNo = getRmbNoFromToken(args.token);
             if (tokenTime.AddMinutes(EXPIRE_MINUTES) <= DateTime.Now)
             {
                 _view.Expire();
+                int RID = _rmbs.Where(a => a.RMBNo==rmbNo).SingleOrDefault().RID;
+                LogThis(RID, 0, "Attempt to upload receipt with expired token: "+args.token + " to rmb #"+getRmbNoFromToken(args.token)+", line #"+getLineNoFromToken(args.token)+", time: "+getTimeFromToken(args.token).ToShortTimeString());
                 return;
             }
-            int rmbNo = getRmbNoFromToken(args.token);
             int lineNo = getLineNoFromToken(args.token);
 
             AP_Staff_Rmb rmb = null;
@@ -126,15 +129,13 @@ namespace PowerToChange.Modules.StaffRmb.Presenters
                 image.URL = strUrl;
                 StaffRmbDataContext d = new StaffRmbDataContext();
                 d.AP_Staff_RmbLine_Files.InsertOnSubmit(image);
-                d.AP_Staff_Rmb_Logs.InsertOnSubmit(new AP_Staff_Rmb_Log() { Timestamp = DateTime.Now, LogType = 2, RID = rmb.RID, Message = "Receipt image uploaded via mobile page" });
                 d.SubmitChanges();
+                LogThis(rmb.RID, 2, "Receipt image uploaded via mobile page");
                 _view.Message = "Image uploaded.";
             }
             catch (Exception ex)
             {
-                StaffRmbDataContext d = new StaffRmbDataContext();
-                d.AP_Staff_Rmb_Logs.InsertOnSubmit(new AP_Staff_Rmb_Log() { Timestamp = DateTime.Now, LogType = 4, RID = rmb.RID, Message = "Error saving receipt image via mobile page" + ex.Message + ex.StackTrace });
-                d.SubmitChanges();
+                LogThis(rmb.RID, 4, "Error saving receipt image via mobile page " + ex.Message + ex.StackTrace);
                 _view.Message = "Image Upload Failed";
             }
         }
@@ -201,6 +202,17 @@ namespace PowerToChange.Modules.StaffRmb.Presenters
             MemoryStream result = new MemoryStream();
             bitmap.Save(result, System.Drawing.Imaging.ImageFormat.Png);
             return result;
+        }
+        protected void LogThis(int RID, short logType, String Message) {
+            AP_Staff_Rmb_Log entry = new AP_Staff_Rmb_Log();
+            entry.Timestamp=DateTime.Now;
+            entry.LogType=logType;
+            entry.RID=RID;
+            entry.Username = "Mobile Receipt Uploader";
+            entry.Message = Message;
+            StaffRmbDataContext d = new StaffRmbDataContext();
+            d.AP_Staff_Rmb_Logs.InsertOnSubmit(entry);
+            d.SubmitChanges();
         }
     }
 }
