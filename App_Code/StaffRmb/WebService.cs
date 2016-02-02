@@ -116,52 +116,50 @@ public class WebService : System.Web.Services.WebService {
 
     }
 
-    [WebMethod]
-    [ScriptMethod(ResponseFormat = ResponseFormat.Json, UseHttpGet=true)]
-    public void getStaffAppsButton()
-    {
+    //[WebMethod]
+    //[ScriptMethod(ResponseFormat = ResponseFormat.Json, UseHttpGet=true)]
+    //public void getStaffAppsButton()
+    //{
+    //    String AUTHORIZATION_MGR = "<a href='https://staffapps.powertochange.org/authmanager'> <img src='https://staff.powertochange.org/wp-content/images/AuthorizationMgr-Icon.png' alt='Authorization Manager'></a>";
+    //    String REPORTS = "<a href='https://staff.powertochange.org/reports/'> <img src='https://staff.powertochange.org/wp-content/images/Reports-Icon.png' alt='Reports'></a>";
+    //    String STAFF_DIRECTORY = "<a href='https://staff.powertochange.org/staff-directory/'> <img src='https://staff.powertochange.org/wp-content/images/Staff-Directory-Icon.png' alt='Staff Directory'></a>";
+    //    String REIMBURSEMENTS = "<a href='https://apps.powertochange.org/Reimbursement-form'><img src='https://staff.powertochange.org/wp-content/images/Reimbursements-Icon.png' alt='Reimbursements' /></a>";
+    //    String HELPDESK = "<a href='mailto:helpdesk@powertochange.org'> <img src='https://staff.powertochange.org/wp-content/images/HelpDesk-Icon.png' alt='Help Desk'></a>";
+    //    String LINK_SHORTENER = "<a href='https://staff.powertochange.org/sh'><img src='https://staff.powertochange.org/wp-content/images/Link-Shortener-Icon.png' alt='Link Shortener'></a>";
+    //    String WIKI = "<a href='https://wiki.powertochange.org/help'><img src='https://staff.powertochange.org/wp-content/images/Self-Help-Wiki-Icon.png' alt='Self-Help Wiki'></a>";
+    //    String EGENCIA = "<a href='https://staff.powertochange.org/egencia-login/'><img src='https://staff.powertochange.org/wp-content/images/Egencia-Icon.png' alt='Egencia'></a>";
+    //    String DAYFORCE = "<a href='https://sso.dayforcehcm.com/p2c'><img src='https://staff.powertochange.org/wp-content/images/Dayforce-Icon.png' alt='Dayforce'></a>";
+    //    String LEARNING = "<a href='https://learning.powertochange.org'><img src='https://staff.powertochange.org/wp-content/images/Learning-Icon.png' alt='Learning'></a>";
+    //    String SETTINGS = "<a href='https://staff.powertochange.org/my-settings'><img src='https://staff.powertochange.org/wp-content/images/My-Settings-Icon.png' alt='Settings' /></a>";
 
-        //String ABSENCE_TRACKER = "<a href='https://absences.powertochange.org'> <img src='https://staff.powertochange.org/wp-content/images/Absence-Tracker-Icon.png' alt='Absence Tracker'></a>";
-        String AUTHORIZATION_MGR = "<a href='https://staffapps.powertochange.org/authmanager'> <img src='https://staff.powertochange.org/wp-content/images/AuthorizationMgr-Icon.png' alt='Authorization Manager'></a>";
-        String REPORTS = "<a href='https://staff.powertochange.org/reports/'> <img src='https://staff.powertochange.org/wp-content/images/Reports-Icon.png' alt='Reports'></a>";
-        String STAFF_DIRECTORY = "<a href='https://staff.powertochange.org/staff-directory/'> <img src='https://staff.powertochange.org/wp-content/images/Staff-Directory-Icon.png' alt='Staff Directory'></a>";
-        String REIMBURSEMENTS = "<a href='https://apps.powertochange.org/Reimbursement-form'><img src='https://staff.powertochange.org/wp-content/images/Reimbursements-Icon.png' alt='Reimbursements' /></a>";
-        String HELPDESK = "<a href='mailto:helpdesk@powertochange.org'> <img src='https://staff.powertochange.org/wp-content/images/HelpDesk-Icon.png' alt='Help Desk'></a>";
-        String LINK_SHORTENER = "<a href='https://staff.powertochange.org/sh'><img src='https://staff.powertochange.org/wp-content/images/Link-Shortener-Icon.png' alt='Link Shortener'></a>";
-        String WIKI = "<a href='https://wiki.powertochange.org/help'><img src='https://staff.powertochange.org/wp-content/images/Self-Help-Wiki-Icon.png' alt='Self-Help Wiki'></a>";
-        String EGENCIA = "<a href='https://staff.powertochange.org/egencia-login/'><img src='https://staff.powertochange.org/wp-content/images/Egencia-Icon.png' alt='Egencia'></a>";
-        String DAYFORCE = "<a href='https://sso.dayforcehcm.com/p2c'><img src='https://staff.powertochange.org/wp-content/images/Dayforce-Icon.png' alt='Dayforce'></a>";
-        String LEARNING = "<a href='https://learning.powertochange.org'><img src='https://staff.powertochange.org/wp-content/images/Learning-Icon.png' alt='Learning'></a>";
-        String SETTINGS = "<a href='https://staff.powertochange.org/my-settings'><img src='https://staff.powertochange.org/wp-content/images/My-Settings-Icon.png' alt='Settings' /></a>";
+    //    String STYLE = "<style type='text/css' scoped>#staffAppsButton:hover, #staffAppsButton:active, #staffAppsButton:focus {color: #000000!important;text-decoration: none;}#staffAppsMenu table td{background:transparent;}</style>";
+    //    String SCRIPT = "<script type='text/javascript'>function staffAppsMenuShow() {$('#staffAppsMenu').show();var e = document.getElementById('staffAppsButton');e.style.background = '#f4f4f4';e.style.border = '1px solid #d6d7d4';e.style.borderBottom = '1px solid #f4f4f4';}" +
+    //           "function staffAppsMenuHide() {$('#staffAppsMenu').hide(); var e = document.getElementById('staffAppsButton');e.style.background = '#f58220';e.style.border = '1px solid #eb8528';}</script>";
 
-        String STYLE = "<style type='text/css' scoped>#staffAppsButton:hover, #staffAppsButton:active, #staffAppsButton:focus {color: #000000!important;text-decoration: none;}#staffAppsMenu table td{background:transparent;}</style>";
-        String SCRIPT = "<script type='text/javascript'>function staffAppsMenuShow() {$('#staffAppsMenu').show();var e = document.getElementById('staffAppsButton');e.style.background = '#f4f4f4';e.style.border = '1px solid #d6d7d4';e.style.borderBottom = '1px solid #f4f4f4';}" +
-               "function staffAppsMenuHide() {$('#staffAppsMenu').hide(); var e = document.getElementById('staffAppsButton');e.style.background = '#f58220';e.style.border = '1px solid #eb8528';}</script>";
-
-        String code = "<div id='staff-app-container' style='display:inline-block; position:relative; float:right; min-width:302px;'>" +
-               "<a id='staffAppsButton' class='button related' onmouseout='staffAppsMenuHide();' onmouseover='staffAppsMenuShow();' style='background:#f58220; border:1px solid #eb8528; cursor:default;  z-index:910; position:relative; float:right; width:103px; height:21px; color:#000000; " +
-               "text-align:center; font-family:sans-serif; font-weight:300; font-size:13px;  padding-top:5px; padding-left:0; padding-bottom:5px; padding-right:0px; margin:10px 10px; border-radius:5px; border:1px solid rgb(235, 133, 40); background:rgb(245, 130, 32);'>Staff Apps</a>" +
-               "<div id='staffAppsMenu' onmouseout='staffAppsMenuHide();' onmouseover='staffAppsMenuShow();' style='position:absolute; display:none; border:1px solid rgb(214, 215, 212); padding: 10px 40px; right:10px; top:37px; z-index:900; background-color: rgb(244, 244, 244);' >" +
-               "<center><ul class='staffAppsPopupMenu' style='margin:15px 0; padding:15px 0; color:#adafb2; font-size:15px;'><table><tbody>" +
-               "<tr><td style='border:0;'>" + AUTHORIZATION_MGR + "</td>" +
-               "<td style='border:0;'>" + REPORTS + "</td>" +
-               "<td style='border:0;'>" + STAFF_DIRECTORY + "</td>" +
-               "<td style='border:0;'>" + REIMBURSEMENTS + "</td>" +
-               "</tr><tr>" +
-               "<td style='border:0;'>" + HELPDESK + "</td>" +
-               "<td style='border:0;'>" + DAYFORCE + "</td>" +
-               "<td style='border:0;'>" + EGENCIA + "</td>" +
-               "<td style='border:0;'>" + LINK_SHORTENER + "</td>" +
-               "</tr><tr>" +
-               "<td style='border:0;'>" + WIKI + "</td>" +
-               "<td style='border:0;'>" + LEARNING + "</td>" +
-               "<td style='border:0;'>" + SETTINGS + "</td>" +
-               "</tr></tbody></table></ul></center></div>" +
-                STYLE + SCRIPT + "</div>";
-        HttpContext.Current.Response.ContentType = "application/json";
-        HttpContext.Current.Response.Headers.Add("Access-Control-Allow-Origin", "*");
-        HttpContext.Current.Response.Write(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(code));
-    }
+    //    String code = "<div id='staff-app-container' style='display:inline-block; position:relative; float:right; min-width:302px;'>" +
+    //           "<a id='staffAppsButton' class='button related' onmouseout='staffAppsMenuHide();' onmouseover='staffAppsMenuShow();' style='background:#f58220; border:1px solid #eb8528; cursor:default;  z-index:910; position:relative; float:right; width:103px; height:21px; color:#000000; " +
+    //           "text-align:center; font-family:sans-serif; font-weight:300; font-size:13px;  padding-top:5px; padding-left:0; padding-bottom:5px; padding-right:0px; margin:10px 10px; border-radius:5px; border:1px solid rgb(235, 133, 40); background:rgb(245, 130, 32);'>Staff Apps</a>" +
+    //           "<div id='staffAppsMenu' onmouseout='staffAppsMenuHide();' onmouseover='staffAppsMenuShow();' style='position:absolute; display:none; border:1px solid rgb(214, 215, 212); padding: 10px 40px; right:10px; top:37px; z-index:900; background-color: rgb(244, 244, 244);' >" +
+    //           "<center><ul class='staffAppsPopupMenu' style='margin:15px 0; padding:15px 0; color:#adafb2; font-size:15px;'><table><tbody>" +
+    //           "<tr><td style='border:0;'>" + AUTHORIZATION_MGR + "</td>" +
+    //           "<td style='border:0;'>" + REPORTS + "</td>" +
+    //           "<td style='border:0;'>" + STAFF_DIRECTORY + "</td>" +
+    //           "<td style='border:0;'>" + REIMBURSEMENTS + "</td>" +
+    //           "</tr><tr>" +
+    //           "<td style='border:0;'>" + HELPDESK + "</td>" +
+    //           "<td style='border:0;'>" + DAYFORCE + "</td>" +
+    //           "<td style='border:0;'>" + EGENCIA + "</td>" +
+    //           "<td style='border:0;'>" + LINK_SHORTENER + "</td>" +
+    //           "</tr><tr>" +
+    //           "<td style='border:0;'>" + WIKI + "</td>" +
+    //           "<td style='border:0;'>" + LEARNING + "</td>" +
+    //           "<td style='border:0;'>" + SETTINGS + "</td>" +
+    //           "</tr></tbody></table></ul></center></div>" +
+    //            STYLE + SCRIPT + "</div>";
+    //    HttpContext.Current.Response.ContentType = "application/json";
+    //    HttpContext.Current.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+    //    HttpContext.Current.Response.Write(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(code));
+    //}
 
     [WebMethod]
     [ScriptMethod(ResponseFormat = ResponseFormat.Json, UseHttpGet=true)]
