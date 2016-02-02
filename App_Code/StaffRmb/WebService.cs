@@ -131,6 +131,7 @@ public class WebService : System.Web.Services.WebService {
         String WIKI = "<a href='https://wiki.powertochange.org/help'><img src='https://staff.powertochange.org/wp-content/images/Self-Help-Wiki-Icon.png' alt='Self-Help Wiki'></a>";
         String EGENCIA = "<a href='https://staff.powertochange.org/egencia-login/'><img src='https://staff.powertochange.org/wp-content/images/Egencia-Icon.png' alt='Egencia'></a>";
         String DAYFORCE = "<a href='https://sso.dayforcehcm.com/p2c'><img src='https://staff.powertochange.org/wp-content/images/Dayforce-Icon.png' alt='Dayforce'></a>";
+        String LEARNING = "<a href='https://learning.powertochange.org'><img src='https://staff.powertochange.org/wp-content/images/Learning-Icon.png' alt='Learning'></a>";
         String SETTINGS = "<a href='https://staff.powertochange.org/my-settings'><img src='https://staff.powertochange.org/wp-content/images/My-Settings-Icon.png' alt='Settings' /></a>";
 
         String STYLE = "<style type='text/css' scoped>#staffAppsButton:hover, #staffAppsButton:active, #staffAppsButton:focus {color: #000000!important;text-decoration: none;}#staffAppsMenu table td{background:transparent;}</style>";
@@ -153,6 +154,7 @@ public class WebService : System.Web.Services.WebService {
                "<td style='border:0;'>" + LINK_SHORTENER + "</td>" +
                "</tr><tr>" +
                "<td style='border:0;'>" + WIKI + "</td>" +
+               "<td style='border:0;'>" + LEARNING + "</td>" +
                "<td style='border:0;'>" + SETTINGS + "</td>" +
                "</tr></tbody></table></ul></center></div>" +
                 STYLE + SCRIPT + "</div>";
@@ -175,6 +177,7 @@ public class WebService : System.Web.Services.WebService {
         String WIKI = "<a href='https://wiki.powertochange.org/help'><img src='https://staff.powertochange.org/wp-content/images/Self-Help-Wiki-Icon.png' alt='Self-Help Wiki'></a>";
         String EGENCIA = "<a href='https://staff.powertochange.org/egencia-login/'><img src='https://staff.powertochange.org/wp-content/images/Egencia-Icon.png' alt='Egencia'></a>";
         String DAYFORCE = "<a href='https://sso.dayforcehcm.com/p2c'><img src='https://staff.powertochange.org/wp-content/images/Dayforce-Icon.png' alt='Dayforce'></a>";
+        String LEARNING = "<a href='https://learning.powertochange.org'><img src='https://staff.powertochange.org/wp-content/images/Learning-Icon.png' alt='Learning'></a>";
         String SETTINGS = "<a href='https://staff.powertochange.org/my-settings'><img src='https://staff.powertochange.org/wp-content/images/My-Settings-Icon.png' alt='Settings' /></a>";
 		String PLACEHOLDER = "<div style='width:63px; height:100px'></div>";
 
@@ -198,8 +201,8 @@ public class WebService : System.Web.Services.WebService {
                "<div class='staff-app-button-styling'>" + LINK_SHORTENER + "</div>" +
                "</div><div>" +
                "<div class='staff-app-button-styling'>" + WIKI + "</div>" +
+               "<div class='staff-app-button-styling'>" + LEARNING + "</div>" +
                "<div class='staff-app-button-styling'>" + SETTINGS + "</div>" +
-               "<div class='staff-app-button-styling'>" + PLACEHOLDER + "</div>" +
                "<div class='staff-app-button-styling'>" + PLACEHOLDER + "</div>" +
                "</div></div></div></ul></center></div>" +
                 STYLE + SCRIPT + "</div>";
