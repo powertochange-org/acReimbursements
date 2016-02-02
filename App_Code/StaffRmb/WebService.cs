@@ -177,7 +177,7 @@ public class WebService : System.Web.Services.WebService {
         String DAYFORCE = "<a href='https://sso.dayforcehcm.com/p2c'><img src='https://staff.powertochange.org/wp-content/images/Dayforce-Icon.png' alt='Dayforce'></a>";
         String LEARNING = "<a href='https://learning.powertochange.org'><img src='https://staff.powertochange.org/wp-content/images/Learning-Icon.png' alt='Learning'></a>";
         String SETTINGS = "<a href='https://staff.powertochange.org/my-settings'><img src='https://staff.powertochange.org/wp-content/images/My-Settings-Icon.png' alt='Settings' /></a>";
-		String PLACEHOLDER = "<div style='width:63px; height:100px'></div>";
+		String PLACEHOLDER = "<div style='width:63px; height:100px; vertical-align:bottom'></div>";
 
         String STYLE = "<style type='text/css' scoped>#staffAppsButton:hover, #staffAppsButton:active, #staffAppsButton:focus {color: #000000!important;text-decoration: none;}#staffAppsMenu table td{background:transparent;}</style>";
         String SCRIPT = "<script type='text/javascript'>function staffAppsMenuShow() {$('#staffAppsMenu').show();var e = document.getElementById('staffAppsButton');e.style.background = '#f4f4f4';e.style.border = '1px solid #d6d7d4';e.style.borderBottom = '1px solid #f4f4f4';}" +
