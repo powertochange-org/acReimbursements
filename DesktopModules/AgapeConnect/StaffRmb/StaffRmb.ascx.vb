@@ -1059,7 +1059,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     btnUnProcess.Enabled = isFinance And (PROCESSING)
                     btnDownload.Visible = (isFinance Or isOwner Or isSpouse) And FORM_HAS_ITEMS
 
-                    manualCodes.Visible = isFinance
+                    manualCodes.Visible = IsAccounts() '--isAccounts shows the manual codes to all finance users, even if it is their own reimbursement (isFinance hides it if it is their own)
                     tbCostcenter.Enabled = isFinance
                     ddlAccountCode.Enabled = isFinance
                     pnlAccountsOptions.Style.Add("display", If(isFinance, "block", "none"))
