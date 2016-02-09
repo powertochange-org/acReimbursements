@@ -1059,6 +1059,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     btnUnProcess.Enabled = isFinance And (PROCESSING)
                     btnDownload.Visible = (isFinance Or isOwner Or isSpouse) And FORM_HAS_ITEMS
 
+                    manualCodes.Visible = isFinance
                     tbCostcenter.Enabled = isFinance
                     ddlAccountCode.Enabled = isFinance
                     pnlAccountsOptions.Style.Add("display", If(isFinance, "block", "none"))
