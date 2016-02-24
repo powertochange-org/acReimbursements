@@ -2603,11 +2603,22 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 'If the form is awaiting approval, notifiy the original approver that they are no longer needed
                 If (rmb.First.Status = RmbStatus.Submitted AndAlso rmb.First.ApprUserId <> ddlApprovedBy.SelectedValue) Then
-                    Dim fromEmail = UserController.Instance.GetCurrentUserInfo.Email
-                    Dim subject As String = Translate("ApproverChangedSubject").Replace("[RMBNO]", rmb.First.RID)
-                    Dim body As String = Translate("ApproverChangedEmail").Replace("[RMBNO]", rmb.First.RID)
-                    SendEmail(fromEmail, oldApprover.Email, "", subject, body)
-                    ScriptManager.RegisterStartupScript(ddlApprovedBy, ddlApprovedBy.GetType(), "notify_approver", "alert('" + oldApprover.DisplayName + " was notified that they are no longer required to approve this reimbursement');", True)
+                    If (Not UserController.Instance.GetCurrentUserInfo.UserID = rmb.First.ApprUserId) Then
+                        '--Send email to old approver
+                        Dim fromEmail = UserController.Instance.GetCurrentUserInfo.Email
+                        Dim subject As String = Translate("ApproverChangedSubject").Replace("[RMBNO]", rmb.First.RID)
+                        Dim body As String = Translate("ApproverChangedEmail").Replace("[RMBNO]", rmb.First.RID)
+                        SendEmail(fromEmail, oldApprover.Email, "", subject, body)
+                        ScriptManager.RegisterStartupScript(ddlApprovedBy, ddlApprovedBy.GetType(), "notify_approver", "alert('" + oldApprover.DisplayName + " was notified that they are no longer required to approve this reimbursement');", True)
+                    End If
+                    If (Not UserController.Instance.GetCurrentUserInfo.UserID = rmb.First.UserId) Then
+                        '--Send email to owner
+                        Dim owner = UserController.GetUserById(rmb.First.PortalId, rmb.First.UserId)
+                        Dim subject As String = Translate("ApproverChangedSubject").Replace("[RMBNO]", rmb.First.RID)
+                        Dim body As String = Translate("ApproverChangedOwnerEmail").Replace("[RMBNO]", rmb.First.RID).Replace("[USER]", UserController.Instance.GetCurrentUserInfo.DisplayName)
+                        SendEmail("P2C Reimbursements <reimbursements@p2c.com>", owner.Email, "", subject, body)
+                        ScriptManager.RegisterStartupScript(ddlApprovedBy, ddlApprovedBy.GetType(), "notify_owner", "alert('" + owner.DisplayName + " was notified that they must re-submit this reimbursement to " + newApproverName + "');", True)
+                    End If
                 End If
                 Log(rmb.First.RID, LOG_LEVEL_INFO, "Approver changed from " + oldApprover.DisplayName + " to " + newApproverName)
             End If
