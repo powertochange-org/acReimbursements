@@ -12,9 +12,13 @@ Namespace DotNetNuke.Modules.StaffRmb
         Inherits Entities.Modules.ModuleSettingsBase
         
 #Region "Base Method Implementations"
+        Private Sub Page_Init(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Me.Init
+            If (Not UserController.Instance.GetCurrentUserInfo.IsInRole("Administrators")) Then
+                Response.Redirect(ApplicationURL, True)
+            End If
+        End Sub
         Private Sub Page_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Me.Load
             Try
-
 
                 If (Page.IsPostBack = False) Then
                     hfPortalId.Value = PortalId
@@ -28,7 +32,7 @@ Namespace DotNetNuke.Modules.StaffRmb
                     ddlEDMS.Items.Clear()
                     ddlPresident.Items.Clear()
                     ' Get the user list: it should only get active users that are in the staff table
-                    Dim userList = (From u In d.Users Where (From p In d.UserPortals Select p.PortalId).Contains(PortalId) And ((From s In d.AP_StaffBroker_Staffs where s.Active Select s.UserId1).Contains(u.UserID) Or (From s In d.AP_StaffBroker_Staffs where s.Active Select s.UserId2).Contains(u.UserID)) Order By u.LastName, u.FirstName)
+                    Dim userList = (From u In d.Users Where (From p In d.UserPortals Select p.PortalId).Contains(PortalId) And ((From s In d.AP_StaffBroker_Staffs Where s.Active Select s.UserId1).Contains(u.UserID) Or (From s In d.AP_StaffBroker_Staffs Where s.Active Select s.UserId2).Contains(u.UserID)) Order By u.LastName, u.FirstName)
                     ' Iterate through our new list
                     For Each user In userList
                         ' Add each one as LASTNAME, FIRSTNAME, with the UserID as the value. To avoid conflicts, each list has to have a new ListItem
@@ -319,7 +323,7 @@ Namespace DotNetNuke.Modules.StaffRmb
 
 
         End Sub
-       
+
 
         'Public Overrides Sub UpdateSettings()
 
