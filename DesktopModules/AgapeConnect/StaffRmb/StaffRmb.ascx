@@ -33,10 +33,20 @@
    
     function loadRmb(rmbno) {
         var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+        var url = trimBefore(trimBefore(document.location.href, "/rmbno"), "/rmbid");
         if (is_chrome) {
-            openInBackgroundTab("?rmbno="+rmbno);
+            openInBackgroundTab(url+"/rmbno/"+rmbno);
         } else {
-            window.open("?rmbno="+rmbno, "_blank");
+            window.open(url+"/rmbno/"+rmbno, "_blank");
+        }
+    }
+
+    function trimBefore(text, delimiter) {
+        var pos = text.toLowerCase().indexOf(delimiter.toLowerCase());
+        if (pos >=0 ) {
+            return text.substr(0, pos);
+        } else {
+            return text;
         }
     }
 
