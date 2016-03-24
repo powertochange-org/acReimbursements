@@ -4794,9 +4794,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Function
 
         Private Function hasOldExpenses() As Boolean
-            Dim oldest_allowable_date = Today.AddDays(-Settings("Expire"))
             Dim advance_line_type As Integer = Settings("AdvanceLineType")
-            Dim old_lines = (From c In d.AP_Staff_RmbLines Where c.RmbNo = hfRmbNo.Value And c.LineType <> advance_line_type And c.TransDate < oldest_allowable_date Select c.TransDate).Count()
+            Dim old_lines = (From c In d.AP_Staff_RmbLines Where c.RmbNo = hfRmbNo.Value And c.LineType <> advance_line_type And c.OutOfDate Select c.TransDate).Count()
             Return old_lines > 0
         End Function
 
