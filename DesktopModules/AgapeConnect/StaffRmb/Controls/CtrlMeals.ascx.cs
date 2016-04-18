@@ -9,14 +9,22 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
     new protected void Page_Init(object sender, EventArgs e)
     {
         base.Page_Init(sender, e);
-        lblForWhom.Visible = true;
-        lbForWhom.Visible = true;
-        tbForWhom.Visible = true;
+//        lblForWhom.Visible = true;
+//        lbForWhom.Visible = true;
+//        tbForWhom.Visible = true;
     }
 
     new public string Spare5
     {
-        get { return tbForWhom.Text; }
+        get {
+            // Show this field, only if it already has data
+            if (!string.IsNullOrEmpty(tbForWhom.Text))
+            {
+                lblForWhom.Visible = true;
+                lbForWhom.Visible = true;
+                tbForWhom.Visible = true;
+            }
+            return tbForWhom.Text; }
         set { tbForWhom.Text = value; }
     }
 
@@ -32,7 +40,7 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
     }
     public bool validate_required_fields()
     {
-        TextBox[] required_fields = new TextBox[] { tbSupplier, tbDesc, tbForWhom, tbAmount };
+        TextBox[] required_fields = new TextBox[] { tbSupplier, tbDesc, tbAmount };
         bool result = true;
         foreach (TextBox control in required_fields)
         {
