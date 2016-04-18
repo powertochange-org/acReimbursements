@@ -183,7 +183,7 @@ public class WebService : System.Web.Services.WebService {
         String SCRIPT = "<script type='text/javascript'>function staffAppsMenuShow() {$('#staffAppsMenu').show();var e = document.getElementById('staffAppsButton');e.style.background = '#f4f4f4';e.style.border = '1px solid #d6d7d4';e.style.borderBottom = '1px solid #f4f4f4';}" +
                "function staffAppsMenuHide() {$('#staffAppsMenu').hide(); var e = document.getElementById('staffAppsButton');e.style.background = '#f58220';e.style.border = '1px solid #eb8528';}</script>";
 
-        String code = "<link href='https://apps.powertochange.org/portals/_default/skins/carmel/staff-apps-button.css' type='text/css' rel='stylesheet'><div id='staff-app-container'>" +
+        String code = "<link href='https://happs.powertochange.org/portals/_default/skins/carmel/staff-apps-button.css' type='text/css' rel='stylesheet'><div id='staff-app-container'>" +
                "<a id='staffAppsButton' class='button related' onmouseout='staffAppsMenuHide();' onmouseover='staffAppsMenuShow();' style='background:#f58220; border:1px solid #eb8528; cursor:default; position:relative; float:right; width:103px; height:21px; color:#000000; " +
                "text-align:center; font-family:sans-serif; font-weight:300; font-size:13px;  padding-top:6px; padding-left:0; padding-bottom:4px; padding-right:0px; margin:10px 10px; border-radius:5px; border:1px solid rgb(235, 133, 40); background:rgb(245, 130, 32);'>Staff Apps</a>" +
                "<div id='staffAppsMenu' onmouseout='staffAppsMenuHide();' onmouseover='staffAppsMenuShow();' class='staff-apps-button' >" +
@@ -206,7 +206,10 @@ public class WebService : System.Web.Services.WebService {
                 STYLE + SCRIPT + "</div>";
         HttpContext.Current.Response.ContentType = "application/json";
         HttpContext.Current.Response.Headers.Add("Access-Control-Allow-Origin", "*");
-        HttpContext.Current.Response.Headers.Add("cache-control", "public, max-age=86400");
+        HttpContext.Current.Response.Cache.SetCacheability(HttpCacheability.Public);
+        HttpContext.Current.Response.Cache.SetMaxAge(TimeSpan.FromDays(1));
+        HttpContext.Current.Response.Cache.SetExpires(DateTime.Now.AddDays(1));
+        HttpContext.Current.Response.Cache.SetValidUntilExpires(true);
         HttpContext.Current.Response.Write(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(code));
     }
 	
