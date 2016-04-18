@@ -206,6 +206,7 @@ public class WebService : System.Web.Services.WebService {
                 STYLE + SCRIPT + "</div>";
         HttpContext.Current.Response.ContentType = "application/json";
         HttpContext.Current.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+        HttpContext.Current.Response.Headers.Add("cache-control", "public, max-age=86400");
         HttpContext.Current.Response.Write(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(code));
     }
 	
