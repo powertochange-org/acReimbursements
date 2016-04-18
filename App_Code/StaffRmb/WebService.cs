@@ -207,8 +207,9 @@ public class WebService : System.Web.Services.WebService {
         HttpContext.Current.Response.ContentType = "application/json";
         HttpContext.Current.Response.Headers.Add("Access-Control-Allow-Origin", "*");
         HttpContext.Current.Response.Cache.SetCacheability(HttpCacheability.Public);
-        HttpContext.Current.Response.Cache.SetMaxAge(TimeSpan.FromDays(1));
         HttpContext.Current.Response.Cache.SetExpires(DateTime.Now.AddDays(1));
+        HttpContext.Current.Response.Cache.SetMaxAge(TimeSpan.FromDays(1));
+        HttpContext.Current.Response.Cache.SetSlidingExpiration(true);
         HttpContext.Current.Response.Cache.SetValidUntilExpires(true);
         HttpContext.Current.Response.Write(new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(code));
     }
