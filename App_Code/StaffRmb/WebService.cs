@@ -204,6 +204,7 @@ public class WebService : System.Web.Services.WebService {
                "<div class='staff-app-button-styling'>" + PLACEHOLDER + "</div>" +
                "</div></div></div></ul></center></div>" +
                 STYLE + SCRIPT + "</div>";
+        HttpContext.Current.Response.ClearHeaders();
         HttpContext.Current.Response.ContentType = "application/json";
         HttpContext.Current.Response.Headers.Add("Access-Control-Allow-Origin", "*");
         HttpContext.Current.Response.Cache.SetCacheability(HttpCacheability.Public);
