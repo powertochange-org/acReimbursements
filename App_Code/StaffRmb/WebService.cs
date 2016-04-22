@@ -198,8 +198,8 @@ public class WebService : System.Web.Services.WebService {
                "<div class='staff-app-button-styling'>" + DAYFORCE + "</div>" +
                "<div class='staff-app-button-styling'>" + DAYFORCE_CALENDAR + "</div>" +
                "<div class='staff-app-button-styling'>" + EGENCIA + "</div>" +
-               "<div class='staff-app-button-styling'>" + LINK_SHORTENER + "</div>" +
                "</div><div>" +
+               "<div class='staff-app-button-styling'>" + LINK_SHORTENER + "</div>" +
                "<div class='staff-app-button-styling'>" + WIKI + "</div>" +
                "<div class='staff-app-button-styling'>" + LEARNING + "</div>" +
                "<div class='staff-app-button-styling'>" + SETTINGS + "</div>" +
