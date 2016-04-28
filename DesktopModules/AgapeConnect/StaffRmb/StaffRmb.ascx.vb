@@ -2172,7 +2172,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 'If the reimbursement has already been downloaded, a warning should be displayed - but hte reimbursement can be simply unprocessed
                 theRmb.Status = RmbStatus.Approved
                 'Remove any posting data associated with this rmb
-                If ((From c In d.AP_Staff_Rmb_Post_Extras Where c.RMBNo = theRmb.RMBNo) IsNot Nothing) Then
+                If ((From c In d.AP_Staff_Rmb_Post_Extras Where c.RMBNo = theRmb.RMBNo).Count > 0) Then
                     d.AP_Staff_Rmb_Post_Extras.DeleteOnSubmit((From c In d.AP_Staff_Rmb_Post_Extras Where c.RMBNo = theRmb.RMBNo).Single)
                 End If
                 SubmitChanges()
@@ -2195,7 +2195,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     theRmb.Year = Nothing
                     theRmb.ProcDate = Nothing
                     'Remove any posting data associated with this rmb
-                    If ((From c In d.AP_Staff_Rmb_Post_Extras Where c.RMBNo = theRmb.RMBNo) IsNot Nothing) Then
+                    If ((From c In d.AP_Staff_Rmb_Post_Extras Where c.RMBNo = theRmb.RMBNo).Count > 0) Then
                         d.AP_Staff_Rmb_Post_Extras.DeleteOnSubmit((From c In d.AP_Staff_Rmb_Post_Extras Where c.RMBNo = theRmb.RMBNo).Single)
                     End If
                     SubmitChanges()
