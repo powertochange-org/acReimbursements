@@ -172,9 +172,10 @@ public class WebService : System.Web.Services.WebService {
         String REIMBURSEMENTS = "<a href='https://apps.powertochange.org/Reimbursement-form'><img src='https://staff.powertochange.org/wp-content/images/Reimbursements-Icon.png' alt='Reimbursements' /></a>";
         String HELPDESK = "<a href='mailto:helpdesk@powertochange.org'> <img src='https://staff.powertochange.org/wp-content/images/HelpDesk-Icon.png' alt='Help Desk'></a>";
         String LINK_SHORTENER = "<a href='https://staff.powertochange.org/sh'><img src='https://staff.powertochange.org/wp-content/images/Link-Shortener-Icon.png' alt='Link Shortener'></a>";
-        String WIKI = "<a href='https://wiki.powertochange.org/help'><img src='https://staff.powertochange.org/wp-content/images/Self-Help-Wiki-Icon.png' alt='Self-Help Wiki'></a>";
+        String WIKI = "<a href='https://staff.powertochange.org/kb/'><img src='https://staff.powertochange.org/wp-content/images/Self-Help-Wiki-Icon.png' alt='Self-Help Wiki'></a>";
         String EGENCIA = "<a href='https://staff.powertochange.org/egencia-login/'><img src='https://staff.powertochange.org/wp-content/images/Egencia-Icon.png' alt='Egencia'></a>";
         String DAYFORCE = "<a href='https://sso.dayforcehcm.com/p2c'><img src='https://staff.powertochange.org/wp-content/images/Dayforce-Icon.png' alt='Dayforce'></a>";
+        String DAYFORCE_CALENDAR = "<a href='https://staffapps.powertochange.org/DayforceCalendar/Relationship/ManageTeam'> <img src='https://staff.powertochange.org/wp-content/images/Dayforce-Calendar-Icon.png' alt='Dayforce Calendar'></a>";
         String LEARNING = "<a href='https://learning.powertochange.org'><img src='https://staff.powertochange.org/wp-content/images/Learning-Icon.png' alt='Learning'></a>";
         String SETTINGS = "<a href='https://staff.powertochange.org/my-settings'><img src='https://staff.powertochange.org/wp-content/images/My-Settings-Icon.png' alt='Settings' /></a>";
 		String PLACEHOLDER = "<div style='width:63px'></div>";
@@ -195,15 +196,16 @@ public class WebService : System.Web.Services.WebService {
                "</div><div>" +
                "<div class='staff-app-button-styling'>" + HELPDESK + "</div>" +
                "<div class='staff-app-button-styling'>" + DAYFORCE + "</div>" +
+               "<div class='staff-app-button-styling'>" + DAYFORCE_CALENDAR + "</div>" +
                "<div class='staff-app-button-styling'>" + EGENCIA + "</div>" +
-               "<div class='staff-app-button-styling'>" + LINK_SHORTENER + "</div>" +
                "</div><div>" +
+               "<div class='staff-app-button-styling'>" + LINK_SHORTENER + "</div>" +
                "<div class='staff-app-button-styling'>" + WIKI + "</div>" +
                "<div class='staff-app-button-styling'>" + LEARNING + "</div>" +
                "<div class='staff-app-button-styling'>" + SETTINGS + "</div>" +
-               "<div class='staff-app-button-styling'>" + PLACEHOLDER + "</div>" +
                "</div></div></div></ul></center></div>" +
                 STYLE + SCRIPT + "</div>";
+        //"<div class='staff-app-button-styling'>" + PLACEHOLDER + "</div>" +
         HttpContext.Current.Response.ClearHeaders();
         HttpContext.Current.Response.ContentType = "application/json";
         HttpContext.Current.Response.Headers.Add("Access-Control-Allow-Origin", "*");
