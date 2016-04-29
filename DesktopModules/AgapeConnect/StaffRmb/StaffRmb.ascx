@@ -10,10 +10,32 @@
     input[type="number"] { text-align:right; }
     .abutton.delete:hover  { background-image:none; color:white; background-color:rgba(255,0,0,0.5); }
     .abutton.go {background-image:none; background-color:#A1D490;}
+    .alert {
+        font-size: 1.3em;
+        padding: 1em;
+        text-align: center;
+        white-space: normal;
+        width:auto;
+        word-wrap: normal;
+    }
 </style>
 
 <script type="text/javascript">
     "use strict";
+    // Replace javascript alerts with jquery
+    window.alert = function(message){
+        $("<div></div>").html(message)
+            .attr({'class': 'alert'})
+            .dialog({
+                title: 'Alert',
+                resizable: false,
+                draggable: true,
+                modal: true,
+                buttons: { "OK": function () { $(this).dialog("close"); } },
+                close: function(){$(this).remove();}
+            });
+    };
+
     var previous_menu_item = null;
     function selectMenuItem(menu_item) {
         deselectPreviousMenuItem();
