@@ -13,7 +13,7 @@
 </style>
 
 <script type="text/javascript">
-
+    "use strict";
     var previous_menu_item = null;
     function selectMenuItem(menu_item) {
         deselectPreviousMenuItem();
@@ -24,8 +24,9 @@
     }
 
     function deselectPreviousMenuItem() {
-        if (previous_menu_item == null)
+        if (previous_menu_item === null) {
             return;
+        }
         previous_menu_item.style.fontWeight = 'normal';
         previous_menu_item.style.fontSize = '10pt';
         $(previous_menu_item).parent().next().children().css('visibility', 'hidden');
@@ -128,7 +129,7 @@
         var result = "";
         var accBal = $("input[id$='StaffRmb_hfAccountBalance']:first").val();
         var formTot = $("span[id$='GridView1_lblTotalAmount']:last").text().replace("$","");
-        if ((accBal == "") || (formTot == "")) {
+        if ((accBal === "") || (formTot === "")) {
             result = "";
         } else {
             result = format_money(accBal - formTot);
@@ -140,7 +141,7 @@
         var total=0;
         $('.clearAdvance').each(function() {
             total+=Number($(this).val());
-        })
+        });
         $("span[id$='gvUnclearedAdvances_lblClearAdvanceTotal']").text(total.toFixed(2));
     }
 
@@ -148,41 +149,38 @@
         control.attr('disabled', !enabled);
         if (enabled) {
             control.removeClass('aspNetDisabled');
-            if (control.hasClass('pdbreakfast') && control.val()==0) { control.val($("[id$='hfBreakfast']").val()); }
-            if (control.hasClass('pdlunch') && control.val()==0) { control.val($("[id$='hfLunch']").val()); }
-            if (control.hasClass('pdsupper') && control.val()==0) { control.val($("[id$='hfSupper']").val()); }
+            if (control.hasClass('pdbreakfast') && control.val()===0) { control.val($("[id$='hfBreakfast']").val()); }
+            if (control.hasClass('pdlunch') && control.val()===0) { control.val($("[id$='hfLunch']").val()); }
+            if (control.hasClass('pdsupper') && control.val()===0) { control.val($("[id$='hfSupper']").val()); }
         } else {
             control.addClass('aspNetDisabled');
-            control.text="0"
+            control.text="0";
         }
         calculatePerDiemTotal();
     }
 
     function calculatePerDiemTotal() {
         var total = 0;
-        if ($('.pdbreakfast').is(':enabled')) { total += parseFloat($('.pdbreakfast').val().replace(',','')) };
-        if ($('.pdlunch').is(':enabled')) { total += parseFloat($('.pdlunch').val().replace(',','')) };
-        if ($('.pdsupper').is(':enabled')) { total += parseFloat($('.pdsupper').val().replace(',','')) };
+        if ($('.pdbreakfast').is(':enabled')) { total += parseFloat($('.pdbreakfast').val().replace(',','')); }
+        if ($('.pdlunch').is(':enabled')) { total += parseFloat($('.pdlunch').val().replace(',','')); }
+        if ($('.pdsupper').is(':enabled')) { total += parseFloat($('.pdsupper').val().replace(',','')); }
         $('#tbPDTotal').text(total.toFixed(2));
     }
 
     function disableSubmitOnEnter(e)
     {
         var key;      
-        if(window.event)
-            key = window.event.keyCode; //IE
-        else
-            key = e.which; //firefox      
-
+        if(window.event) { key = window.event.keyCode; } //IE
+        else { key = e.which; } //firefox      
         return (key != 13);
     }
 
     function format_money(n) {
-        decPlaces = 2,
-        decSeparator = '.',
-        thouSeparator = ',',
-        sign = n < 0 ? "-" : "",
-        i = parseInt(n = Math.abs(+n || 0).toFixed(decPlaces)) + "",
+        decPlaces = 2;
+        decSeparator = '.';
+        thouSeparator = ',';
+        sign = n < 0 ? "-" : "";
+        i = parseInt(n = Math.abs(+n || 0).toFixed(decPlaces), 10) + "";
         j = (j = i.length) > 3 ? j % 3 : 0;
         return sign + (j ? i.substr(0, j) + thouSeparator : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thouSeparator) + (decPlaces ? decSeparator + Math.abs(n - i).toFixed(decPlaces).slice(2) : "");
     }
@@ -211,7 +209,7 @@
                         } else {
                             $("#treeSubmitted").tree('toggle', node);
                         }
-                    })
+                    });
             }
             ).done(function() {
                 <%If IsAccounts() Then%>
@@ -245,7 +243,7 @@
                         } else {
                             $("#treeProcessing").tree('toggle', node);
                         }
-                    })
+                    });
             }
             ).done(function() {
                 <%If IsAccounts() Then%>
@@ -280,7 +278,7 @@
                         } else {
                             $("#treePaid").tree('toggle', node);
                         }
-                    })
+                    });
             }
             ).done(function() {
                 <%If IsAccounts() Then%>
@@ -308,7 +306,7 @@
                 //TODO $('.foreignCurrency').val($('.rmbAmount').val());
                 // Re-calculate the exchange rate
                 // We have foreign currency
-                $('#<%= hfCurOpen.ClientID %>').val("true")
+                $('#<%= hfCurOpen.ClientID %>').val("true");
             }
 
             $('.ddlReceipt').change(function() { 
@@ -467,7 +465,7 @@
             }
             $('.Description').Watermark('<%= Translate("Description") %>');
             $('.Amount').Watermark('<%= Translate("Amount") %>');
-        };
+        }
 
 
         function setUpAccordion() {
@@ -476,16 +474,19 @@
                 active: <%= getSelectedTab() %>,
                 navigate: false
             });
-        };
+        }
 
         function checkForMinistryAccount() {
             var account = $("#<%= tbChargeTo.ClientID %>").val();
-            if (! account) return false;
-            isMinistryAccount = (account.charAt(0)!='8' && account.charAt(0)!='9');
-        };
+            if (! account) {
+                isMinistryAccount = false;
+            } else {
+                isMinistryAccount = (account.charAt(0)!='8' && account.charAt(0)!='9');
+            }
+        }
 
         function setUpReceiptPreviews() {
-            var url = ""
+            var url = "";
             $(".viewReceipt").hover(function(e){
                 var html;
                 // Force IE to reload image every time, to keep up with any rotations
@@ -499,15 +500,15 @@
                 $("#preview").fadeIn("fast");
             },function(){
                 $("#preview").remove();
-            })
+            });
             $(".multiReceipt").hover(function(e){
                 $("body").append("<div id='multi_notify' style='position:fixed; bottom:300px; right:50px'><center></br></hr><span class='AgapeH2'><%=Translate("MultipleReceipts")%></span></br><%=Translate("EditToView")%></center>");
                 $("#multi_notify").show();
             },function(){
                 $("#multi_notify").remove();
-            })
+            });
             
-        };
+        }
 
         function loadFinanceTrees() {
             loadAllSubmittedTree();
@@ -522,7 +523,7 @@
         function setUpConfirms() {
             $('.confirm').click(function() {
                 return window.confirm("Are you sure?");
-            })
+            });
         }
 
         function setUpNumbers() {
@@ -674,13 +675,13 @@ function GetAccountBalance(jsonQuery){
         // update the equivalent CAD based on the (foreign) amount and exchange rate
         console.log('update_CAD()');
         var exchange_rate = parseFloat($('.exchangeRate').val().replace(',',''));
-        if (exchange_rate==0) {
-            exchange_rate==1;
+        if (exchange_rate===0) {
+            exchange_rate=1;
             $('.exchangeRate').val('1.0000');
             console.log('0 exchange rate; set to 1');
         }
         var amount = parseFloat($('.rmbAmount').val().replace(',',''));
-        if (amount==0) {
+        if (amount===0) {
             $('.rmbAmount').val('0.00');
         }
         var CAD = Number(amount / exchange_rate).toFixed(2);
@@ -735,13 +736,13 @@ function GetAccountBalance(jsonQuery){
             if (amount > limit) {
                 if ($('.ddlReceipt').val() == '<%=StaffRmb.RmbReceiptType.No_Receipt %>') {
                     $('.ddlReceipt').val(<%=StaffRmb.RmbReceiptType.Standard %>);
-                };
+                }
                 disabled=true;
             }
             $('.ddlReceipt option[value="<%=StaffRmb.RmbReceiptType.No_Receipt%>"]').prop('disabled', disabled);
         } catch (err) { }
         console.log('-- '+disabled);
-    };
+    }
 
     //***********************************************
 
@@ -750,7 +751,7 @@ function GetAccountBalance(jsonQuery){
         var total = 0.00;
 
         $(".Amount").each(function() {
-            if (!isNaN(this.value) && this.value.length != 0) {total += parseFloat(this.value.replace(',',''));}
+            if (!isNaN(this.value) && this.value.length !== 0) {total += parseFloat(this.value.replace(',',''));}
         });
        
         var orig = $("#<%= lblOriginalAmt.ClientId %>").html();
@@ -763,7 +764,7 @@ function GetAccountBalance(jsonQuery){
         {
             $("#<%= btnOK.ClientId %>").prop('disabled', true).addClass('aspNetDisabled');
         }
-    };
+    }
 
     function setUpAutocomplete() {
         var cache = {};
@@ -792,13 +793,13 @@ function GetAccountBalance(jsonQuery){
                 });
             },
             select: function(event, ui) {
-                console.debug("SELECT: "+ui.item.value)
+                console.debug("SELECT: "+ui.item.value);
                 $('#<%= hfChargeToValue.ClientID%>').val(ui.item.value);
                 $('#<%= tbChargeTo.ClientID%>').val(ui.item.value).change();
             },
             change: function(event, ui) {
                 if (!ui.item) {
-                    console.debug("CHANGE: -null-")
+                    console.debug("CHANGE: -null-");
                     $('#<%= hfChargeToValue.ClientID%>').val('');
                     $('#<%= tbChargeTo.ClientID%>').val('');
                     alert("Please select an account again.  You must click on an item in the list, rather than just typing it.");
@@ -865,7 +866,7 @@ function GetAccountBalance(jsonQuery){
             },
             change: function(event, ui) {
                 if (!ui.item) {
-                    console.debug("CHANGE: -null-")
+                    console.debug("CHANGE: -null-");
                     $('#<%= tbCostCenter.ClientID%>').val('');
                     alert("Please select an account again.  You must click on an item in the list, rather than just typing it.");
                 }
@@ -896,14 +897,14 @@ function GetAccountBalance(jsonQuery){
                 });
             },
             select: function(event, ui) {
-                console.debug("SELECT: "+ui.item.value)
+                console.debug("SELECT: "+ui.item.value);
                 event.preventDefault();
                 $('#<%= hfOnBehalfOf.ClientID%>').val(ui.item.value);
                 $('#<%= tbNewOnBehalfOf.ClientID%>').val(ui.item.label).change();
             },
             change: function(event, ui) {
                 if (!ui.item) {
-                    console.debug("CHANGE: -null-")
+                    console.debug("CHANGE: -null-");
                     $('#<%= hfOnBehalfOf.ClientID%>').val('');
                     $('#<%= tbNewOnBehalfOf.ClientID%>').val('');
                     alert("Please select the staff member again.  You must click on a name in the list, rather than just typing it.");
@@ -912,7 +913,7 @@ function GetAccountBalance(jsonQuery){
             minLength: 2
         });
 
-    };
+    }
 
     function show_loading_spinner() {
         $("#loading").show();
