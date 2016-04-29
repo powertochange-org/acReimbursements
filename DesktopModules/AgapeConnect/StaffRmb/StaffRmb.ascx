@@ -3,9 +3,11 @@
 
 <script src="/js/modernizr-custom.js" type="text/javascript"></script>
 <script src="/js/jquery.watermarkinput.js" type="text/javascript"></script>
+<script src="DesktopModules/AgapeConnect/StaffRmb/js/jquery.dreamalert.js" type="text/javascript"></script>
 
 <script src="/js/tree.jquery.js"></script>
 <link rel="stylesheet" href="/js/jqtree.css" />
+<link rel="stylesheet" href="DesktopModules/AgapeConnect/StaffRmb/css/jquery.dreamalert.css" />
 <style>
     input[type="number"] { text-align:right; }
     .abutton.delete:hover  { background-image:none; color:white; background-color:rgba(255,0,0,0.5); }
@@ -17,6 +19,7 @@
         white-space: normal;
         width:auto;
         word-wrap: normal;
+        top:140px;
     }
 </style>
 
@@ -25,16 +28,34 @@
     // Replace javascript alerts with jquery
     window.alert = function(message){
         $("<div></div>").html(message)
-            .attr({'class': 'alert'})
+            .attr({'title':'Alert', 'class': 'alert'})
             .dialog({
-                title: 'Alert',
+                position: {my:'top', at:'bottom', of:'#statusbar'},
                 resizable: false,
-                draggable: true,
                 modal: true,
                 buttons: { "OK": function () { $(this).dialog("close"); } },
                 close: function(){$(this).remove();}
+                //create: function(event) { $(event.target).parent().css({'position':'fixed'}); }
             });
     };
+
+    function notify(message) {
+        $.dreamAlert({
+            'type':'success',
+            'duration':4000,
+            'position':'center',
+            'message':message
+        })
+    }
+
+    function error(message) {
+        $.dreamAlert({
+            'type': 'error',
+            'message': message,
+            'position':'center',
+            'duration':4500
+        })
+    }
 
     var previous_menu_item = null;
     function selectMenuItem(menu_item) {
@@ -824,7 +845,7 @@ function GetAccountBalance(jsonQuery){
                     console.debug("CHANGE: -null-");
                     $('#<%= hfChargeToValue.ClientID%>').val('');
                     $('#<%= tbChargeTo.ClientID%>').val('');
-                    alert("Please select an account again.  You must click on an item in the list, rather than just typing it.");
+                    error("Please select an account again.<br/>You must click on an item in the list, rather than just typing it.");
                 }
             },
             minLength: 2
@@ -890,7 +911,7 @@ function GetAccountBalance(jsonQuery){
                 if (!ui.item) {
                     console.debug("CHANGE: -null-");
                     $('#<%= tbCostCenter.ClientID%>').val('');
-                    alert("Please select an account again.  You must click on an item in the list, rather than just typing it.");
+                    error("Please select an account again.<br/>You must click on an item in the list, rather than just typing it.");
                 }
             },
             minLength: 2
@@ -929,7 +950,7 @@ function GetAccountBalance(jsonQuery){
                     console.debug("CHANGE: -null-");
                     $('#<%= hfOnBehalfOf.ClientID%>').val('');
                     $('#<%= tbNewOnBehalfOf.ClientID%>').val('');
-                    alert("Please select the staff member again.  You must click on a name in the list, rather than just typing it.");
+                    error("Please select the staff member again.<br/>You must click on a name in the list, rather than just typing it.");
                 }
             },
             minLength: 2
@@ -938,6 +959,7 @@ function GetAccountBalance(jsonQuery){
     }
 
     function show_loading_spinner() {
+        $('.raDiv').hide();
         $("#loading").show();
         return true;
     }
@@ -1285,7 +1307,7 @@ function GetAccountBalance(jsonQuery){
                                     <asp:TextBox ID="tbChargeTo" runat="server" AutoPostBack="true"  Style="float: right; font-size: small;">
                                     </asp:TextBox>
                                 </div>
-                                <div class="inverse" style="width:100%; margin-top:1px; padding-top:3px; padding-bottom:3px; float: left" >
+                                <div id='statusbar' class="inverse" style="width:100%; margin-top:1px; padding-top:3px; padding-bottom:3px; float: left" >
                                     <asp:Label ID="lblStatus" runat="server" Style="float: left; font-style: italic; font-size:13px; padding-left:70px"></asp:Label>
                                     <div style="float: right; padding-right:10px; margin-right: 3px;">
                                         <div id="accountBalanceDiv">

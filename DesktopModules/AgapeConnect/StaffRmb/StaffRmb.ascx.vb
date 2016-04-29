@@ -917,7 +917,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim RmbRel As Integer
                     RmbRel = StaffRmbFunctions.Authenticate(UserId, RmbNo, PortalId)
                     If RmbRel = RmbAccess.Denied And Not (isApprover Or isFinance Or isDelegate) Then
-                        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "accessDenied", "alert('" + Translate("AccessDenied") + "');", True)
+                        ScriptManager.RegisterClientScriptBlock(Page, Page.GetType(), "accessDenied", "error('" + Translate("AccessDenied") + "');", True)
                         pnlMain.Visible = False
                         ltSplash.Text = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbSplash", PortalId))
                         pnlSplash.Visible = True
@@ -1493,7 +1493,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Protected Async Sub btnReject_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnReject.Click
             If btnReject.Attributes("class").Contains("aspNetDisabled") Then
                 'show alert
-                Dim jscript As String = "alert('" & Translate("btnRejectHelp") & "');"
+                Dim jscript As String = "notify('" & Translate("btnRejectHelp") & "');"
                 ScriptManager.RegisterClientScriptBlock(btnReject, btnReject.GetType(), "reject_alert", jscript, True)
                 Return
             End If
@@ -1525,7 +1525,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End Try
                 End If
                 Dim message As String = Translate("RejectorMessage").Replace("[STAFFNAME]", Staffname)
-                ScriptManager.RegisterClientScriptBlock(btnReject, btnReject.GetType(), "notify_reject", "alert('" + message + "');", True)
+                ScriptManager.RegisterClientScriptBlock(btnReject, btnReject.GetType(), "notify_reject", "notify('" + message + "');", True)
             End If
         End Sub
 
@@ -1668,7 +1668,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Log(rmb.RID, LOG_LEVEL_INFO, "SUBMITTED to " & UserController.GetUserById(PortalId, rmb.ApprUserId).DisplayName)
 
                 'use an alert to switch back to the main window from the printout window
-                ScriptManager.RegisterStartupScript(Page, Me.GetType(), "popup_and_select", printable & " alert(""" & message & """); selectIndex(1)", True)
+                ScriptManager.RegisterStartupScript(Page, Me.GetType(), "popup_and_select", printable & " notify(""" & message & """); selectIndex(1)", True)
 
                 Await Task.WhenAll(refreshMenuTasks)
 
@@ -1742,7 +1742,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If rmb.Count > 0 Then
                 Dim State As Integer = rmb.First.Status
                 If Not (State = RmbStatus.Submitted Or State = RmbStatus.PendingDirectorApproval Or State = RmbStatus.PendingEDMSApproval) Then
-                    ScriptManager.RegisterStartupScript(btnApprove, btnApprove.GetType(), "not_approved", "alert('" + Translate("ErrorApprovalState") + "');", True)
+                    ScriptManager.RegisterStartupScript(btnApprove, btnApprove.GetType(), "not_approved", "error('" + Translate("ErrorApprovalState") + "');", True)
                     Return
                 End If
 
@@ -1819,9 +1819,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim allStaff = StaffBrokerFunctions.GetStaff()
                     refreshMenuTasks.Add(buildAllApprovedTreeAsync(allStaff))
                 End If
-                If message.Length = 0 Then message += Translate("UnauthorizedApprover")
                 Await Task.WhenAll(refreshMenuTasks)
-                ScriptManager.RegisterStartupScript(btnApprove, btnApprove.GetType(), "select2", "selectIndex(2); alert(""" & message & """);", True)
+                If message.Length = 0 Then
+                    ScriptManager.RegisterStartupScript(btnApprove, btnApprove.GetType(), "unauthorized", "notify('" + Translate("UnauthorizedApprover") + "');", True)
+                Else
+                    ScriptManager.RegisterStartupScript(btnApprove, btnApprove.GetType(), "select2", "selectIndex(2); notify(""" & message & """);", True)
+                End If
+
                 btnApprove.Visible = False
                 pnlMain.Visible = False
                 ltSplash.Text = Server.HtmlDecode(StaffBrokerFunctions.GetTemplate("RmbSplash", PortalId))
@@ -2144,7 +2148,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 tvFinance.Nodes.Item(0).ChildNodes.Item(3).Expand()
             End If
             Dim message = Translate("NextBatch")
-            ScriptManager.RegisterStartupScript(Page, Me.GetType(), "closePostData", "closePostDataDialog();  alert(""" & message & """); loadAllProcessingTree();", True)
+            ScriptManager.RegisterStartupScript(Page, Me.GetType(), "closePostData", "closePostDataDialog();  notify(""" & message & """); loadAllProcessingTree();", True)
         End Sub
 
         Protected Sub btnDownload_Click(sender As Object, e As System.EventArgs) Handles btnDownload.Click
@@ -2182,9 +2186,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 'if it has not been downloaded, it will be downloaded very soon. We need to check if a download is already in progress.
                 If StaffBrokerFunctions.GetSetting("Datapump", PortalId) = "locked" Then
                     'If a download is in progress, we need to display a "not at this time" message
-                    Dim message = "This reimbursement cannot be unprocessed at this time, as it is currently being downloaded by the automatic datapump (transaction broker). You can try again in a few minutes, but be aware that it will already have been processed into your accounts program."
+                    Dim message = "This reimbursement cannot be unprocessed at this time, as it is currently being downloaded by the automatic datapump (transaction broker).<br/>You can try again in a few minutes, but be aware that it will already have been processed into your accounts program."
                     Dim t As Type = Me.GetType()
-                    ScriptManager.RegisterStartupScript(Page, t, "popup", "alert(""" & message & """);", True)
+                    ScriptManager.RegisterStartupScript(Page, t, "popup", "error(""" & message & """);", True)
                     Log(theRmb.RID, LOG_LEVEL_WARNING, "Attempted unprocessed, but could not as it was in the process of being downloaded by the automatic transaction broker")
                     Return
                 Else
@@ -2610,7 +2614,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         Dim subject As String = Translate("ApproverChangedSubject").Replace("[RMBNO]", rmb.First.RID)
                         Dim body As String = Translate("ApproverChangedEmail").Replace("[RMBNO]", rmb.First.RID)
                         SendEmail(fromEmail, oldApprover.Email, "", subject, body)
-                        ScriptManager.RegisterStartupScript(ddlApprovedBy, ddlApprovedBy.GetType(), "notify_approver", "alert('" + oldApprover.DisplayName + " was notified that they are no longer required to approve this reimbursement');", True)
+                        ScriptManager.RegisterStartupScript(ddlApprovedBy, ddlApprovedBy.GetType(), "notify_approver", "notify('" + oldApprover.DisplayName + " was notified that they are no longer required to approve this reimbursement');", True)
                     End If
                     If (Not UserController.Instance.GetCurrentUserInfo.UserID = rmb.First.UserId) Then
                         '--Send email to owner
@@ -2618,7 +2622,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         Dim subject As String = Translate("ApproverChangedSubject").Replace("[RMBNO]", rmb.First.RID)
                         Dim body As String = Translate("ApproverChangedOwnerEmail").Replace("[RMBNO]", rmb.First.RID).Replace("[USER]", UserController.Instance.GetCurrentUserInfo.DisplayName)
                         SendEmail("P2C Reimbursements <reimbursements@p2c.com>", owner.Email, "", subject, body)
-                        ScriptManager.RegisterStartupScript(ddlApprovedBy, ddlApprovedBy.GetType(), "notify_owner", "alert('" + owner.DisplayName + " was notified that they must re-submit this reimbursement to " + newApproverName + "');", True)
+                        ScriptManager.RegisterStartupScript(ddlApprovedBy, ddlApprovedBy.GetType(), "notify_owner", "notify('" + owner.DisplayName + " was notified that they must re-submit this reimbursement to " + newApproverName + "');", True)
                     End If
                 End If
                 Log(rmb.First.RID, LOG_LEVEL_INFO, "Approver changed from " + oldApprover.DisplayName + " to " + newApproverName)
@@ -4056,7 +4060,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 lblStatus.Text = Translate(RmbStatus.StatusName(theRmb.First.Status))
                 If cbMoreInfo.Checked Then
                     SendMoreinfoEmail(Translate("Accounts"), theRmb.First.AcctComment, theRmb.First)
-                    ScriptManager.RegisterClientScriptBlock(cbMoreInfo, cbMoreInfo.GetType(), "moreinfo", "alert('" + Translate("MoreInfoMsg") + "');", True)
+                    ScriptManager.RegisterClientScriptBlock(cbMoreInfo, cbMoreInfo.GetType(), "moreinfo", "notify('" + Translate("MoreInfoMsg") + "');", True)
                     lblStatus.Text = lblStatus.Text & " - " & Translate("StatusMoreInfo")
                     Log(theRmb.First.RID, LOG_LEVEL_INFO, "More info requested by Finance: " + theRmb.First.AcctComment)
                 End If
@@ -4072,7 +4076,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 If cbApprMoreInfo.Checked Then
                     Dim approver = UserController.GetUserById(PortalId, UserId).DisplayName
                     SendMoreinfoEmail(approver, theRmb.First.ApprComment, theRmb.First)
-                    ScriptManager.RegisterClientScriptBlock(cbApprMoreInfo, cbApprMoreInfo.GetType(), "apprmoreinfo", "alert('" + Translate("MoreInfoMsg") + "');", True)
+                    ScriptManager.RegisterClientScriptBlock(cbApprMoreInfo, cbApprMoreInfo.GetType(), "apprmoreinfo", "notify('" + Translate("MoreInfoMsg") + "');", True)
                     lblStatus.Text = lblStatus.Text & " - " & Translate("StatusMoreInfo")
                     Log(theRmb.First.RID, LOG_LEVEL_INFO, "More info requested by Approver(" + approver + "): " + theRmb.First.ApprComment)
                 End If
