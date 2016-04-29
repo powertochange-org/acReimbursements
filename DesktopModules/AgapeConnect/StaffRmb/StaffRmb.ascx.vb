@@ -785,7 +785,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     End If
                 End If
                 ddlCompany.SelectedValue = ExistingData.First.Company
-                dtPostingDate.Text = ExistingData.First.PostingDate
+                dtPostingDate.Text = Format(ExistingData.First.PostingDate, "yyyy-MM-dd")
                 tbBatchId.Text = ExistingData.First.BatchId
                 tbPostingReference.Text = ExistingData.First.Reference
                 tbInvoiceNumber.Text = ExistingData.First.InvoiceNo
@@ -820,7 +820,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 End Try
                 Dim initials = getInitials(user)
                 ddlCompany.SelectedIndex = -1
-                dtPostingDate.Text = Today.ToString("MM/dd/yyyy")
+                dtPostingDate.Text = Today.ToString("yyyy-MM-dd")
                 Dim batchIds = From c In d.AP_Staff_Rmb_Post_Extras Where c.BatchId.Substring(6, 2).Equals(initials) Order By c.PostingDate Descending Select c.BatchId
                 If (batchIds.Count() > 0) Then
                     tbBatchId.Text = batchIds.First()
@@ -2118,7 +2118,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             PostingData.RMBNo = CInt(hfRmbNo.Value)
             PostingData.Company = ddlCompany.SelectedValue
             Dim fmt = New DateTimeFormatInfo()
-            fmt.ShortDatePattern = "MM/dd/yyyy"
+            'fmt.ShortDatePattern = "MM/dd/yyyy"
+            fmt.ShortDatePattern = "yyyy-MM-dd"
             PostingData.PostingDate = Convert.ToDateTime(dtPostingDate.Text, fmt)
             PostingData.BatchId = tbBatchId.Text
             PostingData.Reference = tbPostingReference.Text
