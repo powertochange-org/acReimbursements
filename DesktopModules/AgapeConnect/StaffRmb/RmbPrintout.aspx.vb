@@ -310,7 +310,7 @@ Partial Class DesktopModules_StaffRmb_RmbPrintout
             End If
             output = output.Replace("[PAIDON]", "")
             output = output.Replace("[PAIDBY]", "")
-            If Not q.First.ApprUserId Is Nothing Then
+            If Not (q.First.ApprUserId Is Nothing Or q.First.ApprUserId < 0) Then
                 output = output.Replace("[APPROVEDBY]", UserController.GetUserById(PS.PortalId, q.First.ApprUserId).DisplayName)
             Else
                 output = output.Replace("[APPROVEDBY]", "")
