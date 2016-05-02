@@ -42,8 +42,8 @@
     function notify(message) {
         $.dreamAlert({
             'type':'success',
-            'duration':4000,
-            'position':'center',
+            'duration':7000,
+            'position':'right',
             'message':message
         })
     }
@@ -55,6 +55,31 @@
             'position':'center',
             'duration':4500
         })
+    }
+
+    function jsConfirm(controlId) {
+        $('<div></div>').appendTo('body')
+          .html('<div><h6>Are you sure?</h6></div>')
+          .dialog({
+              modal: true, zIndex: 10000, autoOpen: true,
+              position: {my:'top', at:'bottom', of:'#statusbar'},
+              resizable: false,
+              draggable: false,
+              dialogClass: 'draggable',
+              buttons: {
+                  Yes: function () {
+                      $(this).dialog("close");
+                      __doPostBack(controlId.replace(/_/g, '$'), '');
+                  },
+                  No: function () {
+                      $(this).dialog("close");
+                  }
+              },
+              close: function (event, ui) {
+                  $(this).remove();
+              }
+          });
+
     }
 
     var previous_menu_item = null;
@@ -1467,7 +1492,7 @@ function GetAccountBalance(jsonQuery){
                                     </tr>
                                     <tr valign="top">
                                         <td colspan="6">
-                                            <asp:Button ID="btnDelete" runat="server" resourcekey="btnDelete" class="aButton delete" OnClientClick='if (! window.confirm("Are you sure?")) return;' OnClick="btnDelete_Click" style="float:left"/>
+                                            <asp:Button ID="btnDelete" runat="server" resourcekey="btnDelete" class="aButton delete" OnClientClick="jsConfirm(this.id); return false;" OnClick="btnDelete_Click" style="float:left"/>
                                             <asp:Button ID="btnSave" runat="server" resourcekey="btnSaved" class="aButton" style="float:right"/>
                                         </td>
                                     </tr>

@@ -1493,7 +1493,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Protected Async Sub btnReject_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnReject.Click
             If btnReject.Attributes("class").Contains("aspNetDisabled") Then
                 'show alert
-                Dim jscript As String = "notify('" & Translate("btnRejectHelp") & "');"
+                Dim jscript As String = "error('" & Translate("btnRejectHelp") & "');"
                 ScriptManager.RegisterClientScriptBlock(btnReject, btnReject.GetType(), "reject_alert", jscript, True)
                 Return
             End If
@@ -1695,7 +1695,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
                 If rmb.First.UserId = UserId Then
                     Log(rmb.First.RID, LOG_LEVEL_INFO, "DELETED by owner")
-                    ScriptManager.RegisterStartupScript(btnDelete, btnDelete.GetType(), "select5", "selectIndex(5)", True)
+                    ScriptManager.RegisterStartupScript(btnDelete, btnDelete.GetType(), "select5", "notify('The Reimbursement has been moved to the DELETED tab'); selectIndex(5)", True)
                 Else
                     'Send an email to the end user
                     Dim from_email = UserController.GetUserById(PortalId, UserId).Email
@@ -1747,6 +1747,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 End If
 
                 Dim message As String = ""
+                Dim warning As String = ""
                 Dim rmbTotal = CType((From a In d.AP_Staff_RmbLines Where a.RmbNo = rmb.First.RMBNo Select a.GrossAmount).Sum(), Decimal?).GetValueOrDefault(0)
                 rmb.First.SpareField1 = rmbTotal.ToString("C") ' currency formatted string
                 ' The following If statements are ordered to allow an approver who is also a director to not have to approve twice.
@@ -1758,11 +1759,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             rmb.First.Status = RmbStatus.PendingDirectorApproval
                             rmb.First.SpareField2 = StaffBrokerFunctions.getDirectorFor(rmb.First.CostCenter, CType(Settings("EDMSId"), Integer))
                             shouldSendApprovalEmail = True '
-                            message += Translate("ExtraApproval") + "\n"
+                            warning += Translate("ExtraApproval") + "\n"
                         ElseIf hasOldExpenses() Then
                             rmb.First.Status = RmbStatus.PendingEDMSApproval
                             shouldSendApprovalEmail = True
-                            message += Translate("WarningOldExpenses").Replace("[DAYS]", Settings("Expire"))
+                            warning += Translate("WarningOldExpenses").Replace("[DAYS]", Settings("Expire"))
                         Else
                             rmb.First.Status = RmbStatus.Approved
                             rmb.First.ApprDate = Now
@@ -1821,8 +1822,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 End If
                 Await Task.WhenAll(refreshMenuTasks)
                 If message.Length = 0 Then
-                    ScriptManager.RegisterStartupScript(btnApprove, btnApprove.GetType(), "unauthorized", "notify('" + Translate("UnauthorizedApprover") + "');", True)
+                    ScriptManager.RegisterStartupScript(btnApprove, btnApprove.GetType(), "unauthorized", "error('" + Translate("UnauthorizedApprover") + "');", True)
                 Else
+                    If (warning.Length > 0) Then
+                        ScriptManager.RegisterStartupScript(btnApprove, btnApprove.GetType(), "warning", "error('" + warning + "');", True)
+                    End If
                     ScriptManager.RegisterStartupScript(btnApprove, btnApprove.GetType(), "select2", "selectIndex(2); notify(""" & message & """);", True)
                 End If
 
@@ -2574,7 +2578,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         rmb.First.ApprUserId = Nothing
                         SubmitChanges()
                         TaskList.Add(LoadMenuAsync())
-                        ScriptManager.RegisterStartupScript(tbChargeTo, tbChargeTo.GetType(), "select0", "selectIndex(0)", True)
+                        ScriptManager.RegisterStartupScript(tbChargeTo, tbChargeTo.GetType(), "select0", "notify('The Reimbursement has been returned to the DRAFT state'); selectIndex(0);", True)
                     Else
                         SubmitChanges()
                     End If
@@ -2640,7 +2644,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If refreshMenu Then
                 Await LoadMenuAsync()
             End If
-            ScriptManager.RegisterStartupScript(ddlApprovedBy, ddlApprovedBy.GetType(), "selectDrafts", "selectIndex(0)", True)
+            ScriptManager.RegisterStartupScript(ddlApprovedBy, ddlApprovedBy.GetType(), "selectDrafts", "notify('The Reimbursement has been returned to the DRAFT state'); selectIndex(0)", True)
         End Sub
 
         Private Sub Undelete_Current_Rmb()
