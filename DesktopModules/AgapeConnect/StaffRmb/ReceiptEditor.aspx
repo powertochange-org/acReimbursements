@@ -54,7 +54,7 @@
 <body>
     <form id="form1" runat="server">
         <asp:ScriptManager runat="server" />
-        <span id="rotate_instructions">Please rotate images right-side-up.</span>
+        <span id="rotate_instructions">Please rotate images<br />right-side-up.</span>
         <div>
             <div style="width: 100%; text-align: left;">
                 <input type="button" class="aButton" onclick="fuReceipt.click()" value="Add receipt..." style="font-size:small" />
