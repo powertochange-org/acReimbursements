@@ -1428,7 +1428,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         insert.OrigCurrencyAmount = 0 - payable
                         insert.TransDate = Today
                         insert.Comment = "Clear Advance:" & comment
-                        insert.ShortComment = insert.Comment.Substring(0, 25)
+                        insert.ShortComment = If(insert.Comment.Length > 25, insert.Comment.Substring(0, 25), insert.Comment)
                         insert.Taxable = False
                         insert.Receipt = False
                         insert.VATReceipt = False
