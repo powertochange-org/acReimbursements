@@ -140,9 +140,18 @@ namespace StaffRmb
         {
         }
 
+        public class UserInfoComparer : IEqualityComparer<UserInfo>
+        {
+            public bool Equals(UserInfo one, UserInfo two) {
+                return one.UserID == two.UserID;
+            }
+            public int GetHashCode(UserInfo item) {
+                return item.UserID.GetHashCode();
+            }
+        }
         public struct Approvers
         {
-            public List<DotNetNuke.Entities.Users.UserInfo> UserIds;
+            public HashSet<UserInfo> UserIds;
             public Boolean CCMSpecial, SpouseSpecial, AmountSpecial, isDept;
             public string Name;
         }
@@ -196,7 +205,7 @@ namespace StaffRmb
             result.SpouseSpecial = false;
             result.AmountSpecial = false;
             result.isDept = false;
-            result.UserIds = new List<DotNetNuke.Entities.Users.UserInfo>();
+            result.UserIds = new HashSet<UserInfo>(new UserInfoComparer());
 
             if (rmb.CostCenter == null || rmb.CostCenter.Length == 0) return result; //empty result
 
