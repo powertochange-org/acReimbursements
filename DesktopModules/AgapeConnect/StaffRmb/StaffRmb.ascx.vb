@@ -156,6 +156,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 End If
 
                 Dim staff = StaffBrokerFunctions.GetStaffMember(UserId)
+                If (staff Is Nothing) Then
+                    pnlEverything.Visible = False
+                    ScriptManager.RegisterStartupScript(Page, Page.GetType(), "StaffError", "console.error('Missing staff record'); error('<span style=color:red>ERROR: missing staff record.</span><br>  Please report this error to Helpdesk.');", True)
+                    Return
+                End If
                 Dim PayOnly As Boolean = False
                 Dim PAC = StaffBrokerFunctions.GetStaffProfileProperty(staff.StaffId, "PersonalAccountCode")
                 Dim CC = ""
