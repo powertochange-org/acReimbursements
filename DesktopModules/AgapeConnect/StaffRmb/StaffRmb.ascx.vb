@@ -2115,6 +2115,22 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             theRmb.First.ProcDate = Today
             theRmb.First.MoreInfoRequested = False
             theRmb.First.ProcUserId = UserId
+
+            PostingData.RMBNo = CInt(hfRmbNo.Value)
+            PostingData.Company = ddlCompany.SelectedValue
+            Dim fmt = New DateTimeFormatInfo()
+            'fmt.ShortDatePattern = "MM/dd/yyyy"
+            fmt.ShortDatePattern = "yyyy-MM-dd"
+            PostingData.PostingDate = Convert.ToDateTime(dtPostingDate.Text, fmt)
+            PostingData.BatchId = tbBatchId.Text
+            PostingData.Reference = tbPostingReference.Text
+            PostingData.InvoiceNo = tbInvoiceNumber.Text
+            PostingData.VendorId = tbVendorId.Text
+            PostingData.RemitToAddress = ddlRemitTo.SelectedValue
+            If (insert) Then
+                d.AP_Staff_Rmb_Post_Extras.InsertOnSubmit(PostingData)
+            End If
+
             SubmitChanges()
             TaskList.Add(loadBasicApprovedPaneAsync())
             TaskList.Add(loadBasicProcessingPaneAsync())
@@ -2128,25 +2144,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 TaskList.Add(buildAllApprovedTreeAsync(allStaff))
             End If
             processingPlaceholder.Controls.AddAt(0, GenerateTreeControl("treeProcessing"))
-            PostingData.RMBNo = CInt(hfRmbNo.Value)
-            PostingData.Company = ddlCompany.SelectedValue
-            Dim fmt = New DateTimeFormatInfo()
-            'fmt.ShortDatePattern = "MM/dd/yyyy"
-            fmt.ShortDatePattern = "yyyy-MM-dd"
-            PostingData.PostingDate = Convert.ToDateTime(dtPostingDate.Text, fmt)
-            PostingData.BatchId = tbBatchId.Text
-            PostingData.Reference = tbPostingReference.Text
-            PostingData.InvoiceNo = tbInvoiceNumber.Text
-            PostingData.VendorId = tbVendorId.Text
-            PostingData.RemitToAddress = ddlRemitTo.SelectedValue
-
-            'TaskList.Add(LoadRmbAsync(hfRmbNo.Value))
             Await Task.WhenAll(TaskList)
-            If (insert) Then
-                d.AP_Staff_Rmb_Post_Extras.InsertOnSubmit(PostingData)
-            End If
             Await clearAdvanceBalancesTask
             SubmitChanges()
+
             Log(theRmb.First.RID, LOG_LEVEL_INFO, "PROCESSED - this reimbursement will be added to the next download batch")
             pnlMain.Visible = False
             '
