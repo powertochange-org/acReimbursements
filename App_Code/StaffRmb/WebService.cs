@@ -165,20 +165,23 @@ public class WebService : System.Web.Services.WebService {
     [ScriptMethod(ResponseFormat = ResponseFormat.Json, UseHttpGet=true)]
     public void getStaffAppsButtonResponsive()
     {
-        //String ABSENCE_TRACKER = "<a href='https://absences.powertochange.org'> <img src='https://staff.powertochange.org/wp-content/images/Absence-Tracker-Icon.png' alt='Absence Tracker'></a>";
-        String AUTHORIZATION_MGR = "<a href='https://staffapps.powertochange.org/authmanager'> <img src='https://staff.powertochange.org/wp-content/images/AuthorizationMgr-Icon.png' alt='Authorization Manager'></a>";
-        String REPORTS = "<a href='https://staff.powertochange.org/reports/'> <img src='https://staff.powertochange.org/wp-content/images/Reports-Icon.png' alt='Reports'></a>";
-        String STAFF_DIRECTORY = "<a href='https://staff.powertochange.org/staff-directory/'> <img src='https://staff.powertochange.org/wp-content/images/Staff-Directory-Icon.png' alt='Staff Directory'></a>";
-        String REIMBURSEMENTS = "<a href='https://apps.powertochange.org/Reimbursement-form'><img src='https://staff.powertochange.org/wp-content/images/Reimbursements-Icon.png' alt='Reimbursements' /></a>";
-        String HELPDESK = "<a href='mailto:helpdesk@powertochange.org'> <img src='https://staff.powertochange.org/wp-content/images/HelpDesk-Icon.png' alt='Help Desk'></a>";
-        String LINK_SHORTENER = "<a href='https://staff.powertochange.org/sh'><img src='https://staff.powertochange.org/wp-content/images/Link-Shortener-Icon.png' alt='Link Shortener'></a>";
-        String WIKI = "<a href='https://staff.powertochange.org/kb/'><img src='https://staff.powertochange.org/wp-content/images/Self-Help-Wiki-Icon.png' alt='Self-Help Wiki'></a>";
-        String EGENCIA = "<a href='https://staff.powertochange.org/egencia-login/'><img src='https://staff.powertochange.org/wp-content/images/Egencia-Icon.png' alt='Egencia'></a>";
-        String DAYFORCE = "<a href='https://sso.dayforcehcm.com/p2c'><img src='https://staff.powertochange.org/wp-content/images/Dayforce-Icon.png' alt='Dayforce'></a>";
-        String DAYFORCE_CALENDAR = "<a href='https://staffapps.powertochange.org/DayforceCalendar/Relationship/ManageTeam'> <img src='https://staff.powertochange.org/wp-content/images/Dayforce-Calendar-Icon.png' alt='Dayforce Calendar'></a>";
-        String LEARNING = "<a href='https://learning.powertochange.org'><img src='https://staff.powertochange.org/wp-content/images/Learning-Icon.png' alt='Learning'></a>";
-        String SETTINGS = "<a href='https://staff.powertochange.org/my-settings'><img src='https://staff.powertochange.org/wp-content/images/My-Settings-Icon.png' alt='Settings' /></a>";
-		String PLACEHOLDER = "<div style='width:63px'></div>";
+        String GA = " onclick='ga(\'send\', \'event\', \'Staff Apps Button\', \'click\', \'[NAME]\');' ";
+        //String ABSENCE_TRACKER = "<a href='https://absences.powertochange.org'"+GA.Replace("[NAME]","Absence Tracker")+"> <img src='https://staff.powertochange.org/wp-content/images/Absence-Tracker-Icon.png' alt='Absence Tracker'></a>";
+        String AUTHORIZATION_MGR = "<a href='https://staffapps.powertochange.org/authmanager'"+GA.Replace("[NAME]","Authorization Mgr")+"> <img src='https://staff.powertochange.org/wp-content/images/AuthorizationMgr-Icon.png' alt='Authorization Manager'></a>";
+        String REPORTS = "<a href='https://staff.powertochange.org/reports/'" + GA.Replace("[NAME]", "Reports") + "> <img src='https://staff.powertochange.org/wp-content/images/Reports-Icon.png' alt='Reports'></a>";
+        String STAFF_DIRECTORY = "<a href='https://staff.powertochange.org/staff-directory/'" + GA.Replace("[NAME]", "Staff Directory") + "> <img src='https://staff.powertochange.org/wp-content/images/Staff-Directory-Icon.png' alt='Staff Directory'></a>";
+        String REIMBURSEMENTS = "<a href='https://apps.powertochange.org/Reimbursement-form'" + GA.Replace("[NAME]", "Reimbursements") + "><img src='https://staff.powertochange.org/wp-content/images/Reimbursements-Icon.png' alt='Reimbursements' /></a>";
+        String HELPDESK = "<a href='mailto:helpdesk@powertochange.org'" + GA.Replace("[NAME]", "Helpdesk") + "> <img src='https://staff.powertochange.org/wp-content/images/HelpDesk-Icon.png' alt='Help Desk'></a>";
+        String LINK_SHORTENER = "<a href='https://staff.powertochange.org/sh'" + GA.Replace("[NAME]", "Link Shortener") + "><img src='https://staff.powertochange.org/wp-content/images/Link-Shortener-Icon.png' alt='Link Shortener'></a>";
+        String WIKI = "<a href='https://staff.powertochange.org/kb/'" + GA.Replace("[NAME]", "Knowledge Base") + "><img src='https://staff.powertochange.org/wp-content/images/Self-Help-Wiki-Icon.png' alt='Self-Help Wiki'></a>";
+        String EGENCIA = "<a href='https://staff.powertochange.org/egencia-login/'" + GA.Replace("[NAME]", "Egencia") + "><img src='https://staff.powertochange.org/wp-content/images/Egencia-Icon.png' alt='Egencia'></a>";
+        String DAYFORCE = "<a href='https://sso.dayforcehcm.com/p2c'" + GA.Replace("[NAME]", "Dayforce") + "><img src='https://staff.powertochange.org/wp-content/images/Dayforce-Icon.png' alt='Dayforce'></a>";
+        String DAYFORCE_CALENDAR = "<a href='https://staffapps.powertochange.org/DayforceCalendar/Relationship/ManageTeam'" + GA.Replace("[NAME]", "Dayforce Calendar") + "> <img src='https://staff.powertochange.org/wp-content/images/Dayforce-Calendar-Icon.png' alt='Dayforce Calendar'></a>";
+        String LEARNING = "<a href='https://learning.powertochange.org'" + GA.Replace("[NAME]", "Learning") + "><img src='https://staff.powertochange.org/wp-content/images/Learning-Icon.png' alt='Learning'></a>";
+        String SETTINGS = "<a href='https://staff.powertochange.org/my-settings'" + GA.Replace("[NAME]", "Settings") + "><img src='https://staff.powertochange.org/wp-content/images/My-Settings-Icon.png' alt='Settings' /></a>";
+        String ONLINE_AP = "<a href='https://apps.powertochange.org/AP'" + GA.Replace("[NAME]", "Online AP") + "><img src='https://staff.powertochange.org/wp-content/images/AP-Icon.png' alt='Online AP' /></a>";
+        String MPDX = "<a href='https://mpdx.org'" + GA.Replace("[NAME]", "mpdx") + "><img src='https://staff.powertochange.org/wp-content/images/mpdx-Icon.png' alt='mpdx' /></a>";
+        String PLACEHOLDER = "<div style='width:63px'></div>";
 
         String STYLE = "<style type='text/css' scoped>#staffAppsButton:hover, #staffAppsButton:active, #staffAppsButton:focus {color: #000000!important;text-decoration: none;}#staffAppsMenu table td{background:transparent;}</style>";
         String SCRIPT = "<script type='text/javascript'>function staffAppsMenuShow() {$('#staffAppsMenu').show();var e = document.getElementById('staffAppsButton');e.style.background = '#f4f4f4';e.style.border = '1px solid #d6d7d4';e.style.borderBottom = '1px solid #f4f4f4';}" +
@@ -202,6 +205,11 @@ public class WebService : System.Web.Services.WebService {
                "<div class='staff-app-button-styling'>" + LINK_SHORTENER + "</div>" +
                "<div class='staff-app-button-styling'>" + WIKI + "</div>" +
                "<div class='staff-app-button-styling'>" + LEARNING + "</div>" +
+               "<div class='staff-app-button-styling'>" + MPDX + "</div>" +
+               "</div><div>" +
+               "<div class='staff-app-button-styling'>" + PLACEHOLDER + "</div>" +
+               "<div class='staff-app-button-styling'>" + PLACEHOLDER + "</div>" +
+               "<div class='staff-app-button-styling'>" + PLACEHOLDER + "</div>" +
                "<div class='staff-app-button-styling'>" + SETTINGS + "</div>" +
                "</div></div></div></ul></center></div>" +
                 STYLE + SCRIPT + "</div>";

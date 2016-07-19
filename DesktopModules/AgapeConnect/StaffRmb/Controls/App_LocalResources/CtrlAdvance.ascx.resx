@@ -118,10 +118,10 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="lblDate.Help" xml:space="preserve">
-    <value>Please enter the date you plan to clear this advance by.</value>
+    <value>Date when the expense will be incurred.</value>
   </data>
   <data name="lblDate.Text" xml:space="preserve">
-    <value>Date to be cleared:</value>
+    <value>Last day of event:</value>
   </data>
   <data name="Explanation.Text" xml:space="preserve">
     <value>This is a system for you to request a cash advance to buy something. If you foresee a big expense that you will be reimbursing and you would like to request the money for it before buying it then enter the amount and a description of what you are using it for in the boxes below.</value>
