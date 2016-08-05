@@ -1060,6 +1060,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     btnApprove.Enabled = isApprover And SUBMITTED
                     btnProcess.Visible = isFinance And APPROVED
                     btnProcess.Enabled = isFinance And APPROVED
+                    btnReLink.Visible = isFinance And PROCESSING
+                    If (isFinance And PROCESSING) Then
+                        Dim q2 = From c In d.AP_Staff_Rmb_Post_Extras Where c.RMBNo = RmbNo
+                        Dim Extra = If(q2.Count > 0, q2.First, Nothing)
+                        If (Extra.VoucherNumber IsNot Nothing) Then
+                            btnReLink.Attributes.Item("style") = "display:none"
+                        End If
+                    End If
                     btnUnProcess.Visible = isFinance And (PROCESSING)
                     btnUnProcess.Enabled = isFinance And (PROCESSING)
                     btnDownload.Visible = (isFinance Or isOwner Or isSpouse) And FORM_HAS_ITEMS

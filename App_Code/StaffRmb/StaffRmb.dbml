@@ -179,6 +179,7 @@
       <Column Name="InvoiceNo" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
       <Column Name="VendorId" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
       <Column Name="RemitToAddress" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+      <Column Name="VoucherNumber" Type="System.String" DbType="Char(21)" CanBeNull="true" />
       <Association Name="AP_Staff_Rmb_AP_Staff_Rmb_Post_Extra" Member="AP_Staff_Rmb" ThisKey="RMBNo" OtherKey="RMBNo" Type="AP_Staff_Rmb" IsForeignKey="true" />
     </Type>
   </Table>

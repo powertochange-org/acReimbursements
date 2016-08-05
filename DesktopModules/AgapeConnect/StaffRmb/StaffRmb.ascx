@@ -1653,6 +1653,7 @@ function GetAccountBalance(jsonQuery){
                                         <asp:Button ID="btnApprove" runat="server" resourcekey="btnApprove" class="aButton" visible="false"/>
                                         <asp:Button ID="btnProcess" runat="server" resourcekey="btnProcess" class="aButton" onClientClick="showPostDataDialog()" visible="false"/>
                                         <asp:Button ID="btnUnProcess" runat="server" resourcekey="btnUnProcess" class="aButton" visible="false"/>
+                                        <asp:Button ID="btnReLink" runat="server" resourcekey="btnReLink" CssClass="aButton error" Visible="false" />
                                     </div>
                                     <%-- <button class="Excel" title="Download" >
                                         <asp:Label ID="Label3" runat="server" Text="Download"></asp:Label>

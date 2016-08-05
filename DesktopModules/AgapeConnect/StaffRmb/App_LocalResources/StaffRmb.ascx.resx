@@ -862,4 +862,7 @@ To view more details about how these numbers were calculated, run a Summary Inco
   <data name="ApproverChangedOwnerEmail.Text" xml:space="preserve">
     <value>[USER] has chosen a new approver for Reimbursement #[RMBNO].  As a result, the reimbursement has been moved back to a DRAFT status, and will need to be Re-Submitted to the new approver.</value>
   </data>
+  <data name="btnReLink.Text" xml:space="preserve">
+    <value>Re-Link to Voucher</value>
+  </data>
 </root>
