@@ -865,4 +865,10 @@ To view more details about how these numbers were calculated, run a Summary Inco
   <data name="btnReLink.Text" xml:space="preserve">
     <value>Re-Link to Voucher</value>
   </data>
+  <data name="ddlReLink.Text" xml:space="preserve">
+    <value>Voucher No:</value>
+  </data>
+  <data name="btnLink.Text" xml:space="preserve">
+    <value>Link</value>
+  </data>
 </root>

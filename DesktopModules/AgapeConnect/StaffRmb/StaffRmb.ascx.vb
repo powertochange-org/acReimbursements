@@ -98,7 +98,6 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Private Async Sub Page_Init(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Me.Init
             lblError.Visible = False
-
             Dim TaskList As New List(Of Task)
 
             If Not String.IsNullOrEmpty(Settings("NoReceipt")) Then
@@ -1060,12 +1059,15 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     btnApprove.Enabled = isApprover And SUBMITTED
                     btnProcess.Visible = isFinance And APPROVED
                     btnProcess.Enabled = isFinance And APPROVED
-                    btnReLink.Visible = isFinance And PROCESSING
                     If (isFinance And PROCESSING) Then
+                        pnlReLink.Visible = True
                         Dim q2 = From c In d.AP_Staff_Rmb_Post_Extras Where c.RMBNo = RmbNo
                         Dim Extra = If(q2.Count > 0, q2.First, Nothing)
-                        If (Extra.VoucherNumber IsNot Nothing) Then
+                        If (Extra IsNot Nothing AndAlso Extra.VoucherNumber IsNot Nothing) Then
                             btnReLink.Attributes.Item("style") = "display:none"
+                            ScriptManager.RegisterStartupScript(Page, Page.GetType(), "verify_voucher_link", "verify_voucher_link('" + Extra.Company + "', '" + Extra.VoucherNumber + "');", True)
+                        Else
+                            ScriptManager.RegisterStartupScript(Page, Page.GetType(), "get_voucher_candidates", "get_voucher_candidates();", True)
                         End If
                     End If
                     btnUnProcess.Visible = isFinance And (PROCESSING)
@@ -1191,6 +1193,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 #End Region
 
 #Region "Button Events"
+
 
         Protected Async Sub btnSaveLine_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSaveLine.Click
 
@@ -1956,6 +1959,17 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             insert.Cells.Add(insertAmt)
             tblSplit.Rows.Add(insert)
             '  Next
+        End Sub
+
+
+        Protected Sub btnLink_click(sender As Object, e As System.EventArgs) Handles btnLink.Click
+            Try
+                Dim extra = (From c In d.AP_Staff_Rmb_Post_Extras Where c.RMBNo = hfRmbNo.Value).Single
+                extra.VoucherNumber = hfReLink.Value
+                d.SubmitChanges()
+                pnlReLink.Visible = False
+            Catch
+            End Try
         End Sub
 
         Protected Async Sub tbYouRef_Change(sender As Object, e As System.EventArgs) Handles tbYouRef.TextChanged

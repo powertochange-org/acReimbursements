@@ -205,6 +205,63 @@
         $("span[id$='GridView1_lblRemainingBalanceAmount']:last").text(result);
     }
 
+    function verify_voucher_link(company, voucher_number) {
+        $.ajax({
+            url:"http://gpapp/gpimport/webservice/voucherExists",
+            dataType: "json",
+            data: {'company': company, 'voucher_number': voucher_number},
+            type: "POST",
+            success: function(data) {
+                if (data==true)  $('#btnReLink').hide(); 
+                else { 
+                    $('#btnReLink').show(); 
+                    get_voucher_candidates();
+                }
+            },
+            error: function(a, b, c) {
+                console.error('Error verifying voucher number');
+            }
+        })
+    }
+
+    function get_voucher_candidates() {
+        var rmbid = $('#<%= hfRmbNo.ClientID %>').val();
+        $.ajax({
+            url:"http://gpapp/gpimport/webservice/getVoucherCandidates",
+            dataType: "json",
+            data: {'rmbid':rmbid},
+            type: "POST",
+            success: function(data) {
+                if (data.length>0) {
+                    setVoucherNumberCandidates(data);
+                } else {
+                    var vendorid = $("#<%= tbVendorId.ClientID%>").val();
+                    var date = $('#<%= lblSubmittedDate.ClientID%>').text();
+                    $.ajax({
+                        url:"http://gpapp/gpimport/webservice/getVoucherNumberCandidates",
+                        dataType: "json",
+                        data: {"vendorid": vendorid, "date": date},
+                        type: "POST",
+                        success: function(data) {
+                            setVoucherNumberCandidates(data)
+                        }
+                    })
+                }
+            }
+        })
+    }
+
+    function setVoucherNumberCandidates(list) {
+        $('#ddlReLink').empty();
+        $('#ddlReLink').append($('<option>', {value:-1, text:'select voucher#'}));
+        for (var i=0; i<list.length; i++) {
+            $('#ddlReLink').append($('<option>', {
+                value: list[i],
+                text: list[i]
+            }));
+        }
+    }
+
     function updateClearingTotal() {
         var total=0;
         $('.clearAdvance').each(function() {
@@ -1359,7 +1416,7 @@ function GetAccountBalance(jsonQuery){
                                             <asp:Label ID="Label18" runat="server" resourcekey="SubmittedOn"></asp:Label>
                                         </td>
                                         <td class="hdrValue">
-                                            <asp:Label ID="lblSubmittedDate" runat="server"></asp:Label>
+                                            <asp:Label ID="lblSubmittedDate" runat="server" ClientIDMode="Static"></asp:Label>
                                         </td>
                                         <td class="hdrTitle" width="10%">
                                             <asp:Label ID="Label19" runat="server" resourcekey="ApprovedOn"></asp:Label>
@@ -1653,7 +1710,12 @@ function GetAccountBalance(jsonQuery){
                                         <asp:Button ID="btnApprove" runat="server" resourcekey="btnApprove" class="aButton" visible="false"/>
                                         <asp:Button ID="btnProcess" runat="server" resourcekey="btnProcess" class="aButton" onClientClick="showPostDataDialog()" visible="false"/>
                                         <asp:Button ID="btnUnProcess" runat="server" resourcekey="btnUnProcess" class="aButton" visible="false"/>
-                                        <asp:Button ID="btnReLink" runat="server" resourcekey="btnReLink" CssClass="aButton error" Visible="false" />
+                                        <asp:Panel ID="pnlReLink" runat="server" Visible="false" style="display:inline-block">
+                                            <asp:Button ID="btnReLink" runat="server" resourcekey="btnReLink" CssClass="aButton error" Width="180" OnClientClick="$(this).hide(200); $('#ddlReLink').show(250); return false;" />
+                                            <select id="ddlReLink" style="display:none; width:180px;" onChange="$('#hfReLink').val($(this).val());$('#btnLink').click();" />
+                                            <asp:HiddenField ID="hfReLink" runat="server" ClientIDMode="Static" />
+                                            <asp:Button ID="btnLink" runat="server" ClientIDMode="Static" resourcekey="btnLink" style="display:none" OnClick="btnLink_click"  />
+                                        </asp:Panel>
                                     </div>
                                     <%-- <button class="Excel" title="Download" >
                                         <asp:Label ID="Label3" runat="server" Text="Download"></asp:Label>
@@ -1699,6 +1761,7 @@ function GetAccountBalance(jsonQuery){
                         <asp:PostBackTrigger ControlID="btnDownload" />
                         <asp:AsyncPostBackTrigger ControlID="btnCreate" />
                         <asp:AsyncPostBackTrigger ControlID="btnAddClearingItem" />
+                        <asp:AsyncPostBackTrigger ControlID="btnLink" />
                     </Triggers>
                 </asp:UpdatePanel>
             </td>
@@ -1952,7 +2015,7 @@ function GetAccountBalance(jsonQuery){
                     <tr><td><asp:Label ID="lblInvoiceNumber" runat="server" resourcekey="InvoiceNumber" /></td>
                         <td><asp:TextBox ID="tbInvoiceNumber" runat="server" /></td></tr>
                     <tr><td><asp:Label ID="lblVendorId" runat="server" resourcekey="VendorId" /></td>
-                        <td><asp:TextBox ID="tbVendorId" runat="server" CssClass="autocomplete" AutoPostBack="True"/></td></tr>
+                        <td><asp:TextBox ID="tbVendorId" runat="server" ClientIDMode="static" CssClass="autocomplete" AutoPostBack="True"/></td></tr>
                     <tr><td><asp:Label ID="lblRemitTo" runat="server" resourcekey="RemitTo" /></td>
                         <td><asp:DropDownList ID="ddlRemitTo" runat="server" AutoPostBack="True" /></td></tr>
                 </table>
