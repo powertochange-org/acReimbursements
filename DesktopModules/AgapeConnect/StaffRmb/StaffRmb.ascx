@@ -1083,7 +1083,7 @@ function GetAccountBalance(jsonQuery){
 <div id="loading" class="loading_overlay" style="display:none" >
     &nbsp;
 </div>
-<asp:Label ID="lblVersion" runat="server" CssClass="left hint" style="margin-top:-50px; margin-left:250px" />
+<asp:Label ID="lblVersion" runat="server" CssClass="right hint" style="margin-top:-50px; margin-right:140px" />
 <div style="position:relative; text-align: center; width: 100%;">
     <asp:UpdatePanel ID="ErrorUpdatePanel" runat="server" >
         <ContentTemplate>
