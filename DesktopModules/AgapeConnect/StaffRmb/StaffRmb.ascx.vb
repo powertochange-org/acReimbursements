@@ -42,7 +42,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
     Partial Class ViewStaffRmb
         Inherits Entities.Modules.PortalModuleBase
         Implements Entities.Modules.IActionable
-        Dim VERSION_STRING As String = "1.2.52"
+        Dim VERSION_STRING As String = "1.2.53"
         Dim BALANCE_INCONCLUSIVE As String = "unknown"
         Dim BALANCE_PERMISSION_DENIED As String = "**hidden**"
         Dim EDMS_APPROVAL_LOG_MESSAGE As String = "APPROVED by EDMS"
@@ -182,13 +182,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Else
                     CC = staff.CostCenter
                     PayOnly = StaffBrokerFunctions.GetStaffProfileProperty(staff.StaffId, "PayOnly")
-                    If (Not (PayOnly = "True" Or PayOnly = "False")) Then
+                    If (String.IsNullOrEmpty(PayOnly)) Then
                         lblError.Text = "Staff record missing PayOnly StaffProfileProperty"
                         lblError.Visible = True
                         pnlEverything.Visible = False
                         Return
-                    End If
-                    'PAC = StaffBrokerFunctions.GetStaffProfileProperty(staff.StaffId, "PersonalAccountCode")
+                    End If                    'PAC = StaffBrokerFunctions.GetStaffProfileProperty(staff.StaffId, "PersonalAccountCode")
                     '-- Disabled because we do not use PAC
                     'If CC = "" And PAC = "" Then
                     '    'cannot use
