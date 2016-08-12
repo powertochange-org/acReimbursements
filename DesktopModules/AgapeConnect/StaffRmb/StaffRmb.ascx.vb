@@ -182,6 +182,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Else
                     CC = staff.CostCenter
                     PayOnly = StaffBrokerFunctions.GetStaffProfileProperty(staff.StaffId, "PayOnly")
+                    If (Not (PayOnly = "True" Or PayOnly = "False")) Then
+                        lblError.Text = "Staff record missing PayOnly StaffProfileProperty"
+                        lblError.Visible = True
+                        pnlEverything.Visible = False
+                        Return
+                    End If
                     'PAC = StaffBrokerFunctions.GetStaffProfileProperty(staff.StaffId, "PersonalAccountCode")
                     '-- Disabled because we do not use PAC
                     'If CC = "" And PAC = "" Then
