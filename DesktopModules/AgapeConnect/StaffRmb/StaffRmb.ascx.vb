@@ -340,7 +340,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim userstr = CStr(UserId)
                 MoreInfo = From c In d.AP_Staff_Rmbs
                                     Where c.MoreInfoRequested = True And c.Status <> RmbStatus.Processing And c.Status <> RmbStatus.Cancelled And ((c.UserId = UserId) Or c.SpareField3.Equals(userstr)) And c.PortalId = PortalId
-                                    Order By c.RmbDate
+                                    Order By c.RID Descending
                                     Select c.UserRef, c.RID, c.RMBNo
                 For Each row In MoreInfo
                     Dim hyp As New HyperLink()
@@ -378,7 +378,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim userstr = CStr(UserId)
                 Dim Submitted = (From c In d.AP_Staff_Rmbs
                                  Where (c.Status = RmbStatus.Submitted Or c.Status = RmbStatus.PendingDirectorApproval Or c.Status = RmbStatus.PendingEDMSApproval) And ((c.UserId = UserId) Or c.SpareField3.Equals(userstr)) And c.PortalId = PortalId
-                                 Order By c.RmbDate Descending
+                                 Order By c.RID Descending
                                  Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
                 dlSubmitted.DataSource = Submitted
                 dlSubmitted.DataBind()
@@ -400,12 +400,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Try
                 Dim ApprovableRmbs = (From c In d.AP_Staff_Rmbs
                             Where ((c.Status = RmbStatus.Submitted And c.ApprUserId = UserId) Or (c.Status = RmbStatus.PendingDirectorApproval And c.SpareField2 IsNot Nothing AndAlso c.SpareField2 = UserId)) And c.ApprDate Is Nothing And c.PortalId = PortalId
-                            Order By c.RmbDate Descending
+                            Order By c.RID Descending
                             Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId)
                 If userIsEDMS Then
                     ApprovableRmbs = ApprovableRmbs.Union(From c In d.AP_Staff_Rmbs
                                           Where c.Status = RmbStatus.PendingEDMSApproval And c.ApprDate Is Nothing And c.PortalId = PortalId
-                                          Order By c.RmbDate Descending
+                                          Order By c.RID Descending
                                           Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId)
                 End If
                 dlToApprove.DataSource = ApprovableRmbs
@@ -438,7 +438,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim Approved = (From c In d.AP_Staff_Rmbs
                                 Where (c.Status = RmbStatus.Approved Or c.Status = RmbStatus.PendingDownload Or c.Status = RmbStatus.DownloadFailed) _
                                     And ((c.UserId = UserId) Or c.SpareField3.Equals(userstr)) And c.PortalId = PortalId
-                                Order By c.RmbDate Descending
+                                Order By c.RID Descending
                                 Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
                 dlApproved.DataSource = Approved
                 dlApproved.DataBind()
@@ -454,7 +454,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim userstr = CStr(UserId)
                 Dim Complete = (From c In d.AP_Staff_Rmbs
                                 Where c.Status = RmbStatus.Processing And ((c.UserId = UserId) Or c.SpareField3.Equals(userstr)) And c.PortalId = PortalId
-                                Order By c.RmbDate Descending
+                                Order By c.RID Descending
                                 Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId).Take(Settings("MenuSize"))
                 dlProcessing.DataSource = Complete
                 dlProcessing.DataBind()
@@ -469,7 +469,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim userstr = CStr(UserId)
                 Dim Complete = (From c In d.AP_Staff_Rmbs
                                 Where c.Status = RmbStatus.Paid And ((c.UserId = UserId) Or c.SpareField3.Equals(userstr)) And c.PortalId = PortalId
-                                Order By c.RmbDate Descending
+                                Order By c.RID Descending
                                 Select c.RMBNo, c.RmbDate, c.UserRef, c.RID, c.UserId)
                 dlPaid.DataSource = Complete
                 dlPaid.DataBind()
@@ -532,7 +532,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                        Where c.UserId = team_member.UserID _
                                             And (c.Status = RmbStatus.Approved Or c.Status = RmbStatus.PendingDownload Or c.Status = RmbStatus.DownloadFailed) _
                                             And c.UserId <> UserId And c.PortalId = PortalId
-                                       Order By c.RmbDate
+                                       Order By c.RID Descending
                                        Select c.RMBNo, c.RmbDate, c.RID, c.SpareField1
                     If (TeamApproved.Count > 0) Then
                         Dim TeamMemberApprovedNode As New TreeNode(team_member.LastName & ", " & team_member.FirstName)
@@ -579,7 +579,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                             On c.CostCenter Equals b.CostCentreCode _
                                                 And c.PortalId Equals b.PortalId
                                         Where c.UserId = team_member.UserID And c.Status = RmbStatus.Processing And c.PortalId = PortalId
-                                        Order By c.RmbDate
+                                        Order By c.RID Descending
                                         Select c.RMBNo, c.RmbDate, c.RID, c.SpareField1
 
                     If (TeamProcessing.Count > 0) Then
@@ -628,7 +628,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                             On c.CostCenter Equals b.CostCentreCode _
                                                 And c.PortalId Equals b.PortalId
                                         Where c.UserId = team_member.UserID And c.Status = RmbStatus.Paid And c.PortalId = PortalId
-                                        Order By c.RmbDate
+                                        Order By c.RID Descending
                                         Select c.RMBNo, c.RmbDate, c.RID, c.SpareField1
                     If (TeamPaid.Count > 0) Then
                         Dim TeamMemberPaidNode As New TreeNode(team_member.LastName & ", " & team_member.FirstName)

@@ -97,7 +97,6 @@ public class WebService : System.Web.Services.WebService {
                 StaffRmbDataContext d = new StaffRmbDataContext();
                 foreach (AP_Staff_Rmb rmb in from c in d.AP_Staff_Rmbs
                                              where c.Status == status && c.PortalId == portalid
-                                             orderby c.RmbDate descending
                                              select c)
                 {
                     DotNetNuke.Entities.Users.UserInfo staffMember = DotNetNuke.Entities.Users.UserController.GetUserById(portalid, rmb.UserId);
@@ -105,7 +104,8 @@ public class WebService : System.Web.Services.WebService {
                     Item letter = tree.Needs(firstLetter);
                     Item staff = letter.Needs(staffMember.LastName!=null?(staffMember.LastName + ", " + staffMember.FirstName):staffMember.DisplayName);
                     string id = rmb.RID.ToString().PadLeft(5, '0');
-                    Item reimbursement = staff.Needs((rmb.PrivComment == null ? "  " : "* ") + id + " : " + (rmb.RmbDate == null ? "" : rmb.RmbDate.Value.ToShortDateString()) + " : " + rmb.SpareField1);
+                    Item reimbursement = staff.Needs(id + " : " + (rmb.RmbDate == null ? "" : rmb.RmbDate.Value.ToShortDateString()) + " : " + rmb.SpareField1, false); //false means reverse sort
+                    if (rmb.PrivComment != null) { reimbursement.label = "* " + reimbursement.label; }
                     reimbursement.setRmbNo(rmb.RMBNo.ToString());
                 }
             }
@@ -259,7 +259,7 @@ public class WebService : System.Web.Services.WebService {
             return false;
         }
 
-        public Item Needs(string match)
+        public Item Needs(string match, bool forward=true)
         // Returns item if it exists, otherwise creates it (in alphabetical order) and returns it
         {
             int position=-1;
@@ -268,7 +268,11 @@ public class WebService : System.Web.Services.WebService {
             {
                 item = children.ElementAt(index);
                 if (item.label.Equals(match)) return item;
-                if (String.Compare(item.label, match, true) < 0) position = index;
+                if (forward) {
+                    if (String.Compare(item.label, match, true) < 0) position = index;
+                } else {
+                    if (String.Compare(item.label, match, true) > 0) position = index;
+                }
             }
             item = new Item(match);
             children.Insert(position+1, item); //insert after the last item that preceeds it
