@@ -97,7 +97,7 @@ public class WebService : System.Web.Services.WebService {
                 StaffRmbDataContext d = new StaffRmbDataContext();
                 foreach (AP_Staff_Rmb rmb in from c in d.AP_Staff_Rmbs
                                              where c.Status == status && c.PortalId == portalid
-                                             orderby c.RID descending
+                                             orderby c.RmbDate descending
                                              select c)
                 {
                     DotNetNuke.Entities.Users.UserInfo staffMember = DotNetNuke.Entities.Users.UserController.GetUserById(portalid, rmb.UserId);
