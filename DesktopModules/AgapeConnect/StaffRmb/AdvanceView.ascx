@@ -20,6 +20,11 @@
                             <asp:Label id="lblWho" runat="server"></asp:Label>
                         </ItemTemplate>
                     </asp:TemplateField>
+                    <asp:TemplateField HeaderText="Account">
+                        <ItemTemplate>
+                            <asp:Label ID="lblAccount" runat="server" Text='<%# Eval("account") %>'></asp:Label>
+                        </ItemTemplate>
+                    </asp:TemplateField>
                     <asp:TemplateField HeaderText="To be cleared by" >
                         <ItemTemplate>
                             <asp:Label runat="server" Text='<%# ((DateTime)Eval("date")).ToShortDateString() %>'></asp:Label>

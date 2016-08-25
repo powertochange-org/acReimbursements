@@ -68,7 +68,7 @@ namespace PowerToChange.Modules.StaffRmb.Views
             decimal cleared = Convert.ToDecimal(((TextBox)row.FindControl("tbCleared")).Text);
             long lineNo = Convert.ToInt64(((HiddenField)row.FindControl("hfLineNo")).Value);
             AP_Staff_RmbLine line = d.AP_Staff_RmbLines.Where(a => a.RmbLineNo == lineNo).Single();
-            String outstanding = (line.GrossAmount - cleared).ToString("0.##");
+            String outstanding = (line.GrossAmount - cleared).ToString("0.00");
             if (outstanding.Equals("0")) outstanding = "CLEARED";
             line.Spare2 = outstanding;
             ((Label)row.FindControl("lblOutstanding")).Text = outstanding;

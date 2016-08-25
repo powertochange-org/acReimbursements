@@ -55,6 +55,7 @@ namespace PowerToChange.Modules.StaffRmb.Presenters
                             date = b.TransDate,
                             comment = b.Comment,
                             originalAmount = b.GrossAmount,
+                            account = b.CostCenter,
                             outstandingAmount = b.Spare2
                         });
                 }

@@ -34,6 +34,7 @@ namespace PowerToChange.Modules.StaffRmb.Presenters
         public DateTime? date { get; set; }
         public decimal originalAmount { get; set; }
         public string outstandingAmount { get; set; }
+        public string account { get; set; }
         public string comment { get; set; }
     }
 

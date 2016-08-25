@@ -105,7 +105,7 @@ public class WebService : System.Web.Services.WebService {
                     Item staff = letter.Needs(staffMember.LastName!=null?(staffMember.LastName + ", " + staffMember.FirstName):staffMember.DisplayName);
                     string id = rmb.RID.ToString().PadLeft(5, '0');
                     Item reimbursement = staff.Needs(id + " : " + (rmb.RmbDate == null ? "" : rmb.RmbDate.Value.ToShortDateString()) + " : " + rmb.SpareField1, false); //false means reverse sort
-                    if (rmb.PrivComment != null) { reimbursement.label = "* " + reimbursement.label; }
+                    //if (rmb.PrivComment != null) { reimbursement.label = "* " + reimbursement.label; }
                     reimbursement.setRmbNo(rmb.RMBNo.ToString());
                 }
             }
