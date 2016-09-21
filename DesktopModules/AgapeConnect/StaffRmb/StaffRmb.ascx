@@ -236,7 +236,7 @@
                     setVoucherNumberCandidates(data);
                 } else {
                     var vendorid = $("#<%= tbVendorId.ClientID%>").val();
-                    var date = $('#<%= lblSubmittedDate.ClientID%>').text();
+                    var date = $('#<%= lblProcessedDate.ClientID%>').text();
                     $.ajax({
                         url:"http://gpapp/gpimport/webservice/getVoucherNumberCandidates",
                         dataType: "json",
