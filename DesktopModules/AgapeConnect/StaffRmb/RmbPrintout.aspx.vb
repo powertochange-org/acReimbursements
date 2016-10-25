@@ -273,7 +273,7 @@ Partial Class DesktopModules_StaffRmb_RmbPrintout
                     Dim theFile = DotNetNuke.Services.FileSystem.FileManager.Instance.GetFile(receipt_image.FileId)
                     If (theFile IsNot Nothing) Then
                         ER &= "<div style='align: center; float: left; margin: 5px; ' >"
-                        If theFile.Extension.ToLower = "pdf" Then
+                        If theFile.Extension.ToLower = "pdf" Or theFile.Extension.ToLower.Contains("xls") Then
 
                             ER &= "<iframe style='width: 747px; height: 1000px;' src='" & DotNetNuke.Services.FileSystem.FileManager.Instance.GetUrl(theFile) & "' ></iframe>"
                         Else

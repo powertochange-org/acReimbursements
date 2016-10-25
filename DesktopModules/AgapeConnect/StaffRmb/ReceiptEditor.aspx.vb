@@ -9,7 +9,7 @@ Imports StaffRmb
 
 Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
     Inherits System.Web.UI.Page
-    Private imgExt() As String = {"jpg", "jpeg", "gif", "png", "bmp", "pdf"}
+    Private imgExt() As String = {"jpg", "jpeg", "gif", "png", "bmp", "pdf", "xls", "xlsx"}
     Private LocalResourceFile As String
     ' Variables for file saving
     Private RmbNo As String
@@ -175,6 +175,9 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
         If file.Extension.ToLower = "pdf" Then
             img.Src = "images/pdf.png"
             img.Width = 64
+        ElseIf file.Extension.ToLower().Contains("xls") Then
+            img.Src = "images/xls.png"
+            img.Width = 64
         Else ' Otherwise, we just use the same as the navigation url
             img.Src = link.NavigateUrl
             img.Width = 200
@@ -184,7 +187,7 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
                 img.Src = img.Src & "&r=" & DateTime.Now.Ticks
             End If
             ' Also add in the rotation buttons, since these
-            ' won't be used when we have a pdf
+            ' won't be used when we have a pdf or xls
             div.Controls.Add(createButton("↻", file.FileName))
             div.Controls.Add(createButton("↺", file.FileName))
         End If
@@ -295,8 +298,8 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
                 Await CheckFolderPermissions(PS.PortalId, theFolder, theRmb.UserId)
                 Dim _theFile As IFileInfo
 
-                If ext.ToLower = "pdf" Then
-                    _theFile = FileManager.Instance.AddFile(theFolder, "R" & RmbNo & "L" & RmbLine & "Rec" & RecNum + 1 & ".pdf", fuReceipt.FileContent, True)
+                If ext.ToLower() = "pdf" Or ext.ToLower().Contains("xls") Then
+                    _theFile = FileManager.Instance.AddFile(theFolder, "R" & RmbNo & "L" & RmbLine & "Rec" & RecNum + 1 & "." & ext.ToLower(), fuReceipt.FileContent, True)
                 Else
 
 
@@ -347,8 +350,8 @@ Partial Class DesktopModules_AgapeConnect_StaffRmb_ReceiptEditor
                 ' Add this file-rmb line relationship to the database
                 AddFileLine(_theFile, RmbLine, RmbNo, RecNum)
             Else
-                'Not image file
-                lblError.Text = "* File must end in .jpg, .jpeg, .gif, .png, .bmp or .pdf<br />"
+                'Not valid file
+                lblError.Text = "* File must end in .jpg, .jpeg, .gif, .png, .bmp, .pdf, .xls, or .xlsx<br />"
             End If
         End If
     End Sub

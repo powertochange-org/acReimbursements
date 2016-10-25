@@ -2911,6 +2911,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         extension = file.Extension.ToLower()
                         If extension = "pdf" Then
                             result += "<a target='_Blank' href='" + receipt.URL + "' title = 'click to download'><img class='" & "' src='/Icons/Sigma/ExtPdf_32X32_Standard.png' width=20 alt='pdf' /></a>"
+                        ElseIf extension.Contains("xls") Then
+                            result += "<a target='_Blank' href='" + receipt.URL + "' title = 'click to download'><img class='" & "' src='/Icons/Sigma/ExtXls_32X32_Standard.png' width=20 alt='xls' /></a>"
                         ElseIf {"jpg", "jpeg", "png", "gif", "bmp"}.Contains(extension) Then
                             result += "<a target='receipt_window' href=" + receipt.URL + "><img id='" + receipt.URL + "' class='viewReceipt" & "' src='/Icons/Sigma/ExtPng_32x32_Standard.png' width=20 alt='img' /></a>"
                         Else
