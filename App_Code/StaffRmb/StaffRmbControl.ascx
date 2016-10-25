@@ -34,7 +34,7 @@
                </div>   
             </asp:Panel>
         </td>
-        <td colspan="2"><asp:TextBox ID="tbSupplier" runat="server" Width="278px" CssClass="required" AutoCompleteType="None" ></asp:TextBox></td>
+        <td colspan="2"><asp:TextBox ID="tbSupplier" runat="server" ClientIDMode="static" Width="278px" CssClass="required" AutoCompleteType="None" onchange="eventBritePrompt(this);" ></asp:TextBox></td>
     </tr>
     <tr>
         <td style="width:200px"><b><asp:label id="lblDesc" runat="server" controlname="tbDesc" ResourceKey="lblDesc"  /></b>

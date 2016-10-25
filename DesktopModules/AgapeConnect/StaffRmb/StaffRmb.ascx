@@ -851,6 +851,13 @@ function GetAccountBalance(jsonQuery){
         console.log('--currency: '+selected_currency + " - " + action);
     }
 
+    function eventBritePrompt(sender) {
+        var supplier = $(sender).val().toLowerCase();
+        if (supplier.indexOf('event') >= 0 && (supplier.indexOf('brite') >= 0  || supplier.indexOf('bright') >=0)) {
+            alert('If this reimbursement is for multiple EventBrite tickets, please attatch an excel (.xls) spreadsheet (just like you would an electronic receipt) that itemizes the individual order numbers.')
+        }
+    }
+
     function check_if_receipt_is_required() {
         // determine whether the "no receipt" option should be enabled
         console.log('check_if_receipt_is_required()');
