@@ -42,7 +42,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
     Partial Class ViewStaffRmb
         Inherits Entities.Modules.PortalModuleBase
         Implements Entities.Modules.IActionable
-        Dim VERSION_STRING As String = "1.2.59"
+        Dim VERSION_STRING As String = "1.2.61"
         Dim BALANCE_INCONCLUSIVE As String = "unknown"
         Dim BALANCE_PERMISSION_DENIED As String = "**hidden**"
         Dim EDMS_APPROVAL_LOG_MESSAGE As String = "APPROVED by EDMS"
@@ -2197,7 +2197,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Protected Sub btnDownload_Click(sender As Object, e As System.EventArgs) Handles btnDownload.Click
             Dim RmbNo As Integer = CInt(hfRmbNo.Value)
             Dim thisRID = (From c In d.AP_Staff_Rmbs Where c.RMBNo = RmbNo And c.PortalId = PortalId Select c.RID).First
-            Dim export As String = "Account,Subaccount,Ref,Date," & GetOrderedString("Description", "Debit", "Credit", "Company")
+            Dim export As String = "Account,Subaccount,Ref,Date,Type," & GetOrderedString("Description", "Debit", "Credit", "Company")
             export &= DownloadRmbSingle(CInt(hfRmbNo.Value))
             Dim attachment As String = "attachment; filename=Rmb" & ZeroFill(thisRID, 5) & ".csv"
 
@@ -3829,6 +3829,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     rtn &= "=""" & line.CostCenter & ""","
                     rtn &= ref & ","
                     rtn &= theDate & ","
+                    rtn &= line.AP_Staff_RmbLineType.TypeName.Replace(",", "") & ","
+
                     Dim Debit As String = ""
                     Dim Credit As String = ""
                     If line.GrossAmount > 0 Then
@@ -3880,7 +3882,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             rtn &= "=""" & StaffBrokerFunctions.GetStaffProfileProperty(theStaff.StaffId, "PersonalAccountCode") & ""","
                             rtn &= "=""" & Settings("ControlAccount") & """" & ","
                             rtn &= ref & ","
-                            rtn &= theDate & ","
+                            rtn &= theDate & ",,"
 
                             Dim Debit As String = ""
                             Dim Credit As String = ""
@@ -3909,7 +3911,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             rtn &= "=""" & Settings("AccountsPayable") & ""","
                             rtn &= "=""" & theStaff.CostCenter & """" & ","
                             rtn &= ref & ","
-                            rtn &= theDate & ","
+                            rtn &= theDate & ",,"
 
                             Dim Debit As String = ""
                             Dim Credit As String = ""
