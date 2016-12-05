@@ -129,6 +129,17 @@ Partial Class DesktopModules_StaffRmb_RmbPrintout
                     output = output.Replace("[SUBMITTEDDATE]", "")
                 End If
             End If
+            If q.First.ApprUserId IsNot Nothing Then
+                output = output.Replace("[APPROVER]", UserController.GetUserById(q.First.PortalId, q.First.ApprUserId).DisplayName)
+            Else
+                output = output.Replace("[APPROVER]", "")
+            End If
+            If q.First.ApprDate IsNot Nothing Then
+                output = output.Replace("[APPROVEDDATE]", q.First.ApprDate.Value.ToString("dd/MM/yyyy"))
+            Else
+                output = output.Replace("[APPROVEDDATE]", "")
+            End If
+            output = output.Replace("[STATUS]", RmbStatus.StatusName(q.First.Status))
             output = output.Replace("[SUBMITTEDBY]", UserController.GetUserById(q.First.PortalId, q.First.UserId).DisplayName)
             If Not Request.QueryString("Period") Is Nothing And Not Request.QueryString("Year") Is Nothing Then
                 output = output.Replace("[POSTED]", "<span class=""Agape_Body_Text"">" & Translate("YearPosted") & Request.QueryString("Year") & ", " & Translate("PeriodPosted") & Request.QueryString("Period") & "</span><br/>")
