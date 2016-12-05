@@ -2750,11 +2750,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
             Else
                 If Not String.IsNullOrEmpty(Currency) Then
-                    If Currency <> StaffBrokerFunctions.GetSetting("            ", PortalId) Then
+                    If Currency <> StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId) Then
                         CurString = Currency & CurrencyValue.ToString("f2")
-                        CurString = CurString.Replace(".00", "")
-
+                    Else
+                        CurString = CurrencyValue.ToString("f2")
                     End If
+                    CurString = CurString.Replace(".00", "")
                 End If
             End If
 
