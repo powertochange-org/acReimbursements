@@ -130,10 +130,12 @@ Partial Class DesktopModules_StaffRmb_RmbPrintout
                 End If
             End If
             If q.First.ApprUserId IsNot Nothing Then
-                output = output.Replace("[APPROVER]", UserController.GetUserById(q.First.PortalId, q.First.ApprUserId).DisplayName)
-            Else
-                output = output.Replace("[APPROVER]", "")
+                Dim appr As UserInfo = UserController.GetUserById(q.First.PortalId, q.First.ApprUserId)
+                If appr IsNot Nothing Then
+                    output = output.Replace("[APPROVER]", appr.DisplayName)
+                End If
             End If
+            output = output.Replace("[APPROVER]", "")
             If q.First.ApprDate IsNot Nothing Then
                 output = output.Replace("[APPROVEDDATE]", q.First.ApprDate.Value.ToString("dd/MM/yyyy"))
             Else
