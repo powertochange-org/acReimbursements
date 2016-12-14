@@ -2753,7 +2753,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     If Currency <> StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId) Then
                         CurString = Currency & CurrencyValue.ToString("f2")
                     Else
-                        CurString = CurrencyValue.ToString("f2")
+                        CurString = "";
                     End If
                     CurString = CurString.Replace(".00", "")
                 End If
