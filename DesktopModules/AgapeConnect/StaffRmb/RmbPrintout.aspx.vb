@@ -303,7 +303,7 @@ Partial Class DesktopModules_StaffRmb_RmbPrintout
                         ER &= "&nbsp;&nbsp;" & cr & amount
                         ER &= "&nbsp;&nbsp;<a href='" & DotNetNuke.Services.FileSystem.FileManager.Instance.GetUrl(theFile) & "' target='_blank'>(Click here to open in new tab/window)</a> "
                         ER &= "</div>"
-                        ER &= " </div><div style='clear: both;' />"
+                        ER &= " </div>"
                     Else
                         ER = "File not found"
                     End If
