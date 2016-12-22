@@ -288,7 +288,7 @@ Partial Class DesktopModules_StaffRmb_RmbPrintout
                         ER &= "<div style='display:inline-block; float: left; margin: 5px; ' >"
                         If theFile.Extension.ToLower = "pdf" Or theFile.Extension.ToLower.Contains("xls") Then
 
-                            ER &= "<iframe style='width:300px; ' src='" & DotNetNuke.Services.FileSystem.FileManager.Instance.GetUrl(theFile) & "' ></iframe>"
+                            ER &= "<iframe style='width:500px; height:700px' src='" & DotNetNuke.Services.FileSystem.FileManager.Instance.GetUrl(theFile) & "' ></iframe>"
                         Else
                             ER &= "<img style='width:300px' src='" & DotNetNuke.Services.FileSystem.FileManager.Instance.GetUrl(theFile) & "'/>"
 
