@@ -285,12 +285,12 @@ Partial Class DesktopModules_StaffRmb_RmbPrintout
                 For Each receipt_image In images
                     Dim theFile = DotNetNuke.Services.FileSystem.FileManager.Instance.GetFile(receipt_image.FileId)
                     If (theFile IsNot Nothing) Then
-                        ER &= "<div style='align: center; float: left; margin: 5px; ' >"
+                        ER &= "<div style='display:inline-block; float: left; margin: 5px; ' >"
                         If theFile.Extension.ToLower = "pdf" Or theFile.Extension.ToLower.Contains("xls") Then
 
-                            ER &= "<iframe style='width: 747px; height: 1000px;' src='" & DotNetNuke.Services.FileSystem.FileManager.Instance.GetUrl(theFile) & "' ></iframe>"
+                            ER &= "<iframe style='width:300px; ' src='" & DotNetNuke.Services.FileSystem.FileManager.Instance.GetUrl(theFile) & "' ></iframe>"
                         Else
-                            ER &= "<img src='" & DotNetNuke.Services.FileSystem.FileManager.Instance.GetUrl(theFile) & "'/>"
+                            ER &= "<img style='width:300px' src='" & DotNetNuke.Services.FileSystem.FileManager.Instance.GetUrl(theFile) & "'/>"
 
                         End If
                         ER &= "<div style='font-style: italic; color: #AAA; font-size: small; width: 100%; text-align: center;'>" & Translate("ReceiptNo") & ": " & receipt_image.RecNum
