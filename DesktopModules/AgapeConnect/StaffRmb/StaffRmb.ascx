@@ -3,7 +3,7 @@
 
 <script src="/js/modernizr-custom.js" type="text/javascript"></script>
 <script src="/js/jquery.watermarkinput.js" type="text/javascript"></script>
-<script src="DesktopModules/AgapeConnect/StaffRmb/js/jquery.dreamalert.js" type="text/javascript"></script>
+<script src="/DesktopModules/AgapeConnect/StaffRmb/js/jquery.dreamalert.js" type="text/javascript"></script>
 
 <script src="/js/tree.jquery.js"></script>
 <link rel="stylesheet" href="/js/jqtree.css" />
@@ -882,18 +882,15 @@ function GetAccountBalance(jsonQuery){
     function calculateTotal() {
         var total = 0.00;
 
-        $(".Amount").each(function() {
+        $("tblSplit .Amount").each(function() {
             if (!isNaN(this.value) && this.value.length !== 0) {total += parseFloat(this.value.replace(',',''));}
         });
        
-        var orig = $("#<%= lblOriginalAmt.ClientId %>").html();
+        var orig = parseFloat($("#<%= lblOriginalAmt.ClientId %>").html().replace(',',''));
 
-        if(total== parseFloat(orig.substring(0,orig.Length).replace(',','')))
-        {
+        if(total == orig) {
             $("#<%= btnOK.ClientId %>").prop('disabled', false).removeClass('aspNetDisabled');
-        }
-        else
-        {
+        } else {
             $("#<%= btnOK.ClientId %>").prop('disabled', true).addClass('aspNetDisabled');
         }
     }
@@ -2145,7 +2142,7 @@ function GetAccountBalance(jsonQuery){
                             <asp:Label ID="Label36" runat="server" resourcekey="SplitIno"></asp:Label></legend>
                         <asp:HiddenField ID="hfRows" runat="server" Value="1" />
                         <asp:HiddenField ID="hfSplitLineId" runat="server" Value="-1" />
-                        <asp:Table ID="tblSplit" runat="server" Width="100%">
+                        <asp:Table ID="tblSplit" CssClass="tblSplit" runat="server" Width="100%">
                             <asp:TableRow>
                                 <asp:TableCell Width="100%">
                                     <asp:TextBox ID="tbSplitDesc" runat="server" Width="100%" CssClass="Description"></asp:TextBox>

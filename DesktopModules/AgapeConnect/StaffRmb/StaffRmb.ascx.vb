@@ -1962,7 +1962,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             tbAmt.Width = Unit.Pixel(100)
             ' tbAmt.ID = "tbAmt" & hfRows.Value
             tbAmt.CssClass = "Amount"
+            tbAmt.Attributes.Add("type", "number")
+            tbAmt.Attributes.Add("step", "0.01")
             tbAmt.Attributes.Add("onblur", "calculateTotal();")
+            tbAmt.Attributes.Add("oninput", "calculateTotal();")
             insertDesc.Controls.Add(tbDesc)
             insertAmt.Controls.Add(tbAmt)
 
