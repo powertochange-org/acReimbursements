@@ -1972,6 +1972,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             insert.Cells.Add(insertDesc)
             insert.Cells.Add(insertAmt)
             tblSplit.Rows.Add(insert)
+            ScriptManager.RegisterStartupScript(btnSplitAdd, btnSplitAdd.GetType(), "checkTotal", "calculateTotal();", True)
             '  Next
         End Sub
 
