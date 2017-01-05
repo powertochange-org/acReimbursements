@@ -7,7 +7,7 @@
 
 <script src="/js/tree.jquery.js"></script>
 <link rel="stylesheet" href="/js/jqtree.css" />
-<link rel="stylesheet" href="DesktopModules/AgapeConnect/StaffRmb/css/jquery.dreamalert.css" />
+<link rel="stylesheet" href="/DesktopModules/AgapeConnect/StaffRmb/css/jquery.dreamalert.css" />
 <style>
     input[type="number"] { text-align:right; }
     .abutton.delete:hover  { background-image:none; color:white; background-color:rgba(255,0,0,0.5); }
