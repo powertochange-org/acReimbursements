@@ -2022,9 +2022,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim RowDesc = CType(row.Cells(0).Controls(0), TextBox).Text
                     If RowAmount = "" Or RowDesc = "" Or RowAmount = "Amount" Or RowDesc = "Description" Then
                         lblSplitError.Visible = True
+                        ScriptManager.RegisterStartupScript(btnOK, btnOK.GetType(), "close_loading_spinner", "$('#loading').hide()", True)
                         Return
                     ElseIf CDbl(RowAmount) = 0 Then
                         lblSplitError.Visible = True
+                        ScriptManager.RegisterStartupScript(btnOK, btnOK.GetType(), "close_loading_spinner", "$('#loading').hide()", True)
                         Return
                     End If
                     Dim insert As New AP_Staff_RmbLine()
@@ -2108,7 +2110,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             sb.Append("<script language='javascript'>")
             sb.Append("closePopupSplit();")
             sb.Append("</script>")
-            ScriptManager.RegisterStartupScript(btnOK, t, "clostSplit", sb.ToString, False)
+            ScriptManager.RegisterStartupScript(btnOK, t, "closeSplit", sb.ToString, False)
 
         End Sub
 

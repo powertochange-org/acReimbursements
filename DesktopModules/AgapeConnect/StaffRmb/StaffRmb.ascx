@@ -739,7 +739,7 @@ function GetAccountBalance(jsonQuery){
  }
 
     function resetSplitPopup() {
-        $('#<%= btnOK.ClientID%>').prop('disabled', true);
+        $('#<%= btnOK.ClientID%>').prop('disabled', true).addClass('aspNetDisabled');
         $('#<%= tblSplit.ClientID%>').find('tr:gt(0)').remove();
         $('#<%= tblSplit.ClientID%>').find('input').val('');
     }
@@ -881,8 +881,7 @@ function GetAccountBalance(jsonQuery){
 
     function calculateTotal() {
         var total = 0.00;
-
-        $("tblSplit .Amount").each(function() {
+        $(".tblSplit .Amount").each(function() {
             if (!isNaN(this.value) && this.value.length !== 0) {total += parseFloat(this.value.replace(',',''));}
         });
        
