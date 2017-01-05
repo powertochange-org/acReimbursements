@@ -658,7 +658,7 @@
         }
 
         function setUpHelpLink() {
-            $("#help-link").attr("href", "https://wiki.powertochange.org/help/index.php/Online_Reimbursements").attr("target", "_blank");        
+            $("#help-link").attr("href", "https://staff.powertochange.org/kb/articles/online-reimbursement-application/").attr("target", "_blank");        
         }
 
         $(document).ready(function () {
@@ -1110,7 +1110,7 @@ function GetAccountBalance(jsonQuery){
     <asp:HiddenField ID="hfCurOpen" runat="server" Value="false" />
     <asp:HiddenField ID="hfChargeToValue" runat="server"  />
     <asp:HiddenField ID="hfTabModuleId" runat="server" Value="-1" />
-	<a target="_blank" style="position: relative; float: right; right: 50px; top: -50px;" href="https://wiki.powertochange.org/help/index.php/Online_Reimbursements">Help</a>
+	<a target="_blank" style="position: relative; float: right; right: 50px; top: -50px;" href="https://staff.powertochange.org/kb/articles/online-reimbursement-application/">Help</a>
 
     <table width="100%">
         <tr valign="top">
