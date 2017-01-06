@@ -526,8 +526,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Private Async Function buildTeamApprovedTreeAsync(Team As List(Of User)) As Task
             Try
-                Dim teamIds = New List(Of Integer)
-                Team.ForEach(Sub(member) teamIds.Add(member.UserID))
+                Dim teamIds = (From u In Team Select u.UserID).ToArray
                 Dim Rmbs = From c In d.AP_Staff_Rmbs
                            Where (c.PortalId = PortalId _
                                   And (c.Status = RmbStatus.Approved Or c.Status = RmbStatus.PendingDownload Or c.Status = RmbStatus.DownloadFailed)) _
@@ -546,8 +545,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Private Async Function buildTeamProcessingTreeAsync(Team As List(Of User)) As Task
             Try
-                Dim teamIds = New List(Of Integer)
-                Team.ForEach(Sub(member) teamIds.Add(member.UserID))
+                Dim teamIds = (From u In Team Select u.UserID).ToArray
                 Dim Rmbs = From c In d.AP_Staff_Rmbs
                            Where (c.PortalId = PortalId And c.Status = RmbStatus.Processing) _
                                 And (teamIds.Contains(c.UserId) Or c.ApprUserId = UserId)
@@ -565,8 +563,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Private Async Function buildTeamPaidTreeAsync(Team As List(Of User)) As Task
             Try
-                Dim teamIds = New List(Of Integer)
-                Team.ForEach(Sub(member) teamIds.Add(member.UserID))
+                Dim teamIds = (From u In Team Select u.UserID).ToArray
                 Dim Rmbs = From c In d.AP_Staff_Rmbs
                            Where (c.PortalId = PortalId And c.Status = RmbStatus.Paid) _
                                 And (teamIds.Contains(c.UserId) Or c.ApprUserId = UserId)
