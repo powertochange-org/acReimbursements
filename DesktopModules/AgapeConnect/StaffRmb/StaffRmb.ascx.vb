@@ -499,9 +499,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Private Async Function LoadSupervisorMenuAsync() As Task
             Try
                 Dim Team As List(Of User) = StaffBrokerFunctions.GetTeam(UserId)
-                Dim isSupervisor = (Team.Count > 0)
-                If isSupervisor Then
-                    lblTeamLeader.Visible = True
+                Dim isApprover As Boolean = (From c In d.AP_Staff_Rmbs
+                                  Where c.PortalId = PortalId And c.ApprUserId = UserId And (Not (c.Status = RmbStatus.Draft) Or (c.Status = RmbStatus.Cancelled))
+                                  Select c.RID).Count > 0
+                Dim showTeamMenu = (Team.Count > 0) Or isApprover
+                If showTeamMenu Then
+                    lblTeamLeader.Visible = (Team.Count > 0)
                     showDividers(True)
                     Dim TeamIds = From c In Team Select c.UserID
                     Dim ReloadMenuTasks As New List(Of Task)
@@ -523,43 +526,17 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Private Async Function buildTeamApprovedTreeAsync(Team As List(Of User)) As Task
             Try
-                Dim TeamApprovedNode As New TreeNode("Your Team")
-                TeamApprovedNode.Expanded = False
-                TeamApprovedNode.SelectAction = TreeNodeSelectAction.Expand
+                Dim teamIds = New List(Of Integer)
+                Team.ForEach(Sub(member) teamIds.Add(member.UserID))
+                Dim Rmbs = From c In d.AP_Staff_Rmbs
+                           Where (c.PortalId = PortalId _
+                                  And (c.Status = RmbStatus.Approved Or c.Status = RmbStatus.PendingDownload Or c.Status = RmbStatus.DownloadFailed)) _
+                                  And (teamIds.Contains(c.UserId) Or c.ApprUserId = UserId)
+                           Order By c.RID Descending
+                           Select c
 
-                For Each team_member In Team
-                    Dim TeamApproved = From c In d.AP_Staff_Rmbs
-                                       Where c.UserId = team_member.UserID _
-                                            And (c.Status = RmbStatus.Approved Or c.Status = RmbStatus.PendingDownload Or c.Status = RmbStatus.DownloadFailed) _
-                                            And c.UserId <> UserId And c.PortalId = PortalId
-                                       Order By c.RID Descending
-                                       Select c.RMBNo, c.RmbDate, c.RID, c.SpareField1
-                    If (TeamApproved.Count > 0) Then
-                        Dim TeamMemberApprovedNode As New TreeNode(team_member.LastName & ", " & team_member.FirstName)
-                        TeamMemberApprovedNode.SelectAction = TreeNodeSelectAction.Expand
-                        TeamMemberApprovedNode.Expanded = False
-                        For Each rmb In TeamApproved
-                            Dim rmb_node As New TreeNode()
-                            Dim rmbTotal = If(rmb.SpareField1 Is Nothing, "", rmb.SpareField1)
-                            If (rmb.RmbDate Is Nothing) Then
-                                rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, New Date(1970, 1, 1), rmbTotal)
-                            Else
-                                rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbTotal)
-                            End If
-                            rmb_node.Value = rmb.RMBNo
-                            rmb_node.SelectAction = TreeNodeSelectAction.Select
-                            TeamMemberApprovedNode.ChildNodes.Add(rmb_node)
-                            If IsSelected(rmb.RMBNo) Then
-                                TeamMemberApprovedNode.Expanded = True
-                                TeamApprovedNode.Expanded = True
-                            End If
-                        Next
-
-                        TeamApprovedNode.ChildNodes.Add(TeamMemberApprovedNode)
-                    End If
-                Next
                 tvTeamApproved.Nodes.Clear()
-                tvTeamApproved.Nodes.Add(TeamApprovedNode)
+                tvTeamApproved.Nodes.Add(BuildTeamTree(Rmbs))
                 tvTeamApproved.Visible = True
                 ApprovedUpdatePanel.Update()
             Catch ex As Exception
@@ -569,46 +546,16 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Private Async Function buildTeamProcessingTreeAsync(Team As List(Of User)) As Task
             Try
-                Dim TeamProcessingNode As New TreeNode("Your Team")
-                TeamProcessingNode.SelectAction = TreeNodeSelectAction.Expand
-                TeamProcessingNode.Expanded = False
+                Dim teamIds = New List(Of Integer)
+                Team.ForEach(Sub(member) teamIds.Add(member.UserID))
+                Dim Rmbs = From c In d.AP_Staff_Rmbs
+                           Where (c.PortalId = PortalId And c.Status = RmbStatus.Processing) _
+                                And (teamIds.Contains(c.UserId) Or c.ApprUserId = UserId)
+                           Order By c.RID Descending
+                           Select c
 
-                For Each team_member In Team
-                    Dim TeamProcessing = From c In d.AP_Staff_Rmbs
-                                        Join b In d.AP_StaffBroker_CostCenters
-                                            On c.CostCenter Equals b.CostCentreCode _
-                                                And c.PortalId Equals b.PortalId
-                                        Where c.UserId = team_member.UserID And c.Status = RmbStatus.Processing And c.PortalId = PortalId
-                                        Order By c.RID Descending
-                                        Select c.RMBNo, c.RmbDate, c.RID, c.SpareField1
-
-                    If (TeamProcessing.Count > 0) Then
-                        Dim TeamMemberProcessingNode As New TreeNode(team_member.LastName & ", " & team_member.FirstName)
-                        TeamMemberProcessingNode.Expanded = False
-                        TeamMemberProcessingNode.SelectAction = TreeNodeSelectAction.Expand
-
-                        For Each rmb In TeamProcessing
-                            Dim rmb_node As New TreeNode()
-                            Dim rmbTotal = If(rmb.SpareField1 Is Nothing, "", rmb.SpareField1)
-                            If (rmb.RmbDate Is Nothing) Then
-                                rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, New Date(1970, 1, 1), rmbTotal)
-                            Else
-                                rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbTotal)
-                            End If
-                            rmb_node.Value = rmb.RMBNo
-                            rmb_node.SelectAction = TreeNodeSelectAction.Select
-                            TeamMemberProcessingNode.ChildNodes.Add(rmb_node)
-                            If IsSelected(rmb.RMBNo) Then
-                                TeamMemberProcessingNode.Expanded = True
-                                TeamProcessingNode.Expanded = True
-                            End If
-                        Next
-
-                        TeamProcessingNode.ChildNodes.Add(TeamMemberProcessingNode)
-                    End If
-                Next
                 tvTeamProcessing.Nodes.Clear()
-                tvTeamProcessing.Nodes.Add(TeamProcessingNode)
+                tvTeamProcessing.Nodes.Add(BuildTeamTree(Rmbs))
                 tvTeamProcessing.Visible = True
                 ProcessingUpdatePanel.Update()
             Catch ex As Exception
@@ -618,50 +565,67 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Private Async Function buildTeamPaidTreeAsync(Team As List(Of User)) As Task
             Try
-                Dim TeamPaidNode As New TreeNode("Your Team")
-                TeamPaidNode.SelectAction = TreeNodeSelectAction.Expand
-                TeamPaidNode.Expanded = False
+                Dim teamIds = New List(Of Integer)
+                Team.ForEach(Sub(member) teamIds.Add(member.UserID))
+                Dim Rmbs = From c In d.AP_Staff_Rmbs
+                           Where (c.PortalId = PortalId And c.Status = RmbStatus.Paid) _
+                                And (teamIds.Contains(c.UserId) Or c.ApprUserId = UserId)
+                           Order By c.RID Descending
+                           Select c
 
-                For Each team_member In Team
-                    Dim TeamPaid = From c In d.AP_Staff_Rmbs
-                                        Join b In d.AP_StaffBroker_CostCenters
-                                            On c.CostCenter Equals b.CostCentreCode _
-                                                And c.PortalId Equals b.PortalId
-                                        Where c.UserId = team_member.UserID And c.Status = RmbStatus.Paid And c.PortalId = PortalId
-                                        Order By c.RID Descending
-                                        Select c.RMBNo, c.RmbDate, c.RID, c.SpareField1
-                    If (TeamPaid.Count > 0) Then
-                        Dim TeamMemberPaidNode As New TreeNode(team_member.LastName & ", " & team_member.FirstName)
-                        TeamMemberPaidNode.Expanded = False
-                        TeamMemberPaidNode.SelectAction = TreeNodeSelectAction.Expand
-
-                        For Each rmb In TeamPaid
-                            Dim rmb_node As New TreeNode()
-                            Dim rmbTotal = If(rmb.SpareField1 Is Nothing, "", rmb.SpareField1)
-                            If (rmb.RmbDate Is Nothing) Then
-                                rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, New Date(1970, 1, 1), rmbTotal)
-                            Else
-                                rmb_node.Text = GetRmbTitleTeamShort(rmb.RID, rmb.RmbDate, rmbTotal)
-                            End If
-                            rmb_node.Value = rmb.RMBNo
-                            rmb_node.SelectAction = TreeNodeSelectAction.Select
-                            TeamMemberPaidNode.ChildNodes.Add(rmb_node)
-                            If IsSelected(rmb.RMBNo) Then
-                                TeamMemberPaidNode.Expanded = True
-                                TeamPaidNode.Expanded = True
-                            End If
-                        Next
-
-                        TeamPaidNode.ChildNodes.Add(TeamMemberPaidNode)
-                    End If
-                Next
                 tvTeamPaid.Nodes.Clear()
-                tvTeamPaid.Nodes.Add(TeamPaidNode)
+                tvTeamPaid.Nodes.Add(BuildTeamTree(Rmbs))
                 tvTeamPaid.Visible = True
                 PaidUpdatePanel.Update()
             Catch ex As Exception
                 Throw New Exception("Error building team paid tree: " + ex.Message)
             End Try
+        End Function
+
+        Private Function BuildTeamTree(Rmbs As IEnumerable(Of AP_Staff_Rmb)) As TreeNode
+            If (Rmbs Is Nothing Or Rmbs.Count = 0) Then
+                Dim noItems = New TreeNode("No Team Items")
+                noItems.SelectAction = TreeNodeSelectAction.None
+                Return noItems
+            End If
+
+            Dim teamTree = New TreeNode("Your Team")
+            teamTree.SelectAction = TreeNodeSelectAction.Expand
+            teamTree.Expanded = False
+
+            For Each Rmb In Rmbs
+                Dim user = UserController.GetUserById(PortalId, Rmb.UserId)
+                Dim name = user.LastName & ", " & user.FirstName
+                Dim TeamMember = addOrGetTeamMember(teamTree.ChildNodes, name)
+                TeamMember.ChildNodes.Add(createNode(Rmb))
+                If IsSelected(Rmb.RMBNo) Then
+                    TeamMember.Expanded = True
+                    teamTree.Expanded = True
+                End If
+            Next
+
+            Return teamTree
+        End Function
+
+        Function addOrGetTeamMember(teamMembers As TreeNodeCollection, name As String) As TreeNode
+            For Each teamMember As TreeNode In teamMembers
+                If (teamMember.Text = name) Then Return teamMember
+            Next
+            Dim newTeamMember = New TreeNode(name)
+            newTeamMember.SelectAction = TreeNodeSelectAction.Expand
+            newTeamMember.Expanded = False
+            teamMembers.Add(newTeamMember)
+            Return newTeamMember
+        End Function
+
+        Function createNode(Rmb As AP_Staff_Rmb) As TreeNode
+            Dim node As New TreeNode()
+            node.SelectAction = TreeNodeSelectAction.Select
+            Dim rmbTotal = If(Rmb.SpareField1 Is Nothing, "", Rmb.SpareField1)
+            Dim rmbDate = If(Rmb.RmbDate Is Nothing, New Date(1970, 1, 1), Rmb.RmbDate)
+            node.Text = GetRmbTitleTeamShort(Rmb.RID, rmbDate, rmbTotal)
+            node.Value = Rmb.RMBNo
+            Return node
         End Function
 
         Private Async Function LoadFinanceMenuAsync() As Task
