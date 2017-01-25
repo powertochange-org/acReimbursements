@@ -884,8 +884,8 @@ function GetAccountBalance(jsonQuery){
         $(".tblSplit .Amount").each(function() {
             if (!isNaN(this.value) && this.value.length !== 0) {total += parseFloat(this.value.replace(',',''));}
         });
-       
-        var orig = parseFloat($("#<%= lblOriginalAmt.ClientId %>").html().replace(',',''));
+        total = total.toFixed(2);
+        var orig = parseFloat($("#<%= lblOriginalAmt.ClientId %>").html().replace(',','')).toFixed(2);
 
         if(total == orig) {
             $("#<%= btnOK.ClientId %>").prop('disabled', false).removeClass('aspNetDisabled');
@@ -2147,7 +2147,7 @@ function GetAccountBalance(jsonQuery){
                                     <asp:TextBox ID="tbSplitDesc" runat="server" Width="100%" CssClass="Description"></asp:TextBox>
                                 </asp:TableCell>
                                 <asp:TableCell>
-                                    <asp:TextBox ID="tbSplitAmt" type="number" step="0.01" runat="server" Width="100px" CssClass="Amount"></asp:TextBox>
+                                    <asp:TextBox ID="tbSplitAmt" type="tel" runat="server" Width="100px" CssClass="Amount"></asp:TextBox>
                                 </asp:TableCell>
                             </asp:TableRow>
                         </asp:Table>
