@@ -85,6 +85,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 tbAmt.Width = Unit.Pixel(100)
                 '  tbAmt.ID = "tbAmt" & i
                 tbAmt.CssClass = "Amount"
+                tbAmt.Attributes.Add("type", "tel")
                 tbAmt.Attributes.Add("onblur", "calculateTotal();")
                 insertDesc.Controls.Add(tbDesc)
                 insertAmt.Controls.Add(tbAmt)
@@ -1923,8 +1924,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             tbAmt.Width = Unit.Pixel(100)
             ' tbAmt.ID = "tbAmt" & hfRows.Value
             tbAmt.CssClass = "Amount"
-            tbAmt.Attributes.Add("type", "number")
-            tbAmt.Attributes.Add("step", "0.01")
+            tbAmt.Attributes.Add("type", "tel")
             tbAmt.Attributes.Add("onblur", "calculateTotal();")
             tbAmt.Attributes.Add("oninput", "calculateTotal();")
             insertDesc.Controls.Add(tbDesc)
@@ -1973,107 +1973,107 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         Protected Async Sub btnOK_Click(sender As Object, e As System.EventArgs) Handles btnOK.Click 'this is the OK button on the Split dialog
             Dim State As Integer = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.Status).First()
-            If State <> RmbStatus.Approved Then Return
-
-            Dim theLine = From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(hfSplitLineId.Value)
-            If theLine.Count > 0 Then
-                Dim receipts As List(Of AP_Staff_RmbLine_File) = (From c In d.AP_Staff_RmbLine_Files Where c.RmbLineNo = theLine.First.RmbLineNo).ToList()
-                Dim rownumber = 1
-                For Each row As TableRow In tblSplit.Rows
-                    Dim RowAmount = CType(row.Cells(1).Controls(0), TextBox).Text
-                    Dim RowDesc = CType(row.Cells(0).Controls(0), TextBox).Text
-                    If RowAmount = "" Or RowDesc = "" Or RowAmount = "Amount" Or RowDesc = "Description" Then
-                        lblSplitError.Visible = True
-                        ScriptManager.RegisterStartupScript(btnOK, btnOK.GetType(), "close_loading_spinner", "$('#loading').hide()", True)
-                        Return
-                    ElseIf CDbl(RowAmount) = 0 Then
-                        lblSplitError.Visible = True
-                        ScriptManager.RegisterStartupScript(btnOK, btnOK.GetType(), "close_loading_spinner", "$('#loading').hide()", True)
-                        Return
-                    End If
-                    Dim insert As New AP_Staff_RmbLine()
-                    insert.AnalysisCode = theLine.First.AnalysisCode
-                    insert.Supplier = theLine.First.Supplier
-                    insert.Comment = RowDesc
-                    insert.GrossAmount = CDbl(RowAmount)
-                    insert.OrigCurrency = theLine.First.OrigCurrency
-                    insert.ExchangeRate = theLine.First.ExchangeRate
-                    Dim originalAmount As Decimal
-                    If (insert.ExchangeRate Is Nothing) Then
-                        originalAmount = insert.GrossAmount
-                    Else : originalAmount = insert.GrossAmount * insert.ExchangeRate
-                    End If
-                    insert.OrigCurrencyAmount = Math.Round(originalAmount, 2)
-                    insert.LargeTransaction = RowAmount > CDbl(Settings("TeamLeaderLimit"))
-                    insert.LineType = theLine.First.LineType
-                    insert.Mileage = theLine.First.Mileage
-                    insert.MileageRate = theLine.First.MileageRate
-                    insert.OutOfDate = theLine.First.OutOfDate
-                    insert.Receipt = theLine.First.Receipt
-                    insert.ReceiptNo = theLine.First.ReceiptNo
-                    insert.RmbNo = theLine.First.RmbNo
-                    insert.Spare1 = theLine.First.Spare1
-                    insert.Spare2 = theLine.First.Spare2
-                    insert.Spare3 = theLine.First.Spare3
-                    insert.Spare4 = theLine.First.Spare4
-                    insert.Spare5 = theLine.First.Spare5
-                    insert.Split = True
-                    insert.Taxable = If(theLine.First.Taxable, 1, 0)
-                    insert.TransDate = theLine.First.TransDate
-                    insert.VATReceipt = theLine.First.VATReceipt
-                    insert.CostCenter = theLine.First.CostCenter
-                    insert.AccountCode = theLine.First.AccountCode
-                    d.AP_Staff_RmbLines.InsertOnSubmit(insert)
+            ScriptManager.RegisterStartupScript(btnOK, btnOK.GetType(), "close_loading_spinner", "$('#loading').hide()", True)
+            If State <> RmbStatus.Approved Then
+                lblErrorMessage.Text = "Split can only be performed in the Approved state"
+                pnlError.Visible = True
+            Else
+                Dim theLine = From c In d.AP_Staff_RmbLines Where c.RmbLineNo = CInt(hfSplitLineId.Value)
+                If theLine.Count > 0 Then
+                    Dim receipts As List(Of AP_Staff_RmbLine_File) = (From c In d.AP_Staff_RmbLine_Files Where c.RmbLineNo = theLine.First.RmbLineNo).ToList()
+                    Dim rownumber = 1
+                    For Each row As TableRow In tblSplit.Rows
+                        Dim RowAmount = CType(row.Cells(1).Controls(0), TextBox).Text
+                        Dim RowDesc = CType(row.Cells(0).Controls(0), TextBox).Text
+                        If RowAmount = "" Or RowDesc = "" Or RowAmount = "Amount" Or RowDesc = "Description" Then
+                            lblSplitError.Visible = True
+                            Return
+                        ElseIf CDbl(RowAmount) = 0 Then
+                            lblSplitError.Visible = True
+                            Return
+                        End If
+                        Dim insert As New AP_Staff_RmbLine()
+                        insert.AnalysisCode = theLine.First.AnalysisCode
+                        insert.Supplier = theLine.First.Supplier
+                        insert.Comment = RowDesc
+                        insert.GrossAmount = CDbl(RowAmount)
+                        insert.OrigCurrency = theLine.First.OrigCurrency
+                        insert.ExchangeRate = theLine.First.ExchangeRate
+                        Dim originalAmount As Decimal
+                        If (insert.ExchangeRate Is Nothing) Then
+                            originalAmount = insert.GrossAmount
+                        Else : originalAmount = insert.GrossAmount * insert.ExchangeRate
+                        End If
+                        insert.OrigCurrencyAmount = Math.Round(originalAmount, 2)
+                        insert.LargeTransaction = RowAmount > CDbl(Settings("TeamLeaderLimit"))
+                        insert.LineType = theLine.First.LineType
+                        insert.Mileage = theLine.First.Mileage
+                        insert.MileageRate = theLine.First.MileageRate
+                        insert.OutOfDate = theLine.First.OutOfDate
+                        insert.Receipt = theLine.First.Receipt
+                        insert.ReceiptNo = theLine.First.ReceiptNo
+                        insert.RmbNo = theLine.First.RmbNo
+                        insert.Spare1 = theLine.First.Spare1
+                        insert.Spare2 = theLine.First.Spare2
+                        insert.Spare3 = theLine.First.Spare3
+                        insert.Spare4 = theLine.First.Spare4
+                        insert.Spare5 = theLine.First.Spare5
+                        insert.Split = True
+                        insert.Taxable = If(theLine.First.Taxable, 1, 0)
+                        insert.TransDate = theLine.First.TransDate
+                        insert.VATReceipt = theLine.First.VATReceipt
+                        insert.CostCenter = theLine.First.CostCenter
+                        insert.AccountCode = theLine.First.AccountCode
+                        d.AP_Staff_RmbLines.InsertOnSubmit(insert)
+                        d.SubmitChanges()
+                        'Duplicate any receipts (and receiptImageId)
+                        If (receipts.Count > 0) Then
+                            Dim receiptnumber = 1
+                            For Each receipt In receipts
+                                Dim file = FileManager.Instance.GetFile(receipt.FileId)
+                                Dim filename = "R" & insert.RmbNo & "L" & insert.RmbLineNo & "Rec" & receiptnumber & "." & file.Extension
+                                Dim stream = FileManager.Instance.GetFileContent(file)
+                                Dim copy = FileManager.Instance.AddFile(FolderManager.Instance.GetFolder(file.FolderId), filename, stream, False)
+                                stream.Close()
+                                stream.Dispose()
+                                insert.ReceiptImageId = copy.FileId
+                                Dim linefile As AP_Staff_RmbLine_File = New AP_Staff_RmbLine_File() With {
+                                    .RMBNo = insert.RmbNo,
+                                    .RmbLineNo = insert.RmbLineNo,
+                                    .RecNum = receiptnumber,
+                                    .FileId = copy.FileId,
+                                    .URL = FileManager.Instance.GetUrl(copy)
+                                }
+                                d.AP_Staff_RmbLine_Files.InsertOnSubmit(linefile)
+                                receiptnumber = receiptnumber + 1
+                            Next
+                        End If
+                        rownumber = rownumber + 1
+                    Next
                     d.SubmitChanges()
-                    'Duplicate any receipts (and receiptImageId)
-                    If (receipts.Count > 0) Then
-                        Dim receiptnumber = 1
-                        For Each receipt In receipts
-                            Dim file = FileManager.Instance.GetFile(receipt.FileId)
-                            Dim filename = "R" & insert.RmbNo & "L" & insert.RmbLineNo & "Rec" & receiptnumber & "." & file.Extension
-                            Dim stream = FileManager.Instance.GetFileContent(file)
-                            Dim copy = FileManager.Instance.AddFile(FolderManager.Instance.GetFolder(file.FolderId), filename, stream, False)
-                            stream.Close()
-                            stream.Dispose()
-                            insert.ReceiptImageId = copy.FileId
-                            Dim linefile As AP_Staff_RmbLine_File = New AP_Staff_RmbLine_File() With {
-                                .RMBNo = insert.RmbNo,
-                                .RmbLineNo = insert.RmbLineNo,
-                                .RecNum = receiptnumber,
-                                .FileId = copy.FileId,
-                                .URL = FileManager.Instance.GetUrl(copy)
-                            }
-                            d.AP_Staff_RmbLine_Files.InsertOnSubmit(linefile)
-                            receiptnumber = receiptnumber + 1
-                        Next
-                    End If
-                    rownumber = rownumber + 1
-                Next
+                    ' now Delete the original receipts
+                    For Each receipt In receipts
+                        Dim fileId = receipt.FileId
+                        Try
+                            Dim file = FileManager.Instance.GetFile(fileId)
+                            FileManager.Instance.DeleteFile(file)
+                        Catch ex As Exception
+                        End Try
+                        d.AP_Staff_RmbLine_Files.DeleteAllOnSubmit(From c In d.AP_Staff_RmbLine_Files Where c.FileId = fileId)
+                    Next
+                End If
+                d.AP_Staff_RmbLine_Files.DeleteAllOnSubmit(From c In d.AP_Staff_RmbLine_Files Where c.RmbLineNo = theLine.First.RmbLineNo)
+                d.AP_Staff_RmbLines.DeleteAllOnSubmit(theLine)
                 d.SubmitChanges()
-                ' now Delete the original receipts
-                For Each receipt In receipts
-                    Dim fileId = receipt.FileId
-                    Try
-                        Dim file = FileManager.Instance.GetFile(fileId)
-                        FileManager.Instance.DeleteFile(file)
-                    Catch ex As Exception
-                    End Try
-                    d.AP_Staff_RmbLine_Files.DeleteAllOnSubmit(From c In d.AP_Staff_RmbLine_Files Where c.FileId = fileId)
-                Next
+                lblSplitError.Visible = False
+                Await LoadRmbAsync(hfRmbNo.Value)
             End If
-            d.AP_Staff_RmbLine_Files.DeleteAllOnSubmit(From c In d.AP_Staff_RmbLine_Files Where c.RmbLineNo = theLine.First.RmbLineNo)
-            d.AP_Staff_RmbLines.DeleteAllOnSubmit(theLine)
-            d.SubmitChanges()
-            lblSplitError.Visible = False
-            Await LoadRmbAsync(hfRmbNo.Value)
-
             Dim t As Type = btnOK.GetType()
             Dim sb As System.Text.StringBuilder = New System.Text.StringBuilder()
             sb.Append("<script language='javascript'>")
             sb.Append("closePopupSplit();")
             sb.Append("</script>")
             ScriptManager.RegisterStartupScript(btnOK, t, "closeSplit", sb.ToString, False)
-
         End Sub
 
         Protected Async Sub btnProcess_Click(sender As Object, e As System.EventArgs) Handles btnSubmitPostingData.Click, btnAccountWarningYes.Click
