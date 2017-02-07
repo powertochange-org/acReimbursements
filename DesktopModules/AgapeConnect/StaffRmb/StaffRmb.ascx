@@ -1841,7 +1841,7 @@ function GetAccountBalance(jsonQuery){
                             </asp:Panel>
                             <div style="width:100%;text-align:right; margin-top:10px;">
                                 <asp:Button ID="btnCancelLine" runat="server" resourceKey="btnCancel" OnClientClick="closeNewItemPopup();" class="aButton" />
-                                <asp:Button ID="btnSaveLine" runat="server" resourcekey="btnEnter" onclientclick="$(this).prop('disabled',true).addClass('aspNetDisabled');" CommandName="Save"  class="aButton" />
+                                <asp:Button ID="btnSaveLine" runat="server" resourcekey="btnEnter" onclientclick="$(this).prop('disabled',true).addClass('aspNetDisabled');if($('.ddlReceipt').val()==1)alert('Please note: Paper receipts will no longer be accepted by mail after Feb 15, 2017.<br>After that date, please upload an image of your paper receipt electronically.')" CommandName="Save"  class="aButton" />
                             </div>
                             </div>
                         <fieldset id="pnlAccountsOptions" runat="server" class="accounts_options">
