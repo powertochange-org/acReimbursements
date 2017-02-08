@@ -661,7 +661,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim AllApproved = (From c In d.AP_Staff_Rmbs
                                    Where (c.Status = RmbStatus.Approved Or c.Status >= RmbStatus.PendingDownload) And c.PortalId = PortalId
                                    Order By c.ApprDate Ascending
-                                   Select c.RMBNo, c.CostCenter, c.RmbDate, c.ApprDate, c.UserRef, c.RID, c.UserId, c.Status, c.SpareField1, c.MoreInfoRequested, _
+                                   Select c.RMBNo, c.CostCenter, c.RmbDate, c.ApprDate, c.UserRef, c.RID, c.UserId, c.Status, c.SpareField1, c.MoreInfoRequested, c.PrivComment, _
                                        Receipts = ((c.AP_Staff_RmbLines.Where(Function(x) x.Receipt And ((From f In d.AP_Staff_RmbLine_Files Where f.RmbLineNo = x.RmbLineNo).Count = 0))).Count > 0))
                 Dim total = AllApproved.Count
 
@@ -712,10 +712,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 For Each rmb In rmbs
                     Dim rmb_node As New TreeNode()
                     Dim rmbTotal = If(rmb.SpareField1 Is Nothing, "unknown", rmb.SpareField1)
-                    Dim flag As Boolean = (rmb.MoreInfoRequested IsNot Nothing AndAlso rmb.MoreInfoRequested)
+                    Dim moreInfo As Boolean = (rmb.MoreInfoRequested IsNot Nothing AndAlso rmb.MoreInfoRequested)
+                    Dim privComments As Boolean = (rmb.PrivComment IsNot Nothing AndAlso rmb.PrivComment.length > 0)
                     Dim owner = UserController.GetUserById(PortalId, rmb.UserId)
                     Dim initials = (getInitials(owner)).ToLower()
-                    rmb_node.Text = GetRmbTitleFinance(initials, rmb.RID, rmb.ApprDate, rmbTotal, flag)
+                    rmb_node.Text = GetRmbTitleFinance(initials, rmb.RID, rmb.ApprDate, rmbTotal, moreInfo, privComments)
                     rmb_node.SelectAction = TreeNodeSelectAction.Select
                     rmb_node.Value = rmb.RMBNo
                     node.ChildNodes.Add(rmb_node)
@@ -2778,10 +2779,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             End Try
         End Function
 
-        Protected Function GetRmbTitleFinance(ByVal initials As String, ByVal RID As Integer, ByVal ApprDate As Date?, ByVal amount As String, flag As Boolean) As String
+        Protected Function GetRmbTitleFinance(ByVal initials As String, ByVal RID As Integer, ByVal ApprDate As Date?, ByVal amount As String, moreInfo As Boolean, privComments As Boolean) As String
             Try
                 Dim DateString = If(ApprDate Is Nothing, "not approved", CType(ApprDate, Date).ToShortDateString)
-                Dim rtn As String = "<span class='" & If(flag, "blue_highlight ", "") & "finance tree' onclick='finance_tree_click(this);'>"
+                Dim rtn As String = "<span class='finance tree' onclick='finance_tree_click(this);'>"
                 rtn = rtn & "<span style=""font-size: 6.5pt; "">" & initials & " #" & ZeroFill(RID.ToString, 5)
                 '  colourize date based on how old it is
                 If (ApprDate Is Nothing) Then
@@ -2802,6 +2803,8 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 If (amount IsNot Nothing) Then
                     rtn = rtn & " - " & amount
                 End If
+                rtn = rtn & If(moreInfo, "<span class='moreInfo' title='More Info Requested'></span>", "")
+                rtn = rtn & If(privComments, "<span class='privComment' title='Private Comments'></span>", "")
                 rtn = rtn & "</span></span>"
                 Return rtn
             Catch ex As Exception
