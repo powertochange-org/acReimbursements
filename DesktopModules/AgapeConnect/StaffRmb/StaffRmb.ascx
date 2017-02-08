@@ -854,7 +854,7 @@ function GetAccountBalance(jsonQuery){
     function eventBritePrompt(sender) {
         var supplier = $(sender).val().toLowerCase();
         if (supplier.indexOf('event') >= 0 && (supplier.indexOf('brite') >= 0  || supplier.indexOf('bright') >=0)) {
-            alert('If this reimbursement is for multiple EventBrite tickets, please attatch an excel (.xls) spreadsheet (just like you would an electronic receipt) that itemizes the individual order numbers.')
+            alert('If this reimbursement is for multiple EventBrite tickets, please attach an excel (.xls) spreadsheet (just like you would an electronic receipt) that itemizes the individual order numbers (in addition to the itemized receipt).')
         }
     }
 
