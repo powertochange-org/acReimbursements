@@ -2038,6 +2038,11 @@ function GetAccountBalance(jsonQuery){
                 </table>
 
             </ContentTemplate>
+            <Triggers>
+                <asp:AsyncPostBackTrigger ControlID="ddlCompany" />
+                <asp:AsyncPostBackTrigger ControlID="tbVendorId" />
+                <asp:AsyncPostBackTrigger ControlID="ddlRemitTo" />
+            </Triggers>
         </asp:UpdatePanel>
     </div>
 
