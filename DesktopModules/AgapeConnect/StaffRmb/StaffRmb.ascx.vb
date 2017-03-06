@@ -10,7 +10,7 @@
 '-------------
 ' Spare1: Province
 ' Spare2: PerDiem meals, Advance UnclearedAmount
-' Spare3: Mileage unit index
+' Spare3: Mileage unit index, Recipient
 ' Spare4: Mileage origin, ClearingAdvance RmbNo
 ' Spare5: Mileage destination, ClearingAdvance RmbLineNo
 
@@ -42,7 +42,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
     Partial Class ViewStaffRmb
         Inherits Entities.Modules.PortalModuleBase
         Implements Entities.Modules.IActionable
-        Dim VERSION_STRING As String = "1.2.62"
+        Dim VERSION_STRING As String = "1.2.64"
         Dim BALANCE_INCONCLUSIVE As String = "unknown"
         Dim BALANCE_PERMISSION_DENIED As String = "**hidden**"
         Dim EDMS_APPROVAL_LOG_MESSAGE As String = "APPROVED by EDMS"

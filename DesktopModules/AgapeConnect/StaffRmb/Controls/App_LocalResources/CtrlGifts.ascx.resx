@@ -210,4 +210,10 @@
   <data name="Error.NoElecReceipt" xml:space="preserve">
     <value>When you choose Electronic Receipts, you must attach your receipt by clicking the Add Receipt button</value>
   </data>
+  <data name="lblRecipient.Help" xml:space="preserve">
+    <value>Who was this gift given to?</value>
+  </data>
+  <data name="lblRecipient.Text" xml:space="preserve">
+    <value>Recipient(s):</value>
+  </data>
 </root>

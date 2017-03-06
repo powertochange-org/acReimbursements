@@ -37,6 +37,18 @@
         <td colspan="2"><asp:TextBox ID="tbSupplier" runat="server" ClientIDMode="static" Width="278px" CssClass="required" AutoCompleteType="None" onchange="eventBritePrompt(this);" ></asp:TextBox></td>
     </tr>
     <tr>
+        <td ><b><asp:label ID="lblRecipient" runat="server" ControlName="tbRecipient" ResourceKey="lblRecipient" Visible="false" /></b>
+            <asp:LinkButton id="lbRecipient" TabIndex="-1" runat="server" CausesValidation="False" EnableViewState="False" CssClass="dnnFormHelp"  style="position:relative" Visible="false"/>
+            <asp:Panel runat="server" CssClass="dnnTooltip">
+                <div class="dnnFormHelpContent dnnClear">
+                    <asp:Label ID="hlpRecipient" runat="server" EnableViewState="False" class="dnnHelpText" />
+                    <a href="#" class="pinHelp"></a>
+               </div>   
+            </asp:Panel>
+        </td>
+        <td colspan="2"><asp:TextBox ID="tbRecipient" runat="server" ClientIDMode="static" Width="278px" CssClass="required" AutoCompleteType="None" Visible="false"></asp:TextBox></td>
+    </tr>
+    <tr>
         <td style="width:200px"><b><asp:label id="lblDesc" runat="server" controlname="tbDesc" ResourceKey="lblDesc"  /></b>
             <asp:LinkButton id="lbDesc" TabIndex="-1" runat="server" CausesValidation="False" EnableViewState="False" CssClass="dnnFormHelp"  style="position:relative"/>
             <asp:Panel runat="server" CssClass="dnnTooltip">
@@ -375,6 +387,7 @@
         //Add items to receipt dropdown
         string text = DotNetNuke.Services.Localization.Localization.GetString(RmbReceiptType.Name(RmbReceiptType.Standard) + ".Text", LocalResourceFile);
         ListItem StandardItem = new ListItem(text, RmbReceiptType.Standard.ToString());
+        StandardItem.Enabled = false;
         text = DotNetNuke.Services.Localization.Localization.GetString(RmbReceiptType.Name(RmbReceiptType.No_Receipt) + ".Text", LocalResourceFile);
         ListItem NoReceiptItem = new ListItem(text, RmbReceiptType.No_Receipt.ToString(), true);
         text = DotNetNuke.Services.Localization.Localization.GetString(RmbReceiptType.Name(RmbReceiptType.Electronic) + ".Text", LocalResourceFile);

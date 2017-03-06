@@ -21,6 +21,9 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
         tbAmount.Attributes.Add("style", "display:none");
         lbAmount.Visible = false;
         currencyUpdatePanel.Attributes.Add("style", "display:none");
+        tbRecipient.Visible = true;
+        lblRecipient.Visible = true;
+        lbRecipient.Visible = true;
     }
 
     new public void Initialize(Hashtable settings)
@@ -80,14 +83,15 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
         hlpDate.Text = DotNetNuke.Services.Localization.Localization.GetString("lblDate.Help", LocalResourceFile);
         hlpAmount.Text = DotNetNuke.Services.Localization.Localization.GetString("lblAmount.Help", LocalResourceFile);
         hlpProvince.Text = DotNetNuke.Services.Localization.Localization.GetString("lblProvince.Help", LocalResourceFile);
+        hlpRecipient.Text = DotNetNuke.Services.Localization.Localization.GetString("lblRecipient.Help", LocalResourceFile);
         // Hint strings
         tbDesc.Attributes.Add("Placeholder", DotNetNuke.Services.Localization.Localization.GetString("lblDesc.Hint", LocalResourceFile));
     }
 
     new public string Supplier
     {
-        get { return ""; }
-        set { }
+        get { return tbRecipient.Text; }
+        set { tbRecipient.Text = value; }
     }
     new public bool VAT
     {
@@ -290,10 +294,15 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
     new public bool validate_required_fields()
     {
         tbDesc.CssClass = tbDesc.CssClass.Replace("missing", "");
-        if (tbDesc.Text.Length == 0)
-        {
+        tbRecipient.CssClass = tbRecipient.CssClass.Replace("missing", "");
+        if (tbDesc.Text.Length == 0) {
             ErrorLbl2.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.RequiredField", LocalResourceFile);
             tbDesc.CssClass = tbDesc.CssClass + " missing";
+            return false;
+        }
+        if (tbRecipient.Text.Length == 0) {
+            ErrorLbl2.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.RequiredField", LocalResourceFile);
+            tbRecipient.CssClass = tbRecipient.CssClass + " missing";
             return false;
         }
         return true;
