@@ -375,6 +375,7 @@
         //Add items to receipt dropdown
         string text = DotNetNuke.Services.Localization.Localization.GetString(RmbReceiptType.Name(RmbReceiptType.Standard) + ".Text", LocalResourceFile);
         ListItem StandardItem = new ListItem(text, RmbReceiptType.Standard.ToString());
+        StandardItem.Enabled = false;
         text = DotNetNuke.Services.Localization.Localization.GetString(RmbReceiptType.Name(RmbReceiptType.No_Receipt) + ".Text", LocalResourceFile);
         ListItem NoReceiptItem = new ListItem(text, RmbReceiptType.No_Receipt.ToString(), true);
         text = DotNetNuke.Services.Localization.Localization.GetString(RmbReceiptType.Name(RmbReceiptType.Electronic) + ".Text", LocalResourceFile);
