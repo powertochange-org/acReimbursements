@@ -10,7 +10,7 @@
 '-------------
 ' Spare1: Province
 ' Spare2: PerDiem meals, Advance UnclearedAmount
-' Spare3: Mileage unit index
+' Spare3: Mileage unit index, Recipient
 ' Spare4: Mileage origin, ClearingAdvance RmbNo
 ' Spare5: Mileage destination, ClearingAdvance RmbLineNo
 

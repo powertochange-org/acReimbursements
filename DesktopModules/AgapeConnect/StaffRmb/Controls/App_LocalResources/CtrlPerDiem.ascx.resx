@@ -201,4 +201,10 @@
   <data name="lblTotal.Text" xml:space="preserve">
     <value>Total:</value>
   </data>
+  <data name="lblRecipient.Help" xml:space="preserve">
+    <value>Which staff are this PerDiem being claimed for?</value>
+  </data>
+  <data name="lblRecipient.Text" xml:space="preserve">
+    <value>Recipient(s):</value>
+  </data>
 </root>

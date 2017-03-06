@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -12,6 +13,14 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
 //        lblForWhom.Visible = true;
 //        lbForWhom.Visible = true;
 //        tbForWhom.Visible = true;
+        tbRecipient.Visible = true;
+        lblRecipient.Visible = true;
+        lbRecipient.Visible = true;
+    }
+
+    new public void Initialize(Hashtable settings) {
+        base.Initialize(settings);
+        hlpRecipient.Text = DotNetNuke.Services.Localization.Localization.GetString("lblRecipient.Help", LocalResourceFile);
     }
 
     new public string Spare5
