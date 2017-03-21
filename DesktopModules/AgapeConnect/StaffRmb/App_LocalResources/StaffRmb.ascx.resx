@@ -697,13 +697,13 @@
     <value>There are multiple receipts for this item</value>
   </data>
   <data name="ExtraApproval.Text" xml:space="preserve">
-    <value>This account has been flagged as requiring a stricter-than-normal approval process.  As a result, this reimbursement will require the additional approval of the Ministry Director, and the Executive Directory of Ministry Services before it can be processed.</value>
+    <value>This account has been flagged as requiring a stricter-than-normal approval process.  As a result, this reimbursement will require the additional approval of the Ministry Director, and the Financial Controller before it can be processed.</value>
   </data>
   <data name="PendingDirectorApproval.Text" xml:space="preserve">
     <value>Awaiting Director's Approval</value>
   </data>
   <data name="PendingEDMSApproval.Text" xml:space="preserve">
-    <value>Awaiting Approval of the Executive Director of Ministry Services</value>
+    <value>Awaiting Approval of the Financial Controller</value>
   </data>
   <data name="Extra.Text" xml:space="preserve">
     <value>...</value>
@@ -745,7 +745,7 @@
     <value>Reimbursement #[RMBNO] has passed Director approval </value>
   </data>
   <data name="RmbApprovedEDMS.Text" xml:space="preserve">
-    <value>Reimbursement #[RMBNO] has passed EDMS approval</value>
+    <value>Reimbursement #[RMBNO] has passed Financial Controller approval</value>
   </data>
   <data name="UnauthorizedApprover.Text" xml:space="preserve">
     <value>You are not authorized to approve this reimbursement</value>
@@ -848,7 +848,7 @@ To view more details about how these numbers were calculated, run a Summary Inco
     <value>Private Finance Comments</value>
   </data>
   <data name="lblExtraApproval.Text" xml:space="preserve">
-    <value>Additional Approval by EDMS granted.</value>
+    <value>Additional Approval by Financial Controller granted.</value>
   </data>
   <data name="ApproverChangedEmail.Text" xml:space="preserve">
     <value>Please note that the selected approver for Reimbursement #[RMBNO] has been changed, and you are no longer required to approve this reimbursement.</value>
