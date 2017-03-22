@@ -12,7 +12,7 @@
 ' Spare2: PerDiem meals, Advance UnclearedAmount
 ' Spare3: Mileage unit index, Recipient
 ' Spare4: Mileage origin, ClearingAdvance RmbNo
-' Spare5: Mileage destination, ClearingAdvance RmbLineNo
+' Spare5: Mileage destination, ClearingAdvance RmbLineNo, meal participants
 
 Imports System
 Imports System.Collections
@@ -3748,6 +3748,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim tName = (From c In d.AP_Staff_RmbLineTypes Where c.LineTypeId = typeId Select c.TypeName).First().ToLower()
                 If (tName.Equals("per diem")) And IsAccounts() Then Return True
                 If (tName.Equals("meals")) Then Return True
+                If (tName.Equals("cida meals")) Then Return True
             Catch
             End Try
             Return False

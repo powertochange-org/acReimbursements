@@ -10,17 +10,9 @@ public partial class ControlBase : StaffRmb.StaffRmbControl {
     new protected void Page_Init(object sender, EventArgs e)
     {
         base.Page_Init(sender, e);
-//        lblForWhom.Visible = true;
-//        lbForWhom.Visible = true;
-//        tbForWhom.Visible = true;
-        tbRecipient.Visible = true;
-        lblRecipient.Visible = true;
-        lbRecipient.Visible = true;
-    }
-
-    new public void Initialize(Hashtable settings) {
-        base.Initialize(settings);
-        hlpRecipient.Text = DotNetNuke.Services.Localization.Localization.GetString("lblRecipient.Help", LocalResourceFile);
+        lblForWhom.Visible = true;
+        lbForWhom.Visible = true;
+        tbForWhom.Visible = true;
     }
 
     new public string Spare5
