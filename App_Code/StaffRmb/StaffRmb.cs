@@ -312,10 +312,10 @@ namespace StaffRmb
                 else
                 {
                     HttpContext.Current.Cache.Add(cacheKey, result, null, DateTime.Now.Add(CACHE_FOR), Cache.NoSlidingExpiration, CacheItemPriority.Default, null);
-                    Log(RID, "Added to cache " + cacheKey + ": " + result);
+                    //Log(RID, "Added to cache " + cacheKey + ": " + result);
                 }
             } else {
-                Log(RID, "Retrieved Managers from cache: " + logon + ": " + result);
+                //Log(RID, "Retrieved Managers from cache: " + logon + ": " + result);
             }
             return JsonConvert.DeserializeObject<string[]>(result);
         }
@@ -390,10 +390,10 @@ namespace StaffRmb
                     result = "[\"ERR\"]"; //this will not produce a visible error, just an empty dropdown
                 else {
                     HttpContext.Current.Cache.Add(cacheKey, result, null, DateTime.Now.Add(CACHE_FOR), Cache.NoSlidingExpiration, CacheItemPriority.Default, null);
-                    Log( RID, "Added signatories to Cache: " + account + "/"+amount.ToString()+": " + result );
+                    //Log( RID, "Added signatories to Cache: " + account + "/"+amount.ToString()+": " + result );
                 }
             } else {
-                Log(RID, "Retrieved signatories from cache: " + account+"/"+amount.ToString() + ": " + result );
+                //Log(RID, "Retrieved signatories from cache: " + account+"/"+amount.ToString() + ": " + result );
             }
             return JsonConvert.DeserializeObject<string[]>(result);
         }
@@ -423,10 +423,10 @@ namespace StaffRmb
                 else
                 {
                     HttpContext.Current.Cache.Add(cacheKey, result, null, DateTime.Now.Add(CACHE_FOR), Cache.NoSlidingExpiration, CacheItemPriority.Default, null);
-                    Log(-1, "Added companies to Cache: " + result );
+                    //Log(-1, "Added companies to Cache: " + result );
                 }
             } else {
-                Log(-1, "Retrieved companies from cache: " + result );
+                //Log(-1, "Retrieved companies from cache: " + result );
             }
             return JsonConvert.DeserializeObject(result);
         }
@@ -445,10 +445,10 @@ namespace StaffRmb
                     result = "[{\"AddressID\":\"ERR\",\"DefaultRemitToAddress\":\"N\",\"Address1\":\"Oops, No addresses!  Re-select the vendor to try again.\"}]";
                 else {
                     HttpContext.Current.Cache.Add(cacheKey, result, null, DateTime.Now.Add(CACHE_FOR), Cache.NoSlidingExpiration, CacheItemPriority.Default, null);
-                    Log(-1, "Added addresses to Cache "+ cacheKey + ": " + result );
+                    //Log(-1, "Added addresses to Cache "+ cacheKey + ": " + result );
                 }
             } else {
-                Log(-1, "Retrieved addresses from cache "+cacheKey +": " + result );
+                //Log(-1, "Retrieved addresses from cache "+cacheKey +": " + result );
             }
             return JsonConvert.DeserializeObject(result);
         }
