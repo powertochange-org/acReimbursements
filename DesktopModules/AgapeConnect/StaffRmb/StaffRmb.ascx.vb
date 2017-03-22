@@ -1361,6 +1361,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             If (theControl.GetType().GetProperty("ReceiptType") IsNot Nothing) Then
                 theControl.GetType().GetProperty("ReceiptType").SetValue(theControl, receiptType)
             End If
+            If receiptType = RmbReceiptType.Electronic Then
+                pnlElecReceipts.Attributes("style") = ""
+            Else
+                pnlElecReceipts.Attributes("style") = "display: none;"
+            End If
         End Sub
 
         Protected Async Sub btnAddClearingItem_click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnAddClearingItem.Click
