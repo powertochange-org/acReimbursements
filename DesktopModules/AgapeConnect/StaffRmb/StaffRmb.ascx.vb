@@ -1172,6 +1172,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Protected Async Sub btnSaveLine_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSaveLine.Click
 
             'unload the iframe (to stop the timed refresh with QR codes)
+            Dim receiptSrc = ifReceipt.Attributes("src")
             ifReceipt.Attributes("src") = "about:blank"
             'never allow changes to reimbursements after they have been processed
             Dim State As Integer = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value Select c.Status).First
@@ -1305,6 +1306,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         d.SubmitChanges()
                         success = True
                     Else ' The form was not valid
+                        ifReceipt.Attributes("src") = receiptSrc
                         ReloadInvalidForm()
                         success = False
                     End If
@@ -1353,24 +1355,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Sub
 
         Private Sub ReloadInvalidForm()
-            ' Need to check the current state of electronic receipts and currency conversions 
-            ' and set the attribute to match; otherwise, it will get reset to the default state. 
-            'Dim currency = theControl.GetType().GetProperty("Currency").GetValue(theControl, Nothing)
-            'If (currency <> StaffBrokerFunctions.GetSetting("AccountingCurrency", PortalId)) Then
-            '    Dim jscript = "$('.exchangeRate').val('" & hfExchangeRate.Value + "');"
-            '    jscript &= "$('.equivalentCAD').val('" & hfOrigCurrencyValue.Value / hfExchangeRate.Value & "');"
-            '    ScriptManager.RegisterClientScriptBlock(Page, Me.GetType(), "fixCurrency", jscript, True)
-            'End If
             btnSaveLine.Enabled = True
+            Dim receiptType = CInt(theControl.GetType().GetProperty("ReceiptType").GetValue(theControl, Nothing))
             theControl.GetType().GetMethod("Initialize").Invoke(theControl, New Object() {Settings})
             If (theControl.GetType().GetProperty("ReceiptType") IsNot Nothing) Then
-                If (CInt(theControl.GetType().GetProperty("ReceiptType").GetValue(theControl, Nothing) = RmbReceiptType.Electronic)) Then
-                    ' If the receipt type is set to 2, we keep it visible
-                    pnlElecReceipts.Attributes("style") = ""
-                Else
-                    ' Hide it
-                    pnlElecReceipts.Attributes("style") = "display: none"
-                End If
+                theControl.GetType().GetProperty("ReceiptType").SetValue(theControl, receiptType)
             End If
         End Sub
 
