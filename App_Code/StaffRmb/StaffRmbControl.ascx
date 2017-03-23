@@ -517,7 +517,7 @@
         }
         public bool Receipt {
             get { return ddlReceipt.SelectedValue == RmbReceiptType.Standard.ToString() || ddlReceipt.SelectedValue==RmbReceiptType.Electronic.ToString() || ddlReceipt.SelectedValue==RmbReceiptType.VAT.ToString();  }
-            set { if (!value) ddlReceipt.SelectedValue = RmbReceiptType.Standard.ToString(); }
+            set { if (!value) ddlReceipt.SelectedValue = RmbReceiptType.Electronic.ToString(); }
         }
         public bool ReceiptsAttached
         {

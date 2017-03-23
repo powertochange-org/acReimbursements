@@ -216,4 +216,10 @@
   <data name="lblRecipient.Text" xml:space="preserve">
     <value>Recipient(s):</value>
   </data>
+  <data name="lblForWhom.Help" xml:space="preserve">
+    <value>Please specify the names of those you are reimbursing the costs of this meal for.</value>
+  </data>
+  <data name="lblForWhom.Text" xml:space="preserve">
+    <value>For whom?</value>
+  </data>
 </root>
