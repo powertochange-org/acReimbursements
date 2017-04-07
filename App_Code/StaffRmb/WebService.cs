@@ -101,8 +101,13 @@ public class WebService : System.Web.Services.WebService {
                 {
                     DotNetNuke.Entities.Users.UserInfo staffMember = DotNetNuke.Entities.Users.UserController.GetUserById(portalid, rmb.UserId);
                     string firstLetter = (staffMember.LastName!=null?staffMember.LastName.ToUpper().Substring(0, 1):"-");
+                    if (firstLetter == "-" && staffMember.DisplayName != null && staffMember.DisplayName.Length > 1) {
+                        firstLetter = StaffRmbFunctions.lastNameFromDisplayName(staffMember.DisplayName).ToUpper().Substring(0, 1);
+                    }
                     Item letter = tree.Needs(firstLetter);
-                    Item staff = letter.Needs(staffMember.LastName!=null?(staffMember.LastName + ", " + staffMember.FirstName):staffMember.DisplayName);
+                    string displayName = staffMember.LastName!=null?staffMember.LastName + ", " + staffMember.FirstName:
+                        StaffRmbFunctions.lastNameFromDisplayName(staffMember.DisplayName) + ", " + StaffRmbFunctions.firstNameFromDisplayName(staffMember.DisplayName);
+                    Item staff = letter.Needs(displayName);
                     string id = rmb.RID.ToString().PadLeft(5, '0');
                     Item reimbursement = staff.Needs(id + " : " + (rmb.RmbDate == null ? "" : rmb.RmbDate.Value.ToShortDateString()) + " : " + rmb.SpareField1, false); //false means reverse sort
                     if (rmb.PrivComment != null) { reimbursement.label += " *"; }

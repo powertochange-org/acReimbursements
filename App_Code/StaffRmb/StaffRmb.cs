@@ -792,6 +792,22 @@ namespace StaffRmb
             return RmbAccess.Denied;
         }
 
+        static public string firstNameFromDisplayName(string displayName) {
+            //Returns all except last word of displayName
+            if (displayName == null) return "";
+            string trimmedName = displayName.Trim();
+            if (!trimmedName.Contains(' ')) return "";
+            return trimmedName.Substring(0, trimmedName.LastIndexOf(' '));
+        }
+
+        static public string lastNameFromDisplayName(string displayName) {
+            // Returns last word of displayName
+            if (displayName == null) return "";
+            string trimmedName = displayName.Trim();
+            if (!trimmedName.Contains(' ')) return trimmedName;
+            return trimmedName.Substring(trimmedName.LastIndexOf(' ') + 1);
+        }
+
         static private void Log(int RID, string Message)
         {
             short verbose = 0;
