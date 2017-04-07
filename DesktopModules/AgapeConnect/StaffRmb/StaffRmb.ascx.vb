@@ -1056,11 +1056,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     '--advances
                     Dim uncleared_advances = getUnclearedAdvances(Rmb.UserId)
                     Dim uncleared_amount As Double
-                    Try
-                        uncleared_amount = (From a In uncleared_advances Select Convert.ToDouble(a.Spare2)).Sum()
-                    Catch
-                        uncleared_amount = 0
-                    End Try
+                    For Each advance In uncleared_advances
+                        Dim amt = 0
+                        If (Double.TryParse(advance.Spare2, amt)) Then
+                            uncleared_amount += amt
+                        End If
+                    Next
+
                     pnlAdvance.Visible = (uncleared_amount > 0) And (((FORM_HAS_ITEMS) And (isOwner Or isSpouse) And (Not (PROCESSING Or PAID Or APPROVED))) Or (isFinance And APPROVED))
                     lblOutstandingAdvanceAmount.Text = uncleared_amount.ToString("C")
                     If (uncleared_amount > 0) Then
