@@ -11,17 +11,22 @@ public partial class ControlBase : StaffRmb.StaffRmbControl
 
     new protected void Page_Init(object sender, EventArgs e) {
         base.Page_Init(sender, e);
-        tbRecipient.Visible = true;
-        lblRecipient.Visible = true;
-        lbRecipient.Visible = true;
+        lblForWhom.Visible = true;
+        lbForWhom.Visible = true;
+        tbForWhom.Visible = true;
     }
-    new public void Initialize(Hashtable settings) {
-        base.Initialize(settings);
-        hlpRecipient.Text = DotNetNuke.Services.Localization.Localization.GetString("lblRecipient.Help", LocalResourceFile);
-    }
-    new public string Spare3 {
-        get { return tbRecipient.Text; }
-        set { tbRecipient.Text = value; }
+
+    new public string Spare5 {
+        get {
+            // Show this field, only if it already has data
+            if (!string.IsNullOrEmpty(tbForWhom.Text)) {
+                lblForWhom.Visible = true;
+                lbForWhom.Visible = true;
+                tbForWhom.Visible = true;
+            }
+            return tbForWhom.Text;
+        }
+        set { tbForWhom.Text = value; }
     }
 
     new public bool ValidateForm(int UserId) {
@@ -33,8 +38,8 @@ public partial class ControlBase : StaffRmb.StaffRmbControl
         ErrorLbl.Text = "";
         return true;
     }
-    new public bool validate_required_fields() {
-        TextBox[] required_fields = new TextBox[] { tbSupplier, tbRecipient, tbDesc, tbAmount };
+    public bool validate_required_fields() {
+        TextBox[] required_fields = new TextBox[] { tbSupplier, tbDesc, tbAmount, tbForWhom };
         bool result = true;
         foreach (TextBox control in required_fields) {
             control.CssClass = control.CssClass.Replace("missing", "");
