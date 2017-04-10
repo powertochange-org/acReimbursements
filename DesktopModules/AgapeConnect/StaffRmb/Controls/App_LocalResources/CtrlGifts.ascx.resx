@@ -216,4 +216,10 @@
   <data name="lblRecipient.Text" xml:space="preserve">
     <value>Recipient(s):</value>
   </data>
+  <data name="lblForWhom.Help" xml:space="preserve">
+    <value>Please specify the names of those to whom you are giving these gifts.</value>
+  </data>
+  <data name="lblForWhom.Text" xml:space="preserve">
+    <value>Gift Recipient(s):</value>
+  </data>
 </root>

@@ -3745,6 +3745,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 If (tName.Equals("per diem")) And IsAccounts() Then Return True
                 If (tName.Equals("meals")) Then Return True
                 If (tName.Equals("cida meals")) Then Return True
+                If (tName.Equals("gifts/awards")) Then Return True
             Catch
             End Try
             Return False
