@@ -944,16 +944,18 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ddlApprovedBy.Visible = DRAFT Or CANCELLED Or ((isApprover Or isOwner Or isSpouse) And Rmb.Status = RmbStatus.Submitted)
                     ddlApprovedBy.Enabled = DRAFT Or CANCELLED Or ((isApprover Or isOwner Or isSpouse) And Rmb.Status = RmbStatus.Submitted)
                     lblApprovedBy.Visible = Not ddlApprovedBy.Visible
-                    lblExtraApproval.Visible = hasHadExtraApproval
                     Dim approverName As String = If(Rmb.ApprUserId Is Nothing Or Rmb.ApprUserId = -1, "", UserController.GetUserById(PortalId, Rmb.ApprUserId).DisplayName)
                     Dim updateApproverListTask As New Task(Sub()
                                                                lblApprovedBy.Text = approverName
+                                                               lblApprovedBy.CssClass = lblApprovedBy.CssClass.Replace("subordinate", "").Replace("extraApproval", "")
+                                                               lblApprovedBy.ToolTip = ""
                                                                If (StaffRmbFunctions.userSupervisesApprover(Rmb.UserId, Rmb.ApprUserId)) Then
-                                                                   lblApprovedBy.CssClass += "subordinate"
-                                                                   lblApprovedBy.ToolTip = Translate("ApproverIsSubordinate")
-                                                               Else
-                                                                   lblApprovedBy.CssClass = lblApprovedBy.CssClass.Replace("subordinate", "")
-                                                                   lblApprovedBy.ToolTip = ""
+                                                                   lblApprovedBy.CssClass += " subordinate"
+                                                                   lblApprovedBy.ToolTip += Translate("ApproverIsSubordinate" + "\n")
+                                                               End If
+                                                               If (hasHadExtraApproval) Then
+                                                                   lblApprovedBy.CssClass += " extraApproval"
+                                                                   lblApprovedBy.ToolTip += Translate("lblExtraApproval")
                                                                End If
                                                            End Sub)
                     If (ddlApprovedBy.Visible) Then
