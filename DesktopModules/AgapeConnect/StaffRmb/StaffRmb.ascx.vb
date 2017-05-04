@@ -948,6 +948,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim approverName As String = If(Rmb.ApprUserId Is Nothing Or Rmb.ApprUserId = -1, "", UserController.GetUserById(PortalId, Rmb.ApprUserId).DisplayName)
                     Dim updateApproverListTask As New Task(Sub()
                                                                lblApprovedBy.Text = approverName
+                                                               If (StaffRmbFunctions.userSupervisesApprover(Rmb.UserId, Rmb.ApprUserId)) Then
+                                                                   lblApprovedBy.CssClass += "subordinate"
+                                                                   lblApprovedBy.ToolTip = Translate("ApproverIsSubordinate")
+                                                               Else
+                                                                   lblApprovedBy.CssClass = lblApprovedBy.CssClass.Replace("subordinate", "")
+                                                                   lblApprovedBy.ToolTip = ""
+                                                               End If
                                                            End Sub)
                     If (ddlApprovedBy.Visible) Then
                         updateApproverListTask = updateApproversListAsync(Rmb)
