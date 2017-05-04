@@ -320,6 +320,16 @@ namespace StaffRmb
             return JsonConvert.DeserializeObject<string[]>(result);
         }
 
+        static public bool userSupervisesApprover(int userId, int approverId) {
+            StaffBroker.StaffBrokerDataContext d = new StaffBroker.StaffBrokerDataContext();
+            var leaderIds = from l in d.AP_StaffBroker_LeaderMetas where l.UserId == approverId select l.LeaderId;
+            foreach (int leaderId in leaderIds) {
+                if (leaderId == userId) return true;
+                if (userSupervisesApprover(userId, leaderId)) return true;
+            }
+            return false;
+        }
+
         static public async Task<int[]> getSupervisors(int id, int levels)
         // Returns the <levels># of upline supervisors ids for a staff member
         {
