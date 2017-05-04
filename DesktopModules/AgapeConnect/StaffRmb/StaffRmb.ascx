@@ -1474,7 +1474,6 @@ function GetAccountBalance(jsonQuery){
                                             </table>
                                         </td>
                                         <td colspan="2">
-                                            <asp:Label id="lblExtraApproval" runat="server" cssclass="extra_approval" resourcekey="lblExtraApproval" Visible="false" />
                                         </td>
                                         <td id="pnlPeriodYear" colspan="2" runat="server" style="white-space: nowrap; color: Gray;">
                                             <asp:Label ID="Label24" runat="server" resourcekey="Period"></asp:Label>
