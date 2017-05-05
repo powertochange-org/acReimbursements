@@ -802,7 +802,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ownerName = ""
                 End Try
                 Dim initials = getInitials(user)
-                ddlCompany.SelectedIndex = -1
+                ddlCompany.SelectedValue = "PTC"
                 dtPostingDate.Text = Today.ToString("yyyy-MM-dd")
                 Dim batchIds = From c In d.AP_Staff_Rmb_Post_Extras Where c.BatchId.Substring(6, 2).Equals(initials) Order By c.PostingDate Descending Select c.BatchId
                 If (batchIds.Count() > 0) Then
