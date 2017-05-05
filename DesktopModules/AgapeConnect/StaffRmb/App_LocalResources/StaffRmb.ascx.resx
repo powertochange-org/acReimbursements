@@ -874,4 +874,10 @@ To view more details about how these numbers were calculated, run a Summary Inco
   <data name="ApproverIsSubordinate.Text" xml:space="preserve">
     <value>Warning: This approver is a subordinate of the submitter.</value>
   </data>
+  <data name="SportAidNoReceipts.Text" xml:space="preserve">
+    <value>No Receipts (SportAid):</value>
+  </data>
+  <data name="SportAidReceipts.Text" xml:space="preserve">
+    <value>Receipts (SportAid):</value>
+  </data>
 </root>
