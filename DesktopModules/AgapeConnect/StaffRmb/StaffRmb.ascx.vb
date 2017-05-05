@@ -42,7 +42,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
     Partial Class ViewStaffRmb
         Inherits Entities.Modules.PortalModuleBase
         Implements Entities.Modules.IActionable
-        Dim VERSION_STRING As String = "1.2.64"
+        Dim VERSION_STRING As String = "1.2.68"
         Dim BALANCE_INCONCLUSIVE As String = "unknown"
         Dim BALANCE_PERMISSION_DENIED As String = "**hidden**"
         Dim EDMS_APPROVAL_LOG_MESSAGE As String = "APPROVED by EDMS"
@@ -665,23 +665,28 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                        Receipts = ((c.AP_Staff_RmbLines.Where(Function(x) x.Receipt And ((From f In d.AP_Staff_RmbLine_Files Where f.RmbLineNo = x.RmbLineNo).Count = 0))).Count > 0))
                 Dim total = AllApproved.Count
 
-                ' NOTE: GAiN cost centers all start with '69' by convention
-                Dim PTCreceiptsTask = buildRmbTreeAsync(Translate("PTCReceipts"), finance_node, From c In AllApproved Where c.Status = RmbStatus.Approved And c.Receipts And Not c.CostCenter.StartsWith("69"))
-                Dim PTCno_receiptsTask = buildRmbTreeAsync(Translate("PTCNoReceipts"), finance_node, From c In AllApproved Where c.Status = RmbStatus.Approved And Not c.Receipts And Not c.CostCenter.StartsWith("69"))
+                Dim PTCreceiptsTask = buildRmbTreeAsync(Translate("PTCReceipts"), finance_node, From c In AllApproved Where c.Status = RmbStatus.Approved And c.Receipts And Not c.CostCenter.StartsWith("69") And Not c.CostCenter.StartsWith("67"))
+                Dim PTCno_receiptsTask = buildRmbTreeAsync(Translate("PTCNoReceipts"), finance_node, From c In AllApproved Where c.Status = RmbStatus.Approved And Not c.Receipts And Not c.CostCenter.StartsWith("69") And Not c.CostCenter.StartsWith("67"))
                 Dim GAiNreceiptsTask = buildRmbTreeAsync(Translate("GAiNReceipts"), finance_node, From c In AllApproved Where c.Status = RmbStatus.Approved And c.Receipts And c.CostCenter.StartsWith("69"))
                 Dim GAiNno_receiptsTask = buildRmbTreeAsync(Translate("GAiNNoReceipts"), finance_node, From c In AllApproved Where c.Status = RmbStatus.Approved And Not c.Receipts And c.CostCenter.StartsWith("69"))
+                Dim SportAidreceiptsTask = buildRmbTreeAsync(Translate("SportAidReceipts"), finance_node, From c In AllApproved Where c.Status = RmbStatus.Approved And c.Receipts And c.CostCenter.StartsWith("67"))
+                Dim SportAidno_receiptsTask = buildRmbTreeAsync(Translate("SportAidNoReceipts"), finance_node, From c In AllApproved Where c.Status = RmbStatus.Approved And Not c.Receipts And c.CostCenter.StartsWith("67"))
                 Dim pendingImportTask = buildRmbTreeAsync(Translate("PendingImport"), finance_node, From c In AllApproved Where c.Status >= RmbStatus.PendingDownload)
 
                 Dim PTCreceipts_node = Await PTCreceiptsTask
                 Dim PTCno_receipts_node = Await PTCno_receiptsTask
                 Dim GAiNreceipts_node = Await GAiNreceiptsTask
                 Dim GAiNno_receipts_node = Await GAiNno_receiptsTask
+                Dim SportAidreceipts_node = Await SportAidreceiptsTask
+                Dim SportAidno_receipts_node = Await SportAidno_receiptsTask
                 Dim pending_import_node = Await pendingImportTask
 
                 finance_node.ChildNodes.Add(PTCreceipts_node)
                 finance_node.ChildNodes.Add(PTCno_receipts_node)
                 finance_node.ChildNodes.Add(GAiNreceipts_node)
                 finance_node.ChildNodes.Add(GAiNno_receipts_node)
+                finance_node.ChildNodes.Add(SportAidreceipts_node)
+                finance_node.ChildNodes.Add(SportAidno_receipts_node)
                 finance_node.ChildNodes.Add(pending_import_node)
 
                 tvFinance.Nodes.Clear()
