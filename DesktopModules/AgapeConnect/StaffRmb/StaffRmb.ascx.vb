@@ -42,7 +42,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
     Partial Class ViewStaffRmb
         Inherits Entities.Modules.PortalModuleBase
         Implements Entities.Modules.IActionable
-        Dim VERSION_STRING As String = "1.2.68"
+        Dim VERSION_STRING As String = "1.2.70"
         Dim BALANCE_INCONCLUSIVE As String = "unknown"
         Dim BALANCE_PERMISSION_DENIED As String = "**hidden**"
         Dim EDMS_APPROVAL_LOG_MESSAGE As String = "APPROVED by EDMS"
@@ -759,22 +759,26 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Private Async Function ResetPostingDataAsync() As task
             Dim ExistingData = From c In d.AP_Staff_Rmb_Post_Extras Where c.RMBNo = CInt(hfRmbNo.Value)
             If (ExistingData.Count > 0) Then
-                If (ddlCompany.Items.Count = 0) Then
+                If (ddlCompany.Items.Count <= 2) Then 'There are 2 default items, blank, and an error message
                     Await LoadCompaniesAsync()
-                    If (ddlCompany.Items.Count = 0) Then
+                    If (ddlCompany.Items.Count <= 2) Then
                         lblErrorMessage.Text = Translate("ErrorCompanies")
                         pnlError.Visible = IsAccounts()
                         Return
                     End If
                 End If
-                ddlCompany.SelectedValue = ExistingData.First.Company
+                Try
+                    ddlCompany.SelectedValue = ExistingData.First.Company
+                Catch
+                    ddlCompany.SelectedIndex = -1
+                End Try
                 dtPostingDate.Text = Format(ExistingData.First.PostingDate, "yyyy-MM-dd")
                 tbBatchId.Text = ExistingData.First.BatchId
                 tbPostingReference.Text = ExistingData.First.Reference
                 tbInvoiceNumber.Text = ExistingData.First.InvoiceNo
                 If (ddlCompany.SelectedIndex > 0) Then
                     'Await LoadVendorsAsync()
-                    'tbVendorId.Enabled = True
+                    tbVendorId.Enabled = True
                     ScriptManager.RegisterClientScriptBlock(ddlCompany, ddlCompany.GetType(), "loadVendors", "loadVendorIds();", True)
                     tbVendorId.Text = ExistingData.First.VendorId
                     If (tbVendorId.Text.Length > 0) Then
@@ -802,7 +806,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     ownerName = ""
                 End Try
                 Dim initials = getInitials(user)
-                ddlCompany.SelectedValue = "PTC"
+                Try
+                    ddlCompany.SelectedValue = "PTC"
+                    tbVendorId.Enabled = True
+                    ScriptManager.RegisterClientScriptBlock(ddlCompany, ddlCompany.GetType(), "loadVendors", "loadVendorIds();", True)
+                Catch
+                    ddlCompany.SelectedIndex = -1
+                    tbVendorId.Enabled = False
+                End Try
                 dtPostingDate.Text = Today.ToString("yyyy-MM-dd")
                 Dim batchIds = From c In d.AP_Staff_Rmb_Post_Extras Where c.BatchId.Substring(6, 2).Equals(initials) Order By c.PostingDate Descending Select c.BatchId
                 If (batchIds.Count() > 0) Then
@@ -819,15 +830,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     tbInvoiceNumber.Text = "REIMB" & lblRmbNo.Text
                 End If
                 tbVendorId.Text = ""
-                tbVendorId.Enabled = ddlCompany.SelectedIndex > 0
-                If (tbVendorId.Enabled) Then
-                    'Await LoadVendorsAsync()
-                    ScriptManager.RegisterClientScriptBlock(ddlCompany, ddlCompany.GetType(), "loadVendors", "loadVendorIds();", True)
-                End If
                 ddlRemitTo.Enabled = False
                 ddlRemitTo.Items.Clear()
                 btnSubmitPostingData.Enabled = False
-
             End If
         End Function
 

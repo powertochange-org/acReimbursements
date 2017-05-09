@@ -145,6 +145,7 @@
 
     function loadVendorIds() {
         var company = $("#<%= ddlCompany.ClientID %>").val();
+        console.log('starting')
         $.ajax({
             url:"/DesktopModules/AgapeConnect/StaffRmb/WebService.asmx/GetVendorIds",
             data:"{ 'company':'"+company+"'}",
@@ -166,7 +167,8 @@
                         __doPostBack('<%= tbVendorId.ClientID %>', '');
                     },
                     minLength: 2
-                });               
+                });   
+                console.log('vendors for ' + company + ' loaded')
             },
             error: function(a, b, c) {
                 console.error('failure: '+a.responseText);
@@ -1710,7 +1712,7 @@ function GetAccountBalance(jsonQuery){
                                         <asp:Button ID="btnSubmit" runat="server" resourcekey="btnSubmit" class="aButton" visible="false"/>
                                         <asp:Button ID="btnReject" runat="server" resourcekey="btnReject" class="aButton" Visible="false" />
                                         <asp:Button ID="btnApprove" runat="server" resourcekey="btnApprove" class="aButton" visible="false"/>
-                                        <asp:Button ID="btnProcess" runat="server" resourcekey="btnProcess" class="aButton" onClientClick="showPostDataDialog()" visible="false"/>
+                                        <asp:Button ID="btnProcess" runat="server" resourcekey="btnProcess" class="aButton" onClientClick="showPostDataDialog(); return false;" visible="false"/>
                                         <asp:Button ID="btnUnProcess" runat="server" resourcekey="btnUnProcess" class="aButton" visible="false"/>
                                         <asp:Panel ID="pnlReLink" runat="server" Visible="false" style="display:inline-block">
                                             <asp:Button ID="btnReLink" runat="server" resourcekey="btnReLink" CssClass="aButton error" Width="180" OnClientClick="$(this).hide(200); $('#ddlReLink').show(250); return false;" />
