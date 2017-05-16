@@ -665,28 +665,19 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                                        Receipts = ((c.AP_Staff_RmbLines.Where(Function(x) x.Receipt And ((From f In d.AP_Staff_RmbLine_Files Where f.RmbLineNo = x.RmbLineNo).Count = 0))).Count > 0))
                 Dim total = AllApproved.Count
 
-                Dim PTCreceiptsTask = buildRmbTreeAsync(Translate("PTCReceipts"), finance_node, From c In AllApproved Where c.Status = RmbStatus.Approved And c.Receipts And Not c.CostCenter.StartsWith("69") And Not c.CostCenter.StartsWith("67"))
-                Dim PTCno_receiptsTask = buildRmbTreeAsync(Translate("PTCNoReceipts"), finance_node, From c In AllApproved Where c.Status = RmbStatus.Approved And Not c.Receipts And Not c.CostCenter.StartsWith("69") And Not c.CostCenter.StartsWith("67"))
-                Dim GAiNreceiptsTask = buildRmbTreeAsync(Translate("GAiNReceipts"), finance_node, From c In AllApproved Where c.Status = RmbStatus.Approved And c.Receipts And c.CostCenter.StartsWith("69"))
-                Dim GAiNno_receiptsTask = buildRmbTreeAsync(Translate("GAiNNoReceipts"), finance_node, From c In AllApproved Where c.Status = RmbStatus.Approved And Not c.Receipts And c.CostCenter.StartsWith("69"))
-                Dim SportAidreceiptsTask = buildRmbTreeAsync(Translate("SportAidReceipts"), finance_node, From c In AllApproved Where c.Status = RmbStatus.Approved And c.Receipts And c.CostCenter.StartsWith("67"))
-                Dim SportAidno_receiptsTask = buildRmbTreeAsync(Translate("SportAidNoReceipts"), finance_node, From c In AllApproved Where c.Status = RmbStatus.Approved And Not c.Receipts And c.CostCenter.StartsWith("67"))
+                Dim PTCTask = buildRmbTreeAsync(Translate("PTCReceipts"), finance_node, From c In AllApproved Where c.Status = RmbStatus.Approved And Not c.CostCenter.StartsWith("69") And Not c.CostCenter.StartsWith("67"))
+                Dim GAiNTask = buildRmbTreeAsync(Translate("GAiNReceipts"), finance_node, From c In AllApproved Where c.Status = RmbStatus.Approved And c.CostCenter.StartsWith("69"))
+                Dim SportAidTask = buildRmbTreeAsync(Translate("SportAidReceipts"), finance_node, From c In AllApproved Where c.Status = RmbStatus.Approved And c.CostCenter.StartsWith("67"))
                 Dim pendingImportTask = buildRmbTreeAsync(Translate("PendingImport"), finance_node, From c In AllApproved Where c.Status >= RmbStatus.PendingDownload)
 
-                Dim PTCreceipts_node = Await PTCreceiptsTask
-                Dim PTCno_receipts_node = Await PTCno_receiptsTask
-                Dim GAiNreceipts_node = Await GAiNreceiptsTask
-                Dim GAiNno_receipts_node = Await GAiNno_receiptsTask
-                Dim SportAidreceipts_node = Await SportAidreceiptsTask
-                Dim SportAidno_receipts_node = Await SportAidno_receiptsTask
+                Dim PTC_node = Await PTCTask
+                Dim GAiN_node = Await GAiNTask
+                Dim SportAid_node = Await SportAidTask
                 Dim pending_import_node = Await pendingImportTask
 
-                finance_node.ChildNodes.Add(PTCreceipts_node)
-                finance_node.ChildNodes.Add(PTCno_receipts_node)
-                finance_node.ChildNodes.Add(GAiNreceipts_node)
-                finance_node.ChildNodes.Add(GAiNno_receipts_node)
-                finance_node.ChildNodes.Add(SportAidreceipts_node)
-                finance_node.ChildNodes.Add(SportAidno_receipts_node)
+                finance_node.ChildNodes.Add(PTC_node)
+                finance_node.ChildNodes.Add(GAiN_node)
+                finance_node.ChildNodes.Add(SportAid_node)
                 finance_node.ChildNodes.Add(pending_import_node)
 
                 tvFinance.Nodes.Clear()
@@ -2092,6 +2083,14 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             ScriptManager.RegisterStartupScript(btnOK, t, "closeSplit", sb.ToString, False)
         End Sub
 
+        Private Sub expand_finance_nodes()
+            If (tvFinance.Nodes.Count = 1 And tvFinance.Nodes.Item(0).ChildNodes.Count = 4) Then
+                tvFinance.Nodes.Item(0).ChildNodes.Item(0).Expand()
+                tvFinance.Nodes.Item(0).ChildNodes.Item(1).Expand()
+                tvFinance.Nodes.Item(0).ChildNodes.Item(2).Expand()
+            End If
+        End Sub
+
         Protected Async Sub btnProcess_Click(sender As Object, e As System.EventArgs) Handles btnSubmitPostingData.Click, btnAccountWarningYes.Click
             saveIfNecessary()
             'Mark as Pending Download in next batch.
@@ -2167,12 +2166,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Log(theRmb.First.RID, LOG_LEVEL_INFO, "PROCESSED - this reimbursement will be added to the next download batch")
             pnlMain.Visible = False
             '
-            If (tvFinance.Nodes.Count = 1 And tvFinance.Nodes.Item(0).ChildNodes.Count = 5) Then
-                tvFinance.Nodes.Item(0).ChildNodes.Item(0).Expand()
-                tvFinance.Nodes.Item(0).ChildNodes.Item(1).Expand()
-                tvFinance.Nodes.Item(0).ChildNodes.Item(2).Expand()
-                tvFinance.Nodes.Item(0).ChildNodes.Item(3).Expand()
-            End If
+            expand_finance_nodes()
             Dim message = Translate("NextBatch")
             ScriptManager.RegisterStartupScript(Page, Me.GetType(), "closePostData", "closePostDataDialog();  notify(""" & message & """); loadAllProcessingTree();", True)
         End Sub
@@ -2248,6 +2242,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 TaskList.Add(buildAllApprovedTreeAsync(allStaff))
             End If
             Await Task.WhenAll(TaskList)
+            expand_finance_nodes()
         End Sub
 
         Private Function getExpenseLines() As IEnumerable

@@ -324,7 +324,7 @@
     <value>Receipt</value>
   </data>
   <data name="PTCReceipts.Text" xml:space="preserve">
-    <value>Receipts (PTC):</value>
+    <value>PTC:</value>
   </data>
   <data name="RecoverVAT.Text" xml:space="preserve">
     <value>Recover VAT?</value>
@@ -754,7 +754,7 @@
     <value>No Receipts (GAiN):</value>
   </data>
   <data name="GAiNReceipts.Text" xml:space="preserve">
-    <value>Receipts (GAiN):</value>
+    <value>GAiN:</value>
   </data>
   <data name="ErrorCompanies.Text" xml:space="preserve">
     <value>Error: Company list could not be loaded</value>
@@ -878,6 +878,6 @@ To view more details about how these numbers were calculated, run a Summary Inco
     <value>No Receipts (SportAid):</value>
   </data>
   <data name="SportAidReceipts.Text" xml:space="preserve">
-    <value>Receipts (SportAid):</value>
+    <value>SportAid:</value>
   </data>
 </root>
