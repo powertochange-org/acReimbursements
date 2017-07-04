@@ -340,9 +340,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 Dim MoreInfo As System.Linq.IQueryable
                 Dim userstr = CStr(UserId)
                 MoreInfo = From c In d.AP_Staff_Rmbs
-                                    Where c.MoreInfoRequested = True And c.Status <> RmbStatus.Processing And c.Status <> RmbStatus.Cancelled And ((c.UserId = UserId) Or c.SpareField3.Equals(userstr)) And c.PortalId = PortalId
-                                    Order By c.RID Descending
-                                    Select c.UserRef, c.RID, c.RMBNo
+                           Where c.MoreInfoRequested = True And c.Status <> RmbStatus.Processing And c.Status <> RmbStatus.Paid And c.Status <> RmbStatus.Cancelled And ((c.UserId = UserId) Or c.SpareField3.Equals(userstr)) And c.PortalId = PortalId
+                           Order By c.RID Descending
+                           Select c.UserRef, c.RID, c.RMBNo
                 For Each row In MoreInfo
                     Dim hyp As New HyperLink()
                     hyp.CssClass = "ui-state-highlight ui-corner-all AgapeWarning"
@@ -2692,7 +2692,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
 
         End Function
 
-        Public Function GetSupplier(ByVal Supplier As String)
+        Public Function GetSupplier(ByVal Supplier As String) As String
             If (Supplier.Length > 0) Then
                 Return " (" & Supplier & ")"
             End If
@@ -4834,13 +4834,13 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Return old_lines > 0
         End Function
 
-        Private Function updateOutOfDateFlag()
+        Private Sub updateOutOfDateFlag()
             Dim oldest_allowable_date = Today.AddDays(-Settings("Expire"))
             For Each line In (From c In d.AP_Staff_RmbLines Where c.RmbNo = hfRmbNo.Value And c.TransDate < oldest_allowable_date)
                 line.OutOfDate = True
             Next
             d.SubmitChanges()
-        End Function
+        End Sub
 
         Private Sub updateReceiptPermissions(ByRef theRmb As AP_Staff_Rmb)
             Dim hasReceipts = (From c In theRmb.AP_Staff_RmbLines Where c.Receipt = True And ((From f In d.AP_Staff_RmbLine_Files Where f.RmbLineNo = c.RmbLineNo).Count = 0)).Count > 0
