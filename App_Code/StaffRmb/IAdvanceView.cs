@@ -33,6 +33,7 @@ namespace PowerToChange.Modules.StaffRmb.Presenters
         public int status { get; set; }
         public DateTime? date { get; set; }
         public decimal originalAmount { get; set; }
+        public bool foreignCurrency { get; set; }
         public string outstandingAmount { get; set; }
         public string account { get; set; }
         public string comment { get; set; }

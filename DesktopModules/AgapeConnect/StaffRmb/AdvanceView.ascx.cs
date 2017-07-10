@@ -53,7 +53,7 @@ namespace PowerToChange.Modules.StaffRmb.Views
                 OutstandingAdvance adv = (OutstandingAdvance) args.Row.DataItem;
                 Label lblWho = (Label)args.Row.FindControl("lblWho");
                 lblWho.Text = sbdc.Users.Where(a => a.UserID == adv.userId).Single().DisplayName;
-                decimal outstanding;
+                decimal outstanding = 0;
                 decimal.TryParse(adv.outstandingAmount, out outstanding);
                 decimal cleared = adv.originalAmount - outstanding;
                 TextBox tbCleared = (TextBox)args.Row.FindControl("tbCleared");

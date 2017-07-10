@@ -32,7 +32,7 @@
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Original Amt">
                         <ItemTemplate>
-                            <asp:Label id="lblOriginalAmount" CssClass="original" runat="server" Text='<%# string.Format("{0:0.00}", Eval("originalAmount")) %>'></asp:Label>
+                            <asp:Label id="lblOriginalAmount" class='<%# ((bool)Eval("foreignCurrency"))?"original foreign":"original" %>' title='<%# ((bool)Eval("foreignCurrency"))?"This advance was not taken in CAD":"" %>' runat="server" Text='<%# string.Format("{0:0.00}", Eval("originalAmount")) %>'></asp:Label>
                         </ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Cleared Amt" >
