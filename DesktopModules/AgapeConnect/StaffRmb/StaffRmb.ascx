@@ -209,7 +209,7 @@
 
     function verify_voucher_link(company, voucher_number) {
         $.ajax({
-            url:"http://gpapp/gpimport/webservice/voucherExists",
+            url:"https://gpapp/gpimport/webservice/voucherExists",
             dataType: "json",
             data: {'company': company, 'voucher_number': voucher_number},
             type: "POST",
@@ -229,7 +229,7 @@
     function get_voucher_candidates() {
         var rmbid = $('#<%= lblRmbNo.ClientID %>').val();
         $.ajax({
-            url:"http://gpapp/gpimport/webservice/getVoucherCandidates",
+            url:"https://gpapp/gpimport/webservice/getVoucherCandidates",
             dataType: "json",
             data: {'rmbid':rmbid},
             type: "POST",
@@ -240,7 +240,7 @@
                     var vendorid = $("#<%= tbVendorId.ClientID%>").val();
                     var date = $('#<%= lblProcessedDate.ClientID%>').text();
                     $.ajax({
-                        url:"http://gpapp/gpimport/webservice/getVoucherCandidates",
+                        url:"https://gpapp/gpimport/webservice/getVoucherCandidates",
                         dataType: "json",
                         data: {"vendorid": vendorid, "date": date},
                         type: "POST",
