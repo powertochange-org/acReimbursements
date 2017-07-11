@@ -227,7 +227,7 @@
     }
 
     function get_voucher_candidates() {
-        var rmbid = $('#<%= hfRmbNo.ClientID %>').val();
+        var rmbid = $('#<%= lblRmbNo.ClientID %>').val();
         $.ajax({
             url:"http://gpapp/gpimport/webservice/getVoucherCandidates",
             dataType: "json",
@@ -240,7 +240,7 @@
                     var vendorid = $("#<%= tbVendorId.ClientID%>").val();
                     var date = $('#<%= lblProcessedDate.ClientID%>').text();
                     $.ajax({
-                        url:"http://gpapp/gpimport/webservice/getVoucherNumberCandidates",
+                        url:"http://gpapp/gpimport/webservice/getVoucherCandidates",
                         dataType: "json",
                         data: {"vendorid": vendorid, "date": date},
                         type: "POST",
