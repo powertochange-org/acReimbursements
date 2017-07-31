@@ -925,6 +925,10 @@ function GetAccountBalance(jsonQuery){
             select: function(event, ui) {
                 console.debug("SELECT: "+ui.item.value);
                 $('#<%= hfChargeToValue.ClientID%>').val(ui.item.value);
+                var accountName = ui.item.label.split(':').pop();
+                console.log('ACCT NAME',accountName);
+                $('#<%= tbChargeTo.ClientID%>').attr('title', accountName);
+                $('#<%= lblChargeTo.ClientID%>').text(accountName);
                 $('#<%= tbChargeTo.ClientID%>').val(ui.item.value).change();
             },
             change: function(event, ui) {
@@ -1393,6 +1397,7 @@ function GetAccountBalance(jsonQuery){
                                     <asp:Label ID="lblRmbNo" runat="server" Style="float: left; margin-right: 5px;"></asp:Label>:
                                     <asp:TextBox ID="tbChargeTo" runat="server" AutoPostBack="true"  Style="float: right; font-size: small;">
                                     </asp:TextBox>
+                                    <asp:Label ID="lblChargeTo" runat="server" Style="float: right; font-size: small; padding:4px;"></asp:Label>
                                 </div>
                                 <div id='statusbar' class="inverse" style="width:100%; margin-top:1px; padding-top:3px; padding-bottom:3px; float: left" >
                                     <asp:Label ID="lblStatus" runat="server" Style="float: left; font-style: italic; font-size:13px; padding-left:70px"></asp:Label>

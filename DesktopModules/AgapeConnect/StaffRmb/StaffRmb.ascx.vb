@@ -922,6 +922,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     Dim accountName = (From c In d.AP_StaffBroker_CostCenters Where c.CostCentreCode = Rmb.CostCenter Select c.CostCentreName).SingleOrDefault()
                     tbChargeTo.Attributes.Add("title", accountName)
                     tbChargeTo.CssClass = If(isFinance, "finance", "")
+                    lblChargeTo.Text = accountName
                     lblStatus.Text = Translate(RmbStatus.StatusName(Rmb.Status))
                     If (Rmb.MoreInfoRequested) Then
                         lblStatus.Text = lblStatus.Text & " - " & Translate("StatusMoreInfo")
@@ -2563,10 +2564,12 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         End Sub
 
         Protected Async Sub tbChargeTo_ValueChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles tbChargeTo.TextChanged
-            'The User selected a new cost centre
+            'The User selected a new cost center
             Try
                 If (hfChargeToValue.Value.Length = 0) Then
                     tbChargeTo.Text = ""
+                    lblChargeTo.Text = ""
+                    tbChargeTo.Attributes("title") = ""
                     ddlApprovedBy.Items.Clear()
                     Return
                 End If
@@ -2600,6 +2603,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         SubmitChanges()
                     End If
                     TaskList.Add(updateApproversListAsync(rmb.First))
+                    Dim accountName As String = (From c In d.AP_StaffBroker_CostCenters Where c.CostCentreCode = hfChargeToValue.Value).FirstOrDefault().CostCentreName
+                    lblChargeTo.Text = accountName
+                    tbChargeTo.Attributes("title") = accountName
                     updateBalanceLabel(Await getAccountBalanceTask)
                     Await Task.WhenAll(TaskList)
                 End If
