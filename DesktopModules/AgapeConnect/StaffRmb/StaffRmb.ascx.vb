@@ -3737,11 +3737,26 @@ Namespace DotNetNuke.Modules.StaffRmbMod
         Public Function TypeHasOriginAndDestination(ByVal typeId As Integer) As Boolean
             Try
                 Dim tName = (From c In d.AP_Staff_RmbLineTypes Where c.LineTypeId = typeId Select c.TypeName).First().ToLower()
-                If (tName.Equals("airfare")) Then Return True
-                If (tName.Equals("mileage")) Then Return True
+                If (tName.Contains("airfare")) Then Return True
+                If (tName.Contains("mileage")) Then Return True
             Catch
             End Try
             Return False
+        End Function
+        Public Function AbbreviatedOrigDest(origin As String, destination As String) As String
+            Dim result As String
+            If (origin.Length > 9) Then
+                result += Left(origin, 8) + "…"
+            Else
+                result += origin
+            End If
+            result += " - "
+            If (destination.Length > 9) Then
+                result += Left(destination, 8) + "…"
+            Else
+                result += destination
+            End If
+            Return result
         End Function
 
         Public Function IsMileageType(ByVal typeId As Integer) As Boolean
