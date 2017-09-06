@@ -42,7 +42,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
     Partial Class ViewStaffRmb
         Inherits Entities.Modules.PortalModuleBase
         Implements Entities.Modules.IActionable
-        Dim VERSION_STRING As String = "1.2.70"
+        Dim VERSION_STRING As String = "1.2.72"
         Dim BALANCE_INCONCLUSIVE As String = "unknown"
         Dim BALANCE_PERMISSION_DENIED As String = "**hidden**"
         Dim EDMS_APPROVAL_LOG_MESSAGE As String = "APPROVED by EDMS"
