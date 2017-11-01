@@ -806,10 +806,10 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     tbVendorId.Enabled = False
                 End Try
                 dtPostingDate.Text = Today.ToString("yyyy-MM-dd")
-                Dim batchIds = From c In d.AP_Staff_Rmb_Post_Extras Where c.BatchId.Substring(6, 2).Equals(initials) Order By c.PostingDate Descending Select c.BatchId
-                If (batchIds.Count() > 0) Then
-                    tbBatchId.Text = batchIds.First()
-                End If
+                'Dim batchIds = From c In d.AP_Staff_Rmb_Post_Extras Where c.BatchId.Substring(6, 2).Equals(initials) Order By c.PostingDate Descending Select c.BatchId
+                'If (batchIds.Count() > 0) Then
+                '    tbBatchId.Text = batchIds.First()
+                'End If
 
                 Dim linetypes = (From t In d.AP_Staff_RmbLines Where t.RmbNo = hfRmbNo.Value And t.GrossAmount > 0 Select t.LineType).Distinct()
                 Dim isAdvanceRequest = linetypes.Count() = 1 And linetypes.Contains(Settings("AdvanceLineType"))
