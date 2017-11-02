@@ -255,7 +255,7 @@
                                     </td>
                                     <td style="text-align:right;">
                                         <table class="curDetails" style="display:inline-table; margin-left:30px;" ><tr>
-                                            <th colspan="2"><asp:Label runat="server" ResourceKey="lblExchangeHeader" /></th></tr><tr>
+                                            <th colspan="2"><asp:Label runat="server" ID="lblExchangeHeader"/></th></tr><tr>
                                             <td style="text-align:center">
                                                 <b><label for="tbExchangeRate"><%=DotNetNuke.Services.Localization.Localization.GetString("lblExchangeRate.Text", LocalResourceFile)%></label></b><br />
                                                 <asp:textbox id="tbExchangeRate" runat="server" cssClass="exchangeRate" style="width:80px" onKeyUp="update_CAD();" onfocus="select();" onblur="format_number(this, 4);" />
@@ -378,6 +378,7 @@
         {
             currencyUpdatePanel.Visible = false;
         }
+
     }
 
     public void Initialize(Hashtable settings)
@@ -582,6 +583,9 @@
         private void Currency_Change(object sender, System.EventArgs e)
         //includes exchange rate lookup, and CAD recalculation
         {
+            lblExchangeHeader.CssClass = "";
+            lblExchangeHeader.ToolTip = "";
+            lblExchangeHeader.Text = DotNetNuke.Services.Localization.Localization.GetString("lblExchangeHeader.Text", LocalResourceFile);
             string foreign_currency = ddlCurrencies.SelectedValue;
             try {
                 decimal exchangeRate = StaffBrokerFunctions.GetExchangeRate(PortalId, accounting_currency, foreign_currency);
@@ -590,16 +594,22 @@
                     try {
                         double amount = double.Parse(tbAmount.Text);
                         CADValue = (amount / (double)exchangeRate);
-                        ScriptManager.RegisterClientScriptBlock(ddlCurrencies, ddlCurrencies.GetType(), "display_foreign_exchange", "display_foreign_exchange();", true);
                     } catch {
                         tbAmount.Text = "0.00";
                         tbCADAmount.Text = "0.00";
                     }
+                } else {
+                    throw new Exception("Exchange rate <=0");
                 }
-            } catch {
-                foreign_currency = "CAD";
-                ddlCurrencies.SelectedValue = "CAD";
+            } catch (Exception ex) {
+                ExchangeRate = 0;
+                tbExchangeRate.Text = "0.0000";
+                CADValue = 0;
+                lblExchangeHeader.Text = "Exchange rate error";
+                lblExchangeHeader.ToolTip = ex.Message;
+                lblExchangeHeader.CssClass = "error";
             }
+            ScriptManager.RegisterClientScriptBlock(ddlCurrencies, ddlCurrencies.GetType(), "display_foreign_exchange", "display_foreign_exchange();", true);
         }
 
     #endregion

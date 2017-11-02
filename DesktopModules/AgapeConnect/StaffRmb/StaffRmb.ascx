@@ -826,7 +826,7 @@ function GetAccountBalance(jsonQuery){
         var exchange_rate = 0;
         if (CAD <=0 ) {
             $('.equivalentCAD').val($('.rmbAmount').val());
-            exchange_rate = '1.0000';
+            exchange_rate = '0.0000';
             console.log('ERROR: equivalent CAD was <= 0');
         } else {
             exchange_rate = Number(amount / CAD).toFixed(4);
