@@ -583,18 +583,23 @@
         //includes exchange rate lookup, and CAD recalculation
         {
             string foreign_currency = ddlCurrencies.SelectedValue;
-            decimal exchangeRate = StaffBrokerFunctions.GetExchangeRate(PortalId, accounting_currency, foreign_currency);
-            tbExchangeRate.Text = String.Format("{0:f4}", exchangeRate);
-               if (exchangeRate > 0) {
+            try {
+                decimal exchangeRate = StaffBrokerFunctions.GetExchangeRate(PortalId, accounting_currency, foreign_currency);
+                tbExchangeRate.Text = String.Format("{0:f4}", exchangeRate);
+                if (exchangeRate > 0) {
                     try {
-                       double amount = double.Parse(tbAmount.Text);
-                       CADValue = (amount / (double)exchangeRate);
+                        double amount = double.Parse(tbAmount.Text);
+                        CADValue = (amount / (double)exchangeRate);
+                        ScriptManager.RegisterClientScriptBlock(ddlCurrencies, ddlCurrencies.GetType(), "display_foreign_exchange", "display_foreign_exchange();", true);
                     } catch {
                         tbAmount.Text = "0.00";
                         tbCADAmount.Text = "0.00";
                     }
-               }
-            ScriptManager.RegisterClientScriptBlock(ddlCurrencies, ddlCurrencies.GetType(), "display_foreign_exchange", "display_foreign_exchange();", true);
+                }
+            } catch {
+                foreign_currency = "CAD";
+                ddlCurrencies.SelectedValue = "CAD";
+            }
         }
 
     #endregion
