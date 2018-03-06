@@ -565,7 +565,7 @@
     <value>Upload an image (jpg, png, gif) or a PDF as an Electronic Receipt.</value>
   </data>
   <data name="lblElectronicReceipts.Text" xml:space="preserve">
-    <value>Electronic Receipts</value>
+    <value>Attachments:</value>
   </data>
   <data name="OpenNewTab.Text" xml:space="preserve">
     <value>Click to view in new tab...</value>

@@ -57,7 +57,7 @@
         <span id="rotate_instructions">Please rotate images<br />right-side-up.</span>
         <div>
             <div style="width: 100%; text-align: left;">
-                <input type="button" class="aButton" onclick="fuReceipt.click()" value="Add receipt..." style="font-size:small" />
+                <input type="button" class="aButton" onclick="fuReceipt.click()" value="Add attachment..." style="font-size:small" />
                 <asp:FileUpload ID="fuReceipt" runat="server" style="display:none" OnChange="$('#btnUploadReceipt').click();" />
                 <asp:Button ID="btnUploadReceipt" runat="server" Text="Upload Selected File" CssClass="aButton" Style="display:none" Font-Size="small" />
                 <asp:UpdatePanel ID="receipts" runat="server" style="position:absolute">

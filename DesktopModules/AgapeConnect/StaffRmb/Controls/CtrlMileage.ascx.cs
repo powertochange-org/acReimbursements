@@ -30,6 +30,12 @@ public partial class ControlBase : StaffRmbControl {
                 }
             }
         }
+        // Repurpose the receipts field for additional documentation
+        lblReceipt.Text = "Documentation";
+        hlpReceipt.Text = "Attatch any (optional) documentation for this expense.";
+        ddlReceipt.Items.Clear();
+        ddlReceipt.Items.Add(new ListItem("", "-1", true));
+        ddlReceipt.Items.Add(new ListItem("File attached", RmbReceiptType.Electronic.ToString(), true));
     }
 
     new public string Supplier
@@ -96,16 +102,6 @@ public partial class ControlBase : StaffRmbControl {
         }
         set {}
     }
-    new public bool Receipt
-    {
-        get { return false; }
-        set { }
-    }
-    new public int ReceiptType
-    {
-        get { return StaffRmb.RmbReceiptType.No_Receipt; } //no receipt required for mileage expenses
-        set { }
-    }
     new public bool VAT
     {
         get { return false; }
@@ -158,9 +154,6 @@ public partial class ControlBase : StaffRmbControl {
         tbSupplier.Visible = false;
         lbSupplier.Visible = false;
         currencyUpdatePanel.Attributes.Add("style", "display:none");
-        lblReceipt.Visible = false;
-        ddlReceipt.Visible = false;
-        lbReceipt.Visible = false;
     }
     public bool validate_amount()
     {
