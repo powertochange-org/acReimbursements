@@ -358,9 +358,9 @@ namespace StaffRmb
         {
             int presidentId = getPresidentId();
             StaffBroker.StaffBrokerDataContext d = new StaffBroker.StaffBrokerDataContext();
-            IQueryable<StaffBroker.AP_StaffBroker_LeaderMeta>  users = d.AP_StaffBroker_LeaderMetas.Where(a => a.LeaderId == presidentId && (d.AP_StaffBroker_LeaderMetas.Where(b => b.LeaderId == a.UserId).Count()>0));
-            int[] memberids = users.Select(a => a.UserId).ToArray<int>();
-            int[] result = combineArrays(memberids, new int[1] { presidentId });
+            IQueryable<StaffBroker.AP_StaffBroker_LeaderMeta>  metas = d.AP_StaffBroker_LeaderMetas.Where(a => a.LeaderId == presidentId && (d.AP_StaffBroker_LeaderMetas.Where(b => b.LeaderId == a.UserId).Count()>0));
+            int[] eltIds = (from meta in metas join user in d.Users on meta.UserId equals user.UserID where !user.IsDeleted select user.UserID).ToArray<int>();
+            int[] result = combineArrays(eltIds, new int[1] { presidentId });
             return result;
         }
 
