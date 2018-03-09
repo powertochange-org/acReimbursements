@@ -334,7 +334,7 @@ namespace StaffRmb
         static public async Task<int[]> getSupervisors(int id, int levels)
         // Returns the <levels># of upline supervisors ids for a staff member
         {
-            List<int> result = new List<int>();
+            HashSet<int> result = new HashSet<int>();
             try
             {
                 if (id < 0 || levels <= 0) return new int[0];
