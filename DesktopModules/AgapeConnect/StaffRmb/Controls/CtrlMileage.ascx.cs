@@ -31,7 +31,7 @@ public partial class ControlBase : StaffRmbControl {
             }
         }
         // Repurpose the receipts field for additional documentation
-        lblReceipt.Text = "Documentation";
+        lblReceipt.Text = "Documentation:";
         hlpReceipt.Text = "Attatch any (optional) documentation for this expense.";
         ddlReceipt.Items.Clear();
         ddlReceipt.Items.Add(new ListItem("", "-1", true));

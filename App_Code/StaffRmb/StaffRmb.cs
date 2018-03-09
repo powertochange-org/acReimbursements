@@ -220,13 +220,14 @@ namespace StaffRmb
                 Task<int[]>  userSupervisorsTask = getSupervisors(rmb.UserId, levels);
                 Task<int[]> spouseSupervisorTask = getSupervisors(spouseId, levels);
                 Task<int[]> getELTTask = ELT();
+                // Special case where staff member or spouse reports directly to the president, and thus would have only a single approver
                 int[] userSupervisors = await userSupervisorsTask;
-                if (userSupervisors.Contains(presidentId))
+                if (userSupervisors.Count() == 1 && userSupervisors.Single() == presidentId)
                 {
                     userSupervisors = combineArrays(userSupervisors, await getELTTask);
                 }
                 int[] spouseSupervisors = await spouseSupervisorTask;
-                if (spouseSupervisors.Contains(presidentId))
+                if (spouseSupervisors.Count() == 1 && spouseSupervisors.Single() == presidentId)
                 {
                     spouseSupervisors = combineArrays(spouseSupervisors, await getELTTask);
                 }
