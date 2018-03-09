@@ -357,12 +357,17 @@ namespace StaffRmb
         // Returns a list of the members of the ELT (IDs), which are those who report directly to the president, and have themselves, people reporting to them
         // It also includes the president himself
         {
+            List<int> eltIds = new List<int>();
+            foreach (UserInfo user in DotNetNuke.Entities.Users.UserController.GetUsers(0)) {
+                if (user.IsInRole("ELT")) {
+                    eltIds.Add(user.UserID);
+                }
+            }
             int presidentId = getPresidentId();
-            StaffBroker.StaffBrokerDataContext d = new StaffBroker.StaffBrokerDataContext();
-            IQueryable<StaffBroker.AP_StaffBroker_LeaderMeta>  metas = d.AP_StaffBroker_LeaderMetas.Where(a => a.LeaderId == presidentId && (d.AP_StaffBroker_LeaderMetas.Where(b => b.LeaderId == a.UserId).Count()>0));
-            int[] eltIds = (from meta in metas join user in d.Users on meta.UserId equals user.UserID where !user.IsDeleted select user.UserID).ToArray<int>();
-            int[] result = combineArrays(eltIds, new int[1] { presidentId });
-            return result;
+            if (eltIds.Contains(presidentId) == false) {
+                eltIds.Add(presidentId);
+            }
+            return eltIds.ToArray<int>();
         }
 
         static public int getPresidentId()
