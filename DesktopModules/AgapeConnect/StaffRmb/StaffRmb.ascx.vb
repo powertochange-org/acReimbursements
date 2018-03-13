@@ -1242,7 +1242,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                             line.OutOfDate = (age > Settings("Expire"))
                         End If
                         line.AccountCode = ddlAccountCode.SelectedValue
-                        line.CostCenter = tbCostcenter.Text
+                        line.CostCenter = If(Not String.IsNullOrEmpty(tbCostcenter.Text), tbCostcenter.Text, If(line.CostCenter IsNot Nothing, line.CostCenter, tbChargeTo.Text))
                         line.LineType = CInt(ddlLineTypes.SelectedValue)
                         line.Supplier = CStr(ucType.GetProperty("Supplier").GetValue(theControl, Nothing))
                         line.Comment = CStr(ucType.GetProperty("Comment").GetValue(theControl, Nothing))
@@ -1406,9 +1406,11 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         Return
                     End Try
                     'lookup original line item
-                    Dim line As AP_Staff_RmbLine
+                    Dim line As AP_Staff_RmbLine = Nothing
+                    Dim originalRmb As AP_Staff_Rmb = Nothing
                     Try
                         line = (From c In d.AP_Staff_RmbLines Where c.RmbLineNo = rmblineno).Single()
+                        originalRmb = (From c In d.AP_Staff_Rmbs Where c.RMBNo = line.RmbNo).Single()
                     Catch ex As Exception
                         lblAdvanceClearError.Text = ex.Message
                         lblAdvanceClearError.Visible = True
@@ -1438,7 +1440,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                         insert.Spare5 = line.RmbLineNo.ToString() ' original line number
                         Dim advancelinetype As Integer = Settings("AdvanceLineType")
                         insert.AccountCode = (From c In d.AP_StaffRmb_PortalLineTypes Where c.PortalId = PortalId And c.LineTypeId = advancelinetype Select c.PCode).Single
-                        insert.CostCenter = line.CostCenter
+                        insert.CostCenter = If(line.CostCenter IsNot Nothing, line.CostCenter, originalRmb.CostCenter)
                         insert.Supplier = ""
                         d.AP_Staff_RmbLines.InsertOnSubmit(insert)
                     End If
@@ -1637,6 +1639,9 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     NewStatus = RmbStatus.Submitted
                     rmb.Locked = False
                 End If
+                For Each line In rmb.AP_Staff_RmbLines
+                    If (line.CostCenter Is Nothing) Then line.CostCenter = rmb.CostCenter
+                Next
 
                 rmb.ApprDate = Nothing
                 rmb.Status = NewStatus
@@ -2587,7 +2592,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     For Each row In rmb.First.AP_Staff_RmbLines
                         If rmb.First.CostCenter = row.CostCenter Then
                             row.Department = Dept
-                            row.AccountCode = GetAccountCode(row.LineType, hfChargeToValue.Value)
+                            row.AccountCode = If(row.LineType = Settings("AdvanceLineType"), Settings("AdvanceLineType"), GetAccountCode(row.LineType, hfChargeToValue.Value))
                             row.CostCenter = hfChargeToValue.Value
                         End If
                     Next
