@@ -67,7 +67,8 @@
                         <asp:Timer ID="refresh_timer" runat="server" interval="5000" />
                     </ContentTemplate>
                 </asp:UpdatePanel>
-                <img id="qrcode" runat="server" src="#" width="128" height="128" title="Scan this code to connect your smartphone to this reimbursement"/>
+                
+                <img id="qrcode" runat="server" src="#" width="128" height="128" title="Scan this code to connect your smartphone to this reimbursement" alt="Save this line-item and re-open it to generate a QR code"/>
             </div>
         </div>
     </form>

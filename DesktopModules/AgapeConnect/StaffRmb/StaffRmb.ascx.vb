@@ -1895,6 +1895,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
             Dim key As String = ""
             saveIfNecessary()
             If (Settings("QRReceipts")) Then
+                'Encode a token without a RmbLineNo
                 key = ReceiptUploaderPresenter.encodeToken(DateTime.Now, hfRmbNo.Value, -1)
                 Dim rid = (From c In d.AP_Staff_Rmbs Where c.RMBNo = hfRmbNo.Value).FirstOrDefault().RID
                 Log(rid, 0, "QR Token encoded for " + hfRmbNo.Value + " at " + DateTime.Now.ToString() + " : " + key)
