@@ -432,7 +432,7 @@ namespace StaffRmb
             if (result == null)
             {
                 string postData = "";
-                string url = "http://gpapp/gpimport/webservice/GetCompanies";
+                string url = "https://gpapp/gpimport/webservice/GetCompanies";
                 result = await getResultFromWebServiceAsync(url, postData);
                 if (result.Length == 0 || result.Equals(WEB_SERVICE_ERROR)) 
                     result = "[{\"CompanyID\":\"ERR\",\"CompanyName\":\"Oops, No companies!  Press F5 to reload the page.\"}]";
