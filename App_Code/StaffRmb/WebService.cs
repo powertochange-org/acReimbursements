@@ -114,7 +114,9 @@ public class WebService : System.Web.Services.WebService {
                     reimbursement.setRmbNo(rmb.RMBNo.ToString());
                 }
             }
-            var result = new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(new Item[] { tree });
+            var serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+            serializer.MaxJsonLength = Int32.MaxValue;
+            var result = serializer.Serialize(new Item[] { tree });
             HttpContext.Current.Response.ContentType = "application/json";
             HttpContext.Current.Response.Write(result);
         }
