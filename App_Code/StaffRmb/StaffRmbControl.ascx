@@ -590,8 +590,9 @@
         try {
             //decimal exchangeRate = StaffBrokerFunctions.GetExchangeRate(PortalId, accounting_currency, foreign_currency);
             string url = string.Format("https://api.p2c.com/api/Finance/ExchangeRate/{0}", foreign_currency.ToUpper());
-            tbExchangeRate.Text = new System.Net.Http.HttpClient().GetStringAsync(url).Result;
-            decimal exchangeRate = Convert.ToDecimal(tbExchangeRate.Text);
+            string exRateString = new System.Net.Http.HttpClient().GetStringAsync(url).Result;
+            decimal exchangeRate = Math.Round(Convert.ToDecimal(exRateString), 4);
+            tbExchangeRate.Text = exchangeRate.ToString();
             if (exchangeRate > 0) {
                 try {
                     double amount = double.Parse(tbAmount.Text);
@@ -601,7 +602,7 @@
                     tbCADAmount.Text = "0.00";
                 }
             } else {
-                throw new Exception("Exchange rate <=0");
+                throw new Exception("Exchange rate <=0" + exRateString);
             }
         } catch (Exception ex) {
             ExchangeRate = 0;
