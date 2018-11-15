@@ -418,7 +418,7 @@
             ReceiptLine.Visible = false;
             ddlReceipt.SelectedValue = StandardItem.Value;
         }
-        
+
         // Help strings
         hlpSupplier.Text = DotNetNuke.Services.Localization.Localization.GetString("lblSupplier.Help", LocalResourceFile);
         hlpDesc.Text = DotNetNuke.Services.Localization.Localization.GetString("lblDesc.Help", LocalResourceFile);
@@ -436,298 +436,300 @@
     }
 
     #region Properties 
-        public string Supplier {
-            get { return tbSupplier.Text; }
-            set { tbSupplier.Text = value; }
-        }
-        public string Comment {
-            get { return tbDesc.Text; }
-            set { tbDesc.Text = value; }
-        }
-        public DateTime theDate  {
-            get {
-                try {
-                    return DateTime.Parse(dtDate.Text);
-                } catch {
-                    return DateTime.Today;
-                }
-            }
-            set {
-                dtDate.Text = value.ToString("o").Split('T')[0]; }
-        }
-        public double Amount {
-            get {
-                try {
-                    return Double.Parse(tbAmount.Text);
-                } catch {
-                    return 0;
-                }
-            }
-            set { 
-                tbAmount.Text = value.ToString("0.00");
-                double exchangeRate;
-                try { exchangeRate = double.Parse(tbExchangeRate.Text); }
-                catch { tbExchangeRate.Text = "1.0000"; exchangeRate = 1; }
-                if (exchangeRate > 0)
-                {
-                    CADValue = value / exchangeRate;
-                }
+    public string Supplier {
+        get { return tbSupplier.Text; }
+        set { tbSupplier.Text = value; }
+    }
+    public string Comment {
+        get { return tbDesc.Text; }
+        set { tbDesc.Text = value; }
+    }
+    public DateTime theDate  {
+        get {
+            try {
+                return DateTime.Parse(dtDate.Text);
+            } catch {
+                return DateTime.Today;
             }
         }
-        public bool VAT {
-            get { return ddlReceipt.SelectedValue.Equals(RmbReceiptType.VAT.ToString()); }
-            set {
-                if (value == true) ddlReceipt.SelectedValue = RmbReceiptType.VAT.ToString();
-                else ddlReceipt.SelectedValue = RmbReceiptType.Standard.ToString();
+        set {
+            dtDate.Text = value.ToString("o").Split('T')[0]; }
+    }
+    public double Amount {
+        get {
+            try {
+                return Double.Parse(tbAmount.Text);
+            } catch {
+                return 0;
             }
         }
-        public int ReceiptType {
-            get { 
-                if (ddlReceipt.SelectedValue == "") return -1;
-                return int.Parse(ddlReceipt.SelectedValue); 
-            }
-            set { ddlReceipt.SelectedValue = value.ToString(); }
-        }
-        public bool Taxable {
-            get { return ddlProvince.SelectedValue != "--"; }
-            set { }
-        }
-        public string Spare1 {
-            get { return ddlProvince.SelectedValue; }
-            set { ddlProvince.SelectedValue = value; }
-        }
-        public string Spare2 {
-            get { return ""; }
-            set { }
-        }
-        public string Spare3 {
-            get { return ""; }
-            set { }
-        }
-        public string Spare4 {
-            get { return ""; }
-            set { }
-        }
-        public string Spare5 {
-            get { return ""; }
-            set { }
-        }
-        public string ErrorText {
-            get { return ""; }
-            set { ErrorLbl.Text = value; }
-        }
-        public bool Receipt {
-            get { return ddlReceipt.SelectedValue == RmbReceiptType.Standard.ToString() || ddlReceipt.SelectedValue==RmbReceiptType.Electronic.ToString() || ddlReceipt.SelectedValue==RmbReceiptType.VAT.ToString();  }
-            set { if (!value) ddlReceipt.SelectedValue = RmbReceiptType.Electronic.ToString(); }
-        }
-        public bool ReceiptsAttached
-        {
-            get { return hfElecReceiptAttached.Value.ToLower().Equals("true"); }
-            set { hfElecReceiptAttached.Value = value.ToString(); }
-        }
-        public double CADValue
-        {
-            get {
-                try
-                {
-                    if (tbCADAmount.Text.Length > 0)
-                    {
-                        return double.Parse(tbCADAmount.Text);
-                    }
-                    else
-                    {
-                        return double.Parse(tbAmount.Text);
-                    }
-                } catch {
-                    return 0;
-                }
-            }
-            set { 
-                hfCADValue.Value = value.ToString(); //this is used by javascript for some reason TODO:get rid of this
-                tbCADAmount.Text = value.ToString("0.00");
-                string script = "check_if_receipt_is_required(); ";
-                if (!tbAmount.Text.Equals(string.Empty)) { script += "adjust_exchange_rate(); display_foreign_exchange(); "; }
-                ScriptManager.RegisterClientScriptBlock(tbCADAmount, tbCADAmount.GetType(), "set_CAD_amount", script, true);
-            }
-        }
-        public string Currency
-        {
-            get { return ddlCurrencies.SelectedValue; }
-            set { ddlCurrencies.SelectedValue = value; }
-        }
-        public double ExchangeRate
-        {
-            get
+        set {
+            tbAmount.Text = value.ToString("0.00");
+            double exchangeRate;
+            try { exchangeRate = double.Parse(tbExchangeRate.Text); }
+            catch { tbExchangeRate.Text = "1.0000"; exchangeRate = 1; }
+            if (exchangeRate > 0)
             {
-                try
-                {
-                    return double.Parse(tbExchangeRate.Text);
-                }
-                catch
-                {
-                    return 1;
-                }
+                CADValue = value / exchangeRate;
             }
-            set { tbExchangeRate.Text = value.ToString(); }
         }
+    }
+    public bool VAT {
+        get { return ddlReceipt.SelectedValue.Equals(RmbReceiptType.VAT.ToString()); }
+        set {
+            if (value == true) ddlReceipt.SelectedValue = RmbReceiptType.VAT.ToString();
+            else ddlReceipt.SelectedValue = RmbReceiptType.Standard.ToString();
+        }
+    }
+    public int ReceiptType {
+        get {
+            if (ddlReceipt.SelectedValue == "") return -1;
+            return int.Parse(ddlReceipt.SelectedValue);
+        }
+        set { ddlReceipt.SelectedValue = value.ToString(); }
+    }
+    public bool Taxable {
+        get { return ddlProvince.SelectedValue != "--"; }
+        set { }
+    }
+    public string Spare1 {
+        get { return ddlProvince.SelectedValue; }
+        set { ddlProvince.SelectedValue = value; }
+    }
+    public string Spare2 {
+        get { return ""; }
+        set { }
+    }
+    public string Spare3 {
+        get { return ""; }
+        set { }
+    }
+    public string Spare4 {
+        get { return ""; }
+        set { }
+    }
+    public string Spare5 {
+        get { return ""; }
+        set { }
+    }
+    public string ErrorText {
+        get { return ""; }
+        set { ErrorLbl.Text = value; }
+    }
+    public bool Receipt {
+        get { return ddlReceipt.SelectedValue == RmbReceiptType.Standard.ToString() || ddlReceipt.SelectedValue==RmbReceiptType.Electronic.ToString() || ddlReceipt.SelectedValue==RmbReceiptType.VAT.ToString();  }
+        set { if (!value) ddlReceipt.SelectedValue = RmbReceiptType.Electronic.ToString(); }
+    }
+    public bool ReceiptsAttached
+    {
+        get { return hfElecReceiptAttached.Value.ToLower().Equals("true"); }
+        set { hfElecReceiptAttached.Value = value.ToString(); }
+    }
+    public double CADValue
+    {
+        get {
+            try
+            {
+                if (tbCADAmount.Text.Length > 0)
+                {
+                    return double.Parse(tbCADAmount.Text);
+                }
+                else
+                {
+                    return double.Parse(tbAmount.Text);
+                }
+            } catch {
+                return 0;
+            }
+        }
+        set {
+            hfCADValue.Value = value.ToString(); //this is used by javascript for some reason TODO:get rid of this
+            tbCADAmount.Text = value.ToString("0.00");
+            string script = "check_if_receipt_is_required(); ";
+            if (!tbAmount.Text.Equals(string.Empty)) { script += "adjust_exchange_rate(); display_foreign_exchange(); "; }
+            ScriptManager.RegisterClientScriptBlock(tbCADAmount, tbCADAmount.GetType(), "set_CAD_amount", script, true);
+        }
+    }
+    public string Currency
+    {
+        get { return ddlCurrencies.SelectedValue; }
+        set { ddlCurrencies.SelectedValue = value; }
+    }
+    public double ExchangeRate
+    {
+        get
+        {
+            try
+            {
+                return double.Parse(tbExchangeRate.Text);
+            }
+            catch
+            {
+                return 1;
+            }
+        }
+        set { tbExchangeRate.Text = value.ToString(); }
+    }
     #endregion
 
     #region Currency functions
 
-        public void Set_Currency(string new_currency)
-        //does not change exchange rate
-        {
-            ddlCurrencies.SelectedValue = new_currency;
-        }
-        
-        private void Currency_Change(object sender, System.EventArgs e)
-        //includes exchange rate lookup, and CAD recalculation
-        {
-            lblExchangeHeader.CssClass = "";
-            lblExchangeHeader.ToolTip = "";
-            lblExchangeHeader.Text = DotNetNuke.Services.Localization.Localization.GetString("lblExchangeHeader.Text", LocalResourceFile);
-            string foreign_currency = ddlCurrencies.SelectedValue;
-            try {
-                decimal exchangeRate = StaffBrokerFunctions.GetExchangeRate(PortalId, accounting_currency, foreign_currency);
-                tbExchangeRate.Text = String.Format("{0:f4}", exchangeRate);
-                if (exchangeRate > 0) {
-                    try {
-                        double amount = double.Parse(tbAmount.Text);
-                        CADValue = (amount / (double)exchangeRate);
-                    } catch {
-                        tbAmount.Text = "0.00";
-                        tbCADAmount.Text = "0.00";
-                    }
-                } else {
-                    throw new Exception("Exchange rate <=0");
+    public void Set_Currency(string new_currency)
+    //does not change exchange rate
+    {
+        ddlCurrencies.SelectedValue = new_currency;
+    }
+
+    private void Currency_Change(object sender, System.EventArgs e)
+    //includes exchange rate lookup, and CAD recalculation
+    {
+        lblExchangeHeader.CssClass = "";
+        lblExchangeHeader.ToolTip = "";
+        lblExchangeHeader.Text = DotNetNuke.Services.Localization.Localization.GetString("lblExchangeHeader.Text", LocalResourceFile);
+        string foreign_currency = ddlCurrencies.SelectedValue;
+        try {
+            //decimal exchangeRate = StaffBrokerFunctions.GetExchangeRate(PortalId, accounting_currency, foreign_currency);
+            string url = string.Format("https://api.p2c.com/api/Finance/ExchangeRate/{0}", foreign_currency.ToUpper());
+            tbExchangeRate.Text = new System.Net.Http.HttpClient().GetStringAsync(url).Result;
+            decimal exchangeRate = Convert.ToDecimal(tbExchangeRate.Text);
+            if (exchangeRate > 0) {
+                try {
+                    double amount = double.Parse(tbAmount.Text);
+                    CADValue = (amount / (double)exchangeRate);
+                } catch {
+                    tbAmount.Text = "0.00";
+                    tbCADAmount.Text = "0.00";
                 }
-            } catch (Exception ex) {
-                ExchangeRate = 0;
-                tbExchangeRate.Text = "0.0000";
-                CADValue = 0;
-                lblExchangeHeader.Text = "Exchange rate error";
-                lblExchangeHeader.ToolTip = ex.Message;
-                lblExchangeHeader.CssClass = "error";
+            } else {
+                throw new Exception("Exchange rate <=0");
             }
-            ScriptManager.RegisterClientScriptBlock(ddlCurrencies, ddlCurrencies.GetType(), "display_foreign_exchange", "display_foreign_exchange();", true);
+        } catch (Exception ex) {
+            ExchangeRate = 0;
+            tbExchangeRate.Text = "0.0000";
+            CADValue = 0;
+            lblExchangeHeader.Text = "Exchange rate error";
+            lblExchangeHeader.ToolTip = ex.Message;
+            lblExchangeHeader.CssClass = "error";
         }
+        ScriptManager.RegisterClientScriptBlock(ddlCurrencies, ddlCurrencies.GetType(), "display_foreign_exchange", "display_foreign_exchange();", true);
+    }
 
     #endregion
 
     #region Validation
-        public bool ValidateForm(int UserId)
-        {
-            if (!validate_required_fields()) return false;
-            if (!validate_description()) return false;
-            if (!validate_date()) return false;
-            if (!validate_amount()) return false;
-            if (!validate_receipt()) return false;
-            ErrorLbl.Text = "";
-            return true;
-        }
-        public bool validate_required_fields()
-        {
-            TextBox[] required_fields = new TextBox[] {tbSupplier, tbDesc, tbAmount};
-            bool result = true;
-            foreach (TextBox control in required_fields) {
-                control.CssClass = control.CssClass.Replace("missing", "");
-                if (((TextBox)control).Text.Length == 0)
-                {
-                    result = false;
-                    control.CssClass = control.CssClass + " missing";
-                }
-            }
-            if (!result) ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.RequiredField", LocalResourceFile);
-            return result;
-        }
-        public bool validate_description()
-        {
-            tbDesc.CssClass = tbDesc.CssClass.Replace("missing", "");
-            if (tbDesc.Text.Length < 5)
+    public bool ValidateForm(int UserId)
+    {
+        if (!validate_required_fields()) return false;
+        if (!validate_description()) return false;
+        if (!validate_date()) return false;
+        if (!validate_amount()) return false;
+        if (!validate_receipt()) return false;
+        ErrorLbl.Text = "";
+        return true;
+    }
+    public bool validate_required_fields()
+    {
+        TextBox[] required_fields = new TextBox[] {tbSupplier, tbDesc, tbAmount};
+        bool result = true;
+        foreach (TextBox control in required_fields) {
+            control.CssClass = control.CssClass.Replace("missing", "");
+            if (((TextBox)control).Text.Length == 0)
             {
-                tbDesc.CssClass += " missing";
-                ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.Description", LocalResourceFile);
+                result = false;
+                control.CssClass = control.CssClass + " missing";
+            }
+        }
+        if (!result) ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.RequiredField", LocalResourceFile);
+        return result;
+    }
+    public bool validate_description()
+    {
+        tbDesc.CssClass = tbDesc.CssClass.Replace("missing", "");
+        if (tbDesc.Text.Length < 5)
+        {
+            tbDesc.CssClass += " missing";
+            ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.Description", LocalResourceFile);
+            return false;
+        }
+        return true;
+    }
+    public bool validate_date()
+    {
+        try
+        {
+            DateTime date = DateTime.Parse(dtDate.Text);
+            if (date > DateTime.Today)
+            {
+                ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.FutureDate", LocalResourceFile);
                 return false;
             }
-            return true;
         }
-        public bool validate_date()
+        catch
         {
-            try
-            {
-                DateTime date = DateTime.Parse(dtDate.Text);
-                if (date > DateTime.Today)
-                {
-                    ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.FutureDate", LocalResourceFile);
-                    return false;
-                }
-            }
-            catch
-            {
-                ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.Date", LocalResourceFile);
-                return false;
-            }
-            return true;
+            ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.Date", LocalResourceFile);
+            return false;
         }
-        public bool validate_amount()
+        return true;
+    }
+    public bool validate_amount()
+    {
+        try
         {
-            try
+            Double amount = Double.Parse(tbAmount.Text);
+            if (tbCADAmount.Text.Equals(String.Empty))
             {
-                Double amount = Double.Parse(tbAmount.Text);
-                if (tbCADAmount.Text.Equals(String.Empty))
-                {
-                    tbCADAmount.Text = CADValue.ToString("0.00");
-                }
-                if (amount <= 0)
-                {
-                    ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.NegativeAmount", LocalResourceFile);
-                    return false;
-                }
-                if (CADValue > 10000)
-                {
-                    ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.LargeAmount", LocalResourceFile);
-                    return false;
-                }
+                tbCADAmount.Text = CADValue.ToString("0.00");
             }
-            catch
+            if (amount <= 0)
             {
-                ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.Amount", LocalResourceFile);
+                ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.NegativeAmount", LocalResourceFile);
                 return false;
             }
-            return true;
+            if (CADValue > 10000)
+            {
+                ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.LargeAmount", LocalResourceFile);
+                return false;
+            }
         }
-        public bool validate_receipt()
-            // Ensure if no receipt is selected, that the value is below the no receipt limit
-            // and ensure that if electronic receipt has been selected, that something has been attached
+        catch
         {
-            ddlReceipt.CssClass = ddlReceipt.CssClass.Replace("missing", "");
-            if (ddlReceipt.SelectedValue.Equals(RmbReceiptType.UNSELECTED.ToString()))
-            {
-                ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.RequiredField", LocalResourceFile).Replace("[LIMIT]", hfNoReceiptLimit.Value);
-                ddlReceipt.CssClass = ddlReceipt.CssClass + " missing";
-                return false;
-            }
-            double limit = 0;
-            try
-            {
-                limit = Double.Parse(hfNoReceiptLimit.Value);
-            }
-            catch { }
-            if ((ddlReceipt.SelectedValue.Equals(RmbReceiptType.No_Receipt.ToString())) && (CADValue > limit))
-            {
-                ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.NoReceipt", LocalResourceFile).Replace("[LIMIT]", hfNoReceiptLimit.Value);
-                return false;
-            }
-            if (ddlReceipt.SelectedValue.Equals(RmbReceiptType.Electronic.ToString())) {
-                if (! hfElecReceiptAttached.Value.ToLower().Equals("true"))
-                {
-                    ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.NoElecReceipt", LocalResourceFile);
-                    return false;
-                }
-            }
-            return true;
+            ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.Amount", LocalResourceFile);
+            return false;
         }
+        return true;
+    }
+    public bool validate_receipt()
+    // Ensure if no receipt is selected, that the value is below the no receipt limit
+    // and ensure that if electronic receipt has been selected, that something has been attached
+    {
+        ddlReceipt.CssClass = ddlReceipt.CssClass.Replace("missing", "");
+        if (ddlReceipt.SelectedValue.Equals(RmbReceiptType.UNSELECTED.ToString()))
+        {
+            ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.RequiredField", LocalResourceFile).Replace("[LIMIT]", hfNoReceiptLimit.Value);
+            ddlReceipt.CssClass = ddlReceipt.CssClass + " missing";
+            return false;
+        }
+        double limit = 0;
+        try
+        {
+            limit = Double.Parse(hfNoReceiptLimit.Value);
+        }
+        catch { }
+        if ((ddlReceipt.SelectedValue.Equals(RmbReceiptType.No_Receipt.ToString())) && (CADValue > limit))
+        {
+            ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.NoReceipt", LocalResourceFile).Replace("[LIMIT]", hfNoReceiptLimit.Value);
+            return false;
+        }
+        if (ddlReceipt.SelectedValue.Equals(RmbReceiptType.Electronic.ToString())) {
+            if (! hfElecReceiptAttached.Value.ToLower().Equals("true"))
+            {
+                ErrorLbl.Text = DotNetNuke.Services.Localization.Localization.GetString("Error.NoElecReceipt", LocalResourceFile);
+                return false;
+            }
+        }
+        return true;
+    }
     #endregion
- 
+
 </script>
 
