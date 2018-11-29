@@ -2593,7 +2593,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                     For Each row In rmb.First.AP_Staff_RmbLines
                         If rmb.First.CostCenter = row.CostCenter Then
                             row.Department = Dept
-                            row.AccountCode = If(row.LineType = Settings("AdvanceLineType"), Settings("AdvanceLineType"), GetAccountCode(row.LineType, hfChargeToValue.Value))
+                            row.AccountCode = GetAccountCode(row.LineType, hfChargeToValue.Value)
                             row.CostCenter = hfChargeToValue.Value
                         End If
                     Next
