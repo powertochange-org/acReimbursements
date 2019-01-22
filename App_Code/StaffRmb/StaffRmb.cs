@@ -322,6 +322,8 @@ namespace StaffRmb
         }
 
         static public bool userSupervisesApprover(int userId, int approverId) {
+            int presidentId = getPresidentId();
+            if (approverId == presidentId) return false;
             StaffBroker.StaffBrokerDataContext d = new StaffBroker.StaffBrokerDataContext();
             var leaderIds = from l in d.AP_StaffBroker_LeaderMetas where l.UserId == approverId select l.LeaderId;
             foreach (int leaderId in leaderIds) {
