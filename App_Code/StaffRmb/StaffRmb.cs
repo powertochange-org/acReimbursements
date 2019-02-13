@@ -14,6 +14,8 @@ using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
 using System.Web.Caching;
+using DotNetNuke.Entities.Modules;
+using System.Configuration;
 
 /// <summary>
 /// Summary description for StaffRmb
@@ -387,14 +389,20 @@ namespace StaffRmb
         static public int discoverPresidentId()
         // Determines the most likely person to be president based on supervisor information
         {
-            //StaffRmbDataContext d = new StaffRmbDataContext();
-            //StaffBroker.StaffBrokerDataContext d = new StaffBroker.StaffBrokerDataContext();
-
-            //// candidates are anybody who is a leader of others, but has no leader themselves
-            //var candidates = d.AP_StaffBroker_LeaderMetas.Where(a => (d.AP_StaffBroker_LeaderMetas.Where(b => a.LeaderId == b.UserId).Count() == 0)).GroupBy(c => c.LeaderId)
-            //    .Select(s => new {id = s.Key, count= s.Count()}).OrderByDescending(o => o.count);
-            //return candidates.First().id;
-            return 114; //Rod Bergen HARDCODED
+            int presidentId = 0;
+            try {
+                ModuleController mc = new ModuleController();
+                presidentId = (int)(mc.GetTabModule(265).TabModuleSettings["PresidentId"]);
+                if (presidentId <= 0) throw new Exception();
+            } catch {
+                try {
+                    presidentId = int.Parse(ConfigurationManager.AppSettings["PresidentId"]);
+                    if (presidentId <= 0) throw new Exception();
+                } catch {
+                    presidentId = 114; //Rod Bergen
+                }
+            }
+            return presidentId;
         }
 
         static private async Task<string[]> staffWithSigningAuthorityAsync(string account, Decimal amount, int RID)
