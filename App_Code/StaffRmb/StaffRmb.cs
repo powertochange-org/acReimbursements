@@ -387,11 +387,14 @@ namespace StaffRmb
         static public int discoverPresidentId()
         // Determines the most likely person to be president based on supervisor information
         {
-            StaffBroker.StaffBrokerDataContext d = new StaffBroker.StaffBrokerDataContext();
-            // candidates are anybody who is a leader of others, but has no leader themselves
-            var candidates = d.AP_StaffBroker_LeaderMetas.Where(a => (d.AP_StaffBroker_LeaderMetas.Where(b => a.LeaderId == b.UserId).Count() == 0)).GroupBy(c => c.LeaderId)
-                .Select(s => new {id = s.Key, count= s.Count()}).OrderByDescending(o => o.count);
-            return candidates.First().id;
+            //StaffRmbDataContext d = new StaffRmbDataContext();
+            //StaffBroker.StaffBrokerDataContext d = new StaffBroker.StaffBrokerDataContext();
+
+            //// candidates are anybody who is a leader of others, but has no leader themselves
+            //var candidates = d.AP_StaffBroker_LeaderMetas.Where(a => (d.AP_StaffBroker_LeaderMetas.Where(b => a.LeaderId == b.UserId).Count() == 0)).GroupBy(c => c.LeaderId)
+            //    .Select(s => new {id = s.Key, count= s.Count()}).OrderByDescending(o => o.count);
+            //return candidates.First().id;
+            return 114; //Rod Bergen HARDCODED
         }
 
         static private async Task<string[]> staffWithSigningAuthorityAsync(string account, Decimal amount, int RID)
