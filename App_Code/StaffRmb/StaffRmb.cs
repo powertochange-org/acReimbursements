@@ -690,55 +690,23 @@ namespace StaffRmb
 
         static public int GetNewRID(int PortalId)
         {
-            string NextRID = StaffBrokerFunctions.GetSetting("NextRID", PortalId);
-            if (NextRID == "")
-            {
-                StaffRmbDataContext d = new StaffRmbDataContext();
-                var MaxRID = (from c in d.AP_Staff_Rmbs where c.PortalId == PortalId orderby c.RID descending select c.RID);
-                if (MaxRID.Count() == 0)
-                {
-                    StaffBrokerFunctions.SetSetting("NextRID", "2", PortalId);
-                    return 1;
-
-                }
-                else
-                {
-                    StaffBrokerFunctions.SetSetting("NextRID", (MaxRID.Max() + 1).ToString(), PortalId);
-                    return MaxRID.First();
-                }
+            StaffRmbDataContext d = new StaffRmbDataContext();
+            var MaxRID = (from c in d.AP_Staff_Rmbs where c.PortalId == PortalId orderby c.RID descending select c.RID);
+            if (MaxRID.Count() == 0) {
+                return 1;
+            } else {
+                return MaxRID.First() + 1;
             }
-            else
-            {
-
-                StaffBrokerFunctions.SetSetting("NextRID",  (Convert.ToInt32(NextRID) + 1).ToString(), PortalId);
-                return Convert.ToInt32( NextRID);
-            }        
         }
 
         static public int GetNewAdvId(int PortalId)
         {
-            string NextAdvID = StaffBrokerFunctions.GetSetting("NextAdvID", PortalId);
-            if (NextAdvID == "")
-            {
-                StaffRmbDataContext d = new StaffRmbDataContext();
-                var MaxAdvID = (from c in d.AP_Staff_AdvanceRequests  where c.PortalId == PortalId select c.LocalAdvanceId);
-                if (MaxAdvID.Count() == 0)
-                {
-                    StaffBrokerFunctions.SetSetting( "NextAdvID",  "2", PortalId);
-                    return 1;
-
-                }
-                else
-                {
-                    StaffBrokerFunctions.SetSetting("NextAdvID", (MaxAdvID.Max() + 1).ToString(), PortalId);
-                    return (int) MaxAdvID.First();
-                }
-            }
-            else
-            {
-
-                StaffBrokerFunctions.SetSetting("NextAdvID", (Convert.ToInt32(NextAdvID) + 1).ToString(), PortalId);
-                return Convert.ToInt32(NextAdvID);
+            StaffRmbDataContext d = new StaffRmbDataContext();
+            var MaxAdvID = (from c in d.AP_Staff_AdvanceRequests where c.PortalId == PortalId orderby c.LocalAdvanceId descending select c.LocalAdvanceId);
+            if (MaxAdvID.Count() == 0 || MaxAdvID.First() == null) {
+                return 1;
+            } else {
+                return Convert.ToInt32(MaxAdvID.First()) + 1;
             }
         }
         static public int Authenticate(int UserId, int RmbNo, int PortalId )
