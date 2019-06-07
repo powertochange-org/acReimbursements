@@ -1475,7 +1475,7 @@ Namespace DotNetNuke.Modules.StaffRmbMod
                 End Try
                 clearingTotal += payable
                 'ensure no amount is < 0 or > outstanding balance, unless it is Finance.
-                If (payable < 0 Or payable > outstanding) Then
+                If ((outstanding > 0 And (payable < 0 Or payable > outstanding)) Or (outstanding < 0 And (payable > 0 Or payable < outstanding))) Then
                     lblAdvanceClearError.Text = Translate("ErrorClearAdvanceAmount")
                     Return False
                 End If
